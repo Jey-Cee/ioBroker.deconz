@@ -1,0 +1,22 @@
+{
+    "common": {
+        "name":                     "hue",
+        "version":                  "0.0.1",
+        "title":                    "Philips Hue Bridge Adapter",
+        "desc":                     "Connects Philips Hue LED Bulbs, Friends of Hue LED Lamps and Stripes and other SmartLink capable Devices (LivingWhites, some LivingColors) via Philips Hue Bridges",
+        "authors": [
+            "hobbyquaker <hq@ccu.io>"
+        ],
+        "license":                  "MIT",
+        "platform":                 "Javascript/Node.js",
+        "mode":                     "daemon",
+        "loglevel":                 "info"
+    },
+    "native": {
+        "test1": true,
+        "test2": 42
+    },
+    "objects": [
+
+    ]
+}
