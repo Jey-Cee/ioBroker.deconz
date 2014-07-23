@@ -1,7 +1,7 @@
 {
     "common": {
         "name":                     "hue",
-        "version":                  "0.0.1",
+        "version":                  "0.1.0",
         "title":                    "Philips Hue Bridge Adapter",
         "desc":                     "Connects Philips Hue LED Bulbs, Friends of Hue LED Lamps and Stripes and other SmartLink capable Devices (LivingWhites, some LivingColors) via Philips Hue Bridges",
         "authors": [
@@ -13,8 +13,10 @@
         "loglevel":                 "info"
     },
     "native": {
-        "test1": true,
-        "test2": 42
+        "bridge": "172.16.23.149",
+        "user": "newdeveloper",
+        "polling": true,
+        "pollingInterval": 30
     },
     "objects": [
 
