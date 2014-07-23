@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "node-hue-api": "^0.2.3"
+  }
+}
