@@ -120,7 +120,12 @@ function main() {
                     type: 'state',
                     parent: adapter.namespace + '.' + channelName,
                     common: {
-                        name: objId
+                        name: objId,
+                        oper: {
+                            read: true,
+                            write: true
+                        }
+
                     },
                     native: {
                         id: id
@@ -135,28 +140,28 @@ function main() {
                     case 'bri':
                         obj.common.type = 'number';
                         obj.common.role = 'level.dimmer';
-                        obj.min = 0;
-                        obj.max = 255;
+                        obj.common.min = 0;
+                        obj.common.max = 255;
                         break;
                     case 'hue':
                         obj.common.type = 'number';
                         obj.common.role = 'level.color.hue';
-                        obj.min = 0;
-                        obj.max = 65535;
+                        obj.common.min = 0;
+                        obj.common.max = 65535;
                         break;
                     case 'sat':
                         obj.common.type = 'number';
                         obj.common.role = 'level.color.saturation';
-                        obj.min = 0;
-                        obj.max = 255;
+                        obj.common.min = 0;
+                        obj.common.max = 255;
                         break;
                     case 'xy':
                         break;
                     case 'ct':
                         obj.common.type = 'number';
                         obj.common.role = 'level.color.temperature';
-                        obj.min = 153;
-                        obj.max = 500;
+                        obj.common.min = 153;
+                        obj.common.max = 500;
                         break;
                     case 'alert':
                         obj.common.type = 'string';
@@ -169,6 +174,7 @@ function main() {
                         break;
                     case 'reachable':
                         obj.common.type = 'boolean';
+                        obj.common.oper.write = false;
                         obj.common.role = 'indicator.reachable';
                         break;
                     default:
