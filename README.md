@@ -7,9 +7,14 @@ some LivingColors) via Philips Hue Bridges to ioBroker
 
 ## Changelog
 
+### 0.1.1
+
+* (hobbyquaker) fixed min/max attributes
+* (hobbyquaker) added common.oper.read/write attributes
+
 ### 0.1.0
 
-first release
+* (hobbyquaker) first release
 
 ## Roadmap/Todo
 
