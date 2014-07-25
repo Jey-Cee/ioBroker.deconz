@@ -10,7 +10,7 @@
 
 var hue = require("node-hue-api");
 
-var adapter = require('../../modules/adapter.js')({
+var adapter = require(__dirname + '../../lib/adapter.js')({
 
     name:           'hue',
 
