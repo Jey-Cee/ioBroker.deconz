@@ -7,6 +7,9 @@ some LivingColors) via Philips Hue Bridges to ioBroker
 
 ## Changelog
 
+### 0.1.2
+* (hobbyquaker) fixes
+
 ### 0.1.1
 
 * (hobbyquaker) fixed min/max attributes

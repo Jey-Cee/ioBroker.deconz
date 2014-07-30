@@ -10,7 +10,7 @@
 
 var hue = require("node-hue-api");
 
-var adapter = require(__dirname + '../../lib/adapter.js')({
+var adapter = require(__dirname + '/../../lib/adapter.js')({
 
     name:           'hue',
 
@@ -121,11 +121,8 @@ function main() {
                     parent: adapter.namespace + '.' + channelName,
                     common: {
                         name: objId,
-                        oper: {
-                            read: true,
-                            write: true
-                        }
-
+                        read: true,
+                        write: true
                     },
                     native: {
                         id: id
@@ -174,7 +171,7 @@ function main() {
                         break;
                     case 'reachable':
                         obj.common.type = 'boolean';
-                        obj.common.oper.write = false;
+                        obj.common.write = false;
                         obj.common.role = 'indicator.reachable';
                         break;
                     default:
