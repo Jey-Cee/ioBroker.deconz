@@ -67,19 +67,12 @@ function main() {
     api.getFullState(function(err, config) {
         if (err) adapter.log.error(err);
 
-        // Create/update device
-        adapter.log.info('creating/updating bridge device');
-        adapter.setObject(config.config.name, {
-            type: 'device',
-            common: {
-                name: config.config.name
-            },
-            native: config.config
-        });
+
 
         // Create/update lamps
         adapter.log.info('creating/updating light channels');
 
+        var devChildren = [];
         var lights = config.lights;
         var count = 0;
         for (var id in lights) {
@@ -87,38 +80,25 @@ function main() {
             var light = lights[id];
 
             var channelName = config.config.name + '.' + light.name;
-
+            devChildren.push(channelName);
             channelIds[channelName] = id;
             pollIds.push(id);
             pollChannels.push(channelName);
 
+            var children = [];
 
-            adapter.setObject(channelName, {
-                type: 'channel',
-                parent: adapter.namespace + '.' + config.config.name,
-                common: {
-                    name: channelName,
-                    role: light.type === 'Dimmable plug-in unit' || light.type === 'Dimmable Light' ? 'light.dimmer' : 'light.color'
-                },
-                native: {
-                    id: id,
-                    type: light.type,
-                    name: light.name,
-                    modelid: light.modelid,
-                    swversion: light.swversion,
-                    pointsymbol: light.pointsymbol
-                }
-            });
 
             for (var state in light.state) {
 
                 var objId = channelName + '.' + state;
 
+                children.push(objId);
+
                 adapter.setState(objId, {val: light.state[state], ack: true});
 
                 var obj = {
                     type: 'state',
-                    parent: adapter.namespace + '.' + channelName,
+                    parent: channelName,
                     common: {
                         name: objId,
                         read: true,
@@ -178,8 +158,38 @@ function main() {
                 }
                 setObject(objId, obj);
             }
+
+            adapter.setObject(channelName, {
+                type: 'channel',
+                parent: config.config.name,
+                children: children,
+                common: {
+                    name: channelName,
+                    role: light.type === 'Dimmable plug-in unit' || light.type === 'Dimmable Light' ? 'light.dimmer' : 'light.color'
+                },
+                native: {
+                    id: id,
+                    type: light.type,
+                    name: light.name,
+                    modelid: light.modelid,
+                    swversion: light.swversion,
+                    pointsymbol: light.pointsymbol
+                }
+            });
+
         }
         adapter.log.info('created/updated ' + count + ' light channels');
+
+        // Create/update device
+        adapter.log.info('creating/updating bridge device');
+        adapter.setObject(config.config.name, {
+            type: 'device',
+            children: devChildren,
+            common: {
+                name: config.config.name
+            },
+            native: config.config
+        });
 
     });
 

@@ -7,6 +7,10 @@ some LivingColors) via Philips Hue Bridges to ioBroker
 
 ## Changelog
 
+### 0.1.3
+* (hobbyquaker) config UI
+* (hobbyquaker) added children
+
 ### 0.1.2
 * (hobbyquaker) fixes
 
