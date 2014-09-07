@@ -10,7 +10,10 @@
         "license":                  "MIT",
         "platform":                 "Javascript/Node.js",
         "mode":                     "daemon",
-        "loglevel":                 "info"
+        "loglevel":                 "info",
+        "keywords":                 ["philips", "hue", "led", "rgb", "smartlink", "zigbee"],
+        "icon":                     "hue.jpeg",
+        "extIcon":                  "https://raw.githubusercontent.com/ioBroker/ioBroker.hue/master/admin/hue.jpeg"
     },
     "native": {
         "bridge": "172.16.23.149",
