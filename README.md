@@ -1,3 +1,4 @@
+![Logo](admin/hue.jpeg)
 # ioBroker Philips Hue Bridge Adapter
 
 Connects Philips Hue LED Bulbs, Friends of Hue LED Lamps and Stripes and other SmartLink capable Devices (LivingWhites,
