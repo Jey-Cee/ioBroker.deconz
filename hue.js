@@ -65,9 +65,13 @@ function main() {
     api = new HueApi(adapter.config.bridge, adapter.config.user);
 
     api.getFullState(function(err, config) {
-        if (err) adapter.log.error(err);
-
-
+        if (err) {
+            adapter.log.error(err);
+            process.exit(1);
+        } else if (!config) {
+            adapter.log.error('Cannot get the configuration from hue bridge');
+            process.exit(1);
+        }
 
         // Create/update lamps
         adapter.log.info('creating/updating light channels');
@@ -156,7 +160,7 @@ function main() {
                         break;
                     default:
                 }
-                setObject(objId, obj);
+                adapter.setObject(objId, obj);
             }
 
             adapter.setObject(channelName, {
@@ -203,7 +207,7 @@ var c = 0;
 
 function pollSingle() {
     if (c >= pollIds.length) {
-        c = 0;
+        c = 0;s
         setTimeout(pollSingle, adapter.config.pollingInterval * 1000);
         return;
     } else {
@@ -211,6 +215,8 @@ function pollSingle() {
         api.lightStatus(pollIds[c], function(err, result) {
             if (err) {
                 adapter.log.error(err);
+            } if (!result) {
+                adapter.log.error('Cannot get result for lightStatus' + pollIds[c]);
             } else {
                 for (var state in result.state) {
                     var objId = pollChannels[c] + '.' + state;
