@@ -7,6 +7,8 @@ some LivingColors) via Philips Hue Bridges to ioBroker
 ## Install
 
 ## Changelog
+### 0.1.4
+* (bluefox) fix some null objects
 
 ### 0.1.3
 * (hobbyquaker) config UI
