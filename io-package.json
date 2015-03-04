@@ -1,15 +1,16 @@
 {
     "common": {
         "name":                     "hue",
-        "version":                  "0.1.4",
+        "version": "0.2.0",
         "title":                    "Philips Hue Bridge Adapter",
         "desc":                     "Connects Philips Hue LED Bulbs, Friends of Hue LED Lamps and Stripes and other SmartLink capable Devices (LivingWhites, some LivingColors) via Philips Hue Bridges",
         "authors": [
             "hobbyquaker <hq@ccu.io>"
         ],
-        "license":                  "MIT",
+        "license":                  "Apache 2.0",
         "platform":                 "Javascript/Node.js",
         "mode":                     "daemon",
+        "readme":                   "https://raw.githubusercontent.com/ioBroker/ioBroker.hue/master/README.md",
         "loglevel":                 "info",
         "keywords":                 ["philips", "hue", "led", "rgb", "smartlink", "zigbee"],
         "icon":                     "hue.jpeg",

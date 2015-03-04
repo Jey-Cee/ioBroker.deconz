@@ -2,51 +2,47 @@
  *
  *      ioBroker Philips Hue Bridge Adapter
  *
- *      (c) 2014 hobbyquaker
+ *      (c) 2014-2015 hobbyquaker
  *
  *      MIT License
  *
  */
+/* jshint -W097 */// jshint strict:false
+/*jslint node: true */
+"use strict";
 
-var hue = require("node-hue-api");
+var hue   = require("node-hue-api");
+var utils = require(__dirname + '/lib/utils'); // Get common adapter utils
 
-var adapter = require(__dirname + '/../../lib/adapter.js')({
+var adapter = utils.adapter('hue');
 
-    name:           'hue',
-
-    objectChange: function (id, obj) {
-
-    },
-
-    stateChange: function (id, state) {
-        if (!state.ack) {
-            adapter.log.debug('stateChange ' + id + ' ' + JSON.stringify(state));
-            var tmp = id.split('.');
-            var dp = tmp.pop();
-            id = tmp.slice(2).join('.');
-            var ls = {};
-            ls[dp] = state.val;
-            api.setLightState(channelIds[id], ls, function (err, res) {
-                if (!err && res) {
-                    adapter.setState([id, dp].join('.'), {val: state.val, ack: true});
-                }
-            });
-        }
-    },
-
-    unload: function (callback) {
-        try {
-            adapter.log.info('terminating');
-            callback();
-        } catch (e) {
-            callback();
-        }
-    },
-
-    ready: function () {
-        main();
+adapter.on('stateChange', function (id, state) {
+    if (id && state && !state.ack) {
+        adapter.log.debug('stateChange ' + id + ' ' + JSON.stringify(state));
+        var tmp = id.split('.');
+        var dp = tmp.pop();
+        id = tmp.slice(2).join('.');
+        var ls = {};
+        ls[dp] = state.val;
+        api.setLightState(channelIds[id], ls, function (err, res) {
+            if (!err && res) {
+                adapter.setState([id, dp].join('.'), {val: state.val, ack: true});
+            }
+        });
     }
+});
 
+adapter.on('unload', function (callback) {
+    try {
+        adapter.log.info('terminating');
+        callback();
+    } catch (e) {
+        callback();
+    }
+});
+
+adapter.on('ready', function () {
+    main();
 });
 
 var HueApi = hue.HueApi;
@@ -58,13 +54,11 @@ var pollIds = [];
 var pollChannels = [];
 
 function main() {
-
     adapter.subscribeStates('*');
-
 
     api = new HueApi(adapter.config.bridge, adapter.config.user);
 
-    api.getFullState(function(err, config) {
+    api.getFullState(function (err, config) {
         if (err) {
             adapter.log.error(err);
             process.exit(1);
@@ -207,12 +201,12 @@ var c = 0;
 
 function pollSingle() {
     if (c >= pollIds.length) {
-        c = 0;s
+        c = 0;
         setTimeout(pollSingle, adapter.config.pollingInterval * 1000);
         return;
     } else {
         adapter.log.debug('polling light ' + pollIds[c]);
-        api.lightStatus(pollIds[c], function(err, result) {
+        api.lightStatus(pollIds[c], function (err, result) {
             if (err) {
                 adapter.log.error(err);
             } if (!result) {

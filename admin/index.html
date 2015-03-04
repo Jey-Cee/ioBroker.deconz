@@ -1,42 +1,54 @@
 <html>
-
-<!-- these 4 files always have to be included -->
 <link rel="stylesheet" type="text/css" href="../../lib/css/themes/jquery-ui/redmond/jquery-ui.min.css"/>
 <script type="text/javascript" src="../../lib/js/jquery-1.11.1.min.js"></script>
 <script type="text/javascript" src="../../socket.io/socket.io.js"></script>
 <script type="text/javascript" src="../../lib/js/jquery-ui-1.10.3.full.min.js"></script>
 
-
-<!-- optional: use jqGrid
-<link rel="stylesheet" type="text/css" href="../../lib/css/jqGrid/ui.jqgrid-4.5.4.css"/>
-<script type="text/javascript" src="../../lib/js/jqGrid/jquery.jqGrid-4.5.4.min.js"></script>
-<script type="text/javascript" src="../../lib/js/jqGrid/i18n/grid.locale-en.js"></script>
--->
-
-<!-- optional: use multiselect
-<link rel="stylesheet" type="text/css" href="../../lib/css/jquery.multiselect-1.13.css"/>
-<script type="text/javascript" src="../../lib/js/jquery.multiselect-1.13.min.js"></script>
--->
-
-<!-- these two file always have to be included -->
 <link rel="stylesheet" type="text/css" href="../../css/adapter.css"/>
+<script type="text/javascript" src="../../js/translate.js"></script>
 <script type="text/javascript" src="../../js/adapter-settings.js"></script>
 
-
-<!-- you have to define 2 functions in the global scope: -->
 <script type="text/javascript">
+    systemDictionary = {
+        "Philips HUE adapter settings": {
+            "en": "Philips HUE adapter settings",
+            "de": "Philips HUE adapter settings",
+            "ru": "Philips HUE adapter settings"
+        },
+        "Settings": {"en": "Settings", "de": "Settings", "ru": "Settings"},
+        "Auto setup": {"en": "Auto setup", "de": "Auto setup", "ru": "Auto setup"},
+        "Bridge Address": {"en": "Bridge Address", "de": "Bridge Address", "ru": "Bridge Address"},
+        "Bridge User": {"en": "Bridge User", "de": "Bridge User", "ru": "Bridge User"},
+        "Polling": {"en": "Polling", "de": "Polling", "ru": "Polling"},
+        "Polling interval (sec)": {
+            "en": "Polling interval (sec)",
+            "de": "Polling interval (sec)",
+            "ru": "Polling interval (sec)"
+        },
+        "Connect Bridge": {"en": "Connect Bridge", "de": "Connect Bridge", "ru": "Connect Bridge"}
+    };
+
+    function setValue(id, value, onChange) {
+        // example: select elements with id=key and class=value and insert value
+        if ($('#' + id + '.value').attr('type') == 'checkbox') {
+            $('#' + id + '.value').prop('checked', value).change(function() {
+                onChange();
+            });
+        } else {
+            $('#' + id + '.value').val(value).change(function() {
+                onChange();
+            }).keyup(function() {
+                $(this).trigger('change');
+            });
+        }
+    }
 
     // the function loadSettings has to exist ...
-    function load(settings) {
+    function load(settings, onChange) {
         for (var key in settings) {
-            // example: select elements with id=key and class=value and insert value
-            $('#' + key + '.value').val(settings[key]);
-            if (settings[key]) {
-                $('#' + key + '.check').attr('checked', true);
-            } else {
-                $('#' + key + '.check').removeAttr('checked');
-            }
+            setValue(key, settings[key], onChange);
         }
+        onChange(false);
     }
 
     // ... and the function save has to exist.
@@ -65,34 +77,34 @@
 
 <!-- you have to put your config page in a div with id adapter-container -->
 <div id="adapter-container">
+    <table><tr><td><img src="hue.jpeg" width="64" height="64"></td><td><h3 class="translate">Philips HUE adapter settings</h3></td></tr></table>
     <div id="tabs">
         <ul>
-            <li><a href="#settings">Settings</a></li>
-            <li><a href="#pair">Auto setup</a></li>
+            <li><a href="#settings" class="translate">Settings</a></li>
+            <li><a href="#pair" class="translate">Auto setup</a></li>
         </ul>
         <div id="settings">
             <table>
                 <tr>
-                    <td>Bridge Address</td><td><input type="text" id="bridge" class="value"></td>
+                    <td class="translate">Bridge Address</td><td><input type="text" id="bridge" class="value"></td>
                 </tr>
                 <tr>
-                    <td>Bridge User</td><td><input type="text" id="user" class="value"></td>
+                    <td class="translate">Bridge User</td><td><input type="text" id="user" class="value"></td>
                 </tr>
                 <tr>
-                    <td>Polling</td><td><input type="checkbox" id="polling" value="true" class="check"></td>
+                    <td class="translate">Polling</td><td><input type="checkbox" id="polling" value="true" class="value"></td>
                 </tr>
                 <tr>
-                    <td>Polling interval</td><td><input type="text" id="pollingInterval" class="value"></td>
+                    <td class="translate">Polling interval (sec)</td><td><input type="text" id="pollingInterval" class="value"></td>
                 </tr>
 
             </table>
         </div>
         <div id="pair">
-            <button id="connect">Connect Bridge</button>
+            <button id="connect" class="translateB">Connect Bridge</button>
             <p id="message">
 
             </p>
-
         </div>
     </div>
 
