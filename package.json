@@ -18,7 +18,7 @@
     "url": "https://github.com/ioBroker/ioBroker.hue"
   },
   "dependencies": {
-    "node-hue-api": "^0.2.3"
+    "node-hue-api": "~1.0.5"
   },
   "devDependencies": {
     "grunt": "~0.4.4",

@@ -11,7 +11,7 @@
 /*jslint node: true */
 "use strict";
 
-var hue   = require("node-hue-api");
+var hue   = require('node-hue-api');
 var utils = require(__dirname + '/lib/utils'); // Get common adapter utils
 
 var adapter = utils.adapter('hue');
@@ -20,8 +20,8 @@ adapter.on('stateChange', function (id, state) {
     if (id && state && !state.ack) {
         adapter.log.debug('stateChange ' + id + ' ' + JSON.stringify(state));
         var tmp = id.split('.');
-        var dp = tmp.pop();
-        id = tmp.slice(2).join('.');
+        var dp  = tmp.pop();
+        id      = tmp.slice(2).join('.');
         var ls = {};
         ls[dp] = state.val;
         api.setLightState(channelIds[id], ls, function (err, res) {
@@ -30,6 +30,11 @@ adapter.on('stateChange', function (id, state) {
             }
         });
     }
+});
+
+adapter.on('message', function (obj) {
+    if (obj) processMessage(obj);
+    processMessages();
 });
 
 adapter.on('unload', function (callback) {
@@ -45,13 +50,51 @@ adapter.on('ready', function () {
     main();
 });
 
-var HueApi = hue.HueApi;
+var HueApi     = hue.HueApi;
 var lightState = hue.lightState;
 var api;
 
 var channelIds = {};
 var pollIds = [];
 var pollChannels = [];
+
+
+function processMessage(obj) {
+    if (!obj || !obj.command) return;
+
+    switch (obj.command) {
+        case 'browse': {
+                browse(function (res) {
+                    if (obj.callback) adapter.sendTo(obj.from, obj.command, res, obj.callback);
+                });
+            }
+            break;
+
+        case 'stopInstance': {
+            //unloadHMM();
+        }
+    }
+}
+
+function processMessages() {
+    adapter.getMessage(function (err, obj) {
+        if (obj) {
+            processMessage(obj.command, obj.message);
+            processMessages();
+        }
+    });
+}
+
+function browse(callback) {
+    var res = [];
+    setTimeout(function () {
+        if (callback) callback(res);
+    }, 3000);
+
+    api.nupnpSearch(function(err, result) {
+        if (!err && result) res.push(result);
+    });
+}
 
 function main() {
     adapter.subscribeStates('*');
@@ -60,7 +103,7 @@ function main() {
 
     api.getFullState(function (err, config) {
         if (err) {
-            adapter.log.error(err);
+            adapter.log.error(JSON.stringify(err));
             process.exit(1);
         } else if (!config) {
             adapter.log.error('Cannot get the configuration from hue bridge');
@@ -84,7 +127,6 @@ function main() {
             pollChannels.push(channelName);
 
             var children = [];
-
 
             for (var state in light.state) {
 
