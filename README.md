@@ -7,6 +7,11 @@ some LivingColors) via Philips Hue Bridges to ioBroker
 ## Install
 
 ## Changelog
+### 0.2.1
+* (Pmant) add rgb states (write only)
+* (Pmant) fix parent/children warnings
+* (Pmant) add switch light off if brightness is zero
+
 ### 0.1.4
 * (bluefox) fix some null objects
 
