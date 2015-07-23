@@ -54,6 +54,9 @@ adapter.on('stateChange', function (id, state) {
                 });
             });
         }else{
+            if (dp == 'ct') {
+                ls['on'] = true;
+            }
             if (dp == 'bri' && state.val > 0) {
                 ls['on'] = true;
             }else if (dp == 'bri' && state.val == 0){
@@ -64,10 +67,8 @@ adapter.on('stateChange', function (id, state) {
                     adapter.setState([id, dp].join('.'), {val: state.val, ack: true});
                     if (dp == 'bri') {
                         adapter.setState([id, 'on'].join('.'), {val: ls.on, ack: true});
-                    }else if (dp == 'on' && state.val == false) {
-                        adapter.setState([id, 'bri'].join('.'), {val: 0, ack: true});
                     }else if (dp == 'on' && state.val == true) {
-                        adapter.getState([id, 'on'].join('.'), function (err, astate) {
+                        adapter.getState([id, 'bri'].join('.'), function (err, astate) {
                             if (astate.val < 5) {
                                 adapter.setState([id, 'bri'].join('.'), {val: 5, ack: true});
                             }
@@ -323,9 +324,6 @@ function pollSingle() {
                 var states = {};
                 for (var state in result.state) {
                     var objId = pollChannels[c] + '.' + state;
-                    if (state == 'bri' && states.on == false) {
-                        result.state[state] = 0;
-                    }
                     adapter.setState(objId, {val: result.state[state], ack: true});
                     states[state] = result.state[state];
                 }
