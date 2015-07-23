@@ -54,16 +54,16 @@ adapter.on('stateChange', function (id, state) {
                 });
             });
         }else{
+            if (dp == 'bri' && state.val > 0) {
+                ls['on'] = true;
+            }else if (dp == 'bri' && state.val == 0){
+                ls['on'] = false;
+            }
             api.setLightState(channelIds[id], ls, function (err, res) {
                 if (!err && res) {
                     adapter.setState([id, dp].join('.'), {val: state.val, ack: true});
-                    if (dp == 'bri' && state.val == 0) {
-                        var huestate = hue.lightState.create().off();
-                        api.setLightState(channelIds[id], huestate, function (err, res) {
-                            if (!err && res) {
-                                adapter.setState([id, 'on'].join('.'), {val: false, ack: true});
-                            }
-                        });
+                    if (dp == 'bri') {
+                        adapter.setState([id, 'on'].join('.'), {val: ls.on, ack: true});
                     }
                 }
             });
@@ -192,7 +192,7 @@ function main() {
                     case 'bri':
                         obj.common.type = 'number';
                         obj.common.role = 'level.dimmer';
-                        obj.common.min = 5;
+                        obj.common.min = 0;
                         obj.common.max = 254;
                         break;
                     case 'hue':
