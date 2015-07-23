@@ -64,6 +64,14 @@ adapter.on('stateChange', function (id, state) {
                     adapter.setState([id, dp].join('.'), {val: state.val, ack: true});
                     if (dp == 'bri') {
                         adapter.setState([id, 'on'].join('.'), {val: ls.on, ack: true});
+                    }else if (dp == 'on' && state.val == false) {
+                        adapter.setState([id, 'bri'].join('.'), {val: 0, ack: true});
+                    }else if (dp == 'on' && state.val == true) {
+                        adapter.getState([id, 'on'].join('.'), function (err, astate) {
+                            if (astate.val < 5) {
+                                adapter.setState([id, 'bri'].join('.'), {val: 5, ack: true});
+                            }
+                        });
                     }
                 }
             });
@@ -312,34 +320,18 @@ function pollSingle() {
             } if (!result) {
                 adapter.log.error('Cannot get result for lightStatus' + pollIds[c]);
             } else {
+                var states = {};
                 for (var state in result.state) {
                     var objId = pollChannels[c] + '.' + state;
+                    if (state == 'bri' && states.on == false) {
+                        result.state[state] = 0;
+                    }
                     adapter.setState(objId, {val: result.state[state], ack: true});
+                    states[state] = result.state[state];
                 }
             }
             c += 1;
             setTimeout(pollSingle, 50);
-        });
-    }
-}
-
-function pollId(c) {
-    if (c >= pollIds.length || c < 0) {
-        adapter.log.debug('invalid channel: ' + c);
-        return;
-    } else {
-        adapter.log.debug('polling light ' + pollIds[c]);
-        api.lightStatus(pollIds[c], function (err, result) {
-            if (err) {
-                adapter.log.error(err);
-            } if (!result) {
-                adapter.log.error('Cannot get result for lightStatus' + pollIds[c]);
-            } else {
-                for (var state in result.state) {
-                    var objId = pollChannels[c] + '.' + state;
-                    adapter.setState(objId, {val: result.state[state], ack: true});
-                }
-            }
         });
     }
 }
