@@ -46,7 +46,10 @@ adapter.on('stateChange', function (id, state) {
                                     adapter.setState([id, 'on'].join('.'), {val: false, ack: true});
                                 }
                             });
+                        }else {
+                            adapter.setState([id, 'on'].join('.'), {val: true, ack: true});
                         }
+                        adapter.setState([id, 'bri'].join('.'), {val: brightness, ack: true});
                     }
                 });
             });
