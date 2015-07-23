@@ -24,11 +24,47 @@ adapter.on('stateChange', function (id, state) {
         id      = tmp.slice(2).join('.');
         var ls = {};
         ls[dp] = state.val;
-        api.setLightState(channelIds[id], ls, function (err, res) {
-            if (!err && res) {
-                adapter.setState([id, dp].join('.'), {val: state.val, ack: true});
-            }
-        });
+        if(dp == 'r' || dp == 'g' || dp == 'b') {
+            var rgb = {};
+            adapter.getState([id, 'r'].join('.'), function (err, astate){
+                rgb['r'] = Math.round(astate.val);
+            });
+            adapter.getState([id, 'g'].join('.'), function (err, astate) {
+                rgb['g'] = Math.round(astate.val);
+            });
+            adapter.getState([id, 'b'].join('.'), function (err, astate) {
+                rgb['b'] = Math.round(astate.val);
+                var brightness = Math.min(254,Math.max(rgb.r,rgb.g,rgb.b));
+                var huestate = hue.lightState.create().on().rgb(rgb.r,rgb.g,rgb.b).bri(brightness);
+                api.setLightState(channelIds[id], huestate, function (err, res) {
+                    if (!err && res) {
+                        adapter.setState([id, dp].join('.'), {val: Math.round(state.val), ack: true});
+                        if (brightness == 0) {
+                            var huestate = hue.lightState.create().off();
+                            api.setLightState(channelIds[id], huestate, function (err, res) {
+                                if (!err && res) {
+                                    adapter.setState([id, 'on'].join('.'), {val: false, ack: true});
+                                }
+                            });
+                        }
+                    }
+                });
+            });
+        }else{
+            api.setLightState(channelIds[id], ls, function (err, res) {
+                if (!err && res) {
+                    adapter.setState([id, dp].join('.'), {val: state.val, ack: true});
+                    if (dp == 'bri' && state.val == 0) {
+                        var huestate = hue.lightState.create().off();
+                        api.setLightState(channelIds[id], huestate, function (err, res) {
+                            if (!err && res) {
+                                adapter.setState([id, 'on'].join('.'), {val: false, ack: true});
+                            }
+                        });
+                    }
+                }
+            });
+        }
     }
 });
 
@@ -57,7 +93,6 @@ var api;
 var channelIds = {};
 var pollIds = [];
 var pollChannels = [];
-
 
 function processMessage(obj) {
     if (!obj || !obj.command) return;
@@ -113,7 +148,6 @@ function main() {
         // Create/update lamps
         adapter.log.info('creating/updating light channels');
 
-        var devChildren = [];
         var lights = config.lights;
         var count = 0;
         for (var id in lights) {
@@ -121,24 +155,22 @@ function main() {
             var light = lights[id];
 
             var channelName = config.config.name + '.' + light.name;
-            devChildren.push(channelName);
             channelIds[channelName] = id;
             pollIds.push(id);
             pollChannels.push(channelName);
 
-            var children = [];
+            light.state.r = 0;
+            light.state.g = 0;
+            light.state.b = 0;
 
             for (var state in light.state) {
 
                 var objId = channelName + '.' + state;
 
-                children.push(objId);
-
                 adapter.setState(objId, {val: light.state[state], ack: true});
 
                 var obj = {
                     type: 'state',
-                    parent: channelName,
                     common: {
                         name: objId,
                         read: true,
@@ -157,8 +189,8 @@ function main() {
                     case 'bri':
                         obj.common.type = 'number';
                         obj.common.role = 'level.dimmer';
-                        obj.common.min = 0;
-                        obj.common.max = 255;
+                        obj.common.min = 5;
+                        obj.common.max = 254;
                         break;
                     case 'hue':
                         obj.common.type = 'number';
@@ -170,9 +202,11 @@ function main() {
                         obj.common.type = 'number';
                         obj.common.role = 'level.color.saturation';
                         obj.common.min = 0;
-                        obj.common.max = 255;
+                        obj.common.max = 254;
                         break;
                     case 'xy':
+                        obj.common.type = 'string';
+                        obj.common.role = 'level.color.xy';
                         break;
                     case 'ct':
                         obj.common.type = 'number';
@@ -182,30 +216,52 @@ function main() {
                         break;
                     case 'alert':
                         obj.common.type = 'string';
+                        obj.common.role = 'switch';
                         break;
                     case 'effect':
                         obj.common.type = 'string';
+                        obj.common.role = 'switch';
                         break;
                     case 'colormode':
                         obj.common.type = 'string';
+                        obj.common.role = 'indicator.colormode';
+                        obj.common.write = false;
                         break;
                     case 'reachable':
                         obj.common.type = 'boolean';
                         obj.common.write = false;
                         obj.common.role = 'indicator.reachable';
                         break;
+                    case 'r':
+                        obj.common.type = 'number';
+                        obj.common.role = 'level.color.r';
+                        obj.common.min = 0;
+                        obj.common.max = 255;
+                        break;
+                    case 'g':
+                        obj.common.type = 'number';
+                        obj.common.role = 'level.color.g';
+                        obj.common.min = 0;
+                        obj.common.max = 255;
+                        break;
+                    case 'b':
+                        obj.common.type = 'number';
+                        obj.common.role = 'level.color.b';
+                        obj.common.min = 0;
+                        obj.common.max = 255;
+                        break;
                     default:
+                        adapter.log.info('skip: ' + state);
+                        break;
                 }
                 adapter.setObject(objId, obj);
             }
 
             adapter.setObject(channelName, {
                 type: 'channel',
-                parent: config.config.name,
-                children: children,
                 common: {
                     name: channelName,
-                    role: light.type === 'Dimmable plug-in unit' || light.type === 'Dimmable Light' ? 'light.dimmer' : 'light.color'
+                    role: light.type === 'Dimmable plug-in unit' || light.type === 'Dimmable light' ? 'light.dimmer' : 'light.color'
                 },
                 native: {
                     id: id,
@@ -224,7 +280,6 @@ function main() {
         adapter.log.info('creating/updating bridge device');
         adapter.setObject(config.config.name, {
             type: 'device',
-            children: devChildren,
             common: {
                 name: config.config.name
             },
@@ -265,3 +320,23 @@ function pollSingle() {
     }
 }
 
+function pollId(c) {
+    if (c >= pollIds.length || c < 0) {
+        adapter.log.debug('invalid channel: ' + c);
+        return;
+    } else {
+        adapter.log.debug('polling light ' + pollIds[c]);
+        api.lightStatus(pollIds[c], function (err, result) {
+            if (err) {
+                adapter.log.error(err);
+            } if (!result) {
+                adapter.log.error('Cannot get result for lightStatus' + pollIds[c]);
+            } else {
+                for (var state in result.state) {
+                    var objId = pollChannels[c] + '.' + state;
+                    adapter.setState(objId, {val: result.state[state], ack: true});
+                }
+            }
+        });
+    }
+}
