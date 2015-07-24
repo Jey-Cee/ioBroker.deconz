@@ -329,6 +329,9 @@ function pollSingle() {
                     states.bri = 0;
                     states.on = false;
                 }
+                if (states.on == false) {
+                    states.bri = 0;
+                }
                 for (var state in states) {
                     var objId = pollChannels[c] + '.' + state;
                     adapter.setState(objId, {val: states[state], ack: true});
