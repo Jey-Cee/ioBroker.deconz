@@ -28,7 +28,7 @@ adapter.on('stateChange', function (id, state) {
     var ls = {};
     //if .on changed to true instead change .bri to 254 or 0
     if (dp == 'on') {
-        var bri = state.val ? state.val : 0;
+        var bri = state.val ? 254 : 0;
         adapter.setState([id, 'bri'].join('.'), {val: bri, ack: false});
         return;
     }
