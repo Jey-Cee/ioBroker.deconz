@@ -13,6 +13,7 @@ some LivingColors) via Philips Hue Bridges to ioBroker
 * (Pmant) change on/off sets brightness to 254/0
 * (Pmant) change changing any color (hs,ct,xy) while light is off sets brightness to max
 * (Pmant) fix set brightness to zero if light is off
+* (Pmant) change set bri to zero if lamp is not reachable
 
 ### 0.2.1
 * (Pmant) add rgb states (write only)
