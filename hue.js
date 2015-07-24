@@ -323,9 +323,15 @@ function pollSingle() {
             } else {
                 var states = {};
                 for (var state in result.state) {
-                    var objId = pollChannels[c] + '.' + state;
-                    adapter.setState(objId, {val: result.state[state], ack: true});
                     states[state] = result.state[state];
+                }
+                if (states.reachable == false) {
+                    states.bri = 0;
+                    states.on = false;
+                }
+                for (var state in states) {
+                    var objId = pollChannels[c] + '.' + state;
+                    adapter.setState(objId, {val: states[state], ack: true});
                 }
             }
             c += 1;
