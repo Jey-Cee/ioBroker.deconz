@@ -185,6 +185,11 @@ adapter.on('stateChange', function (id, state) {
         if ('colormode' in ls) {
             finalLS['colormode'] = ls.colormode;
         }
+        if ('effect' in ls) {
+            lightState = lightState.effect('colorloop');
+            finalLS['effect'] = 'colorloop';
+        }
+
         adapter.log.info('final lightState: ' + JSON.stringify(finalLS));
 
         //set lightState
