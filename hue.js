@@ -196,7 +196,8 @@ function main() {
                 switch (state) {
                     case 'on':
                         obj.common.type = 'boolean';
-                        obj.common.role = 'switch';
+                        obj.common.role = 'indicator.on';
+                        obj.common.write = false;
                         break;
                     case 'bri':
                         obj.common.type = 'number';
