@@ -28,7 +28,7 @@ adapter.on('stateChange', function (id, state) {
     var ls = {};
     //if .on changed to true instead change .bri to 254 or 0
     if (dp == 'on') {
-        var bri = state.val ? 254 : 0;
+        var bri = state.val ? state.val : 0;
         adapter.setState([id, 'bri'].join('.'), {val: bri, ack: false});
         return;
     }
@@ -94,12 +94,10 @@ adapter.on('stateChange', function (id, state) {
         var lightState = hue.lightState.create();
         var finalLS = {};
         if (ls.bri > 0) {
-            lightState = lightState.on();
-            lightState = lightState.bri(Math.min(254,ls.bri));
+            lightState = lightState.on().bri(Math.min(254,ls.bri));
             finalLS['bri'] = Math.min(254,ls.bri);
             finalLS['on'] = true;
         }else {
-            lightState = lightState.bri(0);
             lightState = lightState.off();
             finalLS['bri'] = 0;
             finalLS['on'] = false;
@@ -188,6 +186,12 @@ adapter.on('stateChange', function (id, state) {
         if ('effect' in ls) {
             lightState = lightState.effect('colorloop');
             finalLS['effect'] = 'colorloop';
+            if (!'bri' in ls || ls.bri == 0) {
+                lightState = lightState.on();
+                lightState = lightState.bri(254);
+                finalLS['bri'] = 254;
+                finalLS['on'] = true;
+            }
         }
 
         adapter.log.info('final lightState: ' + JSON.stringify(finalLS));
