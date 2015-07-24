@@ -7,7 +7,7 @@ some LivingColors) via Philips Hue Bridges to ioBroker
 ## Install
 
 ## Changelog
-### 0.3
+### 0.3.0
 * (Pmant) fix rgb states only for color lights
 * (Pmant) change set known state changes immediately
 * (Pmant) change on/off sets brightness to 254/0
