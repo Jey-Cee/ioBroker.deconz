@@ -7,6 +7,16 @@ some LivingColors) via Philips Hue Bridges to ioBroker
 ## Install
 
 ## Changelog
+
+### 0.3.0
+* (Pmant) fix rgb states only for color lights
+* (Pmant) change set known state changes immediately
+* (Pmant) change on/off sets brightness to 254/0
+* (Pmant) change changing any color (hs,ct,xy) while light is off sets brightness to max
+* (Pmant) fix set brightness to zero if light is off
+* (Pmant) change set bri to zero if lamp is not reachable
+* (Pmant) fix bridges and lamps with spaces in name
+
 ### 0.2.1
 * (Pmant) add rgb states (write only)
 * (Pmant) fix parent/children warnings
