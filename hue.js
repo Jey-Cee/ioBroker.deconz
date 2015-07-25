@@ -302,9 +302,9 @@ function main() {
             var light = lights[id];
 
             var channelName = config.config.name + '.' + light.name;
-            channelIds[channelName.replace(' ','_')] = id;
+            channelIds[channelName.replace(/\s/g,'_')] = id;
             pollIds.push(id);
-            pollChannels.push(channelName.replace(' ','_'));
+            pollChannels.push(channelName.replace(/\s/g,'_'));
 
             if (light.type !== 'Dimmable plug-in unit' && light.type !== 'Dimmable light') {
                 light.state.r = 0;
@@ -321,7 +321,7 @@ function main() {
                 var obj = {
                     type: 'state',
                     common: {
-                        name: objId.replace(' ','_'),
+                        name: objId.replace(/\s/g,'_'),
                         read: true,
                         write: true
                     },
@@ -403,13 +403,13 @@ function main() {
                         adapter.log.info('skip: ' + state);
                         break;
                 }
-                adapter.setObject(objId.replace(' ','_'), obj);
+                adapter.setObject(objId.replace(/\s/g,'_'), obj);
             }
 
-            adapter.setObject(channelName.replace(' ','_'), {
+            adapter.setObject(channelName.replace(/\s/g,'_'), {
                 type: 'channel',
                 common: {
-                    name: channelName.replace(' ','_'),
+                    name: channelName.replace(/\s/g,'_'),
                     role: light.type === 'Dimmable plug-in unit' || light.type === 'Dimmable light' ? 'light.dimmer' : 'light.color'
                 },
                 native: {
@@ -427,10 +427,10 @@ function main() {
 
         // Create/update device
         adapter.log.info('creating/updating bridge device');
-        adapter.setObject(config.config.name.replace(' ','_'), {
+        adapter.setObject(config.config.name.replace(/\s/g,'_'), {
             type: 'device',
             common: {
-                name: config.config.name.replace(' ','_')
+                name: config.config.name.replace(/\s/g,'_')
             },
             native: config.config
         });
