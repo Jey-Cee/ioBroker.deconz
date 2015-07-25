@@ -32,11 +32,13 @@ adapter.on('stateChange', function (id, state) {
         adapter.setState([id, 'bri'].join('.'), {val: bri, ack: false});
         return;
     }
+    //get lamp states
     adapter.getStates(id + '.*', function (err, idStates){
         if (err) {
             adapter.log.error(err);
             return;
         }
+        //gather states that need to be changed
         var ls = {};
         for (var idState in idStates) {
             var idtmp = idState.split('.');
@@ -195,6 +197,7 @@ adapter.on('stateChange', function (id, state) {
             }
         }
 
+        //log final changes / states
         adapter.log.info('final lightState: ' + JSON.stringify(finalLS));
 
         //set lightState
@@ -203,13 +206,11 @@ adapter.on('stateChange', function (id, state) {
                 adapter.log.error('error: ' + err);
                 return;
             }
-
             //write back known states
             for (var finalState in finalLS) {
                 adapter.setState([id, finalState].join('.'), {val: finalLS[finalState], ack: true});
             }
         });
-
     });
 });
 
@@ -221,8 +222,9 @@ adapter.on('message', function (obj) {
 adapter.on('unload', function (callback) {
     try {
         adapter.log.info('terminating');
-        callback();
     } catch (e) {
+        adapter.log.error(e);
+    } finally {
         callback();
     }
 });
@@ -300,9 +302,9 @@ function main() {
             var light = lights[id];
 
             var channelName = config.config.name + '.' + light.name;
-            channelIds[channelName] = id;
+            channelIds[channelName.replace(' ','_')] = id;
             pollIds.push(id);
-            pollChannels.push(channelName);
+            pollChannels.push(channelName.replace(' ','_'));
 
             if (light.type !== 'Dimmable plug-in unit' && light.type !== 'Dimmable light') {
                 light.state.r = 0;
@@ -319,7 +321,7 @@ function main() {
                 var obj = {
                     type: 'state',
                     common: {
-                        name: objId,
+                        name: objId.replace(' ','_'),
                         read: true,
                         write: true
                     },
@@ -401,13 +403,13 @@ function main() {
                         adapter.log.info('skip: ' + state);
                         break;
                 }
-                adapter.setObject(objId, obj);
+                adapter.setObject(objId.replace(' ','_'), obj);
             }
 
-            adapter.setObject(channelName, {
+            adapter.setObject(channelName.replace(' ','_'), {
                 type: 'channel',
                 common: {
-                    name: channelName,
+                    name: channelName.replace(' ','_'),
                     role: light.type === 'Dimmable plug-in unit' || light.type === 'Dimmable light' ? 'light.dimmer' : 'light.color'
                 },
                 native: {
@@ -425,10 +427,10 @@ function main() {
 
         // Create/update device
         adapter.log.info('creating/updating bridge device');
-        adapter.setObject(config.config.name, {
+        adapter.setObject(config.config.name.replace(' ','_'), {
             type: 'device',
             common: {
-                name: config.config.name
+                name: config.config.name.replace(' ','_')
             },
             native: config.config
         });
@@ -436,25 +438,23 @@ function main() {
     });
 
     if (adapter.config.polling && adapter.config.pollingInterval > 0) {
-        setTimeout(pollSingle, adapter.config.pollingInterval * 1000);
+        setTimeout(pollSingle, 5 * 1000, 0);
     }
 
 }
 
-var c = 0;
-
-function pollSingle() {
-    if (c >= pollIds.length) {
-        c = 0;
-        setTimeout(pollSingle, adapter.config.pollingInterval * 1000);
+function pollSingle(count) {
+    if (count >= pollIds.length) {
+        count = 0;
+        setTimeout(pollSingle, adapter.config.pollingInterval * 1000, count);
         return;
     } else {
-        adapter.log.debug('polling light ' + pollIds[c]);
-        api.lightStatus(pollIds[c], function (err, result) {
+        adapter.log.debug('polling light ' + pollChannels[count]);
+        api.lightStatus(pollIds[count], function (err, result) {
             if (err) {
                 adapter.log.error(err);
             } if (!result) {
-                adapter.log.error('Cannot get result for lightStatus' + pollIds[c]);
+                adapter.log.error('Cannot get result for lightStatus' + pollIds[count]);
             } else {
                 var states = {};
                 for (var state in result.state) {
@@ -468,17 +468,19 @@ function pollSingle() {
                     states.bri = 0;
                 }
                 for (var state in states) {
-                    var objId = pollChannels[c] + '.' + state;
+                    var objId = pollChannels[count] + '.' + state;
                     adapter.setState(objId, {val: states[state], ack: true});
                 }
             }
-            c += 1;
-            setTimeout(pollSingle, 50);
+            count++;
+            setTimeout(pollSingle, 50, count);
         });
     }
 }
 
 
+
+//rgb conversion functions
 function colorPointsForModel(model)  {
     return {
         'r': {'x': 0.674, 'y': 0.322},
