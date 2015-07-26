@@ -140,7 +140,7 @@ adapter.on('stateChange', function (id, state) {
             }
             finalLS['xy'] = xy.x + ',' + xy.y;
             lightState = lightState.xy(xy.x,xy.y);
-            if (!'r' in ls && (!'bri' in ls || ls.bri == 0)) {
+            if (!'bri' in ls || ls.bri == 0) {
                 lightState = lightState.on();
                 lightState = lightState.bri(254);
                 finalLS['bri'] = 254;
