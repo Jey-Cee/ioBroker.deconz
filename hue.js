@@ -316,7 +316,7 @@ function main() {
 
                 var objId = channelName + '.' + state;
 
-                adapter.setState(objId, {val: light.state[state], ack: true});
+                adapter.setState(objId.replace(/\s/g,'_'), {val: light.state[state], ack: true});
 
                 var obj = {
                     type: 'state',

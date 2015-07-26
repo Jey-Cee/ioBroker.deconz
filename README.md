@@ -7,6 +7,8 @@ some LivingColors) via Philips Hue Bridges to ioBroker
 ## Install
 
 ## Changelog
+### 0.3.1
+* (Pmant) fix another bug with spaces
 
 ### 0.3.0
 * (Pmant) fix rgb states only for color lights
