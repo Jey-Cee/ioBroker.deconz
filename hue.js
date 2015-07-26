@@ -189,7 +189,7 @@ adapter.on('stateChange', function (id, state) {
             if (['colorloop'].indexOf(ls.effect) == -1) finalLS['effect'] = 'none';
             else finalLS['effect'] = ls.effect;
             lightState = lightState.effect(finalLS.effect);
-            if (!'bri' in ls || ls.bri == 0) {
+            if (finalLS['effect'] != 'none' && !'bri' in ls || ls.bri == 0) {
                 lightState = lightState.on();
                 lightState = lightState.bri(254);
                 finalLS['bri'] = 254;
