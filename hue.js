@@ -169,7 +169,7 @@ adapter.on('stateChange', function (id, state) {
         }
         if ('sat' in ls) {
             finalLS['sat'] = Math.max(0,Math.min(254,ls.sat));
-            lightState = lightState.hue(finalLS.sat);
+            lightState = lightState.sat(finalLS.sat);
             if (!'bri' in ls || ls.bri == 0) {
                 lightState = lightState.on();
                 lightState = lightState.bri(254);
