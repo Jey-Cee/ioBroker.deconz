@@ -200,17 +200,42 @@ adapter.on('stateChange', function (id, state) {
         //log final changes / states
         adapter.log.info('final lightState: ' + JSON.stringify(finalLS));
 
+
         //set lightState
-        api.setLightState(channelIds[id], lightState, function (err, res) {
-            if (err || !res) {
-                adapter.log.error('error: ' + err);
+        adapter.log.info(JSON.stringify(state));
+
+        adapter.getObject(id, function (err, obj) {
+            if (err) {
+                adapter.log.error(err);
                 return;
             }
-            //write back known states
-            for (var finalState in finalLS) {
-                adapter.setState([id, finalState].join('.'), {val: finalLS[finalState], ack: true});
+            adapter.log.info(JSON.stringify(obj));
+
+            if (obj.common.role == 'LightGroup') {
+                api.setGroupLightState(groupIds[id], lightState, function (err, res) {
+                    if (err || !res) {
+                        adapter.log.error('error: ' + err);
+                        return;
+                    }
+                    //write back known states
+                    /*for (var finalState in finalLS) {
+                        adapter.setState([id, finalState].join('.'), {val: finalLS[finalState], ack: true});
+                    }*/
+                });
+            }else {
+                api.setLightState(channelIds[id], lightState, function (err, res) {
+                    if (err || !res) {
+                        adapter.log.error('error: ' + err);
+                        return;
+                    }
+                    //write back known states
+                    for (var finalState in finalLS) {
+                        adapter.setState([id, finalState].join('.'), {val: finalLS[finalState], ack: true});
+                    }
+                });
             }
         });
+
     });
 });
 
@@ -536,13 +561,13 @@ function main() {
                 type: 'channel',
                 common: {
                     name: groupName.replace(/\s/g,'_'),
-                    role: action.type
+                    role: group.type
                 },
                 native: {
                     id: id,
-                    type: action.type,
-                    name: action.name,
-                    lights: ''//action.lights
+                    type: group.type,
+                    name: group.name,
+                    lights: group.lights
                 }
             });
         }
