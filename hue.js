@@ -240,6 +240,7 @@ var api;
 var channelIds = {};
 var pollIds = [];
 var pollChannels = [];
+var groupIds = {};
 
 function processMessage(obj) {
     if (!obj || !obj.command) return;
@@ -424,6 +425,129 @@ function main() {
 
         }
         adapter.log.info('created/updated ' + count + ' light channels');
+
+
+        // Create/update groups
+        adapter.log.info('creating/updating light groups');
+
+        var groups = config.groups;
+        var count = 0;
+        for (var id in groups) {
+            count += 1;
+            var group = groups[id];
+
+            var groupName = config.config.name + '.' + group.name;
+            groupIds[groupName.replace(/\s/g,'_')] = id;
+
+            group.action.r = 0;
+            group.action.g = 0;
+            group.action.b = 0;
+
+            for (var action in group.action) {
+
+                var objId = groupName + '.' + action;
+
+                adapter.setState(objId.replace(/\s/g,'_'), {val: group.action[action], ack: true});
+
+                var obj = {
+                    type: 'state',
+                    common: {
+                        name: objId.replace(/\s/g,'_'),
+                        read: true,
+                        write: true
+                    },
+                    native: {
+                        id: id
+                    }
+                };
+
+                switch (action) {
+                    case 'on':
+                        obj.common.type = 'boolean';
+                        obj.common.role = 'switch';
+                        break;
+                    case 'bri':
+                        obj.common.type = 'number';
+                        obj.common.role = 'level.dimmer';
+                        obj.common.min = 0;
+                        obj.common.max = 254;
+                        break;
+                    case 'hue':
+                        obj.common.type = 'number';
+                        obj.common.role = 'level.color.hue';
+                        obj.common.min = 0;
+                        obj.common.max = 65535;
+                        break;
+                    case 'sat':
+                        obj.common.type = 'number';
+                        obj.common.role = 'level.color.saturation';
+                        obj.common.min = 0;
+                        obj.common.max = 254;
+                        break;
+                    case 'xy':
+                        obj.common.type = 'string';
+                        obj.common.role = 'level.color.xy';
+                        break;
+                    case 'ct':
+                        obj.common.type = 'number';
+                        obj.common.role = 'level.color.temperature';
+                        obj.common.min = 153;
+                        obj.common.max = 500;
+                        break;
+                    case 'alert':
+                        obj.common.type = 'string';
+                        obj.common.role = 'switch';
+                        break;
+                    case 'effect':
+                        obj.common.type = 'string';
+                        obj.common.role = 'switch';
+                        break;
+                    case 'colormode':
+                        obj.common.type = 'string';
+                        obj.common.role = 'indicator.colormode';
+                        obj.common.write = false;
+                        break;
+                    case 'r':
+                        obj.common.type = 'number';
+                        obj.common.role = 'level.color.r';
+                        obj.common.min = 0;
+                        obj.common.max = 255;
+                        break;
+                    case 'g':
+                        obj.common.type = 'number';
+                        obj.common.role = 'level.color.g';
+                        obj.common.min = 0;
+                        obj.common.max = 255;
+                        break;
+                    case 'b':
+                        obj.common.type = 'number';
+                        obj.common.role = 'level.color.b';
+                        obj.common.min = 0;
+                        obj.common.max = 255;
+                        break;
+                    default:
+                        adapter.log.info('skip: ' + action);
+                        break;
+                }
+                adapter.setObject(objId.replace(/\s/g,'_'), obj);
+            }
+
+            adapter.setObject(groupName.replace(/\s/g,'_'), {
+                type: 'channel',
+                common: {
+                    name: groupName.replace(/\s/g,'_'),
+                    role: action.type
+                },
+                native: {
+                    id: id,
+                    type: action.type,
+                    name: action.name,
+                    lights: ''//action.lights
+                }
+            });
+        }
+        adapter.log.info('created/updated ' + count + ' light groups');
+
 
         // Create/update device
         adapter.log.info('creating/updating bridge device');
