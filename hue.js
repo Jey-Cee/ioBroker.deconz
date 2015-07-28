@@ -318,6 +318,8 @@ function main() {
             process.exit(1);
         }
 
+        var channelNames = [];
+
         // Create/update lamps
         adapter.log.info('creating/updating light channels');
 
@@ -328,6 +330,12 @@ function main() {
             var light = lights[id];
 
             var channelName = config.config.name + '.' + light.name;
+            if (channelNames.indexOf(channelName) !== -1) {
+                adapter.log.warn('channel "' + channelName + '" already exists, skipping lamp');
+                continue;
+            }else {
+                channelNames.push(channelName);
+            }
             channelIds[channelName.replace(/\s/g,'_')] = id;
             pollIds.push(id);
             pollChannels.push(channelName.replace(/\s/g,'_'));
@@ -462,6 +470,12 @@ function main() {
             var group = groups[id];
 
             var groupName = config.config.name + '.' + group.name;
+            if (channelNames.indexOf(groupName) !== -1) {
+                adapter.log.warn('channel "' + groupName + '" already exists, skipping group');
+                continue;
+            }else {
+                channelNames.push(groupName);
+            }
             groupIds[groupName.replace(/\s/g,'_')] = id;
 
             group.action.r = 0;
