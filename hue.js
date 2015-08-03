@@ -234,7 +234,6 @@ adapter.on('stateChange', function (id, state) {
         if ('transitiontime' in ls){
             var transitiontime = parseInt(ls['transitiontime']);
             if (!isNaN(transitiontime)){
-                transitiontime = transitiontime;
                 //finalLS['transitiontime'] = transitiontime;
                 lightState = lightState.transitiontime(transitiontime);
             }
@@ -653,6 +652,10 @@ function main() {
                         obj.common.role = 'level.color.b';
                         obj.common.min = 0;
                         obj.common.max = 255;
+                        break;
+                    case 'command':
+                        obj.common.type = 'string';
+                        obj.common.role = 'command';
                         break;
                     default:
                         adapter.log.info('skip: ' + action);
