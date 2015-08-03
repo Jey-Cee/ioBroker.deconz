@@ -570,6 +570,7 @@ function main() {
             group.action.r = 0;
             group.action.g = 0;
             group.action.b = 0;
+            group.action.command = '{}';
 
             for (var action in group.action) {
 
