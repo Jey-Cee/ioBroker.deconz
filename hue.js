@@ -234,7 +234,7 @@ adapter.on('stateChange', function (id, state) {
         if ('transitiontime' in ls){
             var transitiontime = parseInt(ls['transitiontime']);
             if (!isNaN(transitiontime)){
-                transitiontime = transitiontime * 100;
+                transitiontime = transitiontime;
                 //finalLS['transitiontime'] = transitiontime;
                 lightState = lightState.transitiontime(transitiontime);
             }
