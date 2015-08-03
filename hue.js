@@ -26,7 +26,7 @@ adapter.on('stateChange', function (id, state) {
     var dp  = tmp.pop();
     id      = tmp.slice(2).join('.');
     var ls = {};
-    //if .on changed to true instead change .bri to 254 or 0
+    //if .on changed instead change .bri to 254 or 0
     if (dp == 'on') {
         var bri = state.val ? 254 : 0;
         adapter.setState([id, 'bri'].join('.'), {val: bri, ack: false});
@@ -40,12 +40,14 @@ adapter.on('stateChange', function (id, state) {
         }
         //gather states that need to be changed
         var ls = {};
+        var lampOn = false;
         for (var idState in idStates) {
             var idtmp = idState.split('.');
             var iddp  = idtmp.pop();
             switch (iddp) {
                 case 'bri':
                     ls[iddp] = idStates[idState].val;
+                    if (idStates[idState].ack && idStates[idState].val > 0) lampOn = true;
                     break;
                 case 'alert':
                     if (dp == 'alert') ls[iddp] = idStates[idState].val;
@@ -80,16 +82,47 @@ adapter.on('stateChange', function (id, state) {
                         ls['colormode'] = 'xy';
                     }
                     break;
+                case 'command':
+                    if (dp == 'command') {
+                        try{
+                            var commands = JSON.parse(state.val);
+                            for (var command in commands) {
+                                if (command == 'on') {
+                                    //convert on to bri
+                                    if (commands[command] && !commands.hasOwnProperty('bri')) {
+                                        ls['bri'] = 254;
+                                    }else {
+                                        ls['bri'] = 0;
+                                    }
+                                }else {
+                                    ls[command] = commands[command];
+                                }
+                            }
+                        } catch (e) {
+                            adapter.log.error(e);
+                            return;
+                        }
+                    }
                 default:
                     break;
             }
         }
         //apply rgb to xy
-        if ('r' in ls) {
+        if ('r' in ls || 'g' in ls || 'b' in ls) {
+            if (! ('r' in ls)){
+                ls.r = 0;
+            }
+            if (! ('g' in ls)){
+                ls.g = 0;
+            }
+            if (! ('b' in ls)){
+                ls.b = 0;
+            }
             var xyb = calculateXYB({'r': ls.r/255, 'g': ls.g/255, 'b': ls.b/255});
             ls.bri = Math.max(ls.r,ls.g,ls.b);
             ls.xy = xyb.x + ',' + xyb.y;
         }
+
 
         //create lightState from ls
         //and check values
@@ -140,7 +173,7 @@ adapter.on('stateChange', function (id, state) {
             }
             finalLS['xy'] = xy.x + ',' + xy.y;
             lightState = lightState.xy(xy.x,xy.y);
-            if (!'bri' in ls || ls.bri == 0) {
+            if (!lampOn && (!('bri' in ls) || ls.bri == 0)) {
                 lightState = lightState.on();
                 lightState = lightState.bri(254);
                 finalLS['bri'] = 254;
@@ -150,7 +183,7 @@ adapter.on('stateChange', function (id, state) {
         if ('ct' in ls) {
             finalLS['ct'] = Math.max(153,Math.min(500,ls.ct));
             lightState = lightState.ct(finalLS.ct);
-            if (!'bri' in ls || ls.bri == 0) {
+            if (!lampOn && (!('bri' in ls) || ls.bri == 0)) {
                 lightState = lightState.on();
                 lightState = lightState.bri(254);
                 finalLS['bri'] = 254;
@@ -160,7 +193,7 @@ adapter.on('stateChange', function (id, state) {
         if ('hue' in ls) {
             finalLS['hue'] = Math.max(0,Math.min(65535,ls.hue))
             lightState = lightState.hue(finalLS.hue);
-            if (!'bri' in ls || ls.bri == 0) {
+            if (!lampOn && (!('bri' in ls) || ls.bri == 0)) {
                 lightState = lightState.on();
                 lightState = lightState.bri(254);
                 finalLS['bri'] = 254;
@@ -170,7 +203,7 @@ adapter.on('stateChange', function (id, state) {
         if ('sat' in ls) {
             finalLS['sat'] = Math.max(0,Math.min(254,ls.sat));
             lightState = lightState.sat(finalLS.sat);
-            if (!'bri' in ls || ls.bri == 0) {
+            if (!lampOn && (!('bri' in ls) || ls.bri == 0)) {
                 lightState = lightState.on();
                 lightState = lightState.bri(254);
                 finalLS['bri'] = 254;
@@ -189,7 +222,7 @@ adapter.on('stateChange', function (id, state) {
             if (['colorloop'].indexOf(ls.effect) == -1) finalLS['effect'] = 'none';
             else finalLS['effect'] = ls.effect;
             lightState = lightState.effect(finalLS.effect);
-            if (finalLS['effect'] != 'none' && !'bri' in ls || ls.bri == 0) {
+            if (!lampOn && (finalLS['effect'] != 'none' && !('bri' in ls) || ls.bri == 0)) {
                 lightState = lightState.on();
                 lightState = lightState.bri(254);
                 finalLS['bri'] = 254;
@@ -197,19 +230,70 @@ adapter.on('stateChange', function (id, state) {
             }
         }
 
+        //only available in command state
+        if ('transitiontime' in ls){
+            var transitiontime = parseInt(transitiontime);
+            if (!isNaN(transitiontime)){
+                transitiontime = transitiontime * 100;
+                finalLS['transitiontime'] = transitiontime;
+                lightState = lightState.transitiontime(transitiontime);
+            }
+        }
+        if ('sat_inc' in ls && !('sat' in finalLS)){
+            //finalLS['sat_inc'] = Math.max(-254,Math.min(254,ls['sat_inc']));
+            lightState = lightState.sat_inc(finalLS['sat_inc']);
+            if (!lampOn && (!('bri' in ls) || ls.bri == 0)) {
+                lightState = lightState.on();
+                lightState = lightState.bri(254);
+                finalLS['bri'] = 254;
+                finalLS['on'] = true;
+            }
+        }
+        if ('hue_inc' in ls && !('hue' in finalLS)){
+            //finalLS['hue_inc'] = Math.max(-65535,Math.min(65535,ls['hue_inc']));
+            lightState = lightState.hue_inc(finalLS['hue_inc']);
+            if (!lampOn && (!('bri' in ls) || ls.bri == 0)) {
+                lightState = lightState.on();
+                lightState = lightState.bri(254);
+                finalLS['bri'] = 254;
+                finalLS['on'] = true;
+            }
+        }
+        if ('ct_inc' in ls && !('ct' in finalLS)){
+            //finalLS['ct_inc'] = Math.max(-65535,Math.min(65535,ls['hue_inc']));
+            lightState = lightState.ct_inc(finalLS['ct_inc']);
+            if (!lampOn && (!('bri' in ls) || ls.bri == 0)) {
+                lightState = lightState.on();
+                lightState = lightState.bri(254);
+                finalLS['bri'] = 254;
+                finalLS['on'] = true;
+            }
+        }
+        if('bri_inc' in ls && !commands.hasOwnProperty('bri')) {
+            if (!('bri' in finalLS)) finalLS['bri'] = 0;
+            finalLS['bri'] = Math.max(0,Math.min(254,finalLS['bri'] + ls['bri_inc']));
+            if (finalLS['bri'] == 0) {
+                if (lampOn){
+                    lightState = lightState.on(false);
+                    finalLS['on'] = false;
+                } else {
+                    adapter.setState([id, 'bri'].join('.'), {val: 0, ack: false});
+                    return;
+                }
+            };
+            lightState = lightState.bri(finalLS['bri']);
+        }
+
         //log final changes / states
         adapter.log.info('final lightState: ' + JSON.stringify(finalLS));
 
 
         //set lightState
-        adapter.log.info(JSON.stringify(state));
-
         adapter.getObject(id, function (err, obj) {
             if (err) {
                 adapter.log.error(err);
                 return;
             }
-            adapter.log.info(JSON.stringify(obj));
 
             if (obj.common.role == 'LightGroup') {
                 api.setGroupLightState(groupIds[id], lightState, function (err, res) {
@@ -217,10 +301,6 @@ adapter.on('stateChange', function (id, state) {
                         adapter.log.error('error: ' + err);
                         return;
                     }
-                    //write back known states
-                    /*for (var finalState in finalLS) {
-                        adapter.setState([id, finalState].join('.'), {val: finalLS[finalState], ack: true});
-                    }*/
                 });
             }else {
                 api.setLightState(channelIds[id], lightState, function (err, res) {
@@ -346,6 +426,8 @@ function main() {
                 light.state.b = 0;
             }
 
+            light.state.command = '{}';
+
             for (var state in light.state) {
 
                 var objId = channelName + '.' + state;
@@ -432,6 +514,10 @@ function main() {
                         obj.common.role = 'level.color.b';
                         obj.common.min = 0;
                         obj.common.max = 255;
+                        break;
+                    case 'command':
+                        obj.common.type = 'string';
+                        obj.common.role = 'command';
                         break;
                     default:
                         adapter.log.info('skip: ' + state);
