@@ -240,7 +240,7 @@ adapter.on('stateChange', function (id, state) {
         }
         if ('sat_inc' in ls && !('sat' in finalLS)){
             //finalLS['sat_inc'] = Math.max(-254,Math.min(254,ls['sat_inc']));
-            lightState = lightState.sat_inc(finalLS['sat_inc']);
+            lightState = lightState.sat_inc(Math.max(-254,Math.min(254,ls['sat_inc'])));
             if (!lampOn && (!('bri' in ls) || ls.bri == 0)) {
                 lightState = lightState.on();
                 lightState = lightState.bri(254);
@@ -250,7 +250,7 @@ adapter.on('stateChange', function (id, state) {
         }
         if ('hue_inc' in ls && !('hue' in finalLS)){
             //finalLS['hue_inc'] = Math.max(-65535,Math.min(65535,ls['hue_inc']));
-            lightState = lightState.hue_inc(finalLS['hue_inc']);
+            lightState = lightState.hue_inc(Math.max(-65535,Math.min(65535,ls['hue_inc'])));
             if (!lampOn && (!('bri' in ls) || ls.bri == 0)) {
                 lightState = lightState.on();
                 lightState = lightState.bri(254);
@@ -260,7 +260,7 @@ adapter.on('stateChange', function (id, state) {
         }
         if ('ct_inc' in ls && !('ct' in finalLS)){
             //finalLS['ct_inc'] = Math.max(-65535,Math.min(65535,ls['hue_inc']));
-            lightState = lightState.ct_inc(finalLS['ct_inc']);
+            lightState = lightState.ct_inc(Math.max(-347,Math.min(347,ls['ct_inc'])));
             if (!lampOn && (!('bri' in ls) || ls.bri == 0)) {
                 lightState = lightState.on();
                 lightState = lightState.bri(254);
