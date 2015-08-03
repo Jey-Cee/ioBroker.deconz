@@ -232,7 +232,7 @@ adapter.on('stateChange', function (id, state) {
 
         //only available in command state
         if ('transitiontime' in ls){
-            var transitiontime = parseInt(transitiontime);
+            var transitiontime = parseInt(ls['transitiontime']);
             if (!isNaN(transitiontime)){
                 transitiontime = transitiontime * 100;
                 finalLS['transitiontime'] = transitiontime;
