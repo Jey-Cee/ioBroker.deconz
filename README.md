@@ -7,6 +7,13 @@ some LivingColors) via Philips Hue Bridges to ioBroker
 ## Install
 
 ## Changelog
+### 0.4.0
+* (Pmant) add command state
+
+### 0.3.2
+* (Pmant) add groups as channels (write only)
+* (Pmant) fix prevent duplicate channel names
+
 ### 0.3.1
 * (Pmant) fix another bug with spaces
 * (Pmant) fix hue/sat bug
