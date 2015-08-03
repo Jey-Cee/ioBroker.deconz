@@ -280,10 +280,11 @@ adapter.on('stateChange', function (id, state) {
                     adapter.setState([id, 'bri'].join('.'), {val: 0, ack: false});
                     return;
                 }
-            };
-            finalLS['on'] = true;
+            }else{
+                finalLS['on'] = true;
+                lightState = lightState.on();
+            }
             lightState = lightState.bri(finalLS['bri']);
-            lightState = lightState.on();
         }
 
         //log final changes / states
