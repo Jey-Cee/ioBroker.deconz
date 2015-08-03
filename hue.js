@@ -281,7 +281,9 @@ adapter.on('stateChange', function (id, state) {
                     return;
                 }
             };
+            finalLS['on'] = true;
             lightState = lightState.bri(finalLS['bri']);
+            lightState = lightState.on();
         }
 
         //log final changes / states
