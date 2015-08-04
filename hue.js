@@ -323,7 +323,7 @@ adapter.on('stateChange', function (id, state) {
                     //write back known states
                     for (var finalState in finalLS) {
                         if (finalState in alls){
-                            adapter.log.debug('writing state "' + [id, finalState].join('.') + '" : ' + finalLS[finalState]);
+                            adapter.log.info('writing state "' + [id, finalState].join('.') + '" : ' + finalLS[finalState]);
                             adapter.setState([id, finalState].join('.'), {val: finalLS[finalState], ack: true});
                         }
                     }
