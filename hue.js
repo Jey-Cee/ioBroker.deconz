@@ -109,6 +109,7 @@ adapter.on('stateChange', function (id, state) {
                         }
                     }
                 default:
+                    alls[iddp] = idStates[idState].val;
                     break;
             }
         }
