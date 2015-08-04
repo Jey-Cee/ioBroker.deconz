@@ -391,13 +391,8 @@ function processMessages() {
 
 function browse(callback) {
     var res = [];
-    setTimeout(function () {
-        if (callback) callback(res);
-    }, 3000);
-
-    api.nupnpSearch(function(err, result) {
-        if (!err && result) res.push(result);
-    });
+    var timeout = 5000; //ms
+    api.upnpSearch(timeout).then(function(bridge){callback(bridge)}).done();
 }
 
 function main() {

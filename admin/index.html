@@ -25,7 +25,9 @@
             "de": "Polling interval (sec)",
             "ru": "Polling interval (sec)"
         },
-        "Connect Bridge": {"en": "Connect Bridge", "de": "Connect Bridge", "ru": "Connect Bridge"}
+        "Connect Bridge": {"en": "Connect Bridge", "de": "Verbinde Bridge", "ru": "Connect Bridge"},
+        "Find Bridge": {"en": "Find Bridge", "de": "Suche Bridge", "ru": "Find Bridge"}
+
     };
 
     function setValue(id, value, onChange) {
@@ -58,7 +60,11 @@
         var obj = {};
         $('.value').each(function () {
             var $this = $(this);
-            obj[$this.attr('id')] = $this.val();
+            if ($this.attr('type') == 'checkbox') {
+                obj[$this.attr('id')] = $this.prop('checked');
+            } else {
+                obj[$this.attr('id')] = $this.val();
+            }
         });
         $('.check').each(function () {
             var $this = $(this);
@@ -70,6 +76,9 @@
     $(document).ready(function () {
         $('#tabs').tabs();
         $('#connect').button().click(function () {
+            alert('todo');
+        });
+        $('#find').button().click(function () {
             alert('todo');
         });
     });
@@ -92,7 +101,7 @@
                     <td class="translate">Bridge User</td><td><input type="text" id="user" class="value"></td>
                 </tr>
                 <tr>
-                    <td class="translate">Polling</td><td><input type="checkbox" id="polling" value="true" class="value"></td>
+                    <td class="translate">Polling</td><td><input type="checkbox" id="polling" class="value"></td>
                 </tr>
                 <tr>
                     <td class="translate">Polling interval (sec)</td><td><input type="text" id="pollingInterval" class="value"></td>
@@ -101,9 +110,9 @@
             </table>
         </div>
         <div id="pair">
-            <button id="connect" class="translateB">Connect Bridge</button>
+            <button id="find"><span class="translate">Find Bridge</span></button>
+            <button id="connect"><span class="translate">Connect Bridge</span></button>
             <p id="message">
-
             </p>
         </div>
     </div>
