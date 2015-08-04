@@ -40,46 +40,51 @@ adapter.on('stateChange', function (id, state) {
         }
         //gather states that need to be changed
         var ls = {};
+        var alls = {};
         var lampOn = false;
         for (var idState in idStates) {
             var idtmp = idState.split('.');
             var iddp  = idtmp.pop();
             switch (iddp) {
                 case 'bri':
+                    alls[iddp] = idStates[idState].val;
                     ls[iddp] = idStates[idState].val;
                     if (idStates[idState].ack && idStates[idState].val > 0) lampOn = true;
                     break;
                 case 'alert':
+                    alls[iddp] = idStates[idState].val;
                     if (dp == 'alert') ls[iddp] = idStates[idState].val;
                     break;
                 case 'effect':
+                    alls[iddp] = idStates[idState].val;
                     if (dp == 'effect') ls[iddp] = idStates[idState].val;
                     break;
                 case 'r':
                 case 'g':
                 case 'b':
+                    alls[iddp] = idStates[idState].val;
                     if (dp == 'r' || dp == 'g' || dp == 'b'){
                         ls[iddp] = idStates[idState].val;
-                        ls['colormode'] = 'xy';
                     }
                     break;
                 case 'ct':
+                    alls[iddp] = idStates[idState].val;
                     if (dp == 'ct') {
                         ls[iddp] = idStates[idState].val;
-                        ls['colormode'] = 'ct';
                     }
                     break;
                 case 'hue':
+                    alls[iddp] = idStates[idState].val;
                 case 'sat':
+                    alls[iddp] = idStates[idState].val;
                     if (dp == 'hue' || dp == 'sat'){
                         ls[iddp] = idStates[idState].val;
-                        ls['colormode'] = 'hs';
                     }
                     break;
                 case 'xy':
+                    alls[iddp] = idStates[idState].val;
                     if (dp == 'xy') {
                         ls[iddp] = idStates[idState].val;
-                        ls['colormode'] = 'xy';
                     }
                     break;
                 case 'command':
@@ -215,9 +220,6 @@ adapter.on('stateChange', function (id, state) {
             else finalLS['alert'] = ls.alert;
             lightState = lightState.alert(finalLS.alert);
         }
-        if ('colormode' in ls) {
-            finalLS['colormode'] = ls.colormode;
-        }
         if ('effect' in ls) {
             if (['colorloop'].indexOf(ls.effect) == -1) finalLS['effect'] = 'none';
             else finalLS['effect'] = ls.effect;
@@ -234,43 +236,42 @@ adapter.on('stateChange', function (id, state) {
         if ('transitiontime' in ls){
             var transitiontime = parseInt(ls['transitiontime']);
             if (!isNaN(transitiontime)){
-                //finalLS['transitiontime'] = transitiontime;
+                finalLS['transitiontime'] = transitiontime;
                 lightState = lightState.transitiontime(transitiontime);
             }
         }
-        if ('sat_inc' in ls && !('sat' in finalLS)){
-            //finalLS['sat_inc'] = Math.max(-254,Math.min(254,ls['sat_inc']));
-            lightState = lightState.sat_inc(Math.max(-254,Math.min(254,ls['sat_inc'])));
+        if ('sat_inc' in ls && !('sat' in finalLS) && 'sat' in alls){
+            finalLS['sat'] = (((ls['sat_inc']+alls['sat']) % 255) + 255) % 255;
             if (!lampOn && (!('bri' in ls) || ls.bri == 0)) {
                 lightState = lightState.on();
                 lightState = lightState.bri(254);
                 finalLS['bri'] = 254;
                 finalLS['on'] = true;
             }
+            lightState = lightState.sat(finalLS['sat']);
         }
-        if ('hue_inc' in ls && !('hue' in finalLS)){
-            //finalLS['hue_inc'] = Math.max(-65535,Math.min(65535,ls['hue_inc']));
-            lightState = lightState.hue_inc(Math.max(-65535,Math.min(65535,ls['hue_inc'])));
+        if ('hue_inc' in ls && !('hue' in finalLS) && 'hue' in alls){
+            finalLS['hue'] = (((ls['hue_inc']+alls['hue']) % 65536) + 65536) % 65536;
             if (!lampOn && (!('bri' in ls) || ls.bri == 0)) {
                 lightState = lightState.on();
                 lightState = lightState.bri(254);
                 finalLS['bri'] = 254;
                 finalLS['on'] = true;
             }
+            lightState = lightState.hue(finalLS['hue']);
         }
-        if ('ct_inc' in ls && !('ct' in finalLS)){
-            //finalLS['ct_inc'] = Math.max(-65535,Math.min(65535,ls['hue_inc']));
-            lightState = lightState.ct_inc(Math.max(-347,Math.min(347,ls['ct_inc'])));
+        if ('ct_inc' in ls && !('ct' in finalLS) && 'ct' in alls){
+            finalLS['ct'] =  (((((alls['ct']-153)+ls['ct_inc']) % 348) + 348) % 348) + 153;
             if (!lampOn && (!('bri' in ls) || ls.bri == 0)) {
                 lightState = lightState.on();
                 lightState = lightState.bri(254);
                 finalLS['bri'] = 254;
                 finalLS['on'] = true;
             }
+            lightState = lightState.ct(finalLS['ct']);
         }
         if('bri_inc' in ls && !commands.hasOwnProperty('bri')) {
-            if (!('bri' in finalLS)) finalLS['bri'] = 0;
-            finalLS['bri'] = Math.max(0,Math.min(254,finalLS['bri'] + ls['bri_inc']));
+            finalLS['bri'] = (((alls['bri'] + ls['bri_inc']) % 255) + 255) % 255;
             if (finalLS['bri'] == 0) {
                 if (lampOn){
                     lightState = lightState.on(false);
@@ -284,6 +285,15 @@ adapter.on('stateChange', function (id, state) {
                 lightState = lightState.on();
             }
             lightState = lightState.bri(finalLS['bri']);
+        }
+
+        //change colormode
+        if ('xy' in finalLS) {
+            finalLS['colormode'] = 'xy';
+        } else if ('ct' in finalLS) {
+            finalLS['colormode'] = 'ct';
+        } else if ('hue' in finalLS || 'sat' in finalLS) {
+            finalLS['colormode'] = 'hs';
         }
 
         //log final changes / states
@@ -312,7 +322,10 @@ adapter.on('stateChange', function (id, state) {
                     }
                     //write back known states
                     for (var finalState in finalLS) {
-                        adapter.setState([id, finalState].join('.'), {val: finalLS[finalState], ack: true});
+                        if (finalState in alls){
+                            adapter.log.debug('writing state "' + [id, finalState].join('.') + '" : ' + finalLS[finalState]);
+                            adapter.setState([id, finalState].join('.'), {val: finalLS[finalState], ack: true});
+                        }
                     }
                 });
             }
