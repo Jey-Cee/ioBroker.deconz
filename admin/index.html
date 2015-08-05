@@ -26,9 +26,8 @@
             "de": "Polling interval (sec)",
             "ru": "Polling interval (sec)"
         },
-        "Connect Bridge": {"en": "Connect Bridge", "de": "Verbinde Bridge", "ru": "Connect Bridge"},
-        "Find Bridge": {"en": "Find Bridge", "de": "Suche Bridge", "ru": "Find Bridge"}
-
+        "Find Bridge": {"en": "Find Bridge", "de": "Suche Bridge", "ru": "Find Bridge"},
+        "Create User": {"en": "Create User", "de": "Erstelle User", "ru": "Create User"}
     };
 
     function setValue(id, value, onChange) {
@@ -81,24 +80,47 @@
     $(document).ready(function () {
         $('#tabs').tabs();
         $('#create').button().click(function () {
-            sendTo('hue.' + instance, 'createUser', $('#bridge.value').val(), function (result) {
-                try{
-                    alert("(todo) result: " + result);
-                } catch (e) {
-                    alert ("error creating user");
-                }
-            });
+            $("#dialog-bridges").html('Please press link button now! <br />You have 30 seconds.');
+            $("#dialog-bridges").dialog("open");
+            var count = 0;
+            ! function sendCreate(){
+                sendTo('hue.' + instance, 'createUser', $('#bridge.value').val(), function (result) {
+                    try {
+                        var result = JSON.parse(result);
+                        if (result.error > 0) {
+                            if (result.error == 101 && count<10) {
+                                count++;
+                                console.log(count);
+                                setTimeout(sendCreate, 3000);
+                                return;
+                            } else {
+                                alert("error creating user: " + result.message);
+                            }
+                        } else {
+                            $('#user.value').val(result.message);
+                        }
+                    } catch (e) {
+                        alert("error creating user");
+                    }
+                    $("#dialog-bridges").dialog('close');
+                });
+            }();
+
         });
         $('#find').button().click(function () {
-            $("#dialog-bridges").html('please wait...');
+            $("#dialog-bridges").html('Please wait, searching for bridge.');
             $("#dialog-bridges").dialog( "open" );
             sendTo('hue.' + instance, 'browse', 5000, function (result) {
                 try{
                     var arr = JSON.parse(result);
-                    var popup = 'Select a bridge: <br />';
-                    arr.forEach(function(element, index, array) {
-                        popup = popup + '<a href="javascript:$(\'#bridge.value\').val(\'' + element.ipaddress + '\');$(\'#dialog-bridges\').dialog(\'close\')">' + element.ipaddress + '</a><br />';
-                    });
+                    if (!arr.length){
+                        var popup = 'Cannot find bridge';
+                    }else{
+                        var popup = 'Select a bridge: <br />';
+                        arr.forEach(function(element, index, array) {
+                            popup = popup + '<a href="javascript:$(\'#bridge.value\').val(\'' + element.ipaddress + '\');$(\'#dialog-bridges\').dialog(\'close\')">' + element.ipaddress + '</a><br />';
+                        });
+                    }
                     $("#dialog-bridges").html(popup);
                 } catch (e) {
                     alert ("error finding bridge");

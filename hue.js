@@ -348,7 +348,7 @@ adapter.on('message', function (obj) {
                 break;
             case 'createUser':
                 createUser(obj.message,function(res) {
-                    if (obj.callback) adapter.sendTo(obj.from, obj.command, res, obj.callback);
+                    if (obj.callback) adapter.sendTo(obj.from, obj.command, JSON.stringify(res), obj.callback);
                 });
                 wait = true;
                 break;
@@ -384,7 +384,24 @@ function browse(timeout, callback) {
 }
 
 function createUser(ip,callback) {
-    callback(ip);
+    var hostname = ip,
+        newUserName,
+        userDescription = "ioBroker.hue";
+    try{
+        var api = new HueApi();
+        api.registerUser(hostname, newUserName, userDescription)
+            .then(function(newUser) {
+                adapter.log.info('created new User: ' + newUser);
+                callback({error:0,message:newUser});
+            })
+            .fail(function(err) {
+                callback({error:err.type,message:err.message});
+            })
+            .done();
+    }catch (e){
+        adapter.log.error(e);
+        callback({error:1,message:JSON.stringify(e)});
+    }
 }
 
 var HueApi     = hue.HueApi;
