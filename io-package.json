@@ -10,6 +10,7 @@
         "license":                  "Apache 2.0",
         "platform":                 "Javascript/Node.js",
         "mode":                     "daemon",
+        "messagebox":               true,
         "readme":                   "https://raw.githubusercontent.com/ioBroker/ioBroker.hue/master/README.md",
         "loglevel":                 "info",
         "keywords":                 ["philips", "hue", "led", "rgb", "smartlink", "zigbee"],
