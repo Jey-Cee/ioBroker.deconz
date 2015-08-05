@@ -7,6 +7,11 @@ some LivingColors) via Philips Hue Bridges to ioBroker
 ## Install
 
 ## Changelog
+### 0.4.2
+* (Pmant) add find bridge
+* (Pmant) add create user
+* (Pmant) fix enable polling
+
 ### 0.4.1
 * (Pmant) calculate and write back inc values
 

@@ -335,9 +335,32 @@ adapter.on('stateChange', function (id, state) {
     });
 });
 
+// New message arrived. obj is array with current messages
 adapter.on('message', function (obj) {
-    if (obj) processMessage(obj);
-    processMessages();
+    var wait = false;
+    if (obj) {
+        switch (obj.command) {
+            case 'browse':
+                browse(obj.message,function(res) {
+                    if (obj.callback) adapter.sendTo(obj.from, obj.command, JSON.stringify(res), obj.callback);
+                });
+                wait = true;
+                break;
+            case 'createUser':
+                createUser(obj.message,function(res) {
+                    if (obj.callback) adapter.sendTo(obj.from, obj.command, res, obj.callback);
+                });
+                wait = true;
+                break;
+            default:
+                adapter.log.warn("Unknown command: " + obj.command);
+                break;
+        }
+    }
+    if (!wait && obj.callback) {
+        adapter.sendTo(obj.from, obj.command, obj.message, obj.callback);
+    }
+    return true;
 });
 
 adapter.on('unload', function (callback) {
@@ -354,46 +377,23 @@ adapter.on('ready', function () {
     main();
 });
 
+function browse(timeout, callback) {
+    timeout = parseInt(timeout);
+    if (isNaN(timeout)) timeout = 5000;
+    hue.upnpSearch(timeout).then(callback).done();
+}
+
+function createUser(ip,callback) {
+    callback(ip);
+}
+
 var HueApi     = hue.HueApi;
-var lightState = hue.lightState;
 var api;
 
 var channelIds = {};
 var pollIds = [];
 var pollChannels = [];
 var groupIds = {};
-
-function processMessage(obj) {
-    if (!obj || !obj.command) return;
-
-    switch (obj.command) {
-        case 'browse': {
-                browse(function (res) {
-                    if (obj.callback) adapter.sendTo(obj.from, obj.command, res, obj.callback);
-                });
-            }
-            break;
-
-        case 'stopInstance': {
-            //unloadHMM();
-        }
-    }
-}
-
-function processMessages() {
-    adapter.getMessage(function (err, obj) {
-        if (obj) {
-            processMessage(obj.command, obj.message);
-            processMessages();
-        }
-    });
-}
-
-function browse(callback) {
-    var res = [];
-    var timeout = 5000; //ms
-    api.upnpSearch(timeout).then(function(bridge){callback(bridge)}).done();
-}
 
 function main() {
     adapter.subscribeStates('*');
@@ -705,7 +705,6 @@ function main() {
     if (adapter.config.polling && adapter.config.pollingInterval > 0) {
         setTimeout(pollSingle, 5 * 1000, 0);
     }
-
 }
 
 function pollSingle(count) {
