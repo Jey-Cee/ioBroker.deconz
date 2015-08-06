@@ -9,6 +9,7 @@
 <script type="text/javascript" src="../../js/adapter-settings.js"></script>
 
 <script type="text/javascript">
+    var bridges = [];
     systemDictionary = {
         "Philips HUE adapter settings": {
             "en": "Philips HUE adapter settings",
@@ -25,7 +26,8 @@
             "de": "Polling interval (sec)",
             "ru": "Polling interval (sec)"
         },
-        "Connect Bridge": {"en": "Connect Bridge", "de": "Connect Bridge", "ru": "Connect Bridge"}
+        "Find Bridge": {"en": "Find Bridge", "de": "Suche Bridge", "ru": "Find Bridge"},
+        "Create User": {"en": "Create User", "de": "Erstelle User", "ru": "Create User"}
     };
 
     function setValue(id, value, onChange) {
@@ -45,6 +47,10 @@
 
     // the function loadSettings has to exist ...
     function load(settings, onChange) {
+        $("#dialog-bridges").dialog({
+            autoOpen: false,
+            modal: true
+        });
         for (var key in settings) {
             setValue(key, settings[key], onChange);
         }
@@ -58,7 +64,11 @@
         var obj = {};
         $('.value').each(function () {
             var $this = $(this);
-            obj[$this.attr('id')] = $this.val();
+            if ($this.attr('type') == 'checkbox') {
+                obj[$this.attr('id')] = $this.prop('checked');
+            } else {
+                obj[$this.attr('id')] = $this.val();
+            }
         });
         $('.check').each(function () {
             var $this = $(this);
@@ -69,45 +79,89 @@
 
     $(document).ready(function () {
         $('#tabs').tabs();
-        $('#connect').button().click(function () {
-            alert('todo');
+        $('#create').button().click(function () {
+            $("#dialog-bridges").html('Please press link button now! <br />You have 30 seconds.');
+            $("#dialog-bridges").dialog("open");
+            var count = 0;
+            ! function sendCreate(){
+                sendTo('hue.' + instance, 'createUser', $('#bridge.value').val(), function (result) {
+                    try {
+                        var result = JSON.parse(result);
+                        if (result.error > 0) {
+                            if (result.error == 101 && count<10) {
+                                count++;
+                                console.log(count);
+                                setTimeout(sendCreate, 3000);
+                                return;
+                            } else {
+                                alert("error creating user: " + result.message);
+                            }
+                        } else {
+                            $('#user.value').val(result.message);
+                        }
+                    } catch (e) {
+                        alert("error creating user");
+                    }
+                    $("#dialog-bridges").dialog('close');
+                });
+            }();
+
+        });
+        $('#find').button().click(function () {
+            $("#dialog-bridges").html('Please wait, searching for bridge.');
+            $("#dialog-bridges").dialog( "open" );
+            sendTo('hue.' + instance, 'browse', 5000, function (result) {
+                try{
+                    var arr = JSON.parse(result);
+                    if (!arr.length){
+                        var popup = 'Cannot find bridge';
+                    }else{
+                        var popup = 'Select a bridge: <br />';
+                        arr.forEach(function(element, index, array) {
+                            popup = popup + '<a href="javascript:$(\'#bridge.value\').val(\'' + element.ipaddress + '\');$(\'#dialog-bridges\').dialog(\'close\')">' + element.ipaddress + '</a><br />';
+                        });
+                    }
+                    $("#dialog-bridges").html(popup);
+                } catch (e) {
+                    alert ("error finding bridge");
+                }
+            });
         });
     });
 </script>
+<style>
+    #settings tr { line-height: 2.5em; }
+</style>
 
 <!-- you have to put your config page in a div with id adapter-container -->
 <div id="adapter-container">
     <table><tr><td><img src="hue.jpeg" width="64" height="64"></td><td><h3 class="translate">Philips HUE adapter settings</h3></td></tr></table>
-    <div id="tabs">
-        <ul>
-            <li><a href="#settings" class="translate">Settings</a></li>
-            <li><a href="#pair" class="translate">Auto setup</a></li>
-        </ul>
         <div id="settings">
             <table>
                 <tr>
-                    <td class="translate">Bridge Address</td><td><input type="text" id="bridge" class="value"></td>
+                    <td class="translate">Bridge Address</td>
+                    <td><input type="text" id="bridge" class="value"></td>
+                    <td><button id="find"><span class="translate">Find Bridge</span></button></td>
                 </tr>
                 <tr>
-                    <td class="translate">Bridge User</td><td><input type="text" id="user" class="value"></td>
+                    <td class="translate">Bridge User</td>
+                    <td><input type="text" id="user" class="value"></td>
+                    <td><button id="create"><span class="translate">Create User</span></button></td>
                 </tr>
                 <tr>
-                    <td class="translate">Polling</td><td><input type="checkbox" id="polling" value="true" class="value"></td>
+                    <td class="translate">Polling</td>
+                    <td><input type="checkbox" id="polling" class="value"></td>
+                    <td></td>
                 </tr>
                 <tr>
-                    <td class="translate">Polling interval (sec)</td><td><input type="text" id="pollingInterval" class="value"></td>
+                    <td class="translate">Polling interval (sec)</td>
+                    <td><input type="text" id="pollingInterval" class="value"></td>
+                    <td></td>
                 </tr>
-
             </table>
-        </div>
-        <div id="pair">
-            <button id="connect" class="translateB">Connect Bridge</button>
-            <p id="message">
 
-            </p>
+            <div id="dialog-bridges" title="Select a bridge"></div>
         </div>
-    </div>
-
 </div>
 
 </html>
