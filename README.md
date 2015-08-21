@@ -7,6 +7,9 @@ some LivingColors) via Philips Hue Bridges to ioBroker
 ## Install
 
 ## Changelog
+### 0.4.3
+* (Pmant) fix adapter crash
+
 ### 0.4.2
 * (Pmant) add find bridge (experimental)
 * (Pmant) add create user (experimental)

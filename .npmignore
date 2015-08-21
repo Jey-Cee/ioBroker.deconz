@@ -1,2 +1,7 @@
 Gruntfile.js
 tasks
+node_modules
+.idea
+.gitignore
+.git
+.DS_Store

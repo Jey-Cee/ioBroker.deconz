@@ -418,11 +418,13 @@ function main() {
 
     api.getFullState(function (err, config) {
         if (err) {
-            adapter.log.error(JSON.stringify(err));
-            process.exit(1);
+            adapter.log.warn('could not connect to ip');
+            setTimeout(main,5000);
+            return;
         } else if (!config) {
-            adapter.log.error('Cannot get the configuration from hue bridge');
-            process.exit(1);
+            adapter.log.warn('Cannot get the configuration from hue bridge');
+            setTimeout(main,5000);
+            return;
         }
 
         var channelNames = [];

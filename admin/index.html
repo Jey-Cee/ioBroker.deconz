@@ -97,7 +97,7 @@
                                 alert("error creating user: " + result.message);
                             }
                         } else {
-                            $('#user.value').val(result.message);
+                            $('#user.value').val(result.message).change();
                         }
                     } catch (e) {
                         alert("error creating user");
@@ -118,7 +118,7 @@
                     }else{
                         var popup = 'Select a bridge: <br />';
                         arr.forEach(function(element, index, array) {
-                            popup = popup + '<a href="javascript:$(\'#bridge.value\').val(\'' + element.ipaddress + '\');$(\'#dialog-bridges\').dialog(\'close\')">' + element.ipaddress + '</a><br />';
+                            popup = popup + '<a href="javascript:$(\'#bridge.value\').val(\'' + element.ipaddress + '\').change();$(\'#dialog-bridges\').dialog(\'close\')">' + element.ipaddress + '</a><br />';
                         });
                     }
                     $("#dialog-bridges").html(popup);
