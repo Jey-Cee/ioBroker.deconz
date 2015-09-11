@@ -7,6 +7,9 @@ some LivingColors) via Philips Hue Bridges to ioBroker
 ## Install
 
 ## Changelog
+### 0.4.4
+* (bluefox) fix config edit
+
 ### 0.4.3
 * (Pmant) fix adapter crash
 
