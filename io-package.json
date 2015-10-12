@@ -16,7 +16,8 @@
         "loglevel":                 "info",
         "keywords":                 ["philips", "hue", "led", "rgb", "smartlink", "zigbee"],
         "icon":                     "hue.jpeg",
-        "extIcon":                  "https://raw.githubusercontent.com/ioBroker/ioBroker.hue/master/admin/hue.jpeg"
+        "extIcon":                  "https://raw.githubusercontent.com/ioBroker/ioBroker.hue/master/admin/hue.jpeg",
+        "type":                     "hardware"
     },
     "native": {
         "bridge": "0.0.0.0",
