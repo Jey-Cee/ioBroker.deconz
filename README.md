@@ -6,11 +6,11 @@ English
 Connects Philips Hue LED Bulbs, Friends of Hue LED Lamps and Stripes and other SmartLink capable Devices (LivingWhites,
 some LivingColors) via Philips Hue Bridges to ioBroker.
 
-You must configure the user name in the HUE Bridge and use it in settings. To create an user see here: http://developers.meethue.com/gettingstarted.html 
+You must configure the user name in the HUE Bridge and use it in settings. To create an user see here: http://www.developers.meethue.com/documentation/getting-started
 
 Deutsch
 -------------
-Bindet Philips Hue / LivingColors / LivingWhites Lampen ein. In den Adapter-Settings muss die IP der Hue Bridge sowie ein Username konfiguriert werden. Zum Anlegen eines Users auf der Bridge siehe: http://developers.meethue.com/gettingstarted.html
+Bindet Philips Hue / LivingColors / LivingWhites Lampen ein. In den Adapter-Settings muss die IP der Hue Bridge sowie ein Username konfiguriert werden. Zum Anlegen eines Users auf der Bridge siehe: http://www.developers.meethue.com/documentation/getting-started
 
 ## Install
 
