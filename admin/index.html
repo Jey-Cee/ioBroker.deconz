@@ -16,19 +16,23 @@
             "de": "Philips HUE adapter settings",
             "ru": "Philips HUE adapter settings"
         },
-        "Settings":       {"en": "Settings",       "de": "Einstellungen",    "ru": "Настройки"},
-        "Auto setup":     {"en": "Auto setup",     "de": "Auto-Setup",       "ru": "Авто настройка"},
-        "Bridge Address": {"en": "Bridge Address", "de": "Bridge-Adresse",   "ru": "Адрес hue bridge"},
-        "Bridge User":    {"en": "Bridge User",    "de": "Bridge-Anwender",  "ru": "Пользователь hue bridge"},
-        "Polling":        {"en": "Polling",        "de": "Polling",          "ru": "Опрос"},
+        "Settings":         {"en": "Settings",       "de": "Einstellungen",    "ru": "Настройки"},
+        "Auto setup":       {"en": "Auto setup",     "de": "Auto-Setup",       "ru": "Авто настройка"},
+        "Bridge Address":   {"en": "Bridge Address", "de": "Bridge-Adresse",   "ru": "Адрес hue bridge"},
+        "Bridge User":      {"en": "Bridge User",    "de": "Bridge-Anwender",  "ru": "Пользователь hue bridge"},
+        "Polling":          {"en": "Polling",        "de": "Polling",          "ru": "Опрос"},
         "Polling interval (sec)": {
             "en": "Polling interval(sec)",
             "de": "Pollintervall(sek)",
             "ru": "Интервал опроса(сек)"
         },
-        "Find Bridge":    {"en": "Find Bridge",    "de": "Suche Bridge",     "ru": "Найти hue bridge"},
-        "Create User":    {"en": "Create User",    "de": "Erstelle User",    "ru": "Создать пользователя"}
+        "Find Bridge":      {"en": "Find Bridge",    "de": "Suche Bridge",     "ru": "Найти hue bridge"},
+        "Create User":      {"en": "Create User",    "de": "Erstelle User",    "ru": "Создать пользователя"},
+        "Enable adapter first": {"en": "Enable adapter first", "de": "Aktivier Adapter zuerst", "ru": "Сначала надо активировать драйвер"},
+        "Ok":               {"en": "Ok",            "de": "Ok",                 "ru": "Ok"}
     };
+
+    var active   = false;
 
     function setValue(id, value, onChange) {
         // example: select elements with id=key and class=value and insert value
@@ -54,6 +58,10 @@
         for (var key in settings) {
             setValue(key, settings[key], onChange);
         }
+        // read if instance is active or enabled
+        socket.emit('getState', 'system.adapter.' + adapter + '.' + instance + '.alive', function (err, state) {
+            active = common.enabled || (state && state.val);
+        });
         onChange(false);
     }
 
@@ -80,10 +88,17 @@
     $(document).ready(function () {
         $('#tabs').tabs();
         $('#create').button().click(function () {
+            if (!active) {
+                showMessage(_('Enable adapter first'), 'Warning', 'info');
+                return;
+            }
+
+
             $("#dialog-bridges").html('Please press link button now! <br />You have 30 seconds.');
             $("#dialog-bridges").dialog("open");
             var count = 0;
-            ! function sendCreate(){
+
+            (function sendCreate(){
                 sendTo('hue.' + instance, 'createUser', $('#bridge.value').val(), function (result) {
                     try {
                         var result = JSON.parse(result);
@@ -97,17 +112,22 @@
                                 alert("error creating user: " + result.message);
                             }
                         } else {
-                            $('#user.value').val(result.message).change();
+                            $('#user.value').val(result.message).trigger('change');
                         }
                     } catch (e) {
                         alert("error creating user");
                     }
                     $("#dialog-bridges").dialog('close');
                 });
-            }();
-
+            })();
         });
+
         $('#find').button().click(function () {
+            if (!active) {
+                showMessage(_('Enable adapter first'), 'Warning', 'info');
+                return;
+            }
+
             $("#dialog-bridges").html('Please wait, searching for bridge.');
             $("#dialog-bridges").dialog( "open" );
             sendTo('hue.' + instance, 'browse', 5000, function (result) {
@@ -118,7 +138,7 @@
                     }else{
                         var popup = 'Select a bridge: <br />';
                         arr.forEach(function(element, index, array) {
-                            popup = popup + '<a href="javascript:$(\'#bridge.value\').val(\'' + element.ipaddress + '\').change();$(\'#dialog-bridges\').dialog(\'close\')">' + element.ipaddress + '</a><br />';
+                            popup = popup + '<a href="javascript:$(\'#bridge.value\').val(\'' + element.ipaddress + '\').trigger(\'change\');$(\'#dialog-bridges\').dialog(\'close\')">' + element.ipaddress + '</a><br />';
                         });
                     }
                     $("#dialog-bridges").html(popup);

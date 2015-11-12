@@ -1,12 +1,23 @@
 ![Logo](admin/hue.jpeg)
 # ioBroker Philips Hue Bridge Adapter
 
+English
+--------------------
 Connects Philips Hue LED Bulbs, Friends of Hue LED Lamps and Stripes and other SmartLink capable Devices (LivingWhites,
-some LivingColors) via Philips Hue Bridges to ioBroker
+some LivingColors) via Philips Hue Bridges to ioBroker.
+
+You must configure the user name in the HUE Bridge and use it in settings. To create an user see here: http://www.developers.meethue.com/documentation/getting-started
+
+Deutsch
+-------------
+Bindet Philips Hue / LivingColors / LivingWhites Lampen ein. In den Adapter-Settings muss die IP der Hue Bridge sowie ein Username konfiguriert werden. Zum Anlegen eines Users auf der Bridge siehe: http://www.developers.meethue.com/documentation/getting-started
 
 ## Install
 
 ## Changelog
+### 0.4.4
+* (bluefox) fix config edit
+
 ### 0.4.3
 * (Pmant) fix adapter crash
 
