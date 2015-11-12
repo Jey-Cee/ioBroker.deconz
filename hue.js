@@ -32,6 +32,12 @@ adapter.on('stateChange', function (id, state) {
         adapter.setState([id, 'bri'].join('.'), {val: bri, ack: false});
         return;
     }
+    //if .level changed instead change .bri to level.val*254
+    if (dp == 'level') {
+        var bri = state.val * 254;
+        adapter.setState([id, 'bri'].join('.'), {val: bri, ack: false});
+        return;
+    }
     //get lamp states
     adapter.getStates(id + '.*', function (err, idStates){
         if (err) {
@@ -297,6 +303,11 @@ adapter.on('stateChange', function (id, state) {
             finalLS['colormode'] = 'hs';
         }
 
+        //set level to final bri / 2.54
+        if ('bri' in finalLS){
+            finalLS['level'] = Math.min(Math.ceil(finalLS['bri']/2.54),100);
+        }
+
         //log final changes / states
         adapter.log.info('final lightState: ' + JSON.stringify(finalLS));
 
@@ -456,6 +467,7 @@ function main() {
             }
 
             light.state.command = '{}';
+            light.state.level = 0;
 
             for (var state in light.state) {
 
@@ -485,6 +497,12 @@ function main() {
                         obj.common.role = 'level.dimmer';
                         obj.common.min = 0;
                         obj.common.max = 254;
+                        break;
+                    case 'level':
+                        obj.common.type = 'number';
+                        obj.common.role = 'level.dimmer';
+                        obj.common.min = 0;
+                        obj.common.max = 100;
                         break;
                     case 'hue':
                         obj.common.type = 'number';
@@ -597,6 +615,7 @@ function main() {
             group.action.g = 0;
             group.action.b = 0;
             group.action.command = '{}';
+            group.action.level = 0;
 
             for (var action in group.action) {
 
@@ -626,6 +645,12 @@ function main() {
                         obj.common.role = 'level.dimmer';
                         obj.common.min = 0;
                         obj.common.max = 254;
+                        break;
+                    case 'level':
+                        obj.common.type = 'number';
+                        obj.common.role = 'level.dimmer';
+                        obj.common.min = 0;
+                        obj.common.max = 100;
                         break;
                     case 'hue':
                         obj.common.type = 'number';
@@ -749,6 +774,7 @@ function pollSingle(count) {
                 if (states.on == false) {
                     states.bri = 0;
                 }
+                states.level = Math.min(Math.ceil(states.bri/2.54),100);
                 for (var state in states) {
                     var objId = pollChannels[count] + '.' + state;
                     adapter.setState(objId, {val: states[state], ack: true});

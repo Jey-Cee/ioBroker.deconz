@@ -15,6 +15,11 @@ Bindet Philips Hue / LivingColors / LivingWhites Lampen ein. In den Adapter-Sett
 ## Install
 
 ## Changelog
+
+### 0.5.0
+* (Pman) update to node-hue-api 1.2.x
+* (Pman) add level state (bri percentage)
+
 ### 0.4.4
 * (bluefox) fix config edit
 
