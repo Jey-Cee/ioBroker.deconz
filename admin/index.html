@@ -138,7 +138,7 @@
                     }else{
                         var popup = 'Select a bridge: <br />';
                         arr.forEach(function(element, index, array) {
-                            popup = popup + '<a href="javascript:$(\'#bridge.value\').val(\'' + element.ipaddress + '\').trigger(\'change\');$(\'#dialog-bridges\').dialog(\'close\')">' + element.ipaddress + '</a><br />';
+                            popup = popup + '<a href="#" onclick="$(\'#bridge.value\').val(\'' + element.ipaddress + '\').trigger(\'change\');$(\'#dialog-bridges\').dialog(\'close\')">' + element.ipaddress + '</a><br />';
                         });
                     }
                     $("#dialog-bridges").html(popup);
