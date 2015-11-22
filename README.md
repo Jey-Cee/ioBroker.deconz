@@ -16,6 +16,9 @@ Bindet Philips Hue / LivingColors / LivingWhites Lampen ein. In den Adapter-Sett
 
 ## Changelog
 
+### 0.5.1
+* (Pman) fix find bridge popup
+
 ### 0.5.0
 * (Pman) update to node-hue-api 1.2.x
 * (Pman) add level state (bri percentage)
