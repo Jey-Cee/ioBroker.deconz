@@ -16,6 +16,11 @@ Bindet Philips Hue / LivingColors / LivingWhites Lampen ein. In den Adapter-Sett
 
 ## Changelog
 
+### 0.5.2
+* (Pman) fix jscs warnings
+* (Pman) improve RGB conversion
+* (Pman) add update rgb color
+
 ### 0.5.1
 * (Pman) fix find bridge popup
 
