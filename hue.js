@@ -11,8 +11,9 @@
 /*jslint node: true */
 "use strict";
 
-var hue   = require('node-hue-api');
+var hue = require('node-hue-api');
 var utils = require(__dirname + '/lib/utils'); // Get common adapter utils
+var huehelper = require('./lib/HueHelper');
 
 var adapter = utils.adapter('hue');
 
@@ -23,18 +24,19 @@ adapter.on('stateChange', function (id, state) {
 
     adapter.log.debug('stateChange ' + id + ' ' + JSON.stringify(state));
     var tmp = id.split('.');
-    var dp  = tmp.pop();
-    id      = tmp.slice(2).join('.');
+    var dp = tmp.pop();
+    id = tmp.slice(2).join('.');
     var ls = {};
     //if .on changed instead change .bri to 254 or 0
+    var bri = 0;
     if (dp == 'on') {
-        var bri = state.val ? 254 : 0;
+        bri = state.val ? 254 : 0;
         adapter.setState([id, 'bri'].join('.'), {val: bri, ack: false});
         return;
     }
     //if .level changed instead change .bri to level.val*254
     if (dp == 'level') {
-        var bri = state.val * 254;
+        bri = Math.max(Math.min(Math.round(state.val * 2.54), 254), 0);
         adapter.setState([id, 'bri'].join('.'), {val: bri, ack: false});
         return;
     }
@@ -45,12 +47,15 @@ adapter.on('stateChange', function (id, state) {
             return;
         }
         //gather states that need to be changed
-        var ls = {};
+        ls = {};
         var alls = {};
         var lampOn = false;
         for (var idState in idStates) {
+            if (!idStates.hasOwnProperty(idState)) {
+                continue;
+            }
             var idtmp = idState.split('.');
-            var iddp  = idtmp.pop();
+            var iddp = idtmp.pop();
             switch (iddp) {
                 case 'bri':
                     alls[iddp] = idStates[idState].val;
@@ -69,7 +74,7 @@ adapter.on('stateChange', function (id, state) {
                 case 'g':
                 case 'b':
                     alls[iddp] = idStates[idState].val;
-                    if (dp == 'r' || dp == 'g' || dp == 'b'){
+                    if (dp == 'r' || dp == 'g' || dp == 'b') {
                         ls[iddp] = idStates[idState].val;
                     }
                     break;
@@ -80,14 +85,9 @@ adapter.on('stateChange', function (id, state) {
                     }
                     break;
                 case 'hue':
-                    alls[iddp] = idStates[idState].val;
-                    if (dp == 'hue' || dp == 'sat'){
-                        ls[iddp] = idStates[idState].val;
-                    }
-                    break;
                 case 'sat':
                     alls[iddp] = idStates[idState].val;
-                    if (dp == 'hue' || dp == 'sat'){
+                    if (dp == 'hue' || dp == 'sat') {
                         ls[iddp] = idStates[idState].val;
                     }
                     break;
@@ -99,17 +99,20 @@ adapter.on('stateChange', function (id, state) {
                     break;
                 case 'command':
                     if (dp == 'command') {
-                        try{
+                        try {
                             var commands = JSON.parse(state.val);
                             for (var command in commands) {
+                                if (!commands.hasOwnProperty(command)) {
+                                    continue;
+                                }
                                 if (command == 'on') {
                                     //convert on to bri
                                     if (commands[command] && !commands.hasOwnProperty('bri')) {
                                         ls.bri = 254;
-                                    }else {
+                                    } else {
                                         ls.bri = 0;
                                     }
-                                }else {
+                                } else {
                                     ls[command] = commands[command];
                                 }
                             }
@@ -127,17 +130,17 @@ adapter.on('stateChange', function (id, state) {
         }
         //apply rgb to xy
         if ('r' in ls || 'g' in ls || 'b' in ls) {
-            if (! ('r' in ls)){
+            if (!('r' in ls)) {
                 ls.r = 0;
             }
-            if (! ('g' in ls)){
+            if (!('g' in ls)) {
                 ls.g = 0;
             }
-            if (! ('b' in ls)){
+            if (!('b' in ls)) {
                 ls.b = 0;
             }
-            var xyb = calculateXYB({'r': ls.r/255, 'g': ls.g/255, 'b': ls.b/255});
-            ls.bri = Math.max(ls.r,ls.g,ls.b);
+            var xyb = huehelper.RgbToXYB(ls.r / 255, ls.g / 255, ls.b / 255, 'LCT001');
+            ls.bri = xyb.b;//Math.max(ls.r,ls.g,ls.b);
             ls.xy = xyb.x + ',' + xyb.y;
         }
 
@@ -147,10 +150,10 @@ adapter.on('stateChange', function (id, state) {
         var lightState = hue.lightState.create();
         var finalLS = {};
         if (ls.bri > 0) {
-            lightState = lightState.on().bri(Math.min(254,ls.bri));
-            finalLS.bri = Math.min(254,ls.bri);
+            lightState = lightState.on().bri(Math.min(254, ls.bri));
+            finalLS.bri = Math.min(254, ls.bri);
             finalLS.on = true;
-        }else {
+        } else {
             lightState = lightState.off();
             finalLS.bri = 0;
             finalLS.on = false;
@@ -158,40 +161,10 @@ adapter.on('stateChange', function (id, state) {
         if ('xy' in ls) {
             var xy = ls.xy.split(',');
             xy = {'x': xy[0], 'y': xy[1]};
-            if (!checkPointInLampsReach(xy,colorPointsForModel(''))) {
-                var colorPoints = colorPointsForModel('');
-                //It seems the colour is out of reach
-                //let's find the closest colour we can produce with our lamp and send this XY value out.
-
-                //Find the closest point on each line in the triangle.
-                var pAB = getClosestPointToPoints(colorPoints.r,colorPoints.g,xy);
-                var pAC = getClosestPointToPoints(colorPoints.b,colorPoints.r,xy);
-                var pBC = getClosestPointToPoints(colorPoints.g,colorPoints.b,xy);
-
-                //Get the distances per point and see which point is closer to our Point.
-                var dAB = getDistanceBetweenTwoPoints(xy,pAB);
-                var dAC = getDistanceBetweenTwoPoints(xy,pAC);
-                var dBC = getDistanceBetweenTwoPoints(xy,pBC);
-
-                var lowest = dAB;
-                var closestPoint = pAB;
-
-                if (dAC < lowest) {
-                    lowest = dAC;
-                    closestPoint = pAC;
-                }
-                if (dBC < lowest) {
-                    lowest = dBC;
-                    closestPoint = pBC;
-                }
-
-                //Change the xy value to a value which is within the reach of the lamp.
-                xy.x = closestPoint.x;
-                xy.y = closestPoint.y;
-            }
+            xy = huehelper.GamutXYforModel(xy.x, xy.y, 'LCT001');
             finalLS.xy = xy.x + ',' + xy.y;
-            lightState = lightState.xy(xy.x,xy.y);
-            if (!lampOn && (!('bri' in ls) || ls.bri == 0)) {
+            lightState = lightState.xy(xy.x, xy.y);
+            if (!lampOn && (!('bri' in ls) || ls.bri === 0)) {
                 lightState = lightState.on();
                 lightState = lightState.bri(254);
                 finalLS.bri = 254;
@@ -199,9 +172,9 @@ adapter.on('stateChange', function (id, state) {
             }
         }
         if ('ct' in ls) {
-            finalLS.ct = Math.max(153,Math.min(500,ls.ct));
+            finalLS.ct = Math.max(153, Math.min(500, ls.ct));
             lightState = lightState.ct(finalLS.ct);
-            if (!lampOn && (!('bri' in ls) || ls.bri == 0)) {
+            if (!lampOn && (!('bri' in ls) || ls.bri === 0)) {
                 lightState = lightState.on();
                 lightState = lightState.bri(254);
                 finalLS.bri = 254;
@@ -209,9 +182,9 @@ adapter.on('stateChange', function (id, state) {
             }
         }
         if ('hue' in ls) {
-            finalLS.hue = Math.max(0,Math.min(65535,ls.hue));
+            finalLS.hue = Math.max(0, Math.min(65535, ls.hue));
             lightState = lightState.hue(finalLS.hue);
-            if (!lampOn && (!('bri' in ls) || ls.bri == 0)) {
+            if (!lampOn && (!('bri' in ls) || ls.bri === 0)) {
                 lightState = lightState.on();
                 lightState = lightState.bri(254);
                 finalLS.bri = 254;
@@ -219,9 +192,9 @@ adapter.on('stateChange', function (id, state) {
             }
         }
         if ('sat' in ls) {
-            finalLS.sat = Math.max(0,Math.min(254,ls.sat));
+            finalLS.sat = Math.max(0, Math.min(254, ls.sat));
             lightState = lightState.sat(finalLS.sat);
-            if (!lampOn && (!('bri' in ls) || ls.bri == 0)) {
+            if (!lampOn && (!('bri' in ls) || ls.bri === 0)) {
                 lightState = lightState.on();
                 lightState = lightState.bri(254);
                 finalLS.bri = 254;
@@ -229,15 +202,21 @@ adapter.on('stateChange', function (id, state) {
             }
         }
         if ('alert' in ls) {
-            if (['select','lselect'].indexOf(ls.alert) == -1) finalLS.alert = 'none';
-            else finalLS.alert = ls.alert;
+            if (['select', 'lselect'].indexOf(ls.alert) == -1) {
+                finalLS.alert = 'none';
+            } else {
+                finalLS.alert = ls.alert;
+            }
             lightState = lightState.alert(finalLS.alert);
         }
         if ('effect' in ls) {
-            if (['colorloop'].indexOf(ls.effect) == -1) finalLS.effect = 'none';
-            else finalLS.effect = ls.effect;
+            if (['colorloop'].indexOf(ls.effect) == -1) {
+                finalLS.effect = 'none';
+            } else {
+                finalLS.effect = ls.effect;
+            }
             lightState = lightState.effect(finalLS.effect);
-            if (!lampOn && (finalLS.effect != 'none' && !('bri' in ls) || ls.bri == 0)) {
+            if (!lampOn && (finalLS.effect != 'none' && !('bri' in ls) || ls.bri === 0)) {
                 lightState = lightState.on();
                 lightState = lightState.bri(254);
                 finalLS.bri = 254;
@@ -246,16 +225,16 @@ adapter.on('stateChange', function (id, state) {
         }
 
         //only available in command state
-        if ('transitiontime' in ls){
+        if ('transitiontime' in ls) {
             var transitiontime = parseInt(ls.transitiontime);
-            if (!isNaN(transitiontime)){
+            if (!isNaN(transitiontime)) {
                 finalLS.transitiontime = transitiontime;
                 lightState = lightState.transitiontime(transitiontime);
             }
         }
-        if ('sat_inc' in ls && !('sat' in finalLS) && 'sat' in alls){
+        if ('sat_inc' in ls && !('sat' in finalLS) && 'sat' in alls) {
             finalLS.sat = (((ls.sat_inc + alls.sat) % 255) + 255) % 255;
-            if (!lampOn && (!('bri' in ls) || ls.bri == 0)) {
+            if (!lampOn && (!('bri' in ls) || ls.bri === 0)) {
                 lightState = lightState.on();
                 lightState = lightState.bri(254);
                 finalLS.bri = 254;
@@ -263,9 +242,9 @@ adapter.on('stateChange', function (id, state) {
             }
             lightState = lightState.sat(finalLS.sat);
         }
-        if ('hue_inc' in ls && !('hue' in finalLS) && 'hue' in alls){
+        if ('hue_inc' in ls && !('hue' in finalLS) && 'hue' in alls) {
             finalLS.hue = (((ls.hue_inc + alls.hue) % 65536) + 65536) % 65536;
-            if (!lampOn && (!('bri' in ls) || ls.bri == 0)) {
+            if (!lampOn && (!('bri' in ls) || ls.bri === 0)) {
                 lightState = lightState.on();
                 lightState = lightState.bri(254);
                 finalLS.bri = 254;
@@ -273,9 +252,9 @@ adapter.on('stateChange', function (id, state) {
             }
             lightState = lightState.hue(finalLS.hue);
         }
-        if ('ct_inc' in ls && !('ct' in finalLS) && 'ct' in alls){
-            finalLS.ct =  (((((alls.ct - 153) + ls.ct_inc) % 348) + 348) % 348) + 153;
-            if (!lampOn && (!('bri' in ls) || ls.bri == 0)) {
+        if ('ct_inc' in ls && !('ct' in finalLS) && 'ct' in alls) {
+            finalLS.ct = (((((alls.ct - 153) + ls.ct_inc) % 348) + 348) % 348) + 153;
+            if (!lampOn && (!('bri' in ls) || ls.bri === 0)) {
                 lightState = lightState.on();
                 lightState = lightState.bri(254);
                 finalLS.bri = 254;
@@ -283,17 +262,17 @@ adapter.on('stateChange', function (id, state) {
             }
             lightState = lightState.ct(finalLS.ct);
         }
-        if('bri_inc' in ls && !commands.hasOwnProperty('bri')) {
-            finalLS.bri = (((alls.bri + ls['bri_inc']) % 255) + 255) % 255;
-            if (finalLS.bri == 0) {
-                if (lampOn){
+        if ('bri_inc' in ls) {
+            finalLS.bri = (((alls.bri + ls.bri_inc) % 255) + 255) % 255;
+            if (finalLS.bri === 0) {
+                if (lampOn) {
                     lightState = lightState.on(false);
                     finalLS.on = false;
                 } else {
                     adapter.setState([id, 'bri'].join('.'), {val: 0, ack: false});
                     return;
                 }
-            }else{
+            } else {
                 finalLS.on = true;
                 lightState = lightState.on();
             }
@@ -310,8 +289,8 @@ adapter.on('stateChange', function (id, state) {
         }
 
         //set level to final bri / 2.54
-        if ('bri' in finalLS){
-            finalLS.level = Math.min(Math.ceil(finalLS.bri/2.54),100);
+        if ('bri' in finalLS) {
+            finalLS.level = Math.max(Math.min(Math.round(finalLS.bri / 2.54), 100), 0);
         }
 
         //log final changes / states
@@ -329,10 +308,9 @@ adapter.on('stateChange', function (id, state) {
                 api.setGroupLightState(groupIds[id], lightState, function (err, res) {
                     if (err || !res) {
                         adapter.log.error('error: ' + err);
-                        return;
                     }
                 });
-            }else {
+            } else {
                 api.setLightState(channelIds[id], lightState, function (err, res) {
                     if (err || !res) {
                         adapter.log.error('error: ' + err);
@@ -340,7 +318,10 @@ adapter.on('stateChange', function (id, state) {
                     }
                     //write back known states
                     for (var finalState in finalLS) {
-                        if (finalState in alls){
+                        if (!finalLS.hasOwnProperty(finalState)) {
+                            continue;
+                        }
+                        if (finalState in alls) {
                             adapter.setState([id, finalState].join('.'), {val: finalLS[finalState], ack: true});
                         }
                     }
@@ -357,13 +338,13 @@ adapter.on('message', function (obj) {
     if (obj) {
         switch (obj.command) {
             case 'browse':
-                browse(obj.message,function(res) {
+                browse(obj.message, function (res) {
                     if (obj.callback) adapter.sendTo(obj.from, obj.command, JSON.stringify(res), obj.callback);
                 });
                 wait = true;
                 break;
             case 'createUser':
-                createUser(obj.message,function(res) {
+                createUser(obj.message, function (res) {
                     if (obj.callback) adapter.sendTo(obj.from, obj.command, JSON.stringify(res), obj.callback);
                 });
                 wait = true;
@@ -399,28 +380,27 @@ function browse(timeout, callback) {
     hue.upnpSearch(timeout).then(callback).done();
 }
 
-function createUser(ip,callback) {
-    var hostname = ip,
-        newUserName,
-        userDescription = "ioBroker.hue";
-    try{
+function createUser(ip, callback) {
+    var newUserName = null;
+    var userDescription = "ioBroker.hue";
+    try {
         var api = new HueApi();
-        api.registerUser(hostname, newUserName, userDescription)
-            .then(function(newUser) {
+        api.registerUser(ip, newUserName, userDescription)
+            .then(function (newUser) {
                 adapter.log.info('created new User: ' + newUser);
-                callback({error:0,message:newUser});
+                callback({error: 0, message: newUser});
             })
-            .fail(function(err) {
-                callback({error:err.type,message:err.message});
+            .fail(function (err) {
+                callback({error: err.type, message: err.message});
             })
             .done();
-    }catch (e){
+    } catch (e) {
         adapter.log.error(e);
-        callback({error:1,message:JSON.stringify(e)});
+        callback({error: 1, message: JSON.stringify(e)});
     }
 }
 
-var HueApi     = hue.HueApi;
+var HueApi = hue.HueApi;
 var api;
 
 var channelIds = {};
@@ -436,11 +416,11 @@ function main() {
     api.getFullState(function (err, config) {
         if (err) {
             adapter.log.warn('could not connect to ip');
-            setTimeout(main,5000);
+            setTimeout(main, 5000);
             return;
         } else if (!config) {
             adapter.log.warn('Cannot get the configuration from hue bridge');
-            setTimeout(main,5000);
+            setTimeout(main, 5000);
             return;
         }
 
@@ -451,20 +431,23 @@ function main() {
 
         var lights = config.lights;
         var count = 0;
-        for (var id in lights) {
+        for (var lid in lights) {
+            if (!lights.hasOwnProperty(lid)) {
+                continue;
+            }
             count += 1;
-            var light = lights[id];
+            var light = lights[lid];
 
             var channelName = config.config.name + '.' + light.name;
             if (channelNames.indexOf(channelName) !== -1) {
                 adapter.log.warn('channel "' + channelName + '" already exists, skipping lamp');
                 continue;
-            }else {
+            } else {
                 channelNames.push(channelName);
             }
-            channelIds[channelName.replace(/\s/g,'_')] = id;
-            pollIds.push(id);
-            pollChannels.push(channelName.replace(/\s/g,'_'));
+            channelIds[channelName.replace(/\s/g, '_')] = lid;
+            pollIds.push(lid);
+            pollChannels.push(channelName.replace(/\s/g, '_'));
 
             if (light.type !== 'Dimmable plug-in unit' && light.type !== 'Dimmable light') {
                 light.state.r = 0;
@@ -476,117 +459,119 @@ function main() {
             light.state.level = 0;
 
             for (var state in light.state) {
-
+                if (!light.state.hasOwnProperty(state)) {
+                    continue;
+                }
                 var objId = channelName + '.' + state;
 
-                adapter.setState(objId.replace(/\s/g,'_'), {val: light.state[state], ack: true});
+                adapter.setState(objId.replace(/\s/g, '_'), {val: light.state[state], ack: true});
 
-                var obj = {
+                var lobj = {
                     type: 'state',
                     common: {
-                        name: objId.replace(/\s/g,'_'),
+                        name: objId.replace(/\s/g, '_'),
                         read: true,
                         write: true
                     },
                     native: {
-                        id: id
+                        id: lid
                     }
                 };
 
                 switch (state) {
                     case 'on':
-                        obj.common.type = 'boolean';
-                        obj.common.role = 'switch';
+                        lobj.common.type = 'boolean';
+                        lobj.common.role = 'switch';
                         break;
                     case 'bri':
-                        obj.common.type = 'number';
-                        obj.common.role = 'level.dimmer';
-                        obj.common.min = 0;
-                        obj.common.max = 254;
+                        lobj.common.type = 'number';
+                        lobj.common.role = 'level.dimmer';
+                        lobj.common.min = 0;
+                        lobj.common.max = 254;
                         break;
                     case 'level':
-                        obj.common.type = 'number';
-                        obj.common.role = 'level.dimmer';
-                        obj.common.min = 0;
-                        obj.common.max = 100;
+                        lobj.common.type = 'number';
+                        lobj.common.role = 'level.dimmer';
+                        lobj.common.min = 0;
+                        lobj.common.max = 100;
                         break;
                     case 'hue':
-                        obj.common.type = 'number';
-                        obj.common.role = 'level.color.hue';
-                        obj.common.min = 0;
-                        obj.common.max = 65535;
+                        lobj.common.type = 'number';
+                        lobj.common.role = 'level.color.hue';
+                        lobj.common.min = 0;
+                        lobj.common.max = 65535;
                         break;
                     case 'sat':
-                        obj.common.type = 'number';
-                        obj.common.role = 'level.color.saturation';
-                        obj.common.min = 0;
-                        obj.common.max = 254;
+                        lobj.common.type = 'number';
+                        lobj.common.role = 'level.color.saturation';
+                        lobj.common.min = 0;
+                        lobj.common.max = 254;
                         break;
                     case 'xy':
-                        obj.common.type = 'string';
-                        obj.common.role = 'level.color.xy';
+                        lobj.common.type = 'string';
+                        lobj.common.role = 'level.color.xy';
                         break;
                     case 'ct':
-                        obj.common.type = 'number';
-                        obj.common.role = 'level.color.temperature';
-                        obj.common.min = 153;
-                        obj.common.max = 500;
+                        lobj.common.type = 'number';
+                        lobj.common.role = 'level.color.temperature';
+                        lobj.common.min = 153;
+                        lobj.common.max = 500;
                         break;
                     case 'alert':
-                        obj.common.type = 'string';
-                        obj.common.role = 'switch';
+                        lobj.common.type = 'string';
+                        lobj.common.role = 'switch';
                         break;
                     case 'effect':
-                        obj.common.type = 'string';
-                        obj.common.role = 'switch';
+                        lobj.common.type = 'string';
+                        lobj.common.role = 'switch';
                         break;
                     case 'colormode':
-                        obj.common.type = 'string';
-                        obj.common.role = 'indicator.colormode';
-                        obj.common.write = false;
+                        lobj.common.type = 'string';
+                        lobj.common.role = 'indicator.colormode';
+                        lobj.common.write = false;
                         break;
                     case 'reachable':
-                        obj.common.type = 'boolean';
-                        obj.common.write = false;
-                        obj.common.role = 'indicator.reachable';
+                        lobj.common.type = 'boolean';
+                        lobj.common.write = false;
+                        lobj.common.role = 'indicator.reachable';
                         break;
                     case 'r':
-                        obj.common.type = 'number';
-                        obj.common.role = 'level.color.r';
-                        obj.common.min = 0;
-                        obj.common.max = 255;
+                        lobj.common.type = 'number';
+                        lobj.common.role = 'level.color.r';
+                        lobj.common.min = 0;
+                        lobj.common.max = 255;
                         break;
                     case 'g':
-                        obj.common.type = 'number';
-                        obj.common.role = 'level.color.g';
-                        obj.common.min = 0;
-                        obj.common.max = 255;
+                        lobj.common.type = 'number';
+                        lobj.common.role = 'level.color.g';
+                        lobj.common.min = 0;
+                        lobj.common.max = 255;
                         break;
                     case 'b':
-                        obj.common.type = 'number';
-                        obj.common.role = 'level.color.b';
-                        obj.common.min = 0;
-                        obj.common.max = 255;
+                        lobj.common.type = 'number';
+                        lobj.common.role = 'level.color.b';
+                        lobj.common.min = 0;
+                        lobj.common.max = 255;
                         break;
                     case 'command':
-                        obj.common.type = 'string';
-                        obj.common.role = 'command';
+                        lobj.common.type = 'string';
+                        lobj.common.role = 'command';
                         break;
                     default:
                         adapter.log.info('skip: ' + state);
                         break;
                 }
-                adapter.setObject(objId.replace(/\s/g,'_'), obj);
+                adapter.setObject(objId.replace(/\s/g, '_'), lobj);
             }
 
-            adapter.setObject(channelName.replace(/\s/g,'_'), {
+            adapter.setObject(channelName.replace(/\s/g, '_'), {
                 type: 'channel',
                 common: {
-                    name: channelName.replace(/\s/g,'_'),
+                    name: channelName.replace(/\s/g, '_'),
                     role: light.type === 'Dimmable plug-in unit' || light.type === 'Dimmable light' ? 'light.dimmer' : 'light.color'
                 },
                 native: {
-                    id: id,
+                    id: lid,
                     type: light.type,
                     name: light.name,
                     modelid: light.modelid,
@@ -603,19 +588,22 @@ function main() {
         adapter.log.info('creating/updating light groups');
 
         var groups = config.groups;
-        var count = 0;
-        for (var id in groups) {
+        count = 0;
+        for (var gid in groups) {
+            if (!groups.hasOwnProperty(gid)) {
+                continue;
+            }
             count += 1;
-            var group = groups[id];
+            var group = groups[gid];
 
             var groupName = config.config.name + '.' + group.name;
             if (channelNames.indexOf(groupName) !== -1) {
                 adapter.log.warn('channel "' + groupName + '" already exists, skipping group');
                 continue;
-            }else {
+            } else {
                 channelNames.push(groupName);
             }
-            groupIds[groupName.replace(/\s/g,'_')] = id;
+            groupIds[groupName.replace(/\s/g, '_')] = gid;
 
             group.action.r = 0;
             group.action.g = 0;
@@ -624,112 +612,115 @@ function main() {
             group.action.level = 0;
 
             for (var action in group.action) {
+                if (!group.action.hasOwnProperty(action)) {
+                    continue;
+                }
 
-                var objId = groupName + '.' + action;
+                var gobjId = groupName + '.' + action;
 
-                adapter.setState(objId.replace(/\s/g,'_'), {val: group.action[action], ack: true});
+                adapter.setState(gobjId.replace(/\s/g, '_'), {val: group.action[action], ack: true});
 
-                var obj = {
+                var gobj = {
                     type: 'state',
                     common: {
-                        name: objId.replace(/\s/g,'_'),
+                        name: gobjId.replace(/\s/g, '_'),
                         read: true,
                         write: true
                     },
                     native: {
-                        id: id
+                        id: gid
                     }
                 };
 
                 switch (action) {
                     case 'on':
-                        obj.common.type = 'boolean';
-                        obj.common.role = 'switch';
+                        gobj.common.type = 'boolean';
+                        gobj.common.role = 'switch';
                         break;
                     case 'bri':
-                        obj.common.type = 'number';
-                        obj.common.role = 'level.dimmer';
-                        obj.common.min = 0;
-                        obj.common.max = 254;
+                        gobj.common.type = 'number';
+                        gobj.common.role = 'level.dimmer';
+                        gobj.common.min = 0;
+                        gobj.common.max = 254;
                         break;
                     case 'level':
-                        obj.common.type = 'number';
-                        obj.common.role = 'level.dimmer';
-                        obj.common.min = 0;
-                        obj.common.max = 100;
+                        gobj.common.type = 'number';
+                        gobj.common.role = 'level.dimmer';
+                        gobj.common.min = 0;
+                        gobj.common.max = 100;
                         break;
                     case 'hue':
-                        obj.common.type = 'number';
-                        obj.common.role = 'level.color.hue';
-                        obj.common.min = 0;
-                        obj.common.max = 65535;
+                        gobj.common.type = 'number';
+                        gobj.common.role = 'level.color.hue';
+                        gobj.common.min = 0;
+                        gobj.common.max = 65535;
                         break;
                     case 'sat':
-                        obj.common.type = 'number';
-                        obj.common.role = 'level.color.saturation';
-                        obj.common.min = 0;
-                        obj.common.max = 254;
+                        gobj.common.type = 'number';
+                        gobj.common.role = 'level.color.saturation';
+                        gobj.common.min = 0;
+                        gobj.common.max = 254;
                         break;
                     case 'xy':
-                        obj.common.type = 'string';
-                        obj.common.role = 'level.color.xy';
+                        gobj.common.type = 'string';
+                        gobj.common.role = 'level.color.xy';
                         break;
                     case 'ct':
-                        obj.common.type = 'number';
-                        obj.common.role = 'level.color.temperature';
-                        obj.common.min = 153;
-                        obj.common.max = 500;
+                        gobj.common.type = 'number';
+                        gobj.common.role = 'level.color.temperature';
+                        gobj.common.min = 153;
+                        gobj.common.max = 500;
                         break;
                     case 'alert':
-                        obj.common.type = 'string';
-                        obj.common.role = 'switch';
+                        gobj.common.type = 'string';
+                        gobj.common.role = 'switch';
                         break;
                     case 'effect':
-                        obj.common.type = 'string';
-                        obj.common.role = 'switch';
+                        gobj.common.type = 'string';
+                        gobj.common.role = 'switch';
                         break;
                     case 'colormode':
-                        obj.common.type = 'string';
-                        obj.common.role = 'indicator.colormode';
-                        obj.common.write = false;
+                        gobj.common.type = 'string';
+                        gobj.common.role = 'indicator.colormode';
+                        gobj.common.write = false;
                         break;
                     case 'r':
-                        obj.common.type = 'number';
-                        obj.common.role = 'level.color.r';
-                        obj.common.min = 0;
-                        obj.common.max = 255;
+                        gobj.common.type = 'number';
+                        gobj.common.role = 'level.color.r';
+                        gobj.common.min = 0;
+                        gobj.common.max = 255;
                         break;
                     case 'g':
-                        obj.common.type = 'number';
-                        obj.common.role = 'level.color.g';
-                        obj.common.min = 0;
-                        obj.common.max = 255;
+                        gobj.common.type = 'number';
+                        gobj.common.role = 'level.color.g';
+                        gobj.common.min = 0;
+                        gobj.common.max = 255;
                         break;
                     case 'b':
-                        obj.common.type = 'number';
-                        obj.common.role = 'level.color.b';
-                        obj.common.min = 0;
-                        obj.common.max = 255;
+                        gobj.common.type = 'number';
+                        gobj.common.role = 'level.color.b';
+                        gobj.common.min = 0;
+                        gobj.common.max = 255;
                         break;
                     case 'command':
-                        obj.common.type = 'string';
-                        obj.common.role = 'command';
+                        gobj.common.type = 'string';
+                        gobj.common.role = 'command';
                         break;
                     default:
                         adapter.log.info('skip: ' + action);
                         break;
                 }
-                adapter.setObject(objId.replace(/\s/g,'_'), obj);
+                adapter.setObject(gobjId.replace(/\s/g, '_'), gobj);
             }
 
-            adapter.setObject(groupName.replace(/\s/g,'_'), {
+            adapter.setObject(groupName.replace(/\s/g, '_'), {
                 type: 'channel',
                 common: {
-                    name: groupName.replace(/\s/g,'_'),
+                    name: groupName.replace(/\s/g, '_'),
                     role: group.type
                 },
                 native: {
-                    id: id,
+                    id: gid,
                     type: group.type,
                     name: group.name,
                     lights: group.lights
@@ -741,10 +732,10 @@ function main() {
 
         // Create/update device
         adapter.log.info('creating/updating bridge device');
-        adapter.setObject(config.config.name.replace(/\s/g,'_'), {
+        adapter.setObject(config.config.name.replace(/\s/g, '_'), {
             type: 'device',
             common: {
-                name: config.config.name.replace(/\s/g,'_')
+                name: config.config.name.replace(/\s/g, '_')
             },
             native: config.config
         });
@@ -760,30 +751,44 @@ function pollSingle(count) {
     if (count >= pollIds.length) {
         count = 0;
         setTimeout(pollSingle, adapter.config.pollingInterval * 1000, count);
-        return;
     } else {
         adapter.log.debug('polling light ' + pollChannels[count]);
         api.lightStatus(pollIds[count], function (err, result) {
             if (err) {
                 adapter.log.error(err);
-            } if (!result) {
+            }
+            if (!result) {
                 adapter.log.error('Cannot get result for lightStatus' + pollIds[count]);
             } else {
                 var states = {};
-                for (var state in result.state) {
-                    states[state] = result.state[state];
+                for (var stateA in result.state) {
+                    if (!result.state.hasOwnProperty(stateA)) {
+                        continue;
+                    }
+                    states[stateA] = result.state[stateA];
                 }
-                if (states.reachable == false) {
+                if (states.reachable === false) {
                     states.bri = 0;
                     states.on = false;
                 }
-                if (states.on == false) {
+                if (states.on === false) {
                     states.bri = 0;
                 }
-                states.level = Math.min(Math.ceil(states.bri/2.54),100);
-                for (var state in states) {
-                    var objId = pollChannels[count] + '.' + state;
-                    adapter.setState(objId, {val: states[state], ack: true});
+                if (states.xy !== undefined) {
+                    var xy = states.xy.toString().split(',');
+                    var rgb = huehelper.XYBtoRGB(xy[0], xy[1], (states.bri / 254));
+                    //adapter.log.info("xy"+states.xy+" split:"+JSON.stringify(xy)+" rgb:"+JSON.stringify(rgb));
+                    states.r = Math.round(rgb.Red * 254);
+                    states.g = Math.round(rgb.Green * 254);
+                    states.b = Math.round(rgb.Blue * 254);
+                }
+                states.level = Math.max(Math.min(Math.round(states.bri / 2.54), 100), 0);
+                for (var stateB in states) {
+                    if (!states.hasOwnProperty(stateB)) {
+                        continue;
+                    }
+                    var objId = pollChannels[count] + '.' + stateB;
+                    adapter.setState(objId, {val: states[stateB], ack: true});
                 }
             }
             count++;
@@ -791,230 +796,3 @@ function pollSingle(count) {
         });
     }
 }
-
-
-
-//rgb conversion functions
-function colorPointsForModel(model)  {
-    return {
-        'r': {'x': 0.674, 'y': 0.322},
-        'g': {'x': 0.408, 'y': 0.517},
-        'b': {'x': 0.168, 'y': 0.041}
-    };
-}
-
-function calculateXYB(rgb) {
-    var red   = rgb.r;
-    var green = rgb.g;
-    var blue  = rgb.b;
-
-    // Apply gamma correction
-    var r = (red   > 0.04045) ? Math.pow((red   + 0.055) / (1.0 + 0.055), 2.4) : (red   / 12.92);
-    var g = (green > 0.04045) ? Math.pow((green + 0.055) / (1.0 + 0.055), 2.4) : (green / 12.92);
-    var b = (blue  > 0.04045) ? Math.pow((blue  + 0.055) / (1.0 + 0.055), 2.4) : (blue  / 12.92);
-
-    // Wide gamut conversion D65
-    var X = r * 0.664511 + g * 0.154324 + b * 0.162028;
-    var Y = r * 0.283881 + g * 0.668433 + b * 0.047685;
-    var Z = r * 0.000088 + g * 0.072310 + b * 0.986039;
-
-    var cx = X / (X + Y + Z);
-    var cy = Y / (X + Y + Z);
-
-    if (isNaN(cx)) {
-        cx = 0.0;
-    }
-
-    if (isNaN(cy)) {
-        cy = 0.0;
-    }
-
-    var xyPoint = {'x': cx, 'y': cy};
-    var colorPoints = colorPointsForModel('');
-    var inReachOfLamps = checkPointInLampsReach(xyPoint, colorPoints);
-
-    if (inReachOfLamps) {
-        return {'x': cx, 'y': cy, 'b': Y};    //Math.max(rgb.r,rgb.g,rgb.b)
-    }
-
-    //It seems the colour is out of reach
-    //let's find the closest colour we can produce with our lamp and send this XY value out.
-
-    //Find the closest point on each line in the triangle.
-    var pAB = getClosestPointToPoints(colorPoints.r,colorPoints.g,xyPoint);
-    var pAC = getClosestPointToPoints(colorPoints.b,colorPoints.r,xyPoint);
-    var pBC = getClosestPointToPoints(colorPoints.g,colorPoints.b,xyPoint);
-
-    //Get the distances per point and see which point is closer to our Point.
-    var dAB = getDistanceBetweenTwoPoints(xyPoint,pAB);
-    var dAC = getDistanceBetweenTwoPoints(xyPoint,pAC);
-    var dBC = getDistanceBetweenTwoPoints(xyPoint,pBC);
-
-    var lowest = dAB;
-    var closestPoint = pAB;
-
-    if (dAC < lowest) {
-        lowest = dAC;
-        closestPoint = pAC;
-    }
-    if (dBC < lowest) {
-        lowest = dBC;
-        closestPoint = pBC;
-    }
-
-    //Change the xy value to a value which is within the reach of the lamp.
-    cx = closestPoint.x;
-    cy = closestPoint.y;
-
-    return {'x': cx, 'y': cy, 'b': Y};
-}
-
-function colorFromXYB(xyb) {
-    var xy = {'x': xyb.x, 'y': xyb.y};
-    var colorPoints = colorPointsForModel('');
-    var inReachOfLamps = checkPointInLampsReach(xy,colorPoints);
-
-    if (!inReachOfLamps) {
-        //It seems the colour is out of reach
-        //let's find the closest colour we can produce with our lamp and send this XY value out.
-
-        //Find the closest point on each line in the triangle.
-        var pAB = getClosestPointToPoints(colorPoints.r,colorPoints.g,xy);
-        var pAC = getClosestPointToPoints(colorPoints.b,colorPoints.r,xy);
-        var pBC = getClosestPointToPoints(colorPoints.g,colorPoints.b,xy);
-
-        //Get the distances per point and see which point is closer to our Point.
-        var dAB = getDistanceBetweenTwoPoints(xy,pAB);
-        var dAC = getDistanceBetweenTwoPoints(xy,pAC);
-        var dBC = getDistanceBetweenTwoPoints(xy,pBC);
-
-        var lowest = dAB;
-        var closestPoint = pAB;
-
-        if (dAC < lowest) {
-            lowest = dAC;
-            closestPoint = pAC;
-        }
-        if (dBC < lowest) {
-            lowest = dBC;
-            closestPoint = pBC;
-        }
-
-        //Change the xy value to a value which is within the reach of the lamp.
-        xy.x = closestPoint.x;
-        xy.y = closestPoint.y;
-    }
-    var x = xy.x;
-    var y = xy.y;
-    var z = 1.0 - x - y;
-
-    var Y = xyb.b;
-    var X = (Y / y) * x;
-    var Z = (Y / y) * z;
-
-    // sRGB D65 conversion
-    var r =  X * 1.656492 - Y * 0.354851 - Z * 0.255038;
-    var g = -X * 0.707196 + Y * 1.655397 + Z * 0.036152;
-    var b =  X * 0.051713 - Y * 0.121364 + Z * 1.011530;
-
-    if (r > b && r > g && r > 1.0) {
-        // red is too big
-        g = g / r;
-        b = b / r;
-        r = 1.0;
-    }
-    else if (g > b && g > r && g > 1.0) {
-        // green is too big
-        r = r / g;
-        b = b / g;
-        g = 1.0;
-    }
-    else if (b > r && b > g && b > 1.0) {
-        // blue is too big
-        r = r / b;
-        g = g / b;
-        b = 1.0;
-    }
-
-    // Apply gamma correction
-    r = r <= 0.0031308 ? 12.92 * r : (1.0 + 0.055) * Math.pow(r, (1.0 / 2.4)) - 0.055;
-    g = g <= 0.0031308 ? 12.92 * g : (1.0 + 0.055) * Math.pow(g, (1.0 / 2.4)) - 0.055;
-    b = b <= 0.0031308 ? 12.92 * b : (1.0 + 0.055) * Math.pow(b, (1.0 / 2.4)) - 0.055;
-
-    if (r > b && r > g) {
-        // red is biggest
-        if (r > 1.0) {
-            g = g / r;
-            b = b / r;
-            r = 1.0;
-        }
-    }
-    else if (g > b && g > r) {
-        // green is biggest
-        if (g > 1.0) {
-            r = r / g;
-            b = b / g;
-            g = 1.0;
-        }
-    }
-    else if (b > r && b > g) {
-        // blue is biggest
-        if (b > 1.0) {
-            r = r / b;
-            g = g / b;
-            b = 1.0;
-        }
-    }
-
-    if (r<0) {
-        r = 0.0;
-    }
-    if (g<0) {
-        g = 0.0;
-    }
-    if (b<0) {
-        b = 0.0;
-    }
-
-    return {'r': r, 'g': g, 'b': b};
-}
-
-function checkPointInLampsReach(xyP, cP) {
-    var v1 = {'x': cP.g.x - cP.r.x, 'y': cP.g.y - cP.r.y};
-    var v2 = {'x': cP.b.x - cP.r.x, 'y': cP.b.y - cP.r.y};
-    var q =  {'x': xyP.x - cP.r.x, 'y': xyP.y - cP.r.y};
-    var s = crossProduct(q,v2) / crossProduct(v1,v2);
-    var t = crossProduct(v1,q) / crossProduct(v1,v2);
-    if ( (s >= 0.0) && (t >= 0.0) && (s+t <= 1.0) ) {
-        return true;
-    }
-    return false;
-}
-
-function crossProduct(p1,p2) {
-    return (p1.x*p2.y - p1.y*p2.x);
-}
-
-function getClosestPointToPoints(a,b,p){
-    var AP = {'x': p.x-a.x, 'y': p.y-a.y};
-    var AB = {'x': b.x-a.x, 'y': b.y-a.y};
-    var ab2 = AB.x*AB.x + AB.y*AB.y;
-    var ap_ab = AP.x*AB.x + AP.y*AB.y;
-    var t = ap_ab / ab2;
-    if (t < 0.0) {
-        t = 0.0;
-    }
-    else if (t > 1.0) {
-        t = 1.0;
-    }
-
-    return {'x': a.x - AB.x*t, 'y': a.y + AB.y * t};
-}
-
-function getDistanceBetweenTwoPoints(one,two) {
-    var dx = one.x - two.x;
-    var dy = one.y - two.y;
-    var dist = Math.sqrt(dx*dx + dy*dy);
-    return dist;
-}
-
