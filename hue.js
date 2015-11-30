@@ -170,6 +170,10 @@ adapter.on('stateChange', function (id, state) {
                 finalLS.bri = 254;
                 finalLS.on = true;
             }
+            var rgb = huehelper.XYBtoRGB(xy.x, xy.y, (finalLS.bri / 254));
+            finalLS.r = Math.round(rgb.Red * 254);
+            finalLS.g = Math.round(rgb.Green * 254);
+            finalLS.b = Math.round(rgb.Blue * 254);
         }
         if ('ct' in ls) {
             finalLS.ct = Math.max(153, Math.min(500, ls.ct));
