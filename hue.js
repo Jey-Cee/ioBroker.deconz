@@ -308,7 +308,7 @@ adapter.on('stateChange', function (id, state) {
                 return;
             }
 
-            if (obj.common.role == 'LightGroup') {
+            if (obj.common.role == 'LightGroup' || obj.common.role == 'Room') {
                 api.setGroupLightState(groupIds[id], lightState, function (err, res) {
                     if (err || !res) {
                         adapter.log.error('error: ' + err);
