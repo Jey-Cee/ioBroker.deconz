@@ -592,6 +592,21 @@ function main() {
         adapter.log.info('creating/updating light groups');
 
         var groups = config.groups;
+		groups[0] = {
+            name: "All",   //"Lightset 0"
+            type: "LightGroup",
+            id: 0,
+            action: {
+                lights: "ALL",
+                alert: "select",
+                bri: 0,
+                colormode: "",
+                ct: 0,
+                effect: "none",
+                hue: 0,
+                on: false
+            }
+        }
         count = 0;
         for (var gid in groups) {
             if (!groups.hasOwnProperty(gid)) {
