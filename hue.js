@@ -597,14 +597,15 @@ function main() {
             type: "LightGroup",
             id: 0,
             action: {
-                lights: "ALL",
                 alert: "select",
                 bri: 0,
                 colormode: "",
                 ct: 0,
                 effect: "none",
                 hue: 0,
-                on: false
+                on: false,
+                sat: 0,
+                xy: '0,0'
             }
         }
         count = 0;
@@ -727,6 +728,7 @@ function main() {
                         break;
                     default:
                         adapter.log.info('skip: ' + action);
+                        continue;
                         break;
                 }
                 adapter.setObject(gobjId.replace(/\s/g, '_'), gobj);
