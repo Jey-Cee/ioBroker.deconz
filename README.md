@@ -16,6 +16,10 @@ Bindet Philips Hue / LivingColors / LivingWhites Lampen ein. In den Adapter-Sett
 
 ## Changelog
 
+### 0.5.4
+* (Pman) Lightset 0 fixed
+* (Pman) support for diffent gamuts
+
 ### 0.5.3
 * (soef) Default Lightset 0 added
 
