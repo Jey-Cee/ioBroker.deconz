@@ -112,6 +112,13 @@ adapter.on('stateChange', function (id, state) {
                                     } else {
                                         ls.bri = 0;
                                     }
+                                } else if (command == 'level') {
+                                    //convert level to bri
+                                    if (!commands.hasOwnProperty('bri')) {
+                                        ls.bri = Math.min(254, Math.max(0, Math.round(parseInt(commands[command]) * 2.54)));
+                                    } else {
+                                        ls.bri = 254;
+                                    }
                                 } else {
                                     ls[command] = commands[command];
                                 }

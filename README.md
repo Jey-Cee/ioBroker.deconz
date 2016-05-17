@@ -18,6 +18,7 @@ Bindet Philips Hue / LivingColors / LivingWhites Lampen ein. In den Adapter-Sett
 
 ### 0.5.5
 * (Pmant) fix error with xy state
+* (Pmant) support level in command state
 
 ### 0.5.4
 * (Pman) Lightset 0 fixed
