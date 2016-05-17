@@ -797,6 +797,7 @@ function pollSingle(count) {
                 }
                 if (states.xy !== undefined) {
                     var xy = states.xy.toString().split(',');
+                    states.xy = states.xy.toString();
                     var rgb = huehelper.XYBtoRGB(xy[0], xy[1], (states.bri / 254));
                     //adapter.log.info("xy"+states.xy+" split:"+JSON.stringify(xy)+" rgb:"+JSON.stringify(rgb));
                     states.r = Math.round(rgb.Red * 254);
