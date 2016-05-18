@@ -112,6 +112,13 @@ adapter.on('stateChange', function (id, state) {
                                     } else {
                                         ls.bri = 0;
                                     }
+                                } else if (command == 'level') {
+                                    //convert level to bri
+                                    if (!commands.hasOwnProperty('bri')) {
+                                        ls.bri = Math.min(254, Math.max(0, Math.round(parseInt(commands[command]) * 2.54)));
+                                    } else {
+                                        ls.bri = 254;
+                                    }
                                 } else {
                                     ls[command] = commands[command];
                                 }
@@ -797,6 +804,7 @@ function pollSingle(count) {
                 }
                 if (states.xy !== undefined) {
                     var xy = states.xy.toString().split(',');
+                    states.xy = states.xy.toString();
                     var rgb = huehelper.XYBtoRGB(xy[0], xy[1], (states.bri / 254));
                     //adapter.log.info("xy"+states.xy+" split:"+JSON.stringify(xy)+" rgb:"+JSON.stringify(rgb));
                     states.r = Math.round(rgb.Red * 254);
