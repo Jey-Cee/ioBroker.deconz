@@ -323,7 +323,7 @@ adapter.on('stateChange', function (id, state) {
                 });
             } else if (obj.common.role == 'switch') {
                 if (finalLS.hasOwnProperty('on')) {
-                    finalLS = {on:Boolean.valueOf(finalLS.on)};
+                    finalLS = {on:finalLS.on};
                     //log final changes / states
                     adapter.log.info('final lightState: ' + JSON.stringify(finalLS));
 
