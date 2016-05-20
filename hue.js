@@ -312,6 +312,7 @@ adapter.on('stateChange', function (id, state) {
                 finalLS.level = Math.max(Math.min(Math.round(finalLS.bri / 2.54), 100), 0);
             }
 
+
             //log final changes / states
             adapter.log.info('final lightState: ' + JSON.stringify(finalLS));
 
@@ -321,6 +322,17 @@ adapter.on('stateChange', function (id, state) {
                         adapter.log.error('error: ' + err);
                     }
                 });
+            } else if (obj.common.role == 'switch') {
+                if (finalLS.hasOwnProperty('on')) {
+                    lightState = hue.lightState.create(finalLS.on);
+                    api.setLightState(channelIds[id], lightState, function (err, res) {
+                        if (err || !res) {
+                            adapter.log.error('error: ' + err);
+                            return;
+                        }
+                        adapter.setState([id, 'on'].join('.'), {val: finalLS.on, ack: true});
+                    });
+                }
             } else {
                 api.setLightState(channelIds[id], lightState, function (err, res) {
                     if (err || !res) {
@@ -460,14 +472,16 @@ function main() {
             pollIds.push(lid);
             pollChannels.push(channelName.replace(/\s/g, '_'));
 
-            if (light.type !== 'Dimmable plug-in unit' && light.type !== 'Dimmable light') {
+            if (light.type == 'Extended color light' && light.type == 'Color Light') {
                 light.state.r = 0;
                 light.state.g = 0;
                 light.state.b = 0;
             }
 
-            light.state.command = '{}';
-            light.state.level = 0;
+            if (light.type != 'On/Off plug-in unit') {
+                light.state.command = '{}';
+                light.state.level = 0;
+            }
 
             for (var state in light.state) {
                 if (!light.state.hasOwnProperty(state)) {
@@ -575,11 +589,17 @@ function main() {
                 adapter.setObject(objId.replace(/\s/g, '_'), lobj);
             }
 
+            var role = "light.color";
+            if (light.type === 'Dimmable light' || light.type === 'Dimmable plug-in unit') {
+                role = 'light.dimmer';
+            } else if (light.type === 'On/Off plug-in unit') {
+                role = 'switch';
+            }
             adapter.setObject(channelName.replace(/\s/g, '_'), {
                 type: 'channel',
                 common: {
                     name: channelName.replace(/\s/g, '_'),
-                    role: light.type === 'Dimmable plug-in unit' || light.type === 'Dimmable light' ? 'light.dimmer' : 'light.color'
+                    role: role
                 },
                 native: {
                     id: lid,
