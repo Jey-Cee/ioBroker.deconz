@@ -57,6 +57,11 @@ adapter.on('stateChange', function (id, state) {
             var idtmp = idState.split('.');
             var iddp = idtmp.pop();
             switch (iddp) {
+                case 'on':
+                    alls['bri'] = idStates[idState].val ? 254 : 0;
+                    ls['bri'] = idStates[idState].val ? 254 : 0;
+                    if (idStates[idState].ack && ls['bri'] > 0) lampOn = true;
+                    break;
                 case 'bri':
                     alls[iddp] = idStates[idState].val;
                     ls[iddp] = idStates[idState].val;
@@ -312,16 +317,36 @@ adapter.on('stateChange', function (id, state) {
                 finalLS.level = Math.max(Math.min(Math.round(finalLS.bri / 2.54), 100), 0);
             }
 
-            //log final changes / states
-            adapter.log.info('final lightState: ' + JSON.stringify(finalLS));
 
             if (obj.common.role == 'LightGroup' || obj.common.role == 'Room') {
+                //log final changes / states
+                adapter.log.info('final lightState: ' + JSON.stringify(finalLS));
                 api.setGroupLightState(groupIds[id], lightState, function (err, res) {
                     if (err || !res) {
                         adapter.log.error('error: ' + err);
                     }
                 });
+            } else if (obj.common.role == 'switch') {
+                if (finalLS.hasOwnProperty('on')) {
+                    finalLS = {on:finalLS.on};
+                    //log final changes / states
+                    adapter.log.info('final lightState: ' + JSON.stringify(finalLS));
+
+                    lightState = hue.lightState.create();
+                    lightState.on(finalLS.on);
+                    api.setLightState(channelIds[id], lightState, function (err, res) {
+                        if (err || !res) {
+                            adapter.log.error('error: ' + err);
+                            return;
+                        }
+                        adapter.setState([id, 'on'].join('.'), {val: finalLS.on, ack: true});
+                    });
+                } else {
+                    adapter.log.warn('invalid switch operation');
+                }
             } else {
+                //log final changes / states
+                adapter.log.info('final lightState: ' + JSON.stringify(finalLS));
                 api.setLightState(channelIds[id], lightState, function (err, res) {
                     if (err || !res) {
                         adapter.log.error('error: ' + err);
@@ -460,14 +485,16 @@ function main() {
             pollIds.push(lid);
             pollChannels.push(channelName.replace(/\s/g, '_'));
 
-            if (light.type !== 'Dimmable plug-in unit' && light.type !== 'Dimmable light') {
+            if (light.type == 'Extended color light' && light.type == 'Color Light') {
                 light.state.r = 0;
                 light.state.g = 0;
                 light.state.b = 0;
             }
 
-            light.state.command = '{}';
-            light.state.level = 0;
+            if (light.type != 'On/Off plug-in unit') {
+                light.state.command = '{}';
+                light.state.level = 0;
+            }
 
             for (var state in light.state) {
                 if (!light.state.hasOwnProperty(state)) {
@@ -575,11 +602,17 @@ function main() {
                 adapter.setObject(objId.replace(/\s/g, '_'), lobj);
             }
 
+            var role = "light.color";
+            if (light.type === 'Dimmable light' || light.type === 'Dimmable plug-in unit') {
+                role = 'light.dimmer';
+            } else if (light.type === 'On/Off plug-in unit') {
+                role = 'switch';
+            }
             adapter.setObject(channelName.replace(/\s/g, '_'), {
                 type: 'channel',
                 common: {
                     name: channelName.replace(/\s/g, '_'),
-                    role: light.type === 'Dimmable plug-in unit' || light.type === 'Dimmable light' ? 'light.dimmer' : 'light.color'
+                    role: role
                 },
                 native: {
                     id: lid,
@@ -795,23 +828,24 @@ function pollSingle(count) {
                     }
                     states[stateA] = result.state[stateA];
                 }
-                if (states.reachable === false) {
+                if (states.reachable === false && states.bri !== undefined) {
                     states.bri = 0;
                     states.on = false;
                 }
-                if (states.on === false) {
+                if (states.on === false && states.bri !== undefined) {
                     states.bri = 0;
                 }
                 if (states.xy !== undefined) {
                     var xy = states.xy.toString().split(',');
                     states.xy = states.xy.toString();
                     var rgb = huehelper.XYBtoRGB(xy[0], xy[1], (states.bri / 254));
-                    //adapter.log.info("xy"+states.xy+" split:"+JSON.stringify(xy)+" rgb:"+JSON.stringify(rgb));
                     states.r = Math.round(rgb.Red * 254);
                     states.g = Math.round(rgb.Green * 254);
                     states.b = Math.round(rgb.Blue * 254);
                 }
-                states.level = Math.max(Math.min(Math.round(states.bri / 2.54), 100), 0);
+                if (states.bri !== undefined) {
+                    states.level = Math.max(Math.min(Math.round(states.bri / 2.54), 100), 0);
+                }
                 for (var stateB in states) {
                     if (!states.hasOwnProperty(stateB)) {
                         continue;
