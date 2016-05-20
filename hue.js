@@ -313,10 +313,9 @@ adapter.on('stateChange', function (id, state) {
             }
 
 
-            //log final changes / states
-            adapter.log.info('final lightState: ' + JSON.stringify(finalLS));
-
             if (obj.common.role == 'LightGroup' || obj.common.role == 'Room') {
+                //log final changes / states
+                adapter.log.info('final lightState: ' + JSON.stringify(finalLS));
                 api.setGroupLightState(groupIds[id], lightState, function (err, res) {
                     if (err || !res) {
                         adapter.log.error('error: ' + err);
@@ -324,7 +323,12 @@ adapter.on('stateChange', function (id, state) {
                 });
             } else if (obj.common.role == 'switch') {
                 if (finalLS.hasOwnProperty('on')) {
-                    lightState = hue.lightState.create(finalLS.on);
+                    finalLS = {on:Boolean.valueOf(finalLS.on)};
+                    //log final changes / states
+                    adapter.log.info('final lightState: ' + JSON.stringify(finalLS));
+
+                    lightState = hue.lightState.create();
+                    lightState.on(finalLS.on);
                     api.setLightState(channelIds[id], lightState, function (err, res) {
                         if (err || !res) {
                             adapter.log.error('error: ' + err);
@@ -332,8 +336,12 @@ adapter.on('stateChange', function (id, state) {
                         }
                         adapter.setState([id, 'on'].join('.'), {val: finalLS.on, ack: true});
                     });
+                } else {
+                    adapter.log.warn('invalid switch operation');
                 }
             } else {
+                //log final changes / states
+                adapter.log.info('final lightState: ' + JSON.stringify(finalLS));
                 api.setLightState(channelIds[id], lightState, function (err, res) {
                     if (err || !res) {
                         adapter.log.error('error: ' + err);
