@@ -57,6 +57,11 @@ adapter.on('stateChange', function (id, state) {
             var idtmp = idState.split('.');
             var iddp = idtmp.pop();
             switch (iddp) {
+                case 'on':
+                    alls['bri'] = idStates[idState].val ? 254 : 0;
+                    ls['bri'] = idStates[idState].val ? 254 : 0;
+                    if (idStates[idState].ack && ls['bri'] > 0) lampOn = true;
+                    break;
                 case 'bri':
                     alls[iddp] = idStates[idState].val;
                     ls[iddp] = idStates[idState].val;
@@ -823,23 +828,24 @@ function pollSingle(count) {
                     }
                     states[stateA] = result.state[stateA];
                 }
-                if (states.reachable === false) {
+                if (states.reachable === false && states.bri !== undefined) {
                     states.bri = 0;
                     states.on = false;
                 }
-                if (states.on === false) {
+                if (states.on === false && states.bri !== undefined) {
                     states.bri = 0;
                 }
                 if (states.xy !== undefined) {
                     var xy = states.xy.toString().split(',');
                     states.xy = states.xy.toString();
                     var rgb = huehelper.XYBtoRGB(xy[0], xy[1], (states.bri / 254));
-                    //adapter.log.info("xy"+states.xy+" split:"+JSON.stringify(xy)+" rgb:"+JSON.stringify(rgb));
                     states.r = Math.round(rgb.Red * 254);
                     states.g = Math.round(rgb.Green * 254);
                     states.b = Math.round(rgb.Blue * 254);
                 }
-                states.level = Math.max(Math.min(Math.round(states.bri / 2.54), 100), 0);
+                if (states.bri !== undefined) {
+                    states.level = Math.max(Math.min(Math.round(states.bri / 2.54), 100), 0);
+                }
                 for (var stateB in states) {
                     if (!states.hasOwnProperty(stateB)) {
                         continue;
