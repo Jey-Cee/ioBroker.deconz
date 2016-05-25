@@ -485,7 +485,7 @@ function main() {
             pollIds.push(lid);
             pollChannels.push(channelName.replace(/\s/g, '_'));
 
-            if (light.type == 'Extended color light' && light.type == 'Color Light') {
+            if (light.type == 'Extended color light' && light.type == 'Color light') {
                 light.state.r = 0;
                 light.state.g = 0;
                 light.state.b = 0;
