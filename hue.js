@@ -57,6 +57,11 @@ adapter.on('stateChange', function (id, state) {
             var idtmp = idState.split('.');
             var iddp = idtmp.pop();
             switch (iddp) {
+                case 'on':
+                    alls['bri'] = idStates[idState].val ? 254 : 0;
+                    ls['bri'] = idStates[idState].val ? 254 : 0;
+                    if (idStates[idState].ack && ls['bri'] > 0) lampOn = true;
+                    break;
                 case 'bri':
                     alls[iddp] = idStates[idState].val;
                     ls[iddp] = idStates[idState].val;
@@ -112,6 +117,13 @@ adapter.on('stateChange', function (id, state) {
                                     } else {
                                         ls.bri = 0;
                                     }
+                                } else if (command == 'level') {
+                                    //convert level to bri
+                                    if (!commands.hasOwnProperty('bri')) {
+                                        ls.bri = Math.min(254, Math.max(0, Math.round(parseInt(commands[command]) * 2.54)));
+                                    } else {
+                                        ls.bri = 254;
+                                    }
                                 } else {
                                     ls[command] = commands[command];
                                 }
@@ -128,193 +140,213 @@ adapter.on('stateChange', function (id, state) {
                     break;
             }
         }
-        //apply rgb to xy
-        if ('r' in ls || 'g' in ls || 'b' in ls) {
-            if (!('r' in ls)) {
-                ls.r = 0;
-            }
-            if (!('g' in ls)) {
-                ls.g = 0;
-            }
-            if (!('b' in ls)) {
-                ls.b = 0;
-            }
-            var xyb = huehelper.RgbToXYB(ls.r / 255, ls.g / 255, ls.b / 255, 'LCT001');
-            ls.bri = xyb.b;//Math.max(ls.r,ls.g,ls.b);
-            ls.xy = xyb.x + ',' + xyb.y;
-        }
 
-
-        //create lightState from ls
-        //and check values
-        var lightState = hue.lightState.create();
-        var finalLS = {};
-        if (ls.bri > 0) {
-            lightState = lightState.on().bri(Math.min(254, ls.bri));
-            finalLS.bri = Math.min(254, ls.bri);
-            finalLS.on = true;
-        } else {
-            lightState = lightState.off();
-            finalLS.bri = 0;
-            finalLS.on = false;
-        }
-        if ('xy' in ls) {
-            var xy = ls.xy.split(',');
-            xy = {'x': xy[0], 'y': xy[1]};
-            xy = huehelper.GamutXYforModel(xy.x, xy.y, 'LCT001');
-            finalLS.xy = xy.x + ',' + xy.y;
-            lightState = lightState.xy(xy.x, xy.y);
-            if (!lampOn && (!('bri' in ls) || ls.bri === 0)) {
-                lightState = lightState.on();
-                lightState = lightState.bri(254);
-                finalLS.bri = 254;
-                finalLS.on = true;
-            }
-            var rgb = huehelper.XYBtoRGB(xy.x, xy.y, (finalLS.bri / 254));
-            finalLS.r = Math.round(rgb.Red * 254);
-            finalLS.g = Math.round(rgb.Green * 254);
-            finalLS.b = Math.round(rgb.Blue * 254);
-        }
-        if ('ct' in ls) {
-            finalLS.ct = Math.max(153, Math.min(500, ls.ct));
-            lightState = lightState.ct(finalLS.ct);
-            if (!lampOn && (!('bri' in ls) || ls.bri === 0)) {
-                lightState = lightState.on();
-                lightState = lightState.bri(254);
-                finalLS.bri = 254;
-                finalLS.on = true;
-            }
-        }
-        if ('hue' in ls) {
-            finalLS.hue = Math.max(0, Math.min(65535, ls.hue));
-            lightState = lightState.hue(finalLS.hue);
-            if (!lampOn && (!('bri' in ls) || ls.bri === 0)) {
-                lightState = lightState.on();
-                lightState = lightState.bri(254);
-                finalLS.bri = 254;
-                finalLS.on = true;
-            }
-        }
-        if ('sat' in ls) {
-            finalLS.sat = Math.max(0, Math.min(254, ls.sat));
-            lightState = lightState.sat(finalLS.sat);
-            if (!lampOn && (!('bri' in ls) || ls.bri === 0)) {
-                lightState = lightState.on();
-                lightState = lightState.bri(254);
-                finalLS.bri = 254;
-                finalLS.on = true;
-            }
-        }
-        if ('alert' in ls) {
-            if (['select', 'lselect'].indexOf(ls.alert) == -1) {
-                finalLS.alert = 'none';
-            } else {
-                finalLS.alert = ls.alert;
-            }
-            lightState = lightState.alert(finalLS.alert);
-        }
-        if ('effect' in ls) {
-            if (['colorloop'].indexOf(ls.effect) == -1) {
-                finalLS.effect = 'none';
-            } else {
-                finalLS.effect = ls.effect;
-            }
-            lightState = lightState.effect(finalLS.effect);
-            if (!lampOn && (finalLS.effect != 'none' && !('bri' in ls) || ls.bri === 0)) {
-                lightState = lightState.on();
-                lightState = lightState.bri(254);
-                finalLS.bri = 254;
-                finalLS.on = true;
-            }
-        }
-
-        //only available in command state
-        if ('transitiontime' in ls) {
-            var transitiontime = parseInt(ls.transitiontime);
-            if (!isNaN(transitiontime)) {
-                finalLS.transitiontime = transitiontime;
-                lightState = lightState.transitiontime(transitiontime);
-            }
-        }
-        if ('sat_inc' in ls && !('sat' in finalLS) && 'sat' in alls) {
-            finalLS.sat = (((ls.sat_inc + alls.sat) % 255) + 255) % 255;
-            if (!lampOn && (!('bri' in ls) || ls.bri === 0)) {
-                lightState = lightState.on();
-                lightState = lightState.bri(254);
-                finalLS.bri = 254;
-                finalLS.on = true;
-            }
-            lightState = lightState.sat(finalLS.sat);
-        }
-        if ('hue_inc' in ls && !('hue' in finalLS) && 'hue' in alls) {
-            finalLS.hue = (((ls.hue_inc + alls.hue) % 65536) + 65536) % 65536;
-            if (!lampOn && (!('bri' in ls) || ls.bri === 0)) {
-                lightState = lightState.on();
-                lightState = lightState.bri(254);
-                finalLS.bri = 254;
-                finalLS.on = true;
-            }
-            lightState = lightState.hue(finalLS.hue);
-        }
-        if ('ct_inc' in ls && !('ct' in finalLS) && 'ct' in alls) {
-            finalLS.ct = (((((alls.ct - 153) + ls.ct_inc) % 348) + 348) % 348) + 153;
-            if (!lampOn && (!('bri' in ls) || ls.bri === 0)) {
-                lightState = lightState.on();
-                lightState = lightState.bri(254);
-                finalLS.bri = 254;
-                finalLS.on = true;
-            }
-            lightState = lightState.ct(finalLS.ct);
-        }
-        if ('bri_inc' in ls) {
-            finalLS.bri = (((alls.bri + ls.bri_inc) % 255) + 255) % 255;
-            if (finalLS.bri === 0) {
-                if (lampOn) {
-                    lightState = lightState.on(false);
-                    finalLS.on = false;
-                } else {
-                    adapter.setState([id, 'bri'].join('.'), {val: 0, ack: false});
-                    return;
-                }
-            } else {
-                finalLS.on = true;
-                lightState = lightState.on();
-            }
-            lightState = lightState.bri(finalLS.bri);
-        }
-
-        //change colormode
-        if ('xy' in finalLS) {
-            finalLS.colormode = 'xy';
-        } else if ('ct' in finalLS) {
-            finalLS.colormode = 'ct';
-        } else if ('hue' in finalLS || 'sat' in finalLS) {
-            finalLS.colormode = 'hs';
-        }
-
-        //set level to final bri / 2.54
-        if ('bri' in finalLS) {
-            finalLS.level = Math.max(Math.min(Math.round(finalLS.bri / 2.54), 100), 0);
-        }
-
-        //log final changes / states
-        adapter.log.info('final lightState: ' + JSON.stringify(finalLS));
-
-
-        //set lightState
+        //get lightState
         adapter.getObject(id, function (err, obj) {
             if (err) {
                 adapter.log.error(err);
                 return;
             }
 
-            if (obj.common.role == 'LightGroup') {
+            //apply rgb to xy with modelId
+            if ('r' in ls || 'g' in ls || 'b' in ls) {
+                if (!('r' in ls)) {
+                    ls.r = 0;
+                }
+                if (!('g' in ls)) {
+                    ls.g = 0;
+                }
+                if (!('b' in ls)) {
+                    ls.b = 0;
+                }
+                var xyb = huehelper.RgbToXYB(ls.r / 255, ls.g / 255, ls.b / 255, (obj.native.hasOwnProperty('modelid') ? obj.native.modelid.trim() : 'default'));
+                ls.bri = xyb.b;
+                ls.xy = xyb.x + ',' + xyb.y;
+            }
+
+
+            //create lightState from ls
+            //and check values
+            var lightState = hue.lightState.create();
+            var finalLS = {};
+            if (ls.bri > 0) {
+                lightState = lightState.on().bri(Math.min(254, ls.bri));
+                finalLS.bri = Math.min(254, ls.bri);
+                finalLS.on = true;
+            } else {
+                lightState = lightState.off();
+                finalLS.bri = 0;
+                finalLS.on = false;
+            }
+            if ('xy' in ls) {
+                var xy = ls.xy.split(',');
+                xy = {'x': xy[0], 'y': xy[1]};
+                xy = huehelper.GamutXYforModel(xy.x, xy.y, (obj.native.hasOwnProperty('modelid') ? obj.native.modelid.trim() : 'default'));
+                finalLS.xy = xy.x + ',' + xy.y;
+                lightState = lightState.xy(xy.x, xy.y);
+                if (!lampOn && (!('bri' in ls) || ls.bri === 0)) {
+                    lightState = lightState.on();
+                    lightState = lightState.bri(254);
+                    finalLS.bri = 254;
+                    finalLS.on = true;
+                }
+                var rgb = huehelper.XYBtoRGB(xy.x, xy.y, (finalLS.bri / 254));
+                finalLS.r = Math.round(rgb.Red * 254);
+                finalLS.g = Math.round(rgb.Green * 254);
+                finalLS.b = Math.round(rgb.Blue * 254);
+            }
+            if ('ct' in ls) {
+                finalLS.ct = Math.max(153, Math.min(500, ls.ct));
+                lightState = lightState.ct(finalLS.ct);
+                if (!lampOn && (!('bri' in ls) || ls.bri === 0)) {
+                    lightState = lightState.on();
+                    lightState = lightState.bri(254);
+                    finalLS.bri = 254;
+                    finalLS.on = true;
+                }
+            }
+            if ('hue' in ls) {
+                finalLS.hue = Math.max(0, Math.min(65535, ls.hue));
+                lightState = lightState.hue(finalLS.hue);
+                if (!lampOn && (!('bri' in ls) || ls.bri === 0)) {
+                    lightState = lightState.on();
+                    lightState = lightState.bri(254);
+                    finalLS.bri = 254;
+                    finalLS.on = true;
+                }
+            }
+            if ('sat' in ls) {
+                finalLS.sat = Math.max(0, Math.min(254, ls.sat));
+                lightState = lightState.sat(finalLS.sat);
+                if (!lampOn && (!('bri' in ls) || ls.bri === 0)) {
+                    lightState = lightState.on();
+                    lightState = lightState.bri(254);
+                    finalLS.bri = 254;
+                    finalLS.on = true;
+                }
+            }
+            if ('alert' in ls) {
+                if (['select', 'lselect'].indexOf(ls.alert) == -1) {
+                    finalLS.alert = 'none';
+                } else {
+                    finalLS.alert = ls.alert;
+                }
+                lightState = lightState.alert(finalLS.alert);
+            }
+            if ('effect' in ls) {
+                if (['colorloop'].indexOf(ls.effect) == -1) {
+                    finalLS.effect = 'none';
+                } else {
+                    finalLS.effect = ls.effect;
+                }
+                lightState = lightState.effect(finalLS.effect);
+                if (!lampOn && (finalLS.effect != 'none' && !('bri' in ls) || ls.bri === 0)) {
+                    lightState = lightState.on();
+                    lightState = lightState.bri(254);
+                    finalLS.bri = 254;
+                    finalLS.on = true;
+                }
+            }
+
+            //only available in command state
+            if ('transitiontime' in ls) {
+                var transitiontime = parseInt(ls.transitiontime);
+                if (!isNaN(transitiontime)) {
+                    finalLS.transitiontime = transitiontime;
+                    lightState = lightState.transitiontime(transitiontime);
+                }
+            }
+            if ('sat_inc' in ls && !('sat' in finalLS) && 'sat' in alls) {
+                finalLS.sat = (((ls.sat_inc + alls.sat) % 255) + 255) % 255;
+                if (!lampOn && (!('bri' in ls) || ls.bri === 0)) {
+                    lightState = lightState.on();
+                    lightState = lightState.bri(254);
+                    finalLS.bri = 254;
+                    finalLS.on = true;
+                }
+                lightState = lightState.sat(finalLS.sat);
+            }
+            if ('hue_inc' in ls && !('hue' in finalLS) && 'hue' in alls) {
+                finalLS.hue = (((ls.hue_inc + alls.hue) % 65536) + 65536) % 65536;
+                if (!lampOn && (!('bri' in ls) || ls.bri === 0)) {
+                    lightState = lightState.on();
+                    lightState = lightState.bri(254);
+                    finalLS.bri = 254;
+                    finalLS.on = true;
+                }
+                lightState = lightState.hue(finalLS.hue);
+            }
+            if ('ct_inc' in ls && !('ct' in finalLS) && 'ct' in alls) {
+                finalLS.ct = (((((alls.ct - 153) + ls.ct_inc) % 348) + 348) % 348) + 153;
+                if (!lampOn && (!('bri' in ls) || ls.bri === 0)) {
+                    lightState = lightState.on();
+                    lightState = lightState.bri(254);
+                    finalLS.bri = 254;
+                    finalLS.on = true;
+                }
+                lightState = lightState.ct(finalLS.ct);
+            }
+            if ('bri_inc' in ls) {
+                finalLS.bri = (((alls.bri + ls.bri_inc) % 255) + 255) % 255;
+                if (finalLS.bri === 0) {
+                    if (lampOn) {
+                        lightState = lightState.on(false);
+                        finalLS.on = false;
+                    } else {
+                        adapter.setState([id, 'bri'].join('.'), {val: 0, ack: false});
+                        return;
+                    }
+                } else {
+                    finalLS.on = true;
+                    lightState = lightState.on();
+                }
+                lightState = lightState.bri(finalLS.bri);
+            }
+
+            //change colormode
+            if ('xy' in finalLS) {
+                finalLS.colormode = 'xy';
+            } else if ('ct' in finalLS) {
+                finalLS.colormode = 'ct';
+            } else if ('hue' in finalLS || 'sat' in finalLS) {
+                finalLS.colormode = 'hs';
+            }
+
+            //set level to final bri / 2.54
+            if ('bri' in finalLS) {
+                finalLS.level = Math.max(Math.min(Math.round(finalLS.bri / 2.54), 100), 0);
+            }
+
+
+            if (obj.common.role == 'LightGroup' || obj.common.role == 'Room') {
+                //log final changes / states
+                adapter.log.info('final lightState: ' + JSON.stringify(finalLS));
                 api.setGroupLightState(groupIds[id], lightState, function (err, res) {
                     if (err || !res) {
                         adapter.log.error('error: ' + err);
                     }
                 });
+            } else if (obj.common.role == 'switch') {
+                if (finalLS.hasOwnProperty('on')) {
+                    finalLS = {on:finalLS.on};
+                    //log final changes / states
+                    adapter.log.info('final lightState: ' + JSON.stringify(finalLS));
+
+                    lightState = hue.lightState.create();
+                    lightState.on(finalLS.on);
+                    api.setLightState(channelIds[id], lightState, function (err, res) {
+                        if (err || !res) {
+                            adapter.log.error('error: ' + err);
+                            return;
+                        }
+                        adapter.setState([id, 'on'].join('.'), {val: finalLS.on, ack: true});
+                    });
+                } else {
+                    adapter.log.warn('invalid switch operation');
+                }
             } else {
+                //log final changes / states
+                adapter.log.info('final lightState: ' + JSON.stringify(finalLS));
                 api.setLightState(channelIds[id], lightState, function (err, res) {
                     if (err || !res) {
                         adapter.log.error('error: ' + err);
@@ -453,14 +485,16 @@ function main() {
             pollIds.push(lid);
             pollChannels.push(channelName.replace(/\s/g, '_'));
 
-            if (light.type !== 'Dimmable plug-in unit' && light.type !== 'Dimmable light') {
+            if (light.type == 'Extended color light' || light.type == 'Color light') {
                 light.state.r = 0;
                 light.state.g = 0;
                 light.state.b = 0;
             }
 
-            light.state.command = '{}';
-            light.state.level = 0;
+            if (light.type != 'On/Off plug-in unit') {
+                light.state.command = '{}';
+                light.state.level = 0;
+            }
 
             for (var state in light.state) {
                 if (!light.state.hasOwnProperty(state)) {
@@ -568,11 +602,17 @@ function main() {
                 adapter.setObject(objId.replace(/\s/g, '_'), lobj);
             }
 
+            var role = "light.color";
+            if (light.type === 'Dimmable light' || light.type === 'Dimmable plug-in unit') {
+                role = 'light.dimmer';
+            } else if (light.type === 'On/Off plug-in unit') {
+                role = 'switch';
+            }
             adapter.setObject(channelName.replace(/\s/g, '_'), {
                 type: 'channel',
                 common: {
                     name: channelName.replace(/\s/g, '_'),
-                    role: light.type === 'Dimmable plug-in unit' || light.type === 'Dimmable light' ? 'light.dimmer' : 'light.color'
+                    role: role
                 },
                 native: {
                     id: lid,
@@ -597,14 +637,15 @@ function main() {
             type: "LightGroup",
             id: 0,
             action: {
-                lights: "ALL",
                 alert: "select",
                 bri: 0,
                 colormode: "",
                 ct: 0,
                 effect: "none",
                 hue: 0,
-                on: false
+                on: false,
+                sat: 0,
+                xy: '0,0'
             }
         }
         count = 0;
@@ -727,6 +768,7 @@ function main() {
                         break;
                     default:
                         adapter.log.info('skip: ' + action);
+                        continue;
                         break;
                 }
                 adapter.setObject(gobjId.replace(/\s/g, '_'), gobj);
@@ -786,22 +828,24 @@ function pollSingle(count) {
                     }
                     states[stateA] = result.state[stateA];
                 }
-                if (states.reachable === false) {
+                if (states.reachable === false && states.bri !== undefined) {
                     states.bri = 0;
                     states.on = false;
                 }
-                if (states.on === false) {
+                if (states.on === false && states.bri !== undefined) {
                     states.bri = 0;
                 }
                 if (states.xy !== undefined) {
                     var xy = states.xy.toString().split(',');
+                    states.xy = states.xy.toString();
                     var rgb = huehelper.XYBtoRGB(xy[0], xy[1], (states.bri / 254));
-                    //adapter.log.info("xy"+states.xy+" split:"+JSON.stringify(xy)+" rgb:"+JSON.stringify(rgb));
                     states.r = Math.round(rgb.Red * 254);
                     states.g = Math.round(rgb.Green * 254);
                     states.b = Math.round(rgb.Blue * 254);
                 }
-                states.level = Math.max(Math.min(Math.round(states.bri / 2.54), 100), 0);
+                if (states.bri !== undefined) {
+                    states.level = Math.max(Math.min(Math.round(states.bri / 2.54), 100), 0);
+                }
                 for (var stateB in states) {
                     if (!states.hasOwnProperty(stateB)) {
                         continue;

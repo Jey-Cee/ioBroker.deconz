@@ -1,5 +1,12 @@
 ![Logo](admin/hue.jpeg)
 # ioBroker Philips Hue Bridge Adapter
+==============
+
+[![NPM version](http://img.shields.io/npm/v/iobroker.hue.svg)](https://www.npmjs.com/package/iobroker.hue)
+[![Downloads](https://img.shields.io/npm/dm/iobroker.hue.svg)](https://www.npmjs.com/package/iobroker.hue)
+
+[![NPM](https://nodei.co/npm/iobroker.hue.png?downloads=true)](https://nodei.co/npm/iobroker.hue/)
+
 
 English
 --------------------
@@ -15,6 +22,18 @@ Bindet Philips Hue / LivingColors / LivingWhites Lampen ein. In den Adapter-Sett
 ## Install
 
 ## Changelog
+
+### 0.5.6
+* (Pmant) (experimental) support for power switches
+
+### 0.5.5
+* (Pmant) fix error with xy state
+* (Pmant) support level in command state
+
+### 0.5.4
+* (Pman) Lightset 0 fixed
+* (Pman) support for diffent gamuts
+* (Pman) support Rooms (new HUE App)
 
 ### 0.5.3
 * (soef) Default Lightset 0 added
