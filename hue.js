@@ -287,7 +287,7 @@ adapter.on('stateChange', function (id, state) {
                 lightState = lightState.ct(finalLS.ct);
             }
             if ('bri_inc' in ls) {
-                finalLS.bri = (((alls.bri + ls.bri_inc) % 255) + 255) % 255;
+                finalLS.bri = (((alls.bri*1 + ls.bri_inc*1) % 255) + 255) % 255;
                 if (finalLS.bri === 0) {
                     if (lampOn) {
                         lightState = lightState.on(false);
@@ -324,6 +324,15 @@ adapter.on('stateChange', function (id, state) {
                 api.setGroupLightState(groupIds[id], lightState, function (err, res) {
                     if (err || !res) {
                         adapter.log.error('error: ' + err);
+                    }
+                    //write back known states
+                    for (var finalState in finalLS) {
+                        if (!finalLS.hasOwnProperty(finalState)) {
+                            continue;
+                        }
+                        if (finalState in alls) {
+                            adapter.setState([id, finalState].join('.'), {val: finalLS[finalState], ack: true});
+                        }
                     }
                 });
             } else if (obj.common.role == 'switch') {
