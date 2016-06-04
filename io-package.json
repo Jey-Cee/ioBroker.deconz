@@ -1,7 +1,7 @@
 {
     "common": {
         "name":                     "hue",
-        "version": "0.5.6",
+        "version": "0.5.7",
 		"news": {
 			"en": "(Pmant) (experimental) support for power switches",
 			"de": "(Pmant) (experimental) support for power switches",
