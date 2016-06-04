@@ -3,9 +3,16 @@
         "name":                     "hue",
         "version": "0.5.7",
 		"news": {
-			"en": "(Pmant) (experimental) support for power switches",
-			"de": "(Pmant) (experimental) support for power switches",
-			"ru": "(Pmant) (experimental) support for power switches"
+			"0.5.7": {
+				"en": "write back known states for group/room\nInteger conversion for bri_inc command",
+				"de": "write back known states for group/room\nInteger conversion for bri_inc command",
+				"ru": "write back known states for group/room\nInteger conversion for bri_inc command"
+			},
+			"0.5.6": {
+				"en": "(experimental) support for power switches",
+				"de": "(experimental) support for power switches",
+				"ru": "(experimental) support for power switches"
+			}
 		},
         "title":                    "Philips Hue Bridge Adapter",
         "desc":                     "Connects Philips Hue LED Bulbs, Friends of Hue LED Lamps and Stripes and other SmartLink capable Devices (LivingWhites, some LivingColors) via Philips Hue Bridges",
