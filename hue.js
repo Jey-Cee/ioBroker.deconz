@@ -287,7 +287,7 @@ adapter.on('stateChange', function (id, state) {
                 lightState = lightState.ct(finalLS.ct);
             }
             if ('bri_inc' in ls) {
-                finalLS.bri = (((parseInt(alls.bri, 10) + (parseInt(ls.bri_inc, 10)) % 255) + 255) % 255;
+                finalLS.bri = (((parseInt(alls.bri, 10) + parseInt(ls.bri_inc, 10)) % 255) + 255) % 255;
                 if (finalLS.bri === 0) {
                     if (lampOn) {
                         lightState = lightState.on(false);
@@ -403,16 +403,6 @@ adapter.on('message', function (obj) {
         adapter.sendTo(obj.from, obj.command, obj.message, obj.callback);
     }
     return true;
-});
-
-adapter.on('unload', function (callback) {
-    try {
-        adapter.log.info('terminating');
-    } catch (e) {
-        adapter.log.error(e);
-    } finally {
-        callback();
-    }
 });
 
 adapter.on('ready', function () {
