@@ -23,6 +23,9 @@ Bindet Philips Hue / LivingColors / LivingWhites Lampen ein. In den Adapter-Sett
 
 ## Changelog
 
+### 0.5.9 (2016.10.11)
+* (pmant) fix error with null values
+
 ### 0.5.8 (2016.06.05)
 * (bluefox) fix typo
 
