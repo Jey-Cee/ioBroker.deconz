@@ -51,7 +51,7 @@ adapter.on('stateChange', function (id, state) {
         var alls = {};
         var lampOn = false;
         for (var idState in idStates) {
-            if (!idStates.hasOwnProperty(idState)) {
+            if (!idStates.hasOwnProperty(idState) || idStates[idState].val === null) {
                 continue;
             }
             var idtmp = idState.split('.');
