@@ -647,7 +647,7 @@ function main() {
                 sat: 0,
                 xy: '0,0'
             }
-        }
+        };
         count = 0;
         for (var gid in groups) {
             if (!groups.hasOwnProperty(gid)) {
