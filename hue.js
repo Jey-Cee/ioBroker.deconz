@@ -2,7 +2,7 @@
  *
  *      ioBroker Philips Hue Bridge Adapter
  *
- *      (c) 2014-2015 hobbyquaker
+ *      (c) 2014-2016 hobbyquaker
  *
  *      MIT License
  *
@@ -191,9 +191,9 @@ adapter.on('stateChange', function (id, state) {
                     finalLS.on = true;
                 }
                 var rgb = huehelper.XYBtoRGB(xy.x, xy.y, (finalLS.bri / 254));
-                finalLS.r = Math.round(rgb.Red * 254);
+                finalLS.r = Math.round(rgb.Red   * 254);
                 finalLS.g = Math.round(rgb.Green * 254);
-                finalLS.b = Math.round(rgb.Blue * 254);
+                finalLS.b = Math.round(rgb.Blue  * 254);
             }
             if ('ct' in ls) {
                 finalLS.ct = Math.max(153, Math.min(500, ls.ct));
@@ -287,7 +287,7 @@ adapter.on('stateChange', function (id, state) {
                 lightState = lightState.ct(finalLS.ct);
             }
             if ('bri_inc' in ls) {
-                finalLS.bri = (((alls.bri + ls.bri_inc) % 255) + 255) % 255;
+                finalLS.bri = (((parseInt(alls.bri, 10) + parseInt(ls.bri_inc, 10)) % 255) + 255) % 255;
                 if (finalLS.bri === 0) {
                     if (lampOn) {
                         lightState = lightState.on(false);
@@ -324,6 +324,15 @@ adapter.on('stateChange', function (id, state) {
                 api.setGroupLightState(groupIds[id], lightState, function (err, res) {
                     if (err || !res) {
                         adapter.log.error('error: ' + err);
+                    }
+                    //write back known states
+                    for (var finalState in finalLS) {
+                        if (!finalLS.hasOwnProperty(finalState)) {
+                            continue;
+                        }
+                        if (finalState in alls) {
+                            adapter.setState([id, finalState].join('.'), {val: finalLS[finalState], ack: true});
+                        }
                     }
                 });
             } else if (obj.common.role == 'switch') {
@@ -394,16 +403,6 @@ adapter.on('message', function (obj) {
         adapter.sendTo(obj.from, obj.command, obj.message, obj.callback);
     }
     return true;
-});
-
-adapter.on('unload', function (callback) {
-    try {
-        adapter.log.info('terminating');
-    } catch (e) {
-        adapter.log.error(e);
-    } finally {
-        callback();
-    }
 });
 
 adapter.on('ready', function () {
@@ -485,7 +484,7 @@ function main() {
             pollIds.push(lid);
             pollChannels.push(channelName.replace(/\s/g, '_'));
 
-            if (light.type == 'Extended color light' && light.type == 'Color Light') {
+            if (light.type == 'Extended color light' || light.type == 'Color light') {
                 light.state.r = 0;
                 light.state.g = 0;
                 light.state.b = 0;
@@ -804,7 +803,7 @@ function main() {
     });
 
     if (adapter.config.polling && adapter.config.pollingInterval > 0) {
-        setTimeout(pollSingle, 5 * 1000, 0);
+        setTimeout(pollSingle, 5000, 0);
     }
 }
 
@@ -839,9 +838,9 @@ function pollSingle(count) {
                     var xy = states.xy.toString().split(',');
                     states.xy = states.xy.toString();
                     var rgb = huehelper.XYBtoRGB(xy[0], xy[1], (states.bri / 254));
-                    states.r = Math.round(rgb.Red * 254);
+                    states.r = Math.round(rgb.Red   * 254);
                     states.g = Math.round(rgb.Green * 254);
-                    states.b = Math.round(rgb.Blue * 254);
+                    states.b = Math.round(rgb.Blue  * 254);
                 }
                 if (states.bri !== undefined) {
                     states.level = Math.max(Math.min(Math.round(states.bri / 2.54), 100), 0);

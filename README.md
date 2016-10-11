@@ -1,5 +1,12 @@
 ![Logo](admin/hue.jpeg)
 # ioBroker Philips Hue Bridge Adapter
+==============
+
+[![NPM version](http://img.shields.io/npm/v/iobroker.hue.svg)](https://www.npmjs.com/package/iobroker.hue)
+[![Downloads](https://img.shields.io/npm/dm/iobroker.hue.svg)](https://www.npmjs.com/package/iobroker.hue)
+
+[![NPM](https://nodei.co/npm/iobroker.hue.png?downloads=true)](https://nodei.co/npm/iobroker.hue/)
+
 
 English
 --------------------
@@ -16,8 +23,15 @@ Bindet Philips Hue / LivingColors / LivingWhites Lampen ein. In den Adapter-Sett
 
 ## Changelog
 
+### 0.5.8 (2016.06.05)
+* (bluefox) fix typo
+
+### 0.5.7 (2016.06.05)
+* (soef) write back known states for group/room
+* (soef) Integer conversion for bri_inc command
+
 ### 0.5.6
-* (Pmant) fix error with null values
+* (Pmant) (experimental) support for power switches
 
 ### 0.5.5
 * (Pmant) fix error with xy state
@@ -112,7 +126,7 @@ Bindet Philips Hue / LivingColors / LivingWhites Lampen ein. In den Adapter-Sett
 
 Apache 2.0
 
-Copyright (c) 2014 hobbyquaker
+Copyright (c) 2014-2016 hobbyquaker
 
 
 
