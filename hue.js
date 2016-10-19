@@ -143,7 +143,8 @@ adapter.on('stateChange', function (id, state) {
 
         //get lightState
         adapter.getObject(id, function (err, obj) {
-            if (err) {
+            if (err || !obj) {
+                if (!err) err = new Error('obj in callback getObject is null or undefined');
                 adapter.log.error(err);
                 return;
             }
