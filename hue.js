@@ -2,7 +2,7 @@
  *
  *      ioBroker Philips Hue Bridge Adapter
  *
- *      (c) 2014-2015 hobbyquaker
+ *      (c) 2014-2016 hobbyquaker
  *
  *      MIT License
  *
@@ -51,7 +51,7 @@ adapter.on('stateChange', function (id, state) {
         var alls = {};
         var lampOn = false;
         for (var idState in idStates) {
-            if (!idStates.hasOwnProperty(idState)) {
+            if (!idStates.hasOwnProperty(idState) || idStates[idState].val === null) {
                 continue;
             }
             var idtmp = idState.split('.');
@@ -191,9 +191,9 @@ adapter.on('stateChange', function (id, state) {
                     finalLS.on = true;
                 }
                 var rgb = huehelper.XYBtoRGB(xy.x, xy.y, (finalLS.bri / 254));
-                finalLS.r = Math.round(rgb.Red * 254);
+                finalLS.r = Math.round(rgb.Red   * 254);
                 finalLS.g = Math.round(rgb.Green * 254);
-                finalLS.b = Math.round(rgb.Blue * 254);
+                finalLS.b = Math.round(rgb.Blue  * 254);
             }
             if ('ct' in ls) {
                 finalLS.ct = Math.max(153, Math.min(500, ls.ct));
@@ -287,7 +287,7 @@ adapter.on('stateChange', function (id, state) {
                 lightState = lightState.ct(finalLS.ct);
             }
             if ('bri_inc' in ls) {
-                finalLS.bri = (((alls.bri*1 + ls.bri_inc*1) % 255) + 255) % 255;
+                finalLS.bri = (((parseInt(alls.bri, 10) + parseInt(ls.bri_inc, 10)) % 255) + 255) % 255;
                 if (finalLS.bri === 0) {
                     if (lampOn) {
                         lightState = lightState.on(false);
@@ -403,16 +403,6 @@ adapter.on('message', function (obj) {
         adapter.sendTo(obj.from, obj.command, obj.message, obj.callback);
     }
     return true;
-});
-
-adapter.on('unload', function (callback) {
-    try {
-        adapter.log.info('terminating');
-    } catch (e) {
-        adapter.log.error(e);
-    } finally {
-        callback();
-    }
 });
 
 adapter.on('ready', function () {
@@ -656,7 +646,7 @@ function main() {
                 sat: 0,
                 xy: '0,0'
             }
-        }
+        };
         count = 0;
         for (var gid in groups) {
             if (!groups.hasOwnProperty(gid)) {
@@ -813,7 +803,7 @@ function main() {
     });
 
     if (adapter.config.polling && adapter.config.pollingInterval > 0) {
-        setTimeout(pollSingle, 5 * 1000, 0);
+        setTimeout(pollSingle, 5000, 0);
     }
 }
 
@@ -848,9 +838,9 @@ function pollSingle(count) {
                     var xy = states.xy.toString().split(',');
                     states.xy = states.xy.toString();
                     var rgb = huehelper.XYBtoRGB(xy[0], xy[1], (states.bri / 254));
-                    states.r = Math.round(rgb.Red * 254);
+                    states.r = Math.round(rgb.Red   * 254);
                     states.g = Math.round(rgb.Green * 254);
-                    states.b = Math.round(rgb.Blue * 254);
+                    states.b = Math.round(rgb.Blue  * 254);
                 }
                 if (states.bri !== undefined) {
                     states.level = Math.max(Math.min(Math.round(states.bri / 2.54), 100), 0);

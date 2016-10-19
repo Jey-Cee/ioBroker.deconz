@@ -23,6 +23,16 @@ Bindet Philips Hue / LivingColors / LivingWhites Lampen ein. In den Adapter-Sett
 
 ## Changelog
 
+### 0.5.9 (2016.10.11)
+* (pmant) fix error with null values
+
+### 0.5.8 (2016.06.05)
+* (bluefox) fix typo
+
+### 0.5.7 (2016.06.05)
+* (soef) write back known states for group/room
+* (soef) Integer conversion for bri_inc command
+
 ### 0.5.6
 * (Pmant) (experimental) support for power switches
 
@@ -119,7 +129,7 @@ Bindet Philips Hue / LivingColors / LivingWhites Lampen ein. In den Adapter-Sett
 
 Apache 2.0
 
-Copyright (c) 2014 hobbyquaker
+Copyright (c) 2014-2016 hobbyquaker
 
 
 
