@@ -23,6 +23,10 @@ Bindet Philips Hue / LivingColors / LivingWhites Lampen ein. In den Adapter-Sett
 
 ## Changelog
 
+### 0.6.0 (2016.11.30)
+* (pmant) support new lamps
+* (pmant) add light name to log
+
 ### 0.5.9 (2016.10.11)
 * (pmant) fix error with null values
 
