@@ -1,8 +1,13 @@
 {
     "common": {
         "name":                     "hue",
-        "version": "0.5.9",
+        "version": "0.6.0",
 		"news": {
+            "0.5.8": {
+              "en": "support new Lamps",
+              "de": "unterstützt neue Lampen",
+              "ru": "support new Lamps"
+            },
 			"0.5.8": {
 				"en": "fix typo",
 				"de": "fix typo",
