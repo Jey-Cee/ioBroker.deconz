@@ -3,10 +3,10 @@
         "name":                     "hue",
         "version": "0.6.0",
 		"news": {
-            "0.5.8": {
+            "0.6.0": {
               "en": "support new Lamps",
               "de": "unterstützt neue Lampen",
-              "ru": "support new Lamps"
+              "ru": "поддержка новых типов ламп"
             },
 			"0.5.8": {
 				"en": "fix typo",
