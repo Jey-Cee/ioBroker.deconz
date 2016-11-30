@@ -321,7 +321,7 @@ adapter.on('stateChange', function (id, state) {
 
             if (obj.common.role == 'LightGroup' || obj.common.role == 'Room') {
                 //log final changes / states
-                adapter.log.info('final lightState: ' + JSON.stringify(finalLS));
+                adapter.log.info('final lightState for ' + obj.common.name + ':' + JSON.stringify(finalLS));
                 api.setGroupLightState(groupIds[id], lightState, function (err, res) {
                     if (err || !res) {
                         adapter.log.error('error: ' + err);
@@ -340,7 +340,7 @@ adapter.on('stateChange', function (id, state) {
                 if (finalLS.hasOwnProperty('on')) {
                     finalLS = {on:finalLS.on};
                     //log final changes / states
-                    adapter.log.info('final lightState: ' + JSON.stringify(finalLS));
+                    adapter.log.info('final lightState for ' + obj.common.name + ':' + JSON.stringify(finalLS));
 
                     lightState = hue.lightState.create();
                     lightState.on(finalLS.on);
@@ -356,7 +356,7 @@ adapter.on('stateChange', function (id, state) {
                 }
             } else {
                 //log final changes / states
-                adapter.log.info('final lightState: ' + JSON.stringify(finalLS));
+                adapter.log.info('final lightState for ' + obj.common.name + ':' + JSON.stringify(finalLS));
                 api.setLightState(channelIds[id], lightState, function (err, res) {
                     if (err || !res) {
                         adapter.log.error('error: ' + err);
