@@ -21,7 +21,8 @@ Deutsch
 Bindet Philips Hue / LivingColors / LivingWhites Lampen ein. 
 In den Adapter-Settings muss die IP der Hue Bridge sowie ein Username konfiguriert werden. 
 
-## Install
+## Notice
+Required node.js >= 0.12.
 
 ## Changelog
 ### 0.6.2 (2017.04.15)
