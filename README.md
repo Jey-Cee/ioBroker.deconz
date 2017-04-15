@@ -7,21 +7,25 @@
 
 [![NPM](https://nodei.co/npm/iobroker.hue.png?downloads=true)](https://nodei.co/npm/iobroker.hue/)
 
-
 English
 --------------------
-Connects Philips Hue LED Bulbs, Friends of Hue LED Lamps and Stripes and other SmartLink capable Devices (LivingWhites,
-some LivingColors) via Philips Hue Bridges to ioBroker.
+Connects Philips Hue LED Bulbs, Friends of Hue LED Lamps and Stripes and other 
+SmartLink capable Devices (LivingWhites, some LivingColors) via Philips Hue Bridges to ioBroker.
 
-You must configure the user name in the HUE Bridge and use it in settings. To create an user see here: http://www.developers.meethue.com/documentation/getting-started
+You must first link you HUE bridge with ioBroker. 
+1. For that find first the IP address by pressing "Find Bridge" button. It is only enabled if no IP address entered.
+2. After IP address is found the USER must be created. For that press the "Create User" button and then press "Link" button on HUE bridge. "Create User" button is only enabled if no USER entered
 
 Deutsch
 -------------
-Bindet Philips Hue / LivingColors / LivingWhites Lampen ein. In den Adapter-Settings muss die IP der Hue Bridge sowie ein Username konfiguriert werden. Zum Anlegen eines Users auf der Bridge siehe: http://www.developers.meethue.com/documentation/getting-started
+Bindet Philips Hue / LivingColors / LivingWhites Lampen ein. 
+In den Adapter-Settings muss die IP der Hue Bridge sowie ein Username konfiguriert werden. 
 
 ## Install
 
 ## Changelog
+### 0.6.1 (2017.04.15)
+* (bluefox) Use new verions of npm library
 
 ### 0.6.0 (2016.11.30)
 * (pmant) support new lamps
@@ -133,6 +137,7 @@ Bindet Philips Hue / LivingColors / LivingWhites Lampen ein. In den Adapter-Sett
 
 Apache 2.0
 
+Copyright (c) 2017 Bluefox <dogafox@gmail.com>
 Copyright (c) 2014-2016 hobbyquaker
 
 

@@ -1,4 +1,5 @@
 <html>
+<head>
 <link rel="stylesheet" type="text/css" href="../../lib/css/themes/jquery-ui/redmond/jquery-ui.min.css"/>
 <script type="text/javascript" src="../../lib/js/jquery-1.11.1.min.js"></script>
 <script type="text/javascript" src="../../socket.io/socket.io.js"></script>
@@ -7,41 +8,21 @@
 <link rel="stylesheet" type="text/css" href="../../css/adapter.css"/>
 <script type="text/javascript" src="../../js/translate.js"></script>
 <script type="text/javascript" src="../../js/adapter-settings.js"></script>
+<script type="text/javascript" src="words.js"></script>
 
 <script type="text/javascript">
     var bridges = [];
-    systemDictionary = {
-        "Philips HUE adapter settings": {
-            "en": "Philips HUE adapter settings",
-            "de": "Philips HUE adapter settings",
-            "ru": "Philips HUE adapter settings"
-        },
-        "Settings":         {"en": "Settings",       "de": "Einstellungen",    "ru": "Настройки"},
-        "Auto setup":       {"en": "Auto setup",     "de": "Auto-Setup",       "ru": "Авто настройка"},
-        "Bridge Address":   {"en": "Bridge Address", "de": "Bridge-Adresse",   "ru": "Адрес hue bridge"},
-        "Bridge User":      {"en": "Bridge User",    "de": "Bridge-Anwender",  "ru": "Пользователь hue bridge"},
-        "Polling":          {"en": "Polling",        "de": "Polling",          "ru": "Опрос"},
-        "Polling interval (sec)": {
-            "en": "Polling interval(sec)",
-            "de": "Pollintervall(sek)",
-            "ru": "Интервал опроса(сек)"
-        },
-        "Find Bridge":      {"en": "Find Bridge",    "de": "Suche Bridge",     "ru": "Найти hue bridge"},
-        "Create User":      {"en": "Create User",    "de": "Erstelle User",    "ru": "Создать пользователя"},
-        "Enable adapter first": {"en": "Enable adapter first", "de": "Aktivier Adapter zuerst", "ru": "Сначала надо активировать драйвер"},
-        "Ok":               {"en": "Ok",            "de": "Ok",                 "ru": "Ok"}
-    };
 
     var active   = false;
 
     function setValue(id, value, onChange) {
-        // example: select elements with id=key and class=value and insert value
-        if ($('#' + id + '.value').attr('type') == 'checkbox') {
-            $('#' + id + '.value').prop('checked', value).change(function() {
+        var $value = $('#' + id + '.value');
+        if ($value.attr('type') === 'checkbox') {
+            $value.prop('checked', value).change(function() {
                 onChange();
             });
         } else {
-            $('#' + id + '.value').val(value).change(function() {
+            $value.val(value).change(function() {
                 onChange();
             }).keyup(function() {
                 $(this).trigger('change');
@@ -51,41 +32,26 @@
 
     // the function loadSettings has to exist ...
     function load(settings, onChange) {
-        $("#dialog-bridges").dialog({
+        $('#dialog-bridges').dialog({
             autoOpen: false,
-            modal: true
-        });
-        for (var key in settings) {
-            setValue(key, settings[key], onChange);
-        }
-        // read if instance is active or enabled
-        socket.emit('getState', 'system.adapter.' + adapter + '.' + instance + '.alive', function (err, state) {
-            active = common.enabled || (state && state.val);
-        });
-        onChange(false);
-    }
-
-    // ... and the function save has to exist.
-    // you have to make sure the callback is called with the settings object as first param!
-    function save(callback) {
-        // example: select elements with class=value and build settings object
-        var obj = {};
-        $('.value').each(function () {
-            var $this = $(this);
-            if ($this.attr('type') == 'checkbox') {
-                obj[$this.attr('id')] = $this.prop('checked');
-            } else {
-                obj[$this.attr('id')] = $this.val();
+            modal:    true,
+            position: {my: 'center top', at: 'center top', of: $('#adapter-container')},
+            open:     function (event) {
+                $(event.target).parent().find('.ui-dialog-titlebar-close .ui-button-text').html('');
             }
         });
-        $('.check').each(function () {
-            var $this = $(this);
-            obj[$this.attr('id')] = $this.is('checked');
+        for (var key in settings) {
+            if (settings.hasOwnProperty(key)) setValue(key, settings[key], onChange);
+        }
+        // read if instance is active or enabled
+        getIsAdapterAlive(function (isAlive) {
+            if (isAlive || common.enabled) {
+                active = true;
+            }
         });
-        callback(obj);
-    }
 
-    $(document).ready(function () {
+        onChange(false);
+
         $('#tabs').tabs();
         $('#create').button().click(function () {
             if (!active) {
@@ -93,31 +59,32 @@
                 return;
             }
 
+            $('#dialog-bridges')
+                .html('<img src="instruction.png"/><br>' + _('Instruction'))
+                .dialog('open');
 
-            $("#dialog-bridges").html('Please press link button now! <br />You have 30 seconds.');
-            $("#dialog-bridges").dialog("open");
             var count = 0;
 
             (function sendCreate(){
                 sendTo('hue.' + instance, 'createUser', $('#bridge.value').val(), function (result) {
                     try {
-                        var result = JSON.parse(result);
+                        result = JSON.parse(result);
                         if (result.error > 0) {
-                            if (result.error == 101 && count<10) {
+                            if (result.error === 101 && count<10) {
                                 count++;
                                 console.log(count);
                                 setTimeout(sendCreate, 3000);
                                 return;
                             } else {
-                                alert("error creating user: " + result.message);
+                                showMessage(_('error creating user: ') + _(result.message), _('Error'), 'info');
                             }
                         } else {
                             $('#user.value').val(result.message).trigger('change');
                         }
                     } catch (e) {
-                        alert("error creating user");
+                        showMessage(_('error creating user'), _('Error'), 'alert');
                     }
-                    $("#dialog-bridges").dialog('close');
+                    $('#dialog-bridges').dialog('close');
                 });
             })();
         });
@@ -128,54 +95,99 @@
                 return;
             }
 
-            $("#dialog-bridges").html('Please wait, searching for bridge.');
-            $("#dialog-bridges").dialog( "open" );
+            $('#dialog-bridges').html(_('Please wait, searching for bridge.')).dialog('open');
+
             sendTo('hue.' + instance, 'browse', 5000, function (result) {
                 try{
                     var arr = JSON.parse(result);
+                    var popup;
                     if (!arr.length){
-                        var popup = 'Cannot find bridge';
+                        popup = 'Cannot find bridge';
                     }else{
-                        var popup = 'Select a bridge: <br />';
+                        popup = 'Select a bridge: <br />';
                         arr.forEach(function(element, index, array) {
                             popup = popup + '<a href="#" onclick="$(\'#bridge.value\').val(\'' + element.ipaddress + '\').trigger(\'change\');$(\'#dialog-bridges\').dialog(\'close\')">' + element.ipaddress + '</a><br />';
                         });
                     }
-                    $("#dialog-bridges").html(popup);
+                    $('#dialog-bridges').html(popup);
                 } catch (e) {
                     alert ("error finding bridge");
                 }
             });
         });
-    });
+
+        if (settings.bridge) {
+            $('#find').button('disable');
+        }
+        if (settings.user) {
+            $('#create').button('disable');
+        }
+        $('#bridge').change(function () {
+            if ($(this).val()) {
+                $('#find').button('disable');
+            } else {
+                $('#find').button('enable');
+            }
+        }).keyup(function () {
+            $(this).trigger('change');
+        });
+        $('#user').change(function () {
+            if ($(this).val()) {
+                $('#create').button('disable');
+            } else {
+                $('#create').button('enable');
+            }
+        }).keyup(function () {
+            $(this).trigger('change');
+        });
+    }
+
+    function save(callback) {
+        var obj = {};
+        $('.value').each(function () {
+            var $this = $(this);
+            if ($this.attr('type') === 'checkbox') {
+                obj[$this.attr('id')] = $this.prop('checked');
+            } else {
+                obj[$this.attr('id')] = $this.val();
+            }
+        });
+        callback(obj);
+    }
 </script>
 <style>
-    #settings tr { line-height: 2.5em; }
+    #settings tr {
+        line-height: 2.5em;
+    }
+    #find, #create {
+        font-size: 14px;
+    }
 </style>
-
+</head>
+<body>
 <!-- you have to put your config page in a div with id adapter-container -->
 <div id="adapter-container">
     <table><tr><td><img src="hue.jpeg" width="64" height="64"></td><td><h3 class="translate">Philips HUE adapter settings</h3></td></tr></table>
         <div id="settings">
             <table>
                 <tr>
-                    <td class="translate">Bridge Address</td>
-                    <td><input type="text" id="bridge" class="value"></td>
+                    <td><label  class="translate" for="bridge">Bridge Address</label></td>
+                    <td><input type="text" id="bridge" class="value" /></td>
                     <td><button id="find"><span class="translate">Find Bridge</span></button></td>
                 </tr>
                 <tr>
-                    <td class="translate">Bridge User</td>
-                    <td><input type="text" id="user" class="value"></td>
-                    <td><button id="create"><span class="translate">Create User</span></button></td>
+                    <td><label  class="translate" for="bridge">Bridge User</label></td>
+                    <td><input type="text" id="user" class="value" /></td>
+                    <td><button id="create"><span class="translate">Create User</label></span></button></td>
                 </tr>
                 <tr>
-                    <td class="translate">Polling</td>
-                    <td><input type="checkbox" id="polling" class="value"></td>
+                    <td><label  class="translate" for="bridge">Polling</label></td>
+                    <td><input type="checkbox" id="polling" class="value" /></td>
                     <td></td>
                 </tr>
                 <tr>
-                    <td class="translate">Polling interval (sec)</td>
-                    <td><input type="text" id="pollingInterval" class="value"></td>
+                    <td><label  class="translate" for="bridge">Polling interval (sec)</label></td>
+                    <td><input type="text" id="pollingInterval" class="value" /></td>
                     <td></td>
                 </tr>
             </table>
@@ -183,5 +195,5 @@
             <div id="dialog-bridges" title="Select a bridge"></div>
         </div>
 </div>
-
+</body>
 </html>

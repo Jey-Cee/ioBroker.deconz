@@ -1,8 +1,13 @@
 {
     "common": {
         "name":                     "hue",
-        "version": "0.6.0",
+        "version": "0.6.1",
 		"news": {
+            "0.6.1": {
+              "en": "Use new verions of npm library",
+              "de": "Benutze neue Version von NPM Bibliothek",
+              "ru": "Используется новая версия NPM библиотеки"
+            },
             "0.6.0": {
               "en": "support new Lamps",
               "de": "unterstützt neue Lampen",
@@ -25,10 +30,20 @@
 			}
 		},
         "title":                    "Philips Hue Bridge Adapter",
-        "desc":                     "Connects Philips Hue LED Bulbs, Friends of Hue LED Lamps and Stripes and other SmartLink capable Devices (LivingWhites, some LivingColors) via Philips Hue Bridges",
+        "titleLang": {
+          "en": "Philips Hue Bridge Adapter",
+          "de": "Philips Hue Bridge Adapter",
+          "ru": "Драйвер для Philips Hue Bridge"
+        },
+        "desc": {
+          "en": "Connects Philips Hue LED Bulbs, Friends of Hue LED Lamps and Stripes and other SmartLink capable Devices (LivingWhites, some LivingColors) via Philips Hue Bridges with ioBroker",
+          "de": "Verbinden Sie Philips Hue LED Birnen, Friends of Hue LED Lampen und Streifen und andere SmartLink fähige Geräte (LivingWhites, einige LivingColors) über Philips Hue Bridges mit ioBroker",
+          "ru": "Соединяет светодиодные лампы Philips Hue, светодиодные лампы и ленты Friends of Hue и другие устройства, поддерживающие SmartLink (LivingWhites, некоторые LivingColors) через Philips Hue Bridges"
+        },
         "authors": [
             "hobbyquaker <hq@ccu.io>",
-            "Pmant <patrickmo@gmx.de>"
+            "Pmant <patrickmo@gmx.de>",
+            "Bluefox <dogafox@gmail.com>"
         ],
         "license":                  "Apache 2.0",
         "platform":                 "Javascript/Node.js",

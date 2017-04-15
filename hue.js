@@ -9,13 +9,13 @@
  */
 /* jshint -W097 */// jshint strict:false
 /*jslint node: true */
-"use strict";
+'use strict';
 
-var hue = require('node-hue-api');
-var utils = require(__dirname + '/lib/utils'); // Get common adapter utils
+var hue       = require('node-hue-api');
+var utils     = require(__dirname + '/lib/utils'); // Get common adapter utils
 var huehelper = require('./lib/HueHelper');
 
-var adapter = utils.adapter('hue');
+var adapter   = new utils.Adapter('hue');
 
 adapter.on('stateChange', function (id, state) {
     if (!id || !state || state.ack) {
@@ -29,13 +29,13 @@ adapter.on('stateChange', function (id, state) {
     var ls = {};
     //if .on changed instead change .bri to 254 or 0
     var bri = 0;
-    if (dp == 'on') {
+    if (dp === 'on') {
         bri = state.val ? 254 : 0;
         adapter.setState([id, 'bri'].join('.'), {val: bri, ack: false});
         return;
     }
     //if .level changed instead change .bri to level.val*254
-    if (dp == 'level') {
+    if (dp === 'level') {
         bri = Math.max(Math.min(Math.round(state.val * 2.54), 254), 0);
         adapter.setState([id, 'bri'].join('.'), {val: bri, ack: false});
         return;
@@ -69,55 +69,55 @@ adapter.on('stateChange', function (id, state) {
                     break;
                 case 'alert':
                     alls[iddp] = idStates[idState].val;
-                    if (dp == 'alert') ls[iddp] = idStates[idState].val;
+                    if (dp === 'alert') ls[iddp] = idStates[idState].val;
                     break;
                 case 'effect':
                     alls[iddp] = idStates[idState].val;
-                    if (dp == 'effect') ls[iddp] = idStates[idState].val;
+                    if (dp === 'effect') ls[iddp] = idStates[idState].val;
                     break;
                 case 'r':
                 case 'g':
                 case 'b':
                     alls[iddp] = idStates[idState].val;
-                    if (dp == 'r' || dp == 'g' || dp == 'b') {
+                    if (dp === 'r' || dp === 'g' || dp === 'b') {
                         ls[iddp] = idStates[idState].val;
                     }
                     break;
                 case 'ct':
                     alls[iddp] = idStates[idState].val;
-                    if (dp == 'ct') {
+                    if (dp === 'ct') {
                         ls[iddp] = idStates[idState].val;
                     }
                     break;
                 case 'hue':
                 case 'sat':
                     alls[iddp] = idStates[idState].val;
-                    if (dp == 'hue' || dp == 'sat') {
+                    if (dp === 'hue' || dp === 'sat') {
                         ls[iddp] = idStates[idState].val;
                     }
                     break;
                 case 'xy':
                     alls[iddp] = idStates[idState].val;
-                    if (dp == 'xy') {
+                    if (dp === 'xy') {
                         ls[iddp] = idStates[idState].val;
                     }
                     break;
                 case 'command':
-                    if (dp == 'command') {
+                    if (dp === 'command') {
                         try {
                             var commands = JSON.parse(state.val);
                             for (var command in commands) {
                                 if (!commands.hasOwnProperty(command)) {
                                     continue;
                                 }
-                                if (command == 'on') {
+                                if (command === 'on') {
                                     //convert on to bri
                                     if (commands[command] && !commands.hasOwnProperty('bri')) {
                                         ls.bri = 254;
                                     } else {
                                         ls.bri = 0;
                                     }
-                                } else if (command == 'level') {
+                                } else if (command === 'level') {
                                     //convert level to bri
                                     if (!commands.hasOwnProperty('bri')) {
                                         ls.bri = Math.min(254, Math.max(0, Math.round(parseInt(commands[command]) * 2.54)));
@@ -227,7 +227,7 @@ adapter.on('stateChange', function (id, state) {
                 }
             }
             if ('alert' in ls) {
-                if (['select', 'lselect'].indexOf(ls.alert) == -1) {
+                if (['select', 'lselect'].indexOf(ls.alert) === -1) {
                     finalLS.alert = 'none';
                 } else {
                     finalLS.alert = ls.alert;
@@ -235,13 +235,13 @@ adapter.on('stateChange', function (id, state) {
                 lightState = lightState.alert(finalLS.alert);
             }
             if ('effect' in ls) {
-                if (['colorloop'].indexOf(ls.effect) == -1) {
+                if (['colorloop'].indexOf(ls.effect) === -1) {
                     finalLS.effect = 'none';
                 } else {
                     finalLS.effect = ls.effect;
                 }
                 lightState = lightState.effect(finalLS.effect);
-                if (!lampOn && (finalLS.effect != 'none' && !('bri' in ls) || ls.bri === 0)) {
+                if (!lampOn && (finalLS.effect !== 'none' && !('bri' in ls) || ls.bri === 0)) {
                     lightState = lightState.on();
                     lightState = lightState.bri(254);
                     finalLS.bri = 254;
@@ -319,7 +319,7 @@ adapter.on('stateChange', function (id, state) {
             }
 
 
-            if (obj.common.role == 'LightGroup' || obj.common.role == 'Room') {
+            if (obj.common.role === 'LightGroup' || obj.common.role === 'Room') {
                 //log final changes / states
                 adapter.log.info('final lightState for ' + obj.common.name + ':' + JSON.stringify(finalLS));
                 api.setGroupLightState(groupIds[id], lightState, function (err, res) {
@@ -336,7 +336,7 @@ adapter.on('stateChange', function (id, state) {
                         }
                     }
                 });
-            } else if (obj.common.role == 'switch') {
+            } else if (obj.common.role === 'switch') {
                 if (finalLS.hasOwnProperty('on')) {
                     finalLS = {on:finalLS.on};
                     //log final changes / states
@@ -406,9 +406,7 @@ adapter.on('message', function (obj) {
     return true;
 });
 
-adapter.on('ready', function () {
-    main();
-});
+adapter.on('ready', main);
 
 function browse(timeout, callback) {
     timeout = parseInt(timeout);
@@ -418,7 +416,7 @@ function browse(timeout, callback) {
 
 function createUser(ip, callback) {
     var newUserName = null;
-    var userDescription = "ioBroker.hue";
+    var userDescription = 'ioBroker.hue';
     try {
         var api = new HueApi();
         api.registerUser(ip, newUserName, userDescription)
@@ -439,24 +437,20 @@ function createUser(ip, callback) {
 var HueApi = hue.HueApi;
 var api;
 
-var channelIds = {};
-var pollIds = [];
+var channelIds   = {};
+var pollIds      = [];
 var pollChannels = [];
-var groupIds = {};
+var groupIds     = {};
 
-function main() {
-    adapter.subscribeStates('*');
-
-    api = new HueApi(adapter.config.bridge, adapter.config.user);
-
+function connect() {
     api.getFullState(function (err, config) {
         if (err) {
             adapter.log.warn('could not connect to ip');
-            setTimeout(main, 5000);
+            setTimeout(connect, 5000);
             return;
         } else if (!config) {
             adapter.log.warn('Cannot get the configuration from hue bridge');
-            setTimeout(main, 5000);
+            setTimeout(connect, 5000);
             return;
         }
 
@@ -485,13 +479,13 @@ function main() {
             pollIds.push(lid);
             pollChannels.push(channelName.replace(/\s/g, '_'));
 
-            if (light.type == 'Extended color light' || light.type == 'Color light') {
+            if (light.type === 'Extended color light' || light.type === 'Color light') {
                 light.state.r = 0;
                 light.state.g = 0;
                 light.state.b = 0;
             }
 
-            if (light.type != 'On/Off plug-in unit') {
+            if (light.type !== 'On/Off plug-in unit') {
                 light.state.command = '{}';
                 light.state.level = 0;
             }
@@ -524,26 +518,26 @@ function main() {
                     case 'bri':
                         lobj.common.type = 'number';
                         lobj.common.role = 'level.dimmer';
-                        lobj.common.min = 0;
-                        lobj.common.max = 254;
+                        lobj.common.min  = 0;
+                        lobj.common.max  = 254;
                         break;
                     case 'level':
                         lobj.common.type = 'number';
                         lobj.common.role = 'level.dimmer';
-                        lobj.common.min = 0;
-                        lobj.common.max = 100;
+                        lobj.common.min  = 0;
+                        lobj.common.max  = 100;
                         break;
                     case 'hue':
                         lobj.common.type = 'number';
                         lobj.common.role = 'level.color.hue';
-                        lobj.common.min = 0;
-                        lobj.common.max = 65535;
+                        lobj.common.min  = 0;
+                        lobj.common.max  = 65535;
                         break;
                     case 'sat':
                         lobj.common.type = 'number';
                         lobj.common.role = 'level.color.saturation';
-                        lobj.common.min = 0;
-                        lobj.common.max = 254;
+                        lobj.common.min  = 0;
+                        lobj.common.max  = 254;
                         break;
                     case 'xy':
                         lobj.common.type = 'string';
@@ -552,8 +546,8 @@ function main() {
                     case 'ct':
                         lobj.common.type = 'number';
                         lobj.common.role = 'level.color.temperature';
-                        lobj.common.min = 153;
-                        lobj.common.max = 500;
+                        lobj.common.min  = 153;
+                        lobj.common.max  = 500;
                         break;
                     case 'alert':
                         lobj.common.type = 'string';
@@ -564,32 +558,32 @@ function main() {
                         lobj.common.role = 'switch';
                         break;
                     case 'colormode':
-                        lobj.common.type = 'string';
-                        lobj.common.role = 'indicator.colormode';
+                        lobj.common.type  = 'string';
+                        lobj.common.role  = 'indicator.colormode';
                         lobj.common.write = false;
                         break;
                     case 'reachable':
-                        lobj.common.type = 'boolean';
+                        lobj.common.type  = 'boolean';
                         lobj.common.write = false;
-                        lobj.common.role = 'indicator.reachable';
+                        lobj.common.role  = 'indicator.reachable';
                         break;
                     case 'r':
                         lobj.common.type = 'number';
                         lobj.common.role = 'level.color.r';
-                        lobj.common.min = 0;
-                        lobj.common.max = 255;
+                        lobj.common.min  = 0;
+                        lobj.common.max  = 255;
                         break;
                     case 'g':
                         lobj.common.type = 'number';
                         lobj.common.role = 'level.color.g';
-                        lobj.common.min = 0;
-                        lobj.common.max = 255;
+                        lobj.common.min  = 0;
+                        lobj.common.max  = 255;
                         break;
                     case 'b':
                         lobj.common.type = 'number';
                         lobj.common.role = 'level.color.b';
-                        lobj.common.min = 0;
-                        lobj.common.max = 255;
+                        lobj.common.min  = 0;
+                        lobj.common.max  = 255;
                         break;
                     case 'command':
                         lobj.common.type = 'string';
@@ -602,7 +596,7 @@ function main() {
                 adapter.setObject(objId.replace(/\s/g, '_'), lobj);
             }
 
-            var role = "light.color";
+            var role = 'light.color';
             if (light.type === 'Dimmable light' || light.type === 'Dimmable plug-in unit') {
                 role = 'light.dimmer';
             } else if (light.type === 'On/Off plug-in unit') {
@@ -632,16 +626,16 @@ function main() {
         adapter.log.info('creating/updating light groups');
 
         var groups = config.groups;
-		groups[0] = {
-            name: "All",   //"Lightset 0"
-            type: "LightGroup",
+        groups[0] = {
+            name: 'All',   //"Lightset 0"
+            type: 'LightGroup',
             id: 0,
             action: {
-                alert: "select",
+                alert: 'select',
                 bri: 0,
-                colormode: "",
+                colormode: '',
                 ct: 0,
-                effect: "none",
+                effect: 'none',
                 hue: 0,
                 on: false,
                 sat: 0,
@@ -700,26 +694,26 @@ function main() {
                     case 'bri':
                         gobj.common.type = 'number';
                         gobj.common.role = 'level.dimmer';
-                        gobj.common.min = 0;
-                        gobj.common.max = 254;
+                        gobj.common.min  = 0;
+                        gobj.common.max  = 254;
                         break;
                     case 'level':
                         gobj.common.type = 'number';
                         gobj.common.role = 'level.dimmer';
-                        gobj.common.min = 0;
-                        gobj.common.max = 100;
+                        gobj.common.min  = 0;
+                        gobj.common.max  = 100;
                         break;
                     case 'hue':
                         gobj.common.type = 'number';
                         gobj.common.role = 'level.color.hue';
-                        gobj.common.min = 0;
-                        gobj.common.max = 65535;
+                        gobj.common.min  = 0;
+                        gobj.common.max  = 65535;
                         break;
                     case 'sat':
                         gobj.common.type = 'number';
                         gobj.common.role = 'level.color.saturation';
-                        gobj.common.min = 0;
-                        gobj.common.max = 254;
+                        gobj.common.min  = 0;
+                        gobj.common.max  = 254;
                         break;
                     case 'xy':
                         gobj.common.type = 'string';
@@ -728,8 +722,8 @@ function main() {
                     case 'ct':
                         gobj.common.type = 'number';
                         gobj.common.role = 'level.color.temperature';
-                        gobj.common.min = 153;
-                        gobj.common.max = 500;
+                        gobj.common.min  = 153;
+                        gobj.common.max  = 500;
                         break;
                     case 'alert':
                         gobj.common.type = 'string';
@@ -747,20 +741,20 @@ function main() {
                     case 'r':
                         gobj.common.type = 'number';
                         gobj.common.role = 'level.color.r';
-                        gobj.common.min = 0;
-                        gobj.common.max = 255;
+                        gobj.common.min  = 0;
+                        gobj.common.max  = 255;
                         break;
                     case 'g':
                         gobj.common.type = 'number';
                         gobj.common.role = 'level.color.g';
-                        gobj.common.min = 0;
-                        gobj.common.max = 255;
+                        gobj.common.min  = 0;
+                        gobj.common.max  = 255;
                         break;
                     case 'b':
                         gobj.common.type = 'number';
                         gobj.common.role = 'level.color.b';
-                        gobj.common.min = 0;
-                        gobj.common.max = 255;
+                        gobj.common.min  = 0;
+                        gobj.common.max  = 255;
                         break;
                     case 'command':
                         gobj.common.type = 'string';
@@ -802,10 +796,17 @@ function main() {
         });
 
     });
+}
+
+function main() {
+    adapter.subscribeStates('*');
+
+    api = new HueApi(adapter.config.bridge, adapter.config.user);
 
     if (adapter.config.polling && adapter.config.pollingInterval > 0) {
         setTimeout(pollSingle, 5000, 0);
     }
+    connect();
 }
 
 function pollSingle(count) {
