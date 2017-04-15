@@ -24,7 +24,7 @@ In den Adapter-Settings muss die IP der Hue Bridge sowie ein Username konfigurie
 ## Install
 
 ## Changelog
-### 0.6.1 (2017.04.15)
+### 0.6.2 (2017.04.15)
 * (bluefox) Use new verions of npm library
 
 ### 0.6.0 (2016.11.30)
