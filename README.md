@@ -25,8 +25,9 @@ In den Adapter-Settings muss die IP der Hue Bridge sowie ein Username konfigurie
 Required node.js >= 0.12.
 
 ## Changelog
-### 0.6.2 (2017.04.15)
-* (bluefox) Use new verions of npm library
+### 0.6.3 (2017.04.15)
+* (bluefox) Use new version of npm library
+* (bluefox) reduce message generation to decrease the last
 
 ### 0.6.0 (2016.11.30)
 * (pmant) support new lamps

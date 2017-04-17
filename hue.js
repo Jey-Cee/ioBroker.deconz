@@ -142,7 +142,7 @@ adapter.on('stateChange', function (id, state) {
         }
 
         //get lightState
-        adapter.getObject(id, function (err, obj) {
+        adapter.getForeignObject(id, function (err, obj) {
             if (err || !obj) {
                 if (!err) err = new Error('obj in callback getObject is null or undefined');
                 adapter.log.error(err);
@@ -164,7 +164,6 @@ adapter.on('stateChange', function (id, state) {
                 ls.bri = xyb.b;
                 ls.xy = xyb.x + ',' + xyb.y;
             }
-
 
             //create lightState from ls
             //and check values
@@ -235,11 +234,8 @@ adapter.on('stateChange', function (id, state) {
                 lightState = lightState.alert(finalLS.alert);
             }
             if ('effect' in ls) {
-                if (['colorloop'].indexOf(ls.effect) === -1) {
-                    finalLS.effect = 'none';
-                } else {
-                    finalLS.effect = ls.effect;
-                }
+                finalLS.effect = ls.effect ? 'colorloop' : 'none';
+
                 lightState = lightState.effect(finalLS.effect);
                 if (!lampOn && (finalLS.effect !== 'none' && !('bri' in ls) || ls.bri === 0)) {
                     lightState = lightState.on();
@@ -332,7 +328,11 @@ adapter.on('stateChange', function (id, state) {
                             continue;
                         }
                         if (finalState in alls) {
-                            adapter.setState([id, finalState].join('.'), {val: finalLS[finalState], ack: true});
+                            if (finalState === 'effect') {
+                                adapter.setState([id, 'effect'].join('.'), {val: finalLS[finalState] === 'colorloop', ack: true});
+                            } else {
+                                adapter.setState([id, finalState].join('.'), {val: finalLS[finalState], ack: true});
+                            }
                         }
                     }
                 });
@@ -368,7 +368,11 @@ adapter.on('stateChange', function (id, state) {
                             continue;
                         }
                         if (finalState in alls) {
-                            adapter.setState([id, finalState].join('.'), {val: finalLS[finalState], ack: true});
+                            if (finalState === 'effect') {
+                                adapter.setState([id, 'effect'].join('.'), {val: finalLS[finalState] === 'colorloop', ack: true});
+                            } else {
+                                adapter.setState([id, finalState].join('.'), {val: finalLS[finalState], ack: true});
+                            }
                         }
                     }
                 });
@@ -459,13 +463,15 @@ function connect() {
         // Create/update lamps
         adapter.log.info('creating/updating light channels');
 
-        var lights = config.lights;
-        var count = 0;
+        var lights  = config.lights;
+        var count   = 0;
+        var objs    = [];
+        var states  = [];
         for (var lid in lights) {
             if (!lights.hasOwnProperty(lid)) {
                 continue;
             }
-            count += 1;
+            count++;
             var light = lights[lid];
 
             var channelName = config.config.name + '.' + light.name;
@@ -496,17 +502,16 @@ function connect() {
                 }
                 var objId = channelName + '.' + state;
 
-                adapter.setState(objId.replace(/\s/g, '_'), {val: light.state[state], ack: true});
-
                 var lobj = {
-                    type: 'state',
+                    _id:        adapter.namespace + '.' + objId.replace(/\s/g, '_'),
+                    type:       'state',
                     common: {
-                        name: objId.replace(/\s/g, '_'),
-                        read: true,
-                        write: true
+                        name:   objId.replace(/\s/g, '_'),
+                        read:   true,
+                        write:  true
                     },
                     native: {
-                        id: lid
+                        id:     lid
                     }
                 };
 
@@ -554,7 +559,7 @@ function connect() {
                         lobj.common.role = 'switch';
                         break;
                     case 'effect':
-                        lobj.common.type = 'string';
+                        lobj.common.type = 'boolean';
                         lobj.common.role = 'switch';
                         break;
                     case 'colormode':
@@ -593,7 +598,9 @@ function connect() {
                         adapter.log.info('skip: ' + state);
                         break;
                 }
-                adapter.setObject(objId.replace(/\s/g, '_'), lobj);
+
+                objs.push(lobj);
+                states.push({id: lobj._id, val: light.state[state]});
             }
 
             var role = 'light.color';
@@ -602,25 +609,26 @@ function connect() {
             } else if (light.type === 'On/Off plug-in unit') {
                 role = 'switch';
             }
-            adapter.setObject(channelName.replace(/\s/g, '_'), {
+
+            objs.push({
+                _id: adapter.namespace + '.' + channelName.replace(/\s/g, '_'),
                 type: 'channel',
                 common: {
-                    name: channelName.replace(/\s/g, '_'),
-                    role: role
+                    name:           channelName.replace(/\s/g, '_'),
+                    role:           role
                 },
                 native: {
-                    id: lid,
-                    type: light.type,
-                    name: light.name,
-                    modelid: light.modelid,
-                    swversion: light.swversion,
-                    pointsymbol: light.pointsymbol
+                    id:             lid,
+                    type:           light.type,
+                    name:           light.name,
+                    modelid:        light.modelid,
+                    swversion:      light.swversion,
+                    pointsymbol:    light.pointsymbol
                 }
             });
 
         }
         adapter.log.info('created/updated ' + count + ' light channels');
-
 
         // Create/update groups
         adapter.log.info('creating/updating light groups');
@@ -631,15 +639,15 @@ function connect() {
             type: 'LightGroup',
             id: 0,
             action: {
-                alert: 'select',
-                bri: 0,
+                alert:  'select',
+                bri:    0,
                 colormode: '',
-                ct: 0,
+                ct:     0,
                 effect: 'none',
-                hue: 0,
-                on: false,
-                sat: 0,
-                xy: '0,0'
+                hue:    0,
+                on:     false,
+                sat:    0,
+                xy:     '0,0'
             }
         };
         count = 0;
@@ -659,11 +667,11 @@ function connect() {
             }
             groupIds[groupName.replace(/\s/g, '_')] = gid;
 
-            group.action.r = 0;
-            group.action.g = 0;
-            group.action.b = 0;
+            group.action.r      = 0;
+            group.action.g      = 0;
+            group.action.b      = 0;
             group.action.command = '{}';
-            group.action.level = 0;
+            group.action.level  = 0;
 
             for (var action in group.action) {
                 if (!group.action.hasOwnProperty(action)) {
@@ -672,17 +680,16 @@ function connect() {
 
                 var gobjId = groupName + '.' + action;
 
-                adapter.setState(gobjId.replace(/\s/g, '_'), {val: group.action[action], ack: true});
-
                 var gobj = {
-                    type: 'state',
+                    _id:        adapter.namespace + '.' + gobjId.replace(/\s/g, '_'),
+                    type:       'state',
                     common: {
-                        name: gobjId.replace(/\s/g, '_'),
-                        read: true,
-                        write: true
+                        name:   gobjId.replace(/\s/g, '_'),
+                        read:   true,
+                        write:  true
                     },
                     native: {
-                        id: gid
+                        id:     gid
                     }
                 };
 
@@ -730,7 +737,7 @@ function connect() {
                         gobj.common.role = 'switch';
                         break;
                     case 'effect':
-                        gobj.common.type = 'string';
+                        gobj.common.type = 'boolean';
                         gobj.common.role = 'switch';
                         break;
                     case 'colormode':
@@ -765,29 +772,31 @@ function connect() {
                         continue;
                         break;
                 }
-                adapter.setObject(gobjId.replace(/\s/g, '_'), gobj);
+                objs.push(gobj);
+                states.push({id: gobj._id, val: group.action[action]});
             }
 
-            adapter.setObject(groupName.replace(/\s/g, '_'), {
-                type: 'channel',
+            objs.push({
+                _id:        adapter.namespace + '.' + groupName.replace(/\s/g, '_'),
+                type:       'channel',
                 common: {
-                    name: groupName.replace(/\s/g, '_'),
-                    role: group.type
+                    name:   groupName.replace(/\s/g, '_'),
+                    role:   group.type
                 },
                 native: {
-                    id: gid,
-                    type: group.type,
-                    name: group.name,
+                    id:     gid,
+                    type:   group.type,
+                    name:   group.name,
                     lights: group.lights
                 }
             });
         }
         adapter.log.info('created/updated ' + count + ' light groups');
 
-
         // Create/update device
         adapter.log.info('creating/updating bridge device');
-        adapter.setObject(config.config.name.replace(/\s/g, '_'), {
+        objs.push({
+            _id:    adapter.namespace + '.' + config.config.name.replace(/\s/g, '_'),
             type: 'device',
             common: {
                 name: config.config.name.replace(/\s/g, '_')
@@ -795,7 +804,78 @@ function connect() {
             native: config.config
         });
 
+        syncObjects(objs, function () {
+            syncStates(states);
+        })
     });
+}
+
+function syncObjects(objs, callback) {
+    if (!objs || !objs.length) {
+        return callback && callback();
+    }
+    var task = objs.shift();
+    adapter.getForeignObject(task._id, function (err, obj) {
+        // add saturation into enum.functions.color
+        if (task.common.role === 'level.color.saturation') {
+            adapter.getForeignObject('enum.functions.color', function (err, _enum) {
+                if (_enum && _enum.common && _enum.common.members && _enum.common.members.indexOf(task._id) === -1) {
+                    _enum.common.members.push(task._id);
+                    adapter.setForeignObject(_enum._id, _enum, function (err) {
+                        if (!obj) {
+                            adapter.setForeignObject(task._id, task, function () {
+                                setTimeout(syncObjects, 0, objs, callback);
+                            });
+                        } else {
+                            obj.native = task.native;
+                            adapter.setForeignObject(obj._id, obj, function () {
+                                setTimeout(syncObjects, 0, objs, callback);
+                            });
+                        }
+                    });
+                } else {
+                    if (!obj) {
+                        adapter.setForeignObject(task._id, task, function () {
+                            setTimeout(syncObjects, 0, objs, callback);
+                        });
+                    } else {
+                        obj.native = task.native;
+                        adapter.setForeignObject(obj._id, obj, function () {
+                            setTimeout(syncObjects, 0, objs, callback);
+                        });
+                    }
+                }
+            });
+        } else {
+            if (!obj) {
+                adapter.setForeignObject(task._id, task, function () {
+                    setTimeout(syncObjects, 0, objs, callback);
+                });
+            } else {
+                obj.native = task.native;
+                adapter.setForeignObject(obj._id, obj, function () {
+                    setTimeout(syncObjects, 0, objs, callback);
+                });
+            }
+        }
+    });
+}
+
+function syncStates(states, isChanged, callback) {
+    if (!states || !states.length) {
+        return callback && callback();
+    }
+    var task = states.shift();
+
+    if (isChanged) {
+        adapter.setForeignStateChanged(task.id, task.val, true, function () {
+            setTimeout(syncStates, 0, states, isChanged, callback);
+        });
+    } else {
+        adapter.setForeignState(task.id, task.val, true, function () {
+            setTimeout(syncStates, 0, states, isChanged, callback);
+        });
+    }
 }
 
 function main() {
@@ -815,7 +895,9 @@ function pollSingle(count) {
         setTimeout(pollSingle, adapter.config.pollingInterval * 1000, count);
     } else {
         adapter.log.debug('polling light ' + pollChannels[count]);
+
         api.lightStatus(pollIds[count], function (err, result) {
+            var values = [];
             if (err) {
                 adapter.log.error(err);
             }
@@ -851,12 +933,12 @@ function pollSingle(count) {
                     if (!states.hasOwnProperty(stateB)) {
                         continue;
                     }
-                    var objId = pollChannels[count] + '.' + stateB;
-                    adapter.setState(objId, {val: states[stateB], ack: true});
+                    values.push({id: adapter.namespace + '.' + pollChannels[count] + '.' + stateB, val: states[stateB]});
                 }
             }
-            count++;
-            setTimeout(pollSingle, 50, count);
+            syncStates(values, true, function () {
+                setTimeout(pollSingle, 50, ++count);
+            });
         });
     }
 }

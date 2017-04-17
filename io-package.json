@@ -1,9 +1,9 @@
 {
     "common": {
         "name":                     "hue",
-        "version": "0.6.2",
+        "version": "0.6.3",
 		"news": {
-            "0.6.2": {
+            "0.6.3": {
               "en": "Use new verions of npm library",
               "de": "Benutze neue Version von NPM Bibliothek",
               "ru": "Используется новая версия NPM библиотеки"
@@ -63,6 +63,14 @@
         "pollingInterval": 30
     },
     "objects": [
-
+      {
+        "_id":        "enum.functions.color",
+        "common": {
+          "name": "Color",
+          "members": []
+        },
+        "type": "enum",
+        "native": {}
+      }
     ]
 }
