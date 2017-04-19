@@ -13,7 +13,7 @@
 
 var hue       = require('node-hue-api');
 var utils     = require(__dirname + '/lib/utils'); // Get common adapter utils
-var huehelper = require('./lib/HueHelper');
+var huehelper = require('./lib/hueHelper');
 
 var adapter   = new utils.Adapter('hue');
 
@@ -27,26 +27,26 @@ adapter.on('stateChange', function (id, state) {
     var dp = tmp.pop();
     id = tmp.slice(2).join('.');
     var ls = {};
-    //if .on changed instead change .bri to 254 or 0
+    // if .on changed instead change .bri to 254 or 0
     var bri = 0;
     if (dp === 'on') {
         bri = state.val ? 254 : 0;
         adapter.setState([id, 'bri'].join('.'), {val: bri, ack: false});
         return;
     }
-    //if .level changed instead change .bri to level.val*254
+    // if .level changed instead change .bri to level.val*254
     if (dp === 'level') {
         bri = Math.max(Math.min(Math.round(state.val * 2.54), 254), 0);
         adapter.setState([id, 'bri'].join('.'), {val: bri, ack: false});
         return;
     }
-    //get lamp states
+    // get lamp states
     adapter.getStates(id + '.*', function (err, idStates) {
         if (err) {
             adapter.log.error(err);
             return;
         }
-        //gather states that need to be changed
+        // gather states that need to be changed
         ls = {};
         var alls = {};
         var lampOn = false;
@@ -141,15 +141,15 @@ adapter.on('stateChange', function (id, state) {
             }
         }
 
-        //get lightState
-        adapter.getForeignObject(id, function (err, obj) {
+        // get lightState
+        adapter.getObject(id, function (err, obj) {
             if (err || !obj) {
                 if (!err) err = new Error('obj in callback getObject is null or undefined');
                 adapter.log.error(err);
                 return;
             }
 
-            //apply rgb to xy with modelId
+            // apply rgb to xy with modelId
             if ('r' in ls || 'g' in ls || 'b' in ls) {
                 if (!('r' in ls)) {
                     ls.r = 0;
@@ -165,8 +165,8 @@ adapter.on('stateChange', function (id, state) {
                 ls.xy = xyb.x + ',' + xyb.y;
             }
 
-            //create lightState from ls
-            //and check values
+            // create lightState from ls
+            // and check values
             var lightState = hue.lightState.create();
             var finalLS = {};
             if (ls.bri > 0) {
@@ -300,7 +300,7 @@ adapter.on('stateChange', function (id, state) {
                 lightState = lightState.bri(finalLS.bri);
             }
 
-            //change colormode
+            // change colormode
             if ('xy' in finalLS) {
                 finalLS.colormode = 'xy';
             } else if ('ct' in finalLS) {
@@ -309,20 +309,20 @@ adapter.on('stateChange', function (id, state) {
                 finalLS.colormode = 'hs';
             }
 
-            //set level to final bri / 2.54
+            // set level to final bri / 2.54
             if ('bri' in finalLS) {
                 finalLS.level = Math.max(Math.min(Math.round(finalLS.bri / 2.54), 100), 0);
             }
 
 
             if (obj.common.role === 'LightGroup' || obj.common.role === 'Room') {
-                //log final changes / states
+                // log final changes / states
                 adapter.log.info('final lightState for ' + obj.common.name + ':' + JSON.stringify(finalLS));
                 api.setGroupLightState(groupIds[id], lightState, function (err, res) {
                     if (err || !res) {
                         adapter.log.error('error: ' + err);
                     }
-                    //write back known states
+                    // write back known states
                     for (var finalState in finalLS) {
                         if (!finalLS.hasOwnProperty(finalState)) {
                             continue;
@@ -339,7 +339,7 @@ adapter.on('stateChange', function (id, state) {
             } else if (obj.common.role === 'switch') {
                 if (finalLS.hasOwnProperty('on')) {
                     finalLS = {on:finalLS.on};
-                    //log final changes / states
+                    // log final changes / states
                     adapter.log.info('final lightState for ' + obj.common.name + ':' + JSON.stringify(finalLS));
 
                     lightState = hue.lightState.create();
@@ -355,7 +355,7 @@ adapter.on('stateChange', function (id, state) {
                     adapter.log.warn('invalid switch operation');
                 }
             } else {
-                //log final changes / states
+                // log final changes / states
                 adapter.log.info('final lightState for ' + obj.common.name + ':' + JSON.stringify(finalLS));
                 api.setLightState(channelIds[id], lightState, function (err, res) {
                     if (err || !res) {
