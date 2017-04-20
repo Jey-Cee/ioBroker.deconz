@@ -179,7 +179,15 @@ adapter.on('stateChange', function (id, state) {
                 finalLS.on = false;
             }
             if ('xy' in ls) {
-                var xy = ls.xy.split(',');
+                if (!ls.xy || typeof ls.xy !== 'string') {
+                    adapter.log.warn('Invalid xy value: "' + ls.xy + '"');
+                    if (typeof ls.xy !== 'string' && ls.xy) {
+                        ls.xy = ls.xy.toString();
+                    } else {
+                        ls.xy = '0,0';
+                    }
+                }
+                var xy = ls.xy.toString().split(',');
                 xy = {'x': xy[0], 'y': xy[1]};
                 xy = huehelper.GamutXYforModel(xy.x, xy.y, (obj.native.hasOwnProperty('modelid') ? obj.native.modelid.trim() : 'default'));
                 finalLS.xy = xy.x + ',' + xy.y;
