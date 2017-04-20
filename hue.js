@@ -144,7 +144,7 @@ adapter.on('stateChange', function (id, state) {
         // get lightState
         adapter.getObject(id, function (err, obj) {
             if (err || !obj) {
-                if (!err) err = new Error('obj in callback getObject is null or undefined');
+                if (!err) err = new Error('obj "' + id + '" in callback getObject is null or undefined');
                 adapter.log.error(err);
                 return;
             }
@@ -179,11 +179,11 @@ adapter.on('stateChange', function (id, state) {
                 finalLS.on = false;
             }
             if ('xy' in ls) {
-                if (!ls.xy || typeof ls.xy !== 'string') {
-                    adapter.log.warn('Invalid xy value: "' + ls.xy + '"');
-                    if (typeof ls.xy !== 'string' && ls.xy) {
+                if (typeof ls.xy !== 'string') {
+                    if (ls.xy) {
                         ls.xy = ls.xy.toString();
                     } else {
+                        adapter.log.warn('Invalid xy value: "' + ls.xy + '"');
                         ls.xy = '0,0';
                     }
                 }
@@ -253,7 +253,7 @@ adapter.on('stateChange', function (id, state) {
                 }
             }
 
-            //only available in command state
+            // only available in command state
             if ('transitiontime' in ls) {
                 var transitiontime = parseInt(ls.transitiontime);
                 if (!isNaN(transitiontime)) {
@@ -322,7 +322,6 @@ adapter.on('stateChange', function (id, state) {
                 finalLS.level = Math.max(Math.min(Math.round(finalLS.bri / 2.54), 100), 0);
             }
 
-
             if (obj.common.role === 'LightGroup' || obj.common.role === 'Room') {
                 // log final changes / states
                 adapter.log.info('final lightState for ' + obj.common.name + ':' + JSON.stringify(finalLS));
@@ -344,7 +343,8 @@ adapter.on('stateChange', function (id, state) {
                         }
                     }
                 });
-            } else if (obj.common.role === 'switch') {
+            } else
+            if (obj.common.role === 'switch') {
                 if (finalLS.hasOwnProperty('on')) {
                     finalLS = {on:finalLS.on};
                     // log final changes / states
@@ -370,7 +370,7 @@ adapter.on('stateChange', function (id, state) {
                         adapter.log.error('error: ' + err);
                         return;
                     }
-                    //write back known states
+                    // write back known states
                     for (var finalState in finalLS) {
                         if (!finalLS.hasOwnProperty(finalState)) {
                             continue;
@@ -386,7 +386,6 @@ adapter.on('stateChange', function (id, state) {
                 });
             }
         });
-
     });
 });
 

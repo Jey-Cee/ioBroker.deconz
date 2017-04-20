@@ -1,9 +1,9 @@
 {
     "common": {
         "name":                     "hue",
-        "version": "0.6.5",
+        "version": "0.6.6",
 		"news": {
-            "0.6.5": {
+            "0.6.6": {
               "en": "Use new verions of npm library",
               "de": "Benutze neue Version von NPM Bibliothek",
               "ru": "Используется новая версия NPM библиотеки"
