@@ -6,7 +6,8 @@ systemDictionary = {
     },
     "Settings":         {"en": "Settings",       "de": "Einstellungen",    "ru": "Настройки"},
     "Auto setup":       {"en": "Auto setup",     "de": "Auto-Setup",       "ru": "Авто настройка"},
-    "Bridge Address":   {"en": "Bridge Address", "de": "Bridge-Adresse",   "ru": "Адрес hue bridge"},
+    "Bridge Address":   {"en": "Bridge Address", "de": "Bridge-Adresse",   "ru": "Адрес HUE bridge"},
+    "Bridge port":      {"en": "Bridge port",    "de": "Bridge-Port",      "ru": "Порт HUE bridge"},
     "Bridge User":      {"en": "Bridge User",    "de": "Bridge-Anwender",  "ru": "Пользователь hue bridge"},
     "Polling":          {"en": "Polling",        "de": "Polling",          "ru": "Опрос"},
     "Polling interval (sec)": {
@@ -14,7 +15,7 @@ systemDictionary = {
         "de": "Pollintervall(sek)",
         "ru": "Интервал опроса(сек)"
     },
-    "Find Bridge":      {"en": "Find Bridge",    "de": "Suche Bridge",     "ru": "Найти hue bridge"},
+    "Find Bridge":      {"en": "Find Bridge",    "de": "Suche Bridge",     "ru": "Найти HUE bridge"},
     "Create User":      {"en": "Create User",    "de": "Erstelle User",    "ru": "Создать пользователя"},
     "Enable adapter first": {"en": "Enable adapter first", "de": "Aktivier Adapter zuerst", "ru": "Сначала надо активировать драйвер"},
     "Ok":               {"en": "Ok",            "de": "Ok",                 "ru": "Ok"},

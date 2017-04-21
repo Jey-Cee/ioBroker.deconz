@@ -1,8 +1,13 @@
 {
     "common": {
         "name":                     "hue",
-        "version": "0.6.6",
+        "version": "0.6.7",
 		"news": {
+            "0.6.7": {
+              "en": "Do not turn on the lights by start",
+              "de": "Schalte nicht die Lichte beim Start ein",
+              "ru": "Не включать лампы при старте"
+            },
             "0.6.6": {
               "en": "Use new verions of npm library",
               "de": "Benutze neue Version von NPM Bibliothek",
@@ -58,6 +63,7 @@
     },
     "native": {
         "bridge": "0.0.0.0",
+        "port": 80,
         "user": "",
         "polling": true,
         "pollingInterval": 30

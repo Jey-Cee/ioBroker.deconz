@@ -699,6 +699,9 @@ function connect() {
                         id:     gid
                     }
                 };
+                if (typeof group.action[action] === 'object') {
+                    group.action[action] = group.action[action].toString();
+                }
 
                 switch (action) {
                     case 'on':
@@ -874,6 +877,9 @@ function syncStates(states, isChanged, callback) {
     }
     var task = states.shift();
 
+    if (typeof task.val === 'object' && task.val !== null && task.val !== undefined) {
+        task.val = task.val.toString();
+    }
     if (isChanged) {
         adapter.setForeignStateChanged(task.id, task.val, true, function () {
             setTimeout(syncStates, 0, states, isChanged, callback);
@@ -887,8 +893,13 @@ function syncStates(states, isChanged, callback) {
 
 function main() {
     adapter.subscribeStates('*');
+    if (!adapter.config.port) {
+        adapter.config.port = 80;
+    } else {
+        adapter.config.port = parseInt(adapter.config.port, 10);
+    }
 
-    api = new HueApi(adapter.config.bridge, adapter.config.user);
+    api = new HueApi(adapter.config.bridge, adapter.config.user, 0, adapter.config.port);
 
     if (adapter.config.polling && adapter.config.pollingInterval > 0) {
         setTimeout(pollSingle, 5000, 0);

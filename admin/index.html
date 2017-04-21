@@ -32,6 +32,8 @@
 
     // the function loadSettings has to exist ...
     function load(settings, onChange) {
+        if (settings.port === undefined) settings.port = 80;
+
         $('#dialog-bridges').dialog({
             autoOpen: false,
             modal:    true,
@@ -174,6 +176,11 @@
                     <td><label  class="translate" for="bridge">Bridge Address</label></td>
                     <td><input type="text" id="bridge" class="value" /></td>
                     <td><button id="find"><span class="translate">Find Bridge</span></button></td>
+                </tr>
+                <tr>
+                    <td><label  class="translate" for="port">Bridge port</label></td>
+                    <td><input type="text" id="port" class="value" /></td>
+                    <td></td>
                 </tr>
                 <tr>
                     <td><label  class="translate" for="bridge">Bridge User</label></td>
