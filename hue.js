@@ -452,6 +452,7 @@ var channelIds   = {};
 var pollIds      = [];
 var pollChannels = [];
 var groupIds     = {};
+var pollGroups   = [];
 
 function connect() {
     api.getFullState(function (err, config) {
@@ -673,6 +674,7 @@ function connect() {
                 channelNames.push(groupName);
             }
             groupIds[groupName.replace(/\s/g, '_')] = gid;
+            pollGroups.push({id: gid, name: groupName.replace(/\s/g, '_')});
 
             group.action.r      = 0;
             group.action.g      = 0;
@@ -907,10 +909,64 @@ function main() {
     connect();
 }
 
+function pollGroup(count) {
+    if (count >= pollGroups.length) {
+        count = 0;
+        setTimeout(pollSingle, adapter.config.pollingInterval * 1000, 0);
+    } else {
+        adapter.log.debug('polling light ' + pollGroups[count].name);
+
+        api.getGroup(pollGroups[count].id, function (err, result) {
+            var values = [];
+            if (err) {
+                adapter.log.error(err);
+            }
+            if (!result) {
+                adapter.log.error('Cannot get result for lightStatus' + pollIds[count]);
+            } else {
+                var states = {};
+                for (var stateA in result.lastAction) {
+                    if (!result.lastAction.hasOwnProperty(stateA)) {
+                        continue;
+                    }
+                    states[stateA] = result.lastAction[stateA];
+                }
+                if (states.reachable === false && states.bri !== undefined) {
+                    states.bri = 0;
+                    states.on = false;
+                }
+                if (states.on === false && states.bri !== undefined) {
+                    states.bri = 0;
+                }
+                if (states.xy !== undefined) {
+                    var xy = states.xy.toString().split(',');
+                    states.xy = states.xy.toString();
+                    var rgb = huehelper.XYBtoRGB(xy[0], xy[1], (states.bri / 254));
+                    states.r = Math.round(rgb.Red   * 254);
+                    states.g = Math.round(rgb.Green * 254);
+                    states.b = Math.round(rgb.Blue  * 254);
+                }
+                if (states.bri !== undefined) {
+                    states.level = Math.max(Math.min(Math.round(states.bri / 2.54), 100), 0);
+                }
+                for (var stateB in states) {
+                    if (!states.hasOwnProperty(stateB)) {
+                        continue;
+                    }
+                    values.push({id: adapter.namespace + '.' + pollGroups[count].name + '.' + stateB, val: states[stateB]});
+                }
+            }
+            syncStates(values, true, function () {
+                setTimeout(pollGroup, 50, ++count);
+            });
+        });
+    }
+}
+
 function pollSingle(count) {
     if (count >= pollIds.length) {
         count = 0;
-        setTimeout(pollSingle, adapter.config.pollingInterval * 1000, count);
+        pollGroup(0);
     } else {
         adapter.log.debug('polling light ' + pollChannels[count]);
 
