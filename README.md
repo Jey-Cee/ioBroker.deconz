@@ -25,6 +25,9 @@ In den Adapter-Settings muss die IP der Hue Bridge sowie ein Username konfigurie
 Required node.js >= 0.12.
 
 ## Changelog
+### 0.6.9 (2017.05.18)
+* (bluefox) Enable adapter by default
+
 ### 0.6.8 (2017.04.22)
 * (bluefox) Poll groups
 
