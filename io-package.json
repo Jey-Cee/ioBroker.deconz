@@ -1,76 +1,83 @@
 {
     "common": {
-        "name":                     "hue",
+        "name": "hue",
         "version": "0.6.9",
-		"news": {
+        "news": {
             "0.6.9": {
-              "en": "Enable adapter by default",
-              "de": "Aktiviere Adapter nach der Installation",
-              "ru": "Запускать драйвер после установки"
+                "en": "Enable adapter by default",
+                "de": "Aktiviere Adapter nach der Installation",
+                "ru": "Запускать драйвер после установки"
             },
             "0.6.8": {
-              "en": "Poll groups",
-              "de": "Frage Gruppen ab",
-              "ru": "Опрашивает группы"
+                "en": "Poll groups",
+                "de": "Frage Gruppen ab",
+                "ru": "Опрашивает группы"
             },
             "0.6.7": {
-              "en": "Do not turn on the lights by start",
-              "de": "Schalte nicht die Lichte beim Start ein",
-              "ru": "Не включать лампы при старте"
+                "en": "Do not turn on the lights by start",
+                "de": "Schalte nicht die Lichte beim Start ein",
+                "ru": "Не включать лампы при старте"
             },
             "0.6.6": {
-              "en": "Use new verions of npm library",
-              "de": "Benutze neue Version von NPM Bibliothek",
-              "ru": "Используется новая версия NPM библиотеки"
+                "en": "Use new verions of npm library",
+                "de": "Benutze neue Version von NPM Bibliothek",
+                "ru": "Используется новая версия NPM библиотеки"
             },
             "0.6.0": {
-              "en": "support new Lamps",
-              "de": "unterstützt neue Lampen",
-              "ru": "поддержка новых типов ламп"
+                "en": "support new Lamps",
+                "de": "unterstützt neue Lampen",
+                "ru": "поддержка новых типов ламп"
             },
-			"0.5.8": {
-				"en": "fix typo",
-				"de": "fix typo",
-				"ru": "fix typo"
-			},
+            "0.5.8": {
+                "en": "fix typo",
+                "de": "fix typo",
+                "ru": "fix typo"
+            },
             "0.5.7": {
-              "en": "write back known states for group/room\nInteger conversion for bri_inc command",
-              "de": "write back known states for group/room\nInteger conversion for bri_inc command",
-              "ru": "write back known states for group/room\nInteger conversion for bri_inc command"
+                "en": "write back known states for group/room\nInteger conversion for bri_inc command",
+                "de": "write back known states for group/room\nInteger conversion for bri_inc command",
+                "ru": "write back known states for group/room\nInteger conversion for bri_inc command"
             },
-			"0.5.6": {
-				"en": "(experimental) support for power switches",
-				"de": "(experimental) support for power switches",
-				"ru": "(experimental) support for power switches"
-			}
-		},
-        "title":                    "Philips Hue Bridge Adapter",
+            "0.5.6": {
+                "en": "(experimental) support for power switches",
+                "de": "(experimental) support for power switches",
+                "ru": "(experimental) support for power switches"
+            }
+        },
+        "title": "Philips Hue Bridge Adapter",
         "titleLang": {
-          "en": "Philips Hue Bridge Adapter",
-          "de": "Philips Hue Bridge Adapter",
-          "ru": "Драйвер для Philips Hue Bridge"
+            "en": "Philips Hue Bridge Adapter",
+            "de": "Philips Hue Bridge Adapter",
+            "ru": "Драйвер для Philips Hue Bridge"
         },
         "desc": {
-          "en": "Connects Philips Hue LED Bulbs, Friends of Hue LED Lamps and Stripes and other SmartLink capable Devices (LivingWhites, some LivingColors) via Philips Hue Bridges with ioBroker",
-          "de": "Verbinden Sie Philips Hue LED Birnen, Friends of Hue LED Lampen und Streifen und andere SmartLink fähige Geräte (LivingWhites, einige LivingColors) über Philips Hue Bridges mit ioBroker",
-          "ru": "Соединяет светодиодные лампы Philips Hue, светодиодные лампы и ленты Friends of Hue и другие устройства, поддерживающие SmartLink (LivingWhites, некоторые LivingColors) через Philips Hue Bridges"
+            "en": "Connects Philips Hue LED Bulbs, Friends of Hue LED Lamps and Stripes and other SmartLink capable Devices (LivingWhites, some LivingColors) via Philips Hue Bridges with ioBroker",
+            "de": "Verbinden Sie Philips Hue LED Birnen, Friends of Hue LED Lampen und Streifen und andere SmartLink fähige Geräte (LivingWhites, einige LivingColors) über Philips Hue Bridges mit ioBroker",
+            "ru": "Соединяет светодиодные лампы Philips Hue, светодиодные лампы и ленты Friends of Hue и другие устройства, поддерживающие SmartLink (LivingWhites, некоторые LivingColors) через Philips Hue Bridges"
         },
         "authors": [
             "hobbyquaker <hq@ccu.io>",
             "Pmant <patrickmo@gmx.de>",
             "Bluefox <dogafox@gmail.com>"
         ],
-        "license":                  "Apache 2.0",
-        "platform":                 "Javascript/Node.js",
-        "mode":                     "daemon",
-        "messagebox":               true,
-		"enabled":                  true,
-        "readme":                   "https://raw.githubusercontent.com/ioBroker/ioBroker.hue/master/README.md",
-        "loglevel":                 "info",
-        "keywords":                 ["philips", "hue", "led", "rgb", "smartlink", "zigbee"],
-        "icon":                     "hue.jpeg",
-        "extIcon":                  "https://raw.githubusercontent.com/ioBroker/ioBroker.hue/master/admin/hue.jpeg",
-        "type":                     "hardware"
+        "license": "Apache 2.0",
+        "platform": "Javascript/Node.js",
+        "mode": "daemon",
+        "messagebox": true,
+        "enabled": true,
+        "readme": "https://raw.githubusercontent.com/ioBroker/ioBroker.hue/master/README.md",
+        "loglevel": "info",
+        "keywords": [
+            "philips",
+            "hue",
+            "led",
+            "rgb",
+            "smartlink",
+            "zigbee"
+        ],
+        "icon": "hue.jpeg",
+        "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.hue/master/admin/hue.jpeg",
+        "type": "lighting"
     },
     "native": {
         "bridge": "0.0.0.0",
@@ -80,14 +87,14 @@
         "pollingInterval": 30
     },
     "objects": [
-      {
-        "_id":        "enum.functions.color",
-        "common": {
-          "name": "Color",
-          "members": []
-        },
-        "type": "enum",
-        "native": {}
-      }
+        {
+            "_id": "enum.functions.color",
+            "common": {
+                "name": "Color",
+                "members": []
+            },
+            "type": "enum",
+            "native": {}
+        }
     ]
 }
