@@ -65,7 +65,7 @@
         "mode": "daemon",
         "messagebox": true,
         "enabled": true,
-        "readme": "https://raw.githubusercontent.com/ioBroker/ioBroker.hue/master/README.md",
+        "readme": "https://github.com/ioBroker/ioBroker.hue/blob/master/README.md",
         "loglevel": "info",
         "keywords": [
             "philips",
