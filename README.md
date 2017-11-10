@@ -1,5 +1,5 @@
 ![Logo](admin/deconz.jpeg)
-# ioBroker Philips Hue Bridge Adapter
+# ioBroker deConz dresden-elektronik Adapter
 ==============
 
 [![NPM version](http://img.shields.io/npm/v/iobroker.deconz.svg)](https://www.npmjs.com/package/iobroker.deconz)
