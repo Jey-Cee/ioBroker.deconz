@@ -1,61 +1,27 @@
 {
     "common": {
-        "name": "hue",
-        "version": "0.6.9",
+        "name": "deconz",
+        "version": "0.1.0",
         "news": {
-            "0.6.9": {
-                "en": "Enable adapter by default",
-                "de": "Aktiviere Adapter nach der Installation",
-                "ru": "Запускать драйвер после установки"
-            },
-            "0.6.8": {
-                "en": "Poll groups",
-                "de": "Frage Gruppen ab",
-                "ru": "Опрашивает группы"
-            },
-            "0.6.7": {
-                "en": "Do not turn on the lights by start",
-                "de": "Schalte nicht die Lichte beim Start ein",
-                "ru": "Не включать лампы при старте"
-            },
-            "0.6.6": {
-                "en": "Use new verions of npm library",
-                "de": "Benutze neue Version von NPM Bibliothek",
-                "ru": "Используется новая версия NPM библиотеки"
-            },
-            "0.6.0": {
-                "en": "support new Lamps",
-                "de": "unterstützt neue Lampen",
-                "ru": "поддержка новых типов ламп"
-            },
-            "0.5.8": {
-                "en": "fix typo",
-                "de": "fix typo",
-                "ru": "fix typo"
-            },
-            "0.5.7": {
-                "en": "write back known states for group/room\nInteger conversion for bri_inc command",
-                "de": "write back known states for group/room\nInteger conversion for bri_inc command",
-                "ru": "write back known states for group/room\nInteger conversion for bri_inc command"
-            },
-            "0.5.6": {
-                "en": "(experimental) support for power switches",
-                "de": "(experimental) support for power switches",
-                "ru": "(experimental) support for power switches"
+            "0.1.0": {
+                "en": "alpha version",
+                "de": "alpha version",
+                "ru": "альфа-версия"
             }
         },
-        "title": "Philips Hue Bridge Adapter",
+        "title": "deConz Adapter",
         "titleLang": {
-            "en": "Philips Hue Bridge Adapter",
-            "de": "Philips Hue Bridge Adapter",
-            "ru": "Драйвер для Philips Hue Bridge"
+            "en": "deConz Adapter",
+            "de": "deConz Adapter",
+            "ru": "Драйвер для deConz"
         },
         "desc": {
-            "en": "Connects Philips Hue LED Bulbs, Friends of Hue LED Lamps and Stripes and other SmartLink capable Devices (LivingWhites, some LivingColors) via Philips Hue Bridges with ioBroker",
-            "de": "Verbinden Sie Philips Hue LED Birnen, Friends of Hue LED Lampen und Streifen und andere SmartLink fähige Geräte (LivingWhites, einige LivingColors) über Philips Hue Bridges mit ioBroker",
-            "ru": "Соединяет светодиодные лампы Philips Hue, светодиодные лампы и ленты Friends of Hue и другие устройства, поддерживающие SmartLink (LivingWhites, некоторые LivingColors) через Philips Hue Bridges"
+            "en": "Connects to the deConz Software that is an gateway solution for ZigBee. deConz works with ConBee USB stick and RaspBee modul for Raspberry Pi which is also from Dresden-Elektronik.",
+            "de": "Verbindet sich mit der deConz-Software, die eine Gateway-Lösung für ZigBee ist. deConz arbeitet mit dem ConBee USB Stick und dem RaspBee Modul für den Raspberry Pi, die ebenfalls von Dresden-Elektronik sind.",
+            "ru": "Подключается к программному обеспечению deConz, которое является шлюзовым решением для ZigBee. deConz работает с ConBee и RaspBee, который также из Дрездена-Электроника."
         },
         "authors": [
+            "Jey Cee <jey-cee@live.com>",
             "hobbyquaker <hq@ccu.io>",
             "Pmant <patrickmo@gmx.de>",
             "Bluefox <dogafox@gmail.com>"
@@ -65,19 +31,23 @@
         "mode": "daemon",
         "messagebox": true,
         "enabled": true,
-        "readme": "https://github.com/ioBroker/ioBroker.hue/blob/master/README.md",
+        "readme": "https://github.com/jey-cee/ioBroker.deconz/blob/master/README.md",
         "loglevel": "info",
         "keywords": [
+            "deconz",
             "philips",
+            "tradfri",
+            "lightify",
+            "dresden-elektronik",
             "hue",
             "led",
             "rgb",
             "smartlink",
             "zigbee"
         ],
-        "icon": "hue.jpeg",
-        "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.hue/master/admin/hue.jpeg",
-        "type": "lighting"
+        "icon": "deconz.jpeg",
+        "extIcon": "https://raw.githubusercontent.com/jey-cee/ioBroker.deconz/master/admin/deconz.jpeg",
+        "type": "hardware"
     },
     "native": {
         "bridge": "0.0.0.0",

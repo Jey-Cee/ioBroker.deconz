@@ -68,7 +68,7 @@
             var count = 0;
 
             (function sendCreate(){
-                sendTo('hue.' + instance, 'createUser', $('#bridge.value').val(), function (result) {
+                sendTo('deconz.' + instance, 'createAPIkey', $('#bridge.value').val(), function (result) {
                     try {
                         result = JSON.parse(result);
                         if (result.error > 0) {
@@ -78,13 +78,13 @@
                                 setTimeout(sendCreate, 3000);
                                 return;
                             } else {
-                                showMessage(_('error creating user: ') + _(result.message), _('Error'), 'info');
+                                showMessage(_('error creating API key: ') + _(result.message), _('Error'), 'info');
                             }
                         } else {
                             $('#user.value').val(result.message).trigger('change');
                         }
                     } catch (e) {
-                        showMessage(_('error creating user'), _('Error'), 'alert');
+                        showMessage(_('error creating API key'), _('Error'), 'alert');
                     }
                     $('#dialog-bridges').dialog('close');
                 });
@@ -97,23 +97,23 @@
                 return;
             }
 
-            $('#dialog-bridges').html(_('Please wait, searching for bridge.')).dialog('open');
+            $('#dialog-bridges').html(_('Please wait, searching for deConz.')).dialog('open');
 
-            sendTo('hue.' + instance, 'browse', 5000, function (result) {
+            sendTo('deconz.' + instance, 'browse', 5000, function (result) {
                 try{
                     var arr = JSON.parse(result);
                     var popup;
                     if (!arr.length){
-                        popup = 'Cannot find bridge';
+                        popup = 'Cannot find deConz';
                     }else{
-                        popup = 'Select a bridge: <br />';
+                        popup = 'Select deConz: <br />';
                         arr.forEach(function(element, index, array) {
                             popup = popup + '<a href="#" onclick="$(\'#bridge.value\').val(\'' + element.ipaddress + '\').trigger(\'change\');$(\'#dialog-bridges\').dialog(\'close\')">' + element.ipaddress + '</a><br />';
                         });
                     }
                     $('#dialog-bridges').html(popup);
                 } catch (e) {
-                    alert ("error finding bridge");
+                    alert ("error finding deConz");
                 }
             });
         });
@@ -169,13 +169,13 @@
 <body>
 <!-- you have to put your config page in a div with id adapter-container -->
 <div id="adapter-container">
-    <table><tr><td><img src="hue.jpeg" width="64" height="64"></td><td><h3 class="translate">Philips HUE adapter settings</h3></td></tr></table>
+    <table><tr><td><img src="deconz.png" width="64" height="64"></td><td><h3 class="translate">deConz adapter settings</h3></td></tr></table>
         <div id="settings">
             <table>
                 <tr>
-                    <td><label  class="translate" for="bridge">Bridge Address</label></td>
+                    <td><label  class="translate" for="bridge">deConz Address</label></td>
                     <td><input type="text" id="bridge" class="value" /></td>
-                    <td><button id="find"><span class="translate">Find Bridge</span></button></td>
+                    <td><button id="find"><span class="translate">Find deConz</span></button></td>
                 </tr>
                 <tr>
                     <td><label  class="translate" for="port">Bridge port</label></td>
@@ -183,9 +183,9 @@
                     <td></td>
                 </tr>
                 <tr>
-                    <td><label  class="translate" for="bridge">Bridge User</label></td>
+                    <td><label  class="translate" for="bridge">Create API key</label></td>
                     <td><input type="text" id="user" class="value" /></td>
-                    <td><button id="create"><span class="translate">Create User</label></span></button></td>
+                    <td><button id="create"><span class="translate">Create API key</label></span></button></td>
                 </tr>
                 <tr>
                     <td><label  class="translate" for="bridge">Polling</label></td>
@@ -199,7 +199,7 @@
                 </tr>
             </table>
 
-            <div id="dialog-bridges" title="Select a bridge"></div>
+            <div id="dialog-bridges" title="Select deConz"></div>
         </div>
 </div>
 </body>

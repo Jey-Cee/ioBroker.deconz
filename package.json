@@ -1,21 +1,36 @@
 {
-  "name": "iobroker.hue",
+  "name": "iobroker.deconz",
   "version": "0.6.9",
-  "description": "Connects Philips Hue LED Bulbs, Friends of Hue LED Lamps and Stripes and other SmartLink capable Devices (LivingWhites, some LivingColors) via Philips Hue Bridges",
-  "author": "hobbyquaker <hq@ccu.io>",
+  "description": "deConz can handle various ZigBee devices, such as Hue, Tradfri, Lightify, etc.",
+  "author": {
+    "name": "Jey Cee",
+    "email": "jey-cee@live.com"
+  },
   "contributors": [
-    "hobbyquaker <hq@ccu.io>",
-    "Pmant <patrickmo@gmx.de>",
-    "Bluefox <dogafox@gmail.com>"
+    {
+      "name": "hobbyquaker",
+      "email": "hq@ccu.io"
+    },
+    {
+      "name": "Pmant",
+      "email": "patrickmo@gmx.de"
+    },
+    {
+      "name": "Bluefox",
+      "email": "dogafox@gmail.com"
+    }
   ],
   "engines": {
     "node": ">=0.12"
   },
-  "homepage": "https://github.com/ioBroker/ioBroker.hue",
+  "homepage": "https://github.com/jey-cee/ioBroker.deconz",
   "license": "Apache 2.0",
   "keywords": [
     "ioBroker",
+    "deconz",
     "hue",
+    "tradfri",
+    "lightify",
     "led",
     "rgb",
     "smartlink",
@@ -24,7 +39,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/ioBroker/ioBroker.hue"
+    "url": "https://github.com/jey-cee/ioBroker.deconz"
   },
   "dependencies": {
     "node-hue-api": "^2.4.2"
@@ -38,11 +53,12 @@
     "mocha": "^3.5.3",
     "chai": "^4.1.2"
   },
-  "bugs": {
-    "url": "https://github.com/ioBroker/ioBroker.hue/issues"
-  },
-  "main": "hue.js",
+  "main": "main.js",
   "scripts": {
     "test": "node node_modules/mocha/bin/mocha"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/jey-cee/ioBroker.deconz/issues"
+  },
+  "readmeFilename": "README.md"
 }
