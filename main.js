@@ -674,6 +674,8 @@ function getAllSensors(gwName) {
         try{var response = JSON.parse(body);} catch(err){}
         var count = Object.keys(list).length - 1;
 
+        adapter.log.debug('getAllSensors: ' + body);
+        
         if (res.statusCode === 200) {
                 for (var i = 0; i <= count; i++) {
                     var keyName = Object.keys(list)[i];
