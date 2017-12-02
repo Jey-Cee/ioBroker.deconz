@@ -1,8 +1,7 @@
 'use strict';
 
-var hue       = require('node-hue-api');
 var utils     = require(__dirname + '/lib/utils'); // Get common adapter utils
-var huehelper = require('./lib/hueHelper');
+var request = require('request');
 
 var adapter   = new utils.Adapter('deconz');
 
@@ -15,368 +14,149 @@ adapter.on('stateChange', function (id, state) {
     var tmp = id.split('.');
     var dp = tmp.pop();
     id = tmp.slice(2).join('.');
-    var ls = {};
-    // if .on changed instead change .bri to 254 or 0
-    var bri = 0;
-    if (dp === 'on') {
-        bri = state.val ? 254 : 0;
-        adapter.setState([id, 'bri'].join('.'), {val: bri, ack: false});
-        return;
-    }
-    // if .level changed instead change .bri to level.val*254
-    if (dp === 'level') {
-        bri = Math.max(Math.min(Math.round(state.val * 2.54), 254), 0);
-        adapter.setState([id, 'bri'].join('.'), {val: bri, ack: false});
-        return;
-    }
-    // get lamp states
-    adapter.getStates(id + '.*', function (err, idStates) {
-        if (err) {
-            adapter.log.error(err);
-            return;
+    adapter.log.debug('dp: ' + dp + '; id:' + id);
+
+    adapter.getState(adapter.name + '.' + adapter.instance + '.' + id + '.transitiontime', function (err, ttime){
+        var ttime;
+        if(err){
+            ttime = 'none';
+        }else if(ttime === null) {
+            ttime = 'none';
+        }else{
+                ttime = ttime.val;
+            }
+
+        if(dp === 'bri'){
+            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+                var controlId = obj.native.id;
+                if(ttime === 'none'){
+                    var parameters = '{"bri": ' + JSON.stringify(state.val) + '}';
+                }else{
+                    var parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "bri": ' + JSON.stringify(state.val) + '}';
+                }
+                if(obj.type === 'device') {
+                    setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri')
+                }else if(obj.type === 'group'){
+                    setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri')
+                }
+            });
+        }else if(dp === 'on'){
+            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+                var controlId = obj.native.id;
+                if(ttime === 'none'){
+                    var parameters = '{"on": ' + JSON.stringify(state.val) + '}';
+                }else{
+                    var parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "on": ' + JSON.stringify(state.val) + '}';
+                }
+                adapter.log.info('type: ' + obj.type);
+                if(obj.type === 'device') {
+                    setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on')
+                }else if(obj.type === 'group'){
+                    setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on')
+                }
+            });
+        }else if(dp === 'hue'){
+            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+                var controlId = obj.native.id;
+                if(ttime === 'none'){
+                    var parameters = '{"hue": ' + JSON.stringify(state.val) + '}';
+                }else{
+                    var parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "hue": ' + JSON.stringify(state.val) + '}';
+                }
+                var parameters = '{"hue": ' + JSON.stringify(state.val) + '}';
+                if(obj.type === 'device') {
+                    setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.hue')
+                }else if(obj.type === 'group'){
+                    setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.hue')
+                }
+            });
+        }else if(dp === 'sat'){
+            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+                var controlId = obj.native.id;
+                if(ttime === 'none'){
+                    var parameters = '{"sat": ' + JSON.stringify(state.val) + '}';
+                }else{
+                    var parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "sat": ' + JSON.stringify(state.val) + '}';
+                }
+                if(obj.type === 'device') {
+                    setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.sat')
+                }else if(obj.type === 'group'){
+                    setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.sat')
+                }
+            });
+        }else if(dp === 'ct'){
+            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+                var controlId = obj.native.id;
+                if(ttime === 'none'){
+                    var parameters = '{"ct": ' + JSON.stringify(state.val) + '}';
+                }else{
+                    var parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "ct": ' + JSON.stringify(state.val) + '}';
+                }
+                if(obj.type === 'device') {
+                    setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.ct')
+                }else if(obj.type === 'group'){
+                    setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.ct')
+                }
+            });
+        }else if(dp === 'xy'){
+            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+                var controlId = obj.native.id;
+                if(ttime === 'none'){
+                    var parameters = '{"xy": ' + JSON.stringify(state.val) + '}';
+                }else{
+                    var parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "xy": ' + JSON.stringify(state.val) + '}';
+                }
+                if(obj.type === 'device') {
+                    setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.xy')
+                }else if(obj.type === 'group'){
+                    setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.xy')
+                }
+            });
+        }else if(dp === 'alert'){
+            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+                var controlId = obj.native.id;
+                if(ttime === 'none'){
+                    var parameters = '{"alert": ' + JSON.stringify(state.val) + '}';
+                }else{
+                    var parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "alert": ' + JSON.stringify(state.val) + '}';
+                }
+                setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.alert')
+            });
+        }else if(dp === 'effect'){
+            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+                if(state.val === 'colorloop'){
+                    adapter.log.info(id + ' Effect: colorloop');
+                    adapter.getState(adapter.name + '.' + adapter.instance + '.' + id + '.colorloopspeed', function(error, colorloopspeed){
+                            var controlId = obj.native.id;
+                            var speed;
+                            try{speed = colorloopspeed.val;} catch(err){}
+                            if (speed === null || speed === undefined) {
+                                speed = 1;
+                            }
+                            var parameters = '{"colorloopspeed": ' + JSON.stringify(speed) + ', "effect": ' + JSON.stringify(state.val) + '}';
+                            adapter.log.info('parameters: ' + parameters);
+                            if (obj.type === 'device') {
+                                setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.effect')
+                            } else if (obj.type === 'group') {
+                                setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.effect')
+                            }
+                        })
+                }else {
+                    adapter.log.info(id+ 'Effect: none');
+                    var controlId = obj.native.id;
+                    var parameters = '{"effect": ' + JSON.stringify(state.val) + '}';
+                    if(obj.type === 'device') {
+                        setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.effect')
+                    }else if(obj.type === 'group'){
+                        setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.effect')
+                    }
+                }
+            });
         }
-        // gather states that need to be changed
-        ls = {};
-        var alls = {};
-        var lampOn = false;
-        for (var idState in idStates) {
-            if (!idStates.hasOwnProperty(idState) || idStates[idState].val === null) {
-                continue;
-            }
-            var idtmp = idState.split('.');
-            var iddp = idtmp.pop();
-            switch (iddp) {
-                case 'on':
-                    alls['bri'] = idStates[idState].val ? 254 : 0;
-                    ls['bri'] = idStates[idState].val ? 254 : 0;
-                    if (idStates[idState].ack && ls['bri'] > 0) lampOn = true;
-                    break;
-                case 'bri':
-                    alls[iddp] = idStates[idState].val;
-                    ls[iddp] = idStates[idState].val;
-                    if (idStates[idState].ack && idStates[idState].val > 0) lampOn = true;
-                    break;
-                case 'alert':
-                    alls[iddp] = idStates[idState].val;
-                    if (dp === 'alert') ls[iddp] = idStates[idState].val;
-                    break;
-                case 'effect':
-                    alls[iddp] = idStates[idState].val;
-                    if (dp === 'effect') ls[iddp] = idStates[idState].val;
-                    break;
-                case 'r':
-                case 'g':
-                case 'b':
-                    alls[iddp] = idStates[idState].val;
-                    if (dp === 'r' || dp === 'g' || dp === 'b') {
-                        ls[iddp] = idStates[idState].val;
-                    }
-                    break;
-                case 'ct':
-                    alls[iddp] = idStates[idState].val;
-                    if (dp === 'ct') {
-                        ls[iddp] = idStates[idState].val;
-                    }
-                    break;
-                case 'hue':
-                case 'sat':
-                    alls[iddp] = idStates[idState].val;
-                    if (dp === 'hue' || dp === 'sat') {
-                        ls[iddp] = idStates[idState].val;
-                    }
-                    break;
-                case 'xy':
-                    alls[iddp] = idStates[idState].val;
-                    if (dp === 'xy') {
-                        ls[iddp] = idStates[idState].val;
-                    }
-                    break;
-                case 'command':
-                    if (dp === 'command') {
-                        try {
-                            var commands = JSON.parse(state.val);
-                            for (var command in commands) {
-                                if (!commands.hasOwnProperty(command)) {
-                                    continue;
-                                }
-                                if (command === 'on') {
-                                    //convert on to bri
-                                    if (commands[command] && !commands.hasOwnProperty('bri')) {
-                                        ls.bri = 254;
-                                    } else {
-                                        ls.bri = 0;
-                                    }
-                                } else if (command === 'level') {
-                                    //convert level to bri
-                                    if (!commands.hasOwnProperty('bri')) {
-                                        ls.bri = Math.min(254, Math.max(0, Math.round(parseInt(commands[command]) * 2.54)));
-                                    } else {
-                                        ls.bri = 254;
-                                    }
-                                } else {
-                                    ls[command] = commands[command];
-                                }
-                            }
-                        } catch (e) {
-                            adapter.log.error(e);
-                            return;
-                        }
-                    }
-                    alls[iddp] = idStates[idState].val;
-                    break;
-                default:
-                    alls[iddp] = idStates[idState].val;
-                    break;
-            }
-        }
+    })
 
-        // get lightState
-        adapter.getObject(id, function (err, obj) {
-            if (err || !obj) {
-                if (!err) err = new Error('obj "' + id + '" in callback getObject is null or undefined');
-                adapter.log.error(err);
-                return;
-            }
-
-            // apply rgb to xy with modelId
-            if ('r' in ls || 'g' in ls || 'b' in ls) {
-                if (!('r' in ls)) {
-                    ls.r = 0;
-                }
-                if (!('g' in ls)) {
-                    ls.g = 0;
-                }
-                if (!('b' in ls)) {
-                    ls.b = 0;
-                }
-                var xyb = huehelper.RgbToXYB(ls.r / 255, ls.g / 255, ls.b / 255, (obj.native.hasOwnProperty('modelid') ? obj.native.modelid.trim() : 'default'));
-                ls.bri = xyb.b;
-                ls.xy = xyb.x + ',' + xyb.y;
-            }
-
-            // create lightState from ls
-            // and check values
-            var lightState = hue.lightState.create();
-            var finalLS = {};
-            if (ls.bri > 0) {
-                lightState = lightState.on().bri(Math.min(254, ls.bri));
-                finalLS.bri = Math.min(254, ls.bri);
-                finalLS.on = true;
-            } else {
-                lightState = lightState.off();
-                finalLS.bri = 0;
-                finalLS.on = false;
-            }
-            if ('xy' in ls) {
-                if (typeof ls.xy !== 'string') {
-                    if (ls.xy) {
-                        ls.xy = ls.xy.toString();
-                    } else {
-                        adapter.log.warn('Invalid xy value: "' + ls.xy + '"');
-                        ls.xy = '0,0';
-                    }
-                }
-                var xy = ls.xy.toString().split(',');
-                xy = {'x': xy[0], 'y': xy[1]};
-                xy = huehelper.GamutXYforModel(xy.x, xy.y, (obj.native.hasOwnProperty('modelid') ? obj.native.modelid.trim() : 'default'));
-                finalLS.xy = xy.x + ',' + xy.y;
-                lightState = lightState.xy(xy.x, xy.y);
-                if (!lampOn && (!('bri' in ls) || ls.bri === 0)) {
-                    lightState = lightState.on();
-                    lightState = lightState.bri(254);
-                    finalLS.bri = 254;
-                    finalLS.on = true;
-                }
-                var rgb = huehelper.XYBtoRGB(xy.x, xy.y, (finalLS.bri / 254));
-                finalLS.r = Math.round(rgb.Red   * 254);
-                finalLS.g = Math.round(rgb.Green * 254);
-                finalLS.b = Math.round(rgb.Blue  * 254);
-            }
-            if ('ct' in ls) {
-                finalLS.ct = Math.max(153, Math.min(500, ls.ct));
-                lightState = lightState.ct(finalLS.ct);
-                if (!lampOn && (!('bri' in ls) || ls.bri === 0)) {
-                    lightState = lightState.on();
-                    lightState = lightState.bri(254);
-                    finalLS.bri = 254;
-                    finalLS.on = true;
-                }
-            }
-            if ('hue' in ls) {
-                finalLS.hue = Math.max(0, Math.min(65535, ls.hue));
-                lightState = lightState.hue(finalLS.hue);
-                if (!lampOn && (!('bri' in ls) || ls.bri === 0)) {
-                    lightState = lightState.on();
-                    lightState = lightState.bri(254);
-                    finalLS.bri = 254;
-                    finalLS.on = true;
-                }
-            }
-            if ('sat' in ls) {
-                finalLS.sat = Math.max(0, Math.min(254, ls.sat));
-                lightState = lightState.sat(finalLS.sat);
-                if (!lampOn && (!('bri' in ls) || ls.bri === 0)) {
-                    lightState = lightState.on();
-                    lightState = lightState.bri(254);
-                    finalLS.bri = 254;
-                    finalLS.on = true;
-                }
-            }
-            if ('alert' in ls) {
-                if (['select', 'lselect'].indexOf(ls.alert) === -1) {
-                    finalLS.alert = 'none';
-                } else {
-                    finalLS.alert = ls.alert;
-                }
-                lightState = lightState.alert(finalLS.alert);
-            }
-            if ('effect' in ls) {
-                finalLS.effect = ls.effect ? 'colorloop' : 'none';
-
-                lightState = lightState.effect(finalLS.effect);
-                if (!lampOn && (finalLS.effect !== 'none' && !('bri' in ls) || ls.bri === 0)) {
-                    lightState = lightState.on();
-                    lightState = lightState.bri(254);
-                    finalLS.bri = 254;
-                    finalLS.on = true;
-                }
-            }
-
-            // only available in command state
-            if ('transitiontime' in ls) {
-                var transitiontime = parseInt(ls.transitiontime);
-                if (!isNaN(transitiontime)) {
-                    finalLS.transitiontime = transitiontime;
-                    lightState = lightState.transitiontime(transitiontime);
-                }
-            }
-            if ('sat_inc' in ls && !('sat' in finalLS) && 'sat' in alls) {
-                finalLS.sat = (((ls.sat_inc + alls.sat) % 255) + 255) % 255;
-                if (!lampOn && (!('bri' in ls) || ls.bri === 0)) {
-                    lightState = lightState.on();
-                    lightState = lightState.bri(254);
-                    finalLS.bri = 254;
-                    finalLS.on = true;
-                }
-                lightState = lightState.sat(finalLS.sat);
-            }
-            if ('hue_inc' in ls && !('hue' in finalLS) && 'hue' in alls) {
-                finalLS.hue = (((ls.hue_inc + alls.hue) % 65536) + 65536) % 65536;
-                if (!lampOn && (!('bri' in ls) || ls.bri === 0)) {
-                    lightState = lightState.on();
-                    lightState = lightState.bri(254);
-                    finalLS.bri = 254;
-                    finalLS.on = true;
-                }
-                lightState = lightState.hue(finalLS.hue);
-            }
-            if ('ct_inc' in ls && !('ct' in finalLS) && 'ct' in alls) {
-                finalLS.ct = (((((alls.ct - 153) + ls.ct_inc) % 348) + 348) % 348) + 153;
-                if (!lampOn && (!('bri' in ls) || ls.bri === 0)) {
-                    lightState = lightState.on();
-                    lightState = lightState.bri(254);
-                    finalLS.bri = 254;
-                    finalLS.on = true;
-                }
-                lightState = lightState.ct(finalLS.ct);
-            }
-            if ('bri_inc' in ls) {
-                finalLS.bri = (((parseInt(alls.bri, 10) + parseInt(ls.bri_inc, 10)) % 255) + 255) % 255;
-                if (finalLS.bri === 0) {
-                    if (lampOn) {
-                        lightState = lightState.on(false);
-                        finalLS.on = false;
-                    } else {
-                        adapter.setState([id, 'bri'].join('.'), {val: 0, ack: false});
-                        return;
-                    }
-                } else {
-                    finalLS.on = true;
-                    lightState = lightState.on();
-                }
-                lightState = lightState.bri(finalLS.bri);
-            }
-
-            // change colormode
-            if ('xy' in finalLS) {
-                finalLS.colormode = 'xy';
-            } else if ('ct' in finalLS) {
-                finalLS.colormode = 'ct';
-            } else if ('hue' in finalLS || 'sat' in finalLS) {
-                finalLS.colormode = 'hs';
-            }
-
-            // set level to final bri / 2.54
-            if ('bri' in finalLS) {
-                finalLS.level = Math.max(Math.min(Math.round(finalLS.bri / 2.54), 100), 0);
-            }
-
-            if (obj.common.role === 'LightGroup' || obj.common.role === 'Room') {
-                // log final changes / states
-                adapter.log.info('final lightState for ' + obj.common.name + ':' + JSON.stringify(finalLS));
-                api.setGroupLightState(groupIds[id], lightState, function (err, res) {
-                    if (err || !res) {
-                        adapter.log.error('error: ' + err);
-                    }
-                    // write back known states
-                    for (var finalState in finalLS) {
-                        if (!finalLS.hasOwnProperty(finalState)) {
-                            continue;
-                        }
-                        if (finalState in alls) {
-                            if (finalState === 'effect') {
-                                adapter.setState([id, 'effect'].join('.'), {val: finalLS[finalState] === 'colorloop', ack: true});
-                            } else {
-                                adapter.setState([id, finalState].join('.'), {val: finalLS[finalState], ack: true});
-                            }
-                        }
-                    }
-                });
-            } else
-            if (obj.common.role === 'switch') {
-                if (finalLS.hasOwnProperty('on')) {
-                    finalLS = {on:finalLS.on};
-                    // log final changes / states
-                    adapter.log.info('final lightState for ' + obj.common.name + ':' + JSON.stringify(finalLS));
-
-                    lightState = hue.lightState.create();
-                    lightState.on(finalLS.on);
-                    api.setLightState(channelIds[id], lightState, function (err, res) {
-                        if (err || !res) {
-                            adapter.log.error('error: ' + err);
-                            return;
-                        }
-                        adapter.setState([id, 'on'].join('.'), {val: finalLS.on, ack: true});
-                    });
-                } else {
-                    adapter.log.warn('invalid switch operation');
-                }
-            } else {
-                // log final changes / states
-                adapter.log.info('final lightState for ' + obj.common.name + ':' + JSON.stringify(finalLS));
-                api.setLightState(channelIds[id], lightState, function (err, res) {
-                    if (err || !res) {
-                        adapter.log.error('error: ' + err);
-                        return;
-                    }
-                    // write back known states
-                    for (var finalState in finalLS) {
-                        if (!finalLS.hasOwnProperty(finalState)) {
-                            continue;
-                        }
-                        if (finalState in alls) {
-                            if (finalState === 'effect') {
-                                adapter.setState([id, 'effect'].join('.'), {val: finalLS[finalState] === 'colorloop', ack: true});
-                            } else {
-                                adapter.setState([id, finalState].join('.'), {val: finalLS[finalState], ack: true});
-                            }
-                        }
-                    }
-                });
-            }
-        });
-    });
 });
+//END on StateChange
 
 // New message arrived. obj is array with current messages
 adapter.on('message', function (obj) {
@@ -389,10 +169,19 @@ adapter.on('message', function (obj) {
                 });
                 wait = true;
                 break;
-            case 'createUser':
-                createUser(obj.message, function (res) {
+            case 'createAPIkey':
+                createAPIkey(obj.message, function (res) {
                     if (obj.callback) adapter.sendTo(obj.from, obj.command, JSON.stringify(res), obj.callback);
                 });
+                wait = true;
+                break;
+            case 'deleteAPIkey':
+                deleteAPIkey();
+                wait = true;
+                break;
+            case 'openNetwork':
+                var parameters = '{"permitjoin": 60}';
+                modifyConfig(parameters);
                 wait = true;
                 break;
             default:
@@ -408,480 +197,6 @@ adapter.on('message', function (obj) {
 
 adapter.on('ready', main);
 
-function browse(timeout, callback) {
-    timeout = parseInt(timeout);
-    if (isNaN(timeout)) timeout = 5000;
-    hue.upnpSearch(timeout).then(callback).done();
-}
-
-function createAPIkey(ip, callback) {
-    var newUserName = null;
-    var userDescription = 'ioBroker.deconz';
-    try {
-        var api = new HueApi();
-        api.registerUser(ip, newUserName, userDescription)
-            .then(function (newUser) {
-                adapter.log.info('created new User: ' + newUser);
-                callback({error: 0, message: newUser});
-            })
-            .fail(function (err) {
-                callback({error: err.type, message: err.message});
-            })
-            .done();
-    } catch (e) {
-        adapter.log.error(e);
-        callback({error: 1, message: JSON.stringify(e)});
-    }
-}
-
-var HueApi = hue.HueApi;
-var api;
-
-var channelIds   = {};
-var pollIds      = [];
-var pollChannels = [];
-var groupIds     = {};
-var pollGroups   = [];
-
-function connect() {
-    api.getFullState(function (err, config) {
-        if (err) {
-            adapter.log.warn('could not connect to ip');
-            setTimeout(connect, 5000);
-            return;
-        } else if (!config) {
-            adapter.log.warn('Cannot get the configuration from hue bridge');
-            setTimeout(connect, 5000);
-            return;
-        }
-
-        var channelNames = [];
-
-        // Create/update lamps
-        adapter.log.info('creating/updating light channels');
-
-        var lights  = config.lights;
-        var count   = 0;
-        var objs    = [];
-        var states  = [];
-        for (var lid in lights) {
-            if (!lights.hasOwnProperty(lid)) {
-                continue;
-            }
-            count++;
-            var light = lights[lid];
-
-            var channelName = config.config.name + '.' + light.name;
-            if (channelNames.indexOf(channelName) !== -1) {
-                adapter.log.warn('channel "' + channelName + '" already exists, skipping lamp');
-                continue;
-            } else {
-                channelNames.push(channelName);
-            }
-            channelIds[channelName.replace(/\s/g, '_')] = lid;
-            pollIds.push(lid);
-            pollChannels.push(channelName.replace(/\s/g, '_'));
-
-            if (light.type === 'Extended color light' || light.type === 'Color light') {
-                light.state.r = 0;
-                light.state.g = 0;
-                light.state.b = 0;
-            }
-
-            if (light.type !== 'On/Off plug-in unit') {
-                light.state.command = '{}';
-                light.state.level = 0;
-            }
-
-            for (var state in light.state) {
-                if (!light.state.hasOwnProperty(state)) {
-                    continue;
-                }
-                var objId = channelName + '.' + state;
-
-                var lobj = {
-                    _id:        adapter.namespace + '.' + objId.replace(/\s/g, '_'),
-                    type:       'state',
-                    common: {
-                        name:   objId.replace(/\s/g, '_'),
-                        read:   true,
-                        write:  true
-                    },
-                    native: {
-                        id:     lid
-                    }
-                };
-
-                switch (state) {
-                    case 'on':
-                        lobj.common.type = 'boolean';
-                        lobj.common.role = 'switch';
-                        break;
-                    case 'bri':
-                        lobj.common.type = 'number';
-                        lobj.common.role = 'level.dimmer';
-                        lobj.common.min  = 0;
-                        lobj.common.max  = 254;
-                        break;
-                    case 'level':
-                        lobj.common.type = 'number';
-                        lobj.common.role = 'level.dimmer';
-                        lobj.common.min  = 0;
-                        lobj.common.max  = 100;
-                        break;
-                    case 'hue':
-                        lobj.common.type = 'number';
-                        lobj.common.role = 'level.color.hue';
-                        lobj.common.min  = 0;
-                        lobj.common.max  = 65535;
-                        break;
-                    case 'sat':
-                        lobj.common.type = 'number';
-                        lobj.common.role = 'level.color.saturation';
-                        lobj.common.min  = 0;
-                        lobj.common.max  = 254;
-                        break;
-                    case 'xy':
-                        lobj.common.type = 'string';
-                        lobj.common.role = 'level.color.xy';
-                        break;
-                    case 'ct':
-                        lobj.common.type = 'number';
-                        lobj.common.role = 'level.color.temperature';
-                        lobj.common.min  = 153;
-                        lobj.common.max  = 500;
-                        break;
-                    case 'alert':
-                        lobj.common.type = 'string';
-                        lobj.common.role = 'switch';
-                        break;
-                    case 'effect':
-                        lobj.common.type = 'boolean';
-                        lobj.common.role = 'switch';
-                        break;
-                    case 'colormode':
-                        lobj.common.type  = 'string';
-                        lobj.common.role  = 'indicator.colormode';
-                        lobj.common.write = false;
-                        break;
-                    case 'reachable':
-                        lobj.common.type  = 'boolean';
-                        lobj.common.write = false;
-                        lobj.common.role  = 'indicator.reachable';
-                        break;
-                    case 'r':
-                        lobj.common.type = 'number';
-                        lobj.common.role = 'level.color.r';
-                        lobj.common.min  = 0;
-                        lobj.common.max  = 255;
-                        break;
-                    case 'g':
-                        lobj.common.type = 'number';
-                        lobj.common.role = 'level.color.g';
-                        lobj.common.min  = 0;
-                        lobj.common.max  = 255;
-                        break;
-                    case 'b':
-                        lobj.common.type = 'number';
-                        lobj.common.role = 'level.color.b';
-                        lobj.common.min  = 0;
-                        lobj.common.max  = 255;
-                        break;
-                    case 'command':
-                        lobj.common.type = 'string';
-                        lobj.common.role = 'command';
-                        break;
-                    default:
-                        adapter.log.info('skip: ' + state);
-                        break;
-                }
-
-                objs.push(lobj);
-                states.push({id: lobj._id, val: light.state[state]});
-            }
-
-            var role = 'light.color';
-            if (light.type === 'Dimmable light' || light.type === 'Dimmable plug-in unit') {
-                role = 'light.dimmer';
-            } else if (light.type === 'On/Off plug-in unit') {
-                role = 'switch';
-            }
-
-            objs.push({
-                _id: adapter.namespace + '.' + channelName.replace(/\s/g, '_'),
-                type: 'channel',
-                common: {
-                    name:           channelName.replace(/\s/g, '_'),
-                    role:           role
-                },
-                native: {
-                    id:             lid,
-                    type:           light.type,
-                    name:           light.name,
-                    modelid:        light.modelid,
-                    swversion:      light.swversion,
-                    pointsymbol:    light.pointsymbol
-                }
-            });
-
-        }
-        adapter.log.info('created/updated ' + count + ' light channels');
-
-        // Create/update groups
-        adapter.log.info('creating/updating light groups');
-
-        var groups = config.groups;
-        groups[0] = {
-            name: 'All',   //"Lightset 0"
-            type: 'LightGroup',
-            id: 0,
-            action: {
-                alert:  'select',
-                bri:    0,
-                colormode: '',
-                ct:     0,
-                effect: 'none',
-                hue:    0,
-                on:     false,
-                sat:    0,
-                xy:     '0,0'
-            }
-        };
-        count = 0;
-        for (var gid in groups) {
-            if (!groups.hasOwnProperty(gid)) {
-                continue;
-            }
-            count += 1;
-            var group = groups[gid];
-
-            var groupName = config.config.name + '.' + group.name;
-            if (channelNames.indexOf(groupName) !== -1) {
-                adapter.log.warn('channel "' + groupName + '" already exists, skipping group');
-                continue;
-            } else {
-                channelNames.push(groupName);
-            }
-            groupIds[groupName.replace(/\s/g, '_')] = gid;
-            pollGroups.push({id: gid, name: groupName.replace(/\s/g, '_')});
-
-            group.action.r      = 0;
-            group.action.g      = 0;
-            group.action.b      = 0;
-            group.action.command = '{}';
-            group.action.level  = 0;
-
-            for (var action in group.action) {
-                if (!group.action.hasOwnProperty(action)) {
-                    continue;
-                }
-
-                var gobjId = groupName + '.' + action;
-
-                var gobj = {
-                    _id:        adapter.namespace + '.' + gobjId.replace(/\s/g, '_'),
-                    type:       'state',
-                    common: {
-                        name:   gobjId.replace(/\s/g, '_'),
-                        read:   true,
-                        write:  true
-                    },
-                    native: {
-                        id:     gid
-                    }
-                };
-                if (typeof group.action[action] === 'object') {
-                    group.action[action] = group.action[action].toString();
-                }
-
-                switch (action) {
-                    case 'on':
-                        gobj.common.type = 'boolean';
-                        gobj.common.role = 'switch';
-                        break;
-                    case 'bri':
-                        gobj.common.type = 'number';
-                        gobj.common.role = 'level.dimmer';
-                        gobj.common.min  = 0;
-                        gobj.common.max  = 254;
-                        break;
-                    case 'level':
-                        gobj.common.type = 'number';
-                        gobj.common.role = 'level.dimmer';
-                        gobj.common.min  = 0;
-                        gobj.common.max  = 100;
-                        break;
-                    case 'hue':
-                        gobj.common.type = 'number';
-                        gobj.common.role = 'level.color.hue';
-                        gobj.common.min  = 0;
-                        gobj.common.max  = 65535;
-                        break;
-                    case 'sat':
-                        gobj.common.type = 'number';
-                        gobj.common.role = 'level.color.saturation';
-                        gobj.common.min  = 0;
-                        gobj.common.max  = 254;
-                        break;
-                    case 'xy':
-                        gobj.common.type = 'string';
-                        gobj.common.role = 'level.color.xy';
-                        break;
-                    case 'ct':
-                        gobj.common.type = 'number';
-                        gobj.common.role = 'level.color.temperature';
-                        gobj.common.min  = 153;
-                        gobj.common.max  = 500;
-                        break;
-                    case 'alert':
-                        gobj.common.type = 'string';
-                        gobj.common.role = 'switch';
-                        break;
-                    case 'effect':
-                        gobj.common.type = 'boolean';
-                        gobj.common.role = 'switch';
-                        break;
-                    case 'colormode':
-                        gobj.common.type = 'string';
-                        gobj.common.role = 'indicator.colormode';
-                        gobj.common.write = false;
-                        break;
-                    case 'r':
-                        gobj.common.type = 'number';
-                        gobj.common.role = 'level.color.r';
-                        gobj.common.min  = 0;
-                        gobj.common.max  = 255;
-                        break;
-                    case 'g':
-                        gobj.common.type = 'number';
-                        gobj.common.role = 'level.color.g';
-                        gobj.common.min  = 0;
-                        gobj.common.max  = 255;
-                        break;
-                    case 'b':
-                        gobj.common.type = 'number';
-                        gobj.common.role = 'level.color.b';
-                        gobj.common.min  = 0;
-                        gobj.common.max  = 255;
-                        break;
-                    case 'command':
-                        gobj.common.type = 'string';
-                        gobj.common.role = 'command';
-                        break;
-                    default:
-                        adapter.log.info('skip: ' + action);
-                        continue;
-                        break;
-                }
-                objs.push(gobj);
-                states.push({id: gobj._id, val: group.action[action]});
-            }
-
-            objs.push({
-                _id:        adapter.namespace + '.' + groupName.replace(/\s/g, '_'),
-                type:       'channel',
-                common: {
-                    name:   groupName.replace(/\s/g, '_'),
-                    role:   group.type
-                },
-                native: {
-                    id:     gid,
-                    type:   group.type,
-                    name:   group.name,
-                    lights: group.lights
-                }
-            });
-        }
-        adapter.log.info('created/updated ' + count + ' light groups');
-
-        // Create/update device
-        adapter.log.info('creating/updating bridge device');
-        objs.push({
-            _id:    adapter.namespace + '.' + config.config.name.replace(/\s/g, '_'),
-            type: 'device',
-            common: {
-                name: config.config.name.replace(/\s/g, '_')
-            },
-            native: config.config
-        });
-
-        syncObjects(objs, function () {
-            syncStates(states);
-        })
-    });
-}
-
-function syncObjects(objs, callback) {
-    if (!objs || !objs.length) {
-        return callback && callback();
-    }
-    var task = objs.shift();
-    adapter.getForeignObject(task._id, function (err, obj) {
-        // add saturation into enum.functions.color
-        if (task.common.role === 'level.color.saturation') {
-            adapter.getForeignObject('enum.functions.color', function (err, _enum) {
-                if (_enum && _enum.common && _enum.common.members && _enum.common.members.indexOf(task._id) === -1) {
-                    _enum.common.members.push(task._id);
-                    adapter.setForeignObject(_enum._id, _enum, function (err) {
-                        if (!obj) {
-                            adapter.setForeignObject(task._id, task, function () {
-                                setTimeout(syncObjects, 0, objs, callback);
-                            });
-                        } else {
-                            obj.native = task.native;
-                            adapter.setForeignObject(obj._id, obj, function () {
-                                setTimeout(syncObjects, 0, objs, callback);
-                            });
-                        }
-                    });
-                } else {
-                    if (!obj) {
-                        adapter.setForeignObject(task._id, task, function () {
-                            setTimeout(syncObjects, 0, objs, callback);
-                        });
-                    } else {
-                        obj.native = task.native;
-                        adapter.setForeignObject(obj._id, obj, function () {
-                            setTimeout(syncObjects, 0, objs, callback);
-                        });
-                    }
-                }
-            });
-        } else {
-            if (!obj) {
-                adapter.setForeignObject(task._id, task, function () {
-                    setTimeout(syncObjects, 0, objs, callback);
-                });
-            } else {
-                obj.native = task.native;
-                adapter.setForeignObject(obj._id, obj, function () {
-                    setTimeout(syncObjects, 0, objs, callback);
-                });
-            }
-        }
-    });
-}
-
-function syncStates(states, isChanged, callback) {
-    if (!states || !states.length) {
-        return callback && callback();
-    }
-    var task = states.shift();
-
-    if (typeof task.val === 'object' && task.val !== null && task.val !== undefined) {
-        task.val = task.val.toString();
-    }
-    if (isChanged) {
-        adapter.setForeignStateChanged(task.id, task.val, true, function () {
-            setTimeout(syncStates, 0, states, isChanged, callback);
-        });
-    } else {
-        adapter.setForeignState(task.id, task.val, true, function () {
-            setTimeout(syncStates, 0, states, isChanged, callback);
-        });
-    }
-}
-
 function main() {
     adapter.subscribeStates('*');
     if (!adapter.config.port) {
@@ -889,119 +204,1162 @@ function main() {
     } else {
         adapter.config.port = parseInt(adapter.config.port, 10);
     }
-
-    api = new HueApi(adapter.config.bridge, adapter.config.user, 0, adapter.config.port);
-
-    if (adapter.config.polling && adapter.config.pollingInterval > 0) {
-        setTimeout(pollSingle, 5000, 0);
+    if(adapter.config.user === '' || adapter.config.user === null){
+    }else {
+        getConfig();
     }
-    connect();
+    setTimeout(function(){
+        getAutoUpdates();
+    }, 10000);
 }
 
-function pollGroup(count) {
-    if (count >= pollGroups.length) {
-        count = 0;
-        setTimeout(pollSingle, adapter.config.pollingInterval * 1000, 0);
-    } else {
-        adapter.log.debug('polling light ' + pollGroups[count].name);
-
-        api.getGroup(pollGroups[count].id, function (err, result) {
-            var values = [];
-            if (err) {
-                adapter.log.error(err);
+function createAPIkey(host, callback){
+    var newApiKey = null;
+    var userDescription = 'iobroker.deconz';
+    var options = {
+        url: 'http://' + host + '/api',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'text/plain;charset=UTF-8',
+            'Content-Length': Buffer.byteLength('{"devicetype": "ioBroker"}')
+        }
+    };
+    adapter.log.info(host);
+    try{
+        var req = request(options, function (error, res, body){
+            adapter.log.info('STATUS: ' + res.statusCode);
+            if(res.statusCode === 403){
+                callback({error: 101, message: 'Unlock Key not pressed'});
+            }else if(res.statusCode === 200){
+                var apiKey = JSON.parse(body);
+                adapter.log.info(JSON.stringify(apiKey[0]['success']['username']));
+                callback({error: 0, message: apiKey[0]['success']['username']});
+                getConfig();
             }
-            if (!result) {
-                adapter.log.error('Cannot get result for lightStatus' + pollIds[count]);
-            } else {
-                var states = {};
-                for (var stateA in result.lastAction) {
-                    if (!result.lastAction.hasOwnProperty(stateA)) {
-                        continue;
-                    }
-                    states[stateA] = result.lastAction[stateA];
-                }
-                if (states.reachable === false && states.bri !== undefined) {
-                    states.bri = 0;
-                    states.on = false;
-                }
-                if (states.on === false && states.bri !== undefined) {
-                    states.bri = 0;
-                }
-                if (states.xy !== undefined) {
-                    var xy = states.xy.toString().split(',');
-                    states.xy = states.xy.toString();
-                    var rgb = huehelper.XYBtoRGB(xy[0], xy[1], (states.bri / 254));
-                    states.r = Math.round(rgb.Red   * 254);
-                    states.g = Math.round(rgb.Green * 254);
-                    states.b = Math.round(rgb.Blue  * 254);
-                }
-                if (states.bri !== undefined) {
-                    states.level = Math.max(Math.min(Math.round(states.bri / 2.54), 100), 0);
-                }
-                for (var stateB in states) {
-                    if (!states.hasOwnProperty(stateB)) {
-                        continue;
-                    }
-                    values.push({id: adapter.namespace + '.' + pollGroups[count].name + '.' + stateB, val: states[stateB]});
-                }
-            }
-            syncStates(values, true, function () {
-                setTimeout(pollGroup, 50, ++count);
-            });
         });
+        req.write('{"devicetype": "ioBroker"}');
+    }catch(err){}
+
+}
+
+function deleteAPIkey(){
+    adapter.log.info('deleteAPIkey');
+    var options = {
+        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/config/whitelist/' + adapter.config.user,
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'text/plain;charset=UTF-8'
+        }
+    };
+
+    request(options, function(error, res, body) {
+        try{var response = JSON.parse(body);} catch(err){}
+        if(res.statusCode === 200){
+            if(response[0]['success']){
+                adapter.log.info('API key deleted');
+                adapter.config.user = '';
+            }else if(response[0]['error']){
+                adapter.log.warn(JSON.stringify(response[0]['error']));
+            }
+        }else if(res.statusCode === 403){
+            adapter.log.warn('You do not have the permission to do this! ');
+        }else if(res.statusCode === 400){
+            adapter.log.warn('Error 404 Not Found ')
+        }
+    });
+}
+
+
+//Make Abo using websocket
+var WebSocket = require('ws');
+
+function getAutoUpdates(){
+    var host = adapter.config.bridge;
+    var port = adapter.config.websocketport;
+
+    var ws = new WebSocket('ws://' + host + ':' + port);
+
+    ws.onmessage = function(msg) {
+        var data = JSON.parse(msg.data);
+        var id = data['id'];
+        var type = data['r'];
+        var state = data['state'];
+        adapter.log.info(id + ' ' + type);
+
+        switch(type){
+            case 'lights':
+                adapter.getForeignObjects('*', 'device', function (err, enums){
+                    var count = Object.keys(enums).length - 1;
+                    for (var i = 0; i <= count; i++) {
+                        var keyName = Object.keys(enums)[i];
+                        if(enums[keyName].common.role === 'light'){
+                            var gwName = keyName.replace(/\.(\w|\w|\s|\(|\)|\[|\]|\-|\+)*$/, '');
+                            getLightState(gwName, id);
+                        }
+
+                    }
+                });
+                break;
+            case 'groups':
+                adapter.getForeignObjects('*', 'device', function (err, enums){
+                    var count = Object.keys(enums).length - 1;
+                    for (var i = 0; i <= count; i++) {
+                        var keyName = Object.keys(enums)[i];
+                        if(enums[keyName].common.role === 'group') {
+                            var gwName = keyName.replace(/\.(\w|\w|\s|\(|\)|\[|\]|\-|\+)*$/, '');
+                            getGroupAttributes(gwName, id);
+                        }
+                    }
+                });
+                break;
+            case 'sensors':
+                adapter.getForeignObjects('*', 'device', function (err, enums){
+                    var count = Object.keys(enums).length - 1;
+                    for (var i = 0; i <= count; i++) {
+                        var keyName = Object.keys(enums)[i];
+                        if(enums[keyName].common.role === 'sensor') {
+                            var gwName = keyName.replace(/\.(\w|\w|\s|\(|\)|\[|\]|\-|\+)*$/, '');
+                            getGroupAttributes(gwName, id);
+                        }
+                    }
+                });
+                break;
+        }
     }
 }
 
-function pollSingle(count) {
-    if (count >= pollIds.length) {
-        count = 0;
-        pollGroup(0);
-    } else {
-        adapter.log.debug('polling light ' + pollChannels[count]);
+//START deConz config --------------------------------------------------------------------------------------------------
+function modifyConfig(parameters){
+    var options = {
+        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/config',
+        method: 'PUT',
+        headers: 'Content-Type" : "application/json',
+        body: parameters
+    };
 
-        api.lightStatus(pollIds[count], function (err, result) {
-            var values = [];
-            if (err) {
-                adapter.log.error(err);
+    request(options, function(error, res, body) {
+        try{var response = JSON.parse(body);} catch(err){}
+
+
+        if(res.statusCode === 200){
+            if(response[0]['success']){
+                switch (JSON.stringify(response[0]['success'])) {
+                    case '{"/config/permitjoin":60}':
+                        adapter.log.info('Network is now open for 60 seconds to register new devices.');
+                        break;
+                }
+            }else if(response[0]['error']){
+                //adapter.setState(stateId, {ack: false});
+                adapter.log.warn(JSON.stringify(response[0]['error']));
             }
-            if (!result) {
-                adapter.log.error('Cannot get result for lightStatus' + pollIds[count]);
-            } else {
-                var states = {};
-                for (var stateA in result.state) {
-                    if (!result.state.hasOwnProperty(stateA)) {
-                        continue;
+        }else if(res.statusCode === 403){
+            adapter.log.warn('You do not have the permission to do this! ' +  parameters);
+        }else if(res.statusCode === 400){
+            adapter.log.warn('Error 404 Not Found ' + parameters)
+        }
+    });
+}
+
+function getConfig(){
+    var options = {
+        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/config',
+        method: 'GET'
+    };
+
+    request(options, function(error, res, body){
+        var gateway = JSON.parse(body);
+        try{var response = JSON.parse(body);} catch(err){}
+        adapter.log.debug('API version: ' + gateway['apiversion']);
+
+        if(res.statusCode === 200) {
+                adapter.setObject(gateway['name'], {
+                    type: 'device',
+                    common: {
+                        name: gateway['name'],
+                        role: 'gateway'
+                    },
+                    native: {
+                        apiversion: gateway['apiversion'],
+                        bridgeid: gateway['bridgeid'],
+                        datastoreversion: gateway['datastoreversion'],
+                        devicename: gateway['devicename'],
+                        dhcp: gateway['dhcp'],
+                        factorynew: gateway['factorynew'],
+                        gateway: gateway['gateway'],
+                        ipaddress: gateway['ipaddress'],
+                        linkbutton: gateway['linkbutton'],
+                        mac: gateway['mac'],
+                        modelid: gateway['modelid'],
+                        netmask: gateway['netmask'],
+                        networkopenduration: gateway['networkopenduration'],
+                        panid: gateway['panid'],
+                        portalconnection: gateway['portalconnection'],
+                        portalservices: gateway['portalservices'],
+                        proxyaddress: gateway['proxyaddress'],
+                        proxyport: gateway['proxyport'],
+                        replacesbridgeid: gateway['replacesbridgeid'],
+                        starterkitid: gateway['starterkitid'],
+                        swversion: gateway['swversion'],
+                        timeformat: gateway['timeformat'],
+                        timezone: gateway['timezone'],
+                        uuid: gateway['uuid'],
+                        websocketnotifyall: gateway['websocketnotifyall'],
+                        websocketport: gateway['websocketport'],
+                        zigbeechannel: gateway['zigbeechannel']
                     }
-                    states[stateA] = result.state[stateA];
+                });
+                adapter.config.websocketport = gateway['websocketport'];
+                getAllLights(gateway['name']);
+                getAllSensors(gateway['name']);
+                getAllGroups(gateway['name']);
+
+        }else{
+            logging(res.statusCode, 'Get Config:');
+        }
+    });
+} //END getConfig
+//END deConz config ----------------------------------------------------------------------------------------------------
+
+
+//START  Group functions -----------------------------------------------------------------------------------------------
+function getAllGroups(gwName) {
+    var options = {
+        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/groups',
+        method: 'GET'
+    };
+    request(options, function (error, res, body) {
+        var list = JSON.parse(body);
+        try{var response = JSON.parse(body);} catch(err){}
+        var count = Object.keys(list).length - 1;
+        //adapter.log.debug('getAllGroups: ' + JSON.stringify(response));
+
+        if(res.statusCode === 200){
+                for (var i = 0; i <= count; i++) {
+                    var keyName = Object.keys(list)[i];
+                    //create object for group
+                    adapter.setObject(gwName + '.' + list[keyName]['name'], {
+                        type: 'device',
+                        common: {
+                            name: list[keyName]['name'],
+                            role: 'group'
+                        },
+                        native: {
+                            devicemembership: list[keyName]['devicemembership'],
+                            etag: list[keyName]['etag'],
+                            id: list[keyName]['id'],
+                            hidden: list[keyName]['hidden'],
+                            type: 'group'
+                        }
+                    });
+                    getGroupAttributes(gwName, list[keyName]['id']);
                 }
-                if (states.reachable === false && states.bri !== undefined) {
-                    states.bri = 0;
-                    states.on = false;
-                }
-                if (states.on === false && states.bri !== undefined) {
-                    states.bri = 0;
-                }
-                if (states.xy !== undefined) {
-                    var xy = states.xy.toString().split(',');
-                    states.xy = states.xy.toString();
-                    var rgb = huehelper.XYBtoRGB(xy[0], xy[1], (states.bri / 254));
-                    states.r = Math.round(rgb.Red   * 254);
-                    states.g = Math.round(rgb.Green * 254);
-                    states.b = Math.round(rgb.Blue  * 254);
-                }
-                if (states.bri !== undefined) {
-                    states.level = Math.max(Math.min(Math.round(states.bri / 2.54), 100), 0);
-                }
-                for (var stateB in states) {
-                    if (!states.hasOwnProperty(stateB)) {
-                        continue;
+        }else{
+            logging(res.statusCode, 'Get all Groups:');
+        }
+    });
+} //END getAllGroups
+
+function getGroupAttributes(gwName, groupId) {
+    var options = {
+        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/groups/' + groupId,
+        method: 'GET'
+    };
+    request(options, function (error, res, body) {
+        var list = JSON.parse(body);
+        try{var response = JSON.parse(body);} catch(err){}
+        var count = Object.keys(list).length - 1;
+
+        //adapter.log.info('Response: ' + JSON.stringify(response));
+
+        if(res.statusCode === 200){
+            for (var i = 0; i <= count; i++) {
+                var keyName = Object.keys(list)[i];
+                //create object for group with attributes
+                adapter.setObject(gwName + '.' + list['name'], {
+                    type: 'device',
+                    common: {
+                        name: list['name'],
+                        role: 'group'
+                    },
+                    native: {
+                        devicemembership: list['devicemembership'],
+                        etag: list['etag'],
+                        hidden: list['hidden'],
+                        id: groupId,
+                        lights: list['lights'],
+                        lightsequence: list['lightsequence'],
+                        multideviceids: list['multideviceids']
                     }
-                    values.push({id: adapter.namespace + '.' + pollChannels[count] + '.' + stateB, val: states[stateB]});
+                });
+                var count2 = Object.keys(list['action']).length - 1;
+                //create states for light device
+                for (var z = 0; z <= count2; z++) {
+                    var stateName = Object.keys(list['action'])[z];
+                    switch (stateName) {
+                        case 'on':
+                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                type: 'state',
+                                common: {
+                                    name: stateName,
+                                    type: 'boolean',
+                                    role: 'state',
+                                    read: true,
+                                    write: true
+                                },
+                                native: {}
+                            });
+                            adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['action'][stateName], ack: true});
+                            break;
+                        case 'bri':
+                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                type: 'state',
+                                common: {
+                                    name: stateName,
+                                    type: 'number',
+                                    role: 'level.dimmer',
+                                    min: 0,
+                                    max: 255,
+                                    read: true,
+                                    write: true
+                                },
+                                native: {}
+                            });
+                            adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['action'][stateName], ack: true});
+                            break;
+                        case 'hue':
+                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                type: 'state',
+                                common: {
+                                    name: stateName,
+                                    type: 'number',
+                                    role: 'hue.color',
+                                    min: 0,
+                                    max: 65535,
+                                    read: true,
+                                    write: true
+                                },
+                                native: {}
+                            });
+                            adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['action'][stateName], ack: true});
+                            break;
+                        case 'sat':
+                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                type: 'state',
+                                common: {
+                                    name: stateName,
+                                    type: 'number',
+                                    role: 'color.saturation',
+                                    min: 0,
+                                    max: 255,
+                                    read: true,
+                                    write: true
+                                },
+                                native: {}
+                            });
+                            adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['action'][stateName], ack: true});
+                            break;
+                        case 'ct':
+                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                type: 'state',
+                                common: {
+                                    name: stateName,
+                                    type: 'number',
+                                    role: 'color.temp',
+                                    min: 153,
+                                    max: 500,
+                                    read: true,
+                                    write: true
+                                },
+                                native: {}
+                            });
+                            adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['action'][stateName], ack: true});
+                            break;
+                        case 'xy':
+                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                type: 'state',
+                                common: {
+                                    name: stateName,
+                                    type: 'string',
+                                    role: 'color.CIE',
+                                    read: true,
+                                    write: true
+                                },
+                                native: {}
+                            });
+                            adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['action'][stateName], ack: true});
+                            break;
+                        case 'effect':
+                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                type: 'state',
+                                common: {
+                                    name: stateName,
+                                    type: 'string',
+                                    role: 'action',
+                                    read: true,
+                                    write: true
+                                },
+                                native: {}
+                            });
+                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.colorloopspeed', {
+                                type: 'state',
+                                common: {
+                                    name: 'colorloopspeed',
+                                    type: 'number',
+                                    role: 'argument',
+                                    min: 1,
+                                    max: 255,
+                                    read: true,
+                                    write: true
+                                },
+                                native: {}
+                            });
+                            adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['action'][stateName], ack: true});
+                            break;
+                    }
                 }
+                adapter.setObjectNotExists(gwName + '.' + list['name'] + '.transitiontime', {
+                    type: 'state',
+                    common: {
+                        name: 'transitiontime',
+                        type: 'number',
+                        role: 'argument',
+                        read: true,
+                        write: true
+                    },
+                    native: {}
+                });
+                }
+        }else{
+            logging(res.statusCode, 'Get group attributes: ' + groupId);
+        }
+    })
+} //END getGroupAttributes
+
+function setGroupState(parameters, groupId, stateId){
+    var options = {
+        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/groups/' + groupId + '/action',
+        method: 'PUT',
+        headers: 'Content-Type" : "application/json',
+        body: parameters
+    };
+
+    request(options, function(error, res, body) {
+        adapter.log.debug('STATUS: ' + res.statusCode);
+        try{var response = JSON.parse(body);} catch(err){}
+        adapter.log.debug('BODY: ' + JSON.stringify(response));
+
+        if(res.statusCode === 200){
+            if(response[0]['success']){
+                adapter.setState(stateId, {ack: true});
+            }else if(response[0]['error']){
+                //adapter.setState(stateId, {ack: false});
+                adapter.log.warn(JSON.stringify(response[0]['error']));
             }
-            syncStates(values, true, function () {
-                setTimeout(pollSingle, 50, ++count);
-            });
+        }else{
+            logging(res.statusCode, 'Set group state with ID: ' + groupId + ' parameter: ' + parameters);
+        }
+    });
+} //END setGroupState
+//END  Group functions -------------------------------------------------------------------------------------------------
+
+
+//START  Sensor functions ----------------------------------------------------------------------------------------------
+function getAllSensors(gwName) {
+    var options = {
+        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/sensors',
+        method: 'GET'
+    };
+    request(options, function (error, res, body) {
+        var list = JSON.parse(body);
+        try{var response = JSON.parse(body);} catch(err){}
+        var count = Object.keys(list).length - 1;
+
+        if (res.statusCode === 200) {
+                for (var i = 0; i <= count; i++) {
+                    var keyName = Object.keys(list)[i];
+
+                    //create object for sensor device
+                    adapter.setObject(gwName + '.' + list[keyName]['name'], {
+                        type: 'device',
+                        common: {
+                            name: list[keyName]['name'],
+                            role: 'sensor'
+                        },
+                        native: {
+                            ep: list[keyName]['ep'],
+                            etag: list[keyName]['etag'],
+                            id: list[keyName]['id'],
+                            manufacturername: list[keyName]['manufacturername'],
+                            modelid: list[keyName]['modelid'],
+                            swversion: list[keyName]['swversion'],
+                            type: list[keyName]['type'],
+                            uniqueid: list[keyName]['uniqueid']
+                        }
+                    });
+
+                    var count2 = Object.keys(list[keyName]['state']).length - 1;
+                    //create states for sensor device
+                    for (var z = 0; z <= count2; z++) {
+                        var stateName = Object.keys(list[keyName]['state'])[z];
+                        switch (stateName) {
+                            case 'on':
+                                adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: stateName,
+                                        type: 'boolean',
+                                        role: 'state',
+                                        read: true,
+                                        write: true
+                                    },
+                                    native: {}
+                                });
+                                break;
+                            case 'reachable':
+                                adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: stateName,
+                                        type: 'boolean',
+                                        role: 'indicator.reachable',
+                                        read: true,
+                                        write: false
+                                    },
+                                    native: {}
+                                });
+                                break;
+                        }
+                    }
+                }
+        }else{
+            logging(res.statusCode, 'Get all Sensors:');
+        }
+    });
+} //END getAllSensors
+
+function getSensor(gwName, sensorId){
+    var options = {
+        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/sensors/' + sensorId,
+        method: 'GET'
+    };
+    request(options, function (error, res, body) {
+        try {
+            var response = JSON.parse(body);
+        } catch (err) {
+        }
+
+        if (res.statusCode === 200) {
+            if (response[0]['success']) {
+                var list = JSON.parse(body);
+                var keyName = Object.keys(list)[0];
+                //create object for sensor
+                adapter.setObject(gwName + '.' + list['name'], {
+                    type: 'device',
+                    common: {
+                        name: list['name'],
+                        role: 'sensor'
+                    },
+                    native: {
+                        ep: list['ep'],
+                        etag: list['etag'],
+                        id: sensorId,
+                        manufacturername: list['manufacturername'],
+                        mode:   list['mode'],
+                        modelid: list['modelid'],
+                        swversion: list['swversion'],
+                        type: list['type'],
+                        uniqueid: list['uniqueid']
+                    }
+                });
+                var count2 = Object.keys(list['state']).length - 1;
+                //create states for light device
+                for (var z = 0; z <= count2; z++) {
+                    var stateName = Object.keys(list['config'])[z];
+                    switch (stateName) {
+                        case 'on':
+                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                type: 'state',
+                                common: {
+                                    name: stateName,
+                                    type: 'boolean',
+                                    role: 'state',
+                                    read: true,
+                                    write: true
+                                },
+                                native: {}
+                            });
+                            adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['config'][stateName], ack: true});
+                            break;
+                        case 'battery':
+                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                type: 'state',
+                                common: {
+                                    name: stateName,
+                                    type: 'boolean',
+                                    role: 'indicator.battery',
+                                    read: true,
+                                    write: false
+                                },
+                                native: {}
+                            });
+                            adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['config'][stateName], ack: true});
+                            break;
+                        case 'reachable':
+                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                type: 'state',
+                                common: {
+                                    name: stateName,
+                                    type: 'boolean',
+                                    role: 'indicator.reachable',
+                                    read: true,
+                                    write: false
+                                },
+                                native: {}
+                            });
+                            adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['config'][stateName], ack: true});
+                            break;
+                        case 'buttonevent':
+                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                type: 'state',
+                                common: {
+                                    name: stateName,
+                                    type: 'number',
+                                    role: 'indicator.state',
+                                    read: true,
+                                    write: false
+                                },
+                                native: {}
+                            });
+                            adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['config'][stateName], ack: true});
+                            break;
+                        case 'presence':
+                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                type: 'state',
+                                common: {
+                                    name: stateName,
+                                    type: 'boolean',
+                                    role: 'indicator.state',
+                                    read: true,
+                                    write: false
+                                },
+                                native: {}
+                            });
+                            adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['config'][stateName], ack: true});
+                            break;
+                    }
+
+                }
+            } else{
+                logging(res.statusCode, 'Get light state with ID: ' + lightId);
+            }
+        }
+    })
+} //END getSensor
+//END  Sensor functions ------------------------------------------------------------------------------------------------
+
+
+//START  Light functions -----------------------------------------------------------------------------------------------
+function getAllLights(gwName){
+    var options = {
+        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/lights',
+        method: 'GET'
+    };
+        request(options, function (error, res, body) {
+            var list = JSON.parse(body);
+            try{var response = JSON.parse(body);} catch(err){}
+            var count = Object.keys(list).length - 1;
+            //adapter.log.info('Light: ' + JSON.stringify(response));
+            if (res.statusCode === 200) {
+                    for (var i = 0; i <= count; i++) {
+                        var keyName = Object.keys(list)[i];
+                        //adapter.log.info('Light: ' + Object.keys(list)[i]);
+                        //create object for light device
+                        adapter.setObject(gwName + '.' + list[keyName]['name'], {
+                            type: 'device',
+                            common: {
+                                name: list[keyName]['name'],
+                                role: 'light'
+                            },
+                            native: {
+                                etag: list[keyName]['etag'],
+                                hascolor: list[keyName]['hascolor'],
+                                id: Object.keys(list)[i],
+                                manufacturername: list[keyName]['manufacturername'],
+                                modelid: list[keyName]['modelid'],
+                                swversion: list[keyName]['swversion'],
+                                type: list[keyName]['type'],
+                                uniqueid: list[keyName]['uniqueid']
+                            }
+                        });
+                        var count2 = Object.keys(list[keyName]['state']).length - 1;
+                        //create states for light device
+                        for (var z = 0; z <= count2; z++) {
+                            var stateName = Object.keys(list[keyName]['state'])[z];
+                            switch (stateName) {
+                                case 'on':
+                                    adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
+                                        type: 'state',
+                                        common: {
+                                            name: stateName,
+                                            type: 'boolean',
+                                            role: 'state',
+                                            read: true,
+                                            write: true
+                                        },
+                                        native: {}
+                                    });
+                                    break;
+                                case 'bri':
+                                    adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
+                                        type: 'state',
+                                        common: {
+                                            name: stateName,
+                                            type: 'number',
+                                            role: 'level.dimmer',
+                                            min: 0,
+                                            max: 255,
+                                            read: true,
+                                            write: true
+                                        },
+                                        native: {}
+                                    });
+                                    break;
+                                case 'hue':
+                                    adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
+                                        type: 'state',
+                                        common: {
+                                            name: stateName,
+                                            type: 'number',
+                                            role: 'hue.color',
+                                            min: 0,
+                                            max: 65535,
+                                            read: true,
+                                            write: true
+                                        },
+                                        native: {}
+                                    });
+                                    break;
+                                case 'sat':
+                                    adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
+                                        type: 'state',
+                                        common: {
+                                            name: stateName,
+                                            type: 'number',
+                                            role: 'color.saturation',
+                                            min: 0,
+                                            max: 255,
+                                            read: true,
+                                            write: true
+                                        },
+                                        native: {}
+                                    });
+                                    break;
+                                case 'ct':
+                                    adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
+                                        type: 'state',
+                                        common: {
+                                            name: stateName,
+                                            type: 'number',
+                                            role: 'color.temp',
+                                            min: 153,
+                                            max: 500,
+                                            read: true,
+                                            write: true
+                                        },
+                                        native: {}
+                                    });
+                                    break;
+                                case 'xy':
+                                    adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
+                                        type: 'state',
+                                        common: {
+                                            name: stateName,
+                                            type: 'string',
+                                            role: 'color.CIE',
+                                            read: true,
+                                            write: true
+                                        },
+                                        native: {}
+                                    });
+                                    break;
+                                case 'alert':
+                                    adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
+                                        type: 'state',
+                                        common: {
+                                            name: stateName,
+                                            type: 'string',
+                                            role: 'action',
+                                            read: true,
+                                            write: true
+                                        },
+                                        native: {}
+                                    });
+                                    break;
+                                case 'effect':
+                                    adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
+                                        type: 'state',
+                                        common: {
+                                            name: stateName,
+                                            type: 'string',
+                                            role: 'action',
+                                            read: true,
+                                            write: true
+                                        },
+                                        native: {}
+                                    });
+                                    adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.colorloopspeed', {
+                                        type: 'state',
+                                        common: {
+                                            name: 'colorloopspeed',
+                                            type: 'number',
+                                            role: 'argument',
+                                            min: 1,
+                                            max: 255,
+                                            read: true,
+                                            write: true
+                                        },
+                                        native: {}
+                                    });
+                                    break;
+                                case 'reachable':
+                                    adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
+                                        type: 'state',
+                                        common: {
+                                            name: stateName,
+                                            type: 'boolean',
+                                            role: 'indicator.reachable',
+                                            read: true,
+                                            write: false
+                                        },
+                                        native: {}
+                                    });
+                                    break;
+                            }
+                            adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.transitiontime', {
+                                type: 'state',
+                                common: {
+                                    name: 'transitiontime',
+                                    type: 'number',
+                                    role: 'argument',
+                                    read: true,
+                                    write: true
+                                },
+                                native: {}
+                            });
+
+                        }
+                    }
+            }else{
+                logging(res.statusCode, 'Get all lights:');
+            }
+        })
+} //END getAllLights
+
+function getLightState(gwName, lightId){
+    var options = {
+        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/lights/' + lightId,
+        method: 'GET'
+    };
+    request(options, function (error, res, body) {
+        try {
+            var response = JSON.parse(body);
+        } catch (err) {
+        }
+        adapter.log.info('getLightState: ' + body);
+            if (res.statusCode === 200) {
+                var list = JSON.parse(body);
+                var keyName = Object.keys(list)[0];
+                //create object for light device
+                    adapter.setObject(gwName + '.' + list['name'], {
+                        type: 'device',
+                        common: {
+                            name: list['name'],
+                            role: 'light'
+                        },
+                        native: {
+                            etag: list['etag'],
+                            hascolor: list['hascolor'],
+                            id: lightId,
+                            manufacturername: list['manufacturername'],
+                            modelid: list['modelid'],
+                            swversion: list['swversion'],
+                            type: list['type'],
+                            uniqueid: list['uniqueid']
+                        }
+                    });
+                    var count2 = Object.keys(list['state']).length - 1;
+                    //create states for light device
+                    for (var z = 0; z <= count2; z++) {
+                        var stateName = Object.keys(list['state'])[z];
+                        switch (stateName) {
+                            case 'on':
+                                adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: stateName,
+                                        type: 'boolean',
+                                        role: 'state',
+                                        read: true,
+                                        write: true
+                                    },
+                                    native: {}
+                                });
+                                adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['state'][stateName], ack: true});
+                                break;
+                            case 'bri':
+                                adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: stateName,
+                                        type: 'number',
+                                        role: 'level.dimmer',
+                                        min: 0,
+                                        max: 255,
+                                        read: true,
+                                        write: true
+                                    },
+                                    native: {}
+                                });
+                                adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['state'][stateName], ack: true});
+                                break;
+                            case 'hue':
+                                adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: stateName,
+                                        type: 'number',
+                                        role: 'hue.color',
+                                        min: 0,
+                                        max: 65535,
+                                        read: true,
+                                        write: true
+                                    },
+                                    native: {}
+                                });
+                                adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['state'][stateName], ack: true});
+                                break;
+                            case 'sat':
+                                adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: stateName,
+                                        type: 'number',
+                                        role: 'color.saturation',
+                                        min: 0,
+                                        max: 255,
+                                        read: true,
+                                        write: true
+                                    },
+                                    native: {}
+                                });
+                                adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['state'][stateName], ack: true});
+                                break;
+                            case 'ct':
+                                adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: stateName,
+                                        type: 'number',
+                                        role: 'color.temp',
+                                        min: 153,
+                                        max: 500,
+                                        read: true,
+                                        write: true
+                                    },
+                                    native: {}
+                                });
+                                adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['state'][stateName], ack: true});
+                                break;
+                            case 'xy':
+                                adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: stateName,
+                                        type: 'string',
+                                        role: 'color.CIE',
+                                        read: true,
+                                        write: true
+                                    },
+                                    native: {}
+                                });
+                                adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['state'][stateName], ack: true});
+                                break;
+                            case 'alert':
+                                adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: stateName,
+                                        type: 'string',
+                                        role: 'action',
+                                        read: true,
+                                        write: true
+                                    },
+                                    native: {}
+                                });
+                                adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['state'][stateName], ack: true});
+                                break;
+                            case 'effect':
+                                adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: stateName,
+                                        type: 'string',
+                                        role: 'action',
+                                        read: true,
+                                        write: true
+                                    },
+                                    native: {}
+                                });
+                                adapter.setObjectNotExists(gwName + '.' + list['name'] + '.colorloopspeed', {
+                                    type: 'state',
+                                    common: {
+                                        name: 'colorloopspeed',
+                                        type: 'number',
+                                        role: 'argument',
+                                        min: 1,
+                                        max: 255,
+                                        read: true,
+                                        write: true
+                                    },
+                                    native: {}
+                                });
+                                adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['state'][stateName], ack: true});
+                                break;
+                            case 'transitiontime':
+                                adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: stateName,
+                                        type: 'number',
+                                        role: 'argument',
+                                        read: true,
+                                        write: true
+                                    },
+                                    native: {}
+                                });
+                                break;
+                            case 'reachable':
+                                adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: stateName,
+                                        type: 'boolean',
+                                        role: 'indicator.reachable',
+                                        read: true,
+                                        write: false
+                                    },
+                                    native: {}
+                                });
+                                adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['state'][stateName], ack: true});
+                                break;
+                        }
+
+                    }
+            } else{
+                logging(res.statusCode, 'Get light state with ID: ' + lightId);
+            }
+    })
+} //END getLightState
+
+function setLightState(parameters, lightId, stateId){
+
+        var options = {
+            url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/lights/' + lightId + '/state',
+            method: 'PUT',
+            headers: 'Content-Type" : "application/json',
+            body: parameters
+        };
+
+        request(options, function(error, res, body) {
+            adapter.log.debug('STATUS: ' + res.statusCode);
+            try{var response = JSON.parse(body);} catch(err){}
+            adapter.log.debug('BODY: ' + JSON.stringify(response));
+
+            if(res.statusCode === 200){
+                if(response[0]['success']){
+                    adapter.setState(stateId, {ack: true});
+                }else if(response[0]['error']){
+                    //adapter.setState(stateId, {ack: false});
+                    adapter.log.warn(JSON.stringify(response[0]['error']));
+                }
+            }else{
+                logging(res.statusCode, 'Set light state with ID: ' + lightId + ' parameter: ' + parameters);
+            }
         });
+} //END setLightState
+
+function deleteLight(parameters, lightId){
+    var options = {
+        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/lights/' + lightId,
+        method: 'DELETE',
+        headers: 'Content-Type" : "application/json',
+        body: parameters
+    };
+
+    request(options, function(error, res, body) {
+        adapter.log.debug('STATUS: ' + res.statusCode);
+        try{var response = JSON.parse(body);} catch(err){}
+        adapter.log.debug('BODY: ' + JSON.stringify(response));
+
+        if(res.statusCode === 200){
+            if(response[0]['success']){
+                adapter.log.info('The light with id ' + lightId + ' was removed.')
+            }else if(response[0]['error']){
+                //adapter.setState(stateId, {ack: false});
+                adapter.log.warn(JSON.stringify(response[0]['error']));
+            }
+        }else{
+            logging(res.statusCode, 'Delete light with ID: ' + lightId);
+        }
+    });
+}
+
+function removeFromGroups(lightId){
+    var options = {
+        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/lights/' + lightId + '/groups',
+        method: 'DELETE',
+        headers: 'Content-Type" : "application/json'
+    };
+
+    request(options, function(error, res, body) {
+        adapter.log.debug('STATUS: ' + res.statusCode);
+        try{var response = JSON.parse(body);} catch(err){}
+        adapter.log.debug('BODY: ' + JSON.stringify(response));
+
+        if(res.statusCode === 200){
+            if(response[0]['success']){
+                adapter.log.info('The light with id ' + lightId + ' was removed from all groups.')
+            }else if(response[0]['error']){
+                //adapter.setState(stateId, {ack: false});
+                adapter.log.warn(JSON.stringify(response[0]['error']));
+            }
+        }else{
+            logging(res.statusCode, 'Remove light with ID from Groups: ' + lightId);
+        }
+    });
+}
+//END  Light functions -----------------------------------------------------------------------------------------------
+
+
+function logging(statusCode, message){
+    switch (statusCode){
+        case '304':
+            adapter.log.debug(message + ' Code 304: Not modified');
+            break;
+        case '400':
+            adapter.log.warn(message + ' Code 400: Bad request');
+            break;
+        case '401':
+            adapter.log.info(message + ' Code 401: Unathorized');
+            break;
+        case '403':
+            adapter.log.info(message + ' Code 403: Forbidden');
+            break;
+        case '404':
+            adapter.log.info(message + ' Code 404: Ressource not found');
+            break;
+        case '503':
+            adapter.log.info(message + ' Code 503: Service unavailable');
+            break;
     }
 }

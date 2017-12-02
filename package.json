@@ -1,24 +1,12 @@
 {
   "name": "iobroker.deconz",
-  "version": "0.6.9",
+  "version": "0.1.1",
   "description": "deConz can handle various ZigBee devices, such as Hue, Tradfri, Lightify, etc.",
   "author": {
     "name": "Jey Cee",
     "email": "jey-cee@live.com"
   },
   "contributors": [
-    {
-      "name": "hobbyquaker",
-      "email": "hq@ccu.io"
-    },
-    {
-      "name": "Pmant",
-      "email": "patrickmo@gmx.de"
-    },
-    {
-      "name": "Bluefox",
-      "email": "dogafox@gmail.com"
-    }
   ],
   "engines": {
     "node": ">=0.12"
@@ -42,7 +30,6 @@
     "url": "https://github.com/jey-cee/ioBroker.deconz"
   },
   "dependencies": {
-    "node-hue-api": "^2.4.2"
   },
   "devDependencies": {
     "grunt": "^1.0.1",

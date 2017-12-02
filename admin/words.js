@@ -9,14 +9,8 @@ systemDictionary = {
     "deConz Address":   {"en": "deConz Address", "de": "deConz Adresse",   "ru": "Адрес deConz"},
     "Bridge port":      {"en": "Bridge port",    "de": "Bridge-Port",      "ru": "Порт HUE bridge"},
     "API key":          {"en": "API key",    "de": "API Key",  "ru": "Ключ API"},
-    "Polling":          {"en": "Polling",        "de": "Polling",          "ru": "Опрос"},
-    "Polling interval (sec)": {
-        "en": "Polling interval(sec)",
-        "de": "Pollintervall(sek)",
-        "ru": "Интервал опроса(сек)"
-    },
-    "Find deConz":      {"en": "Find deConz",    "de": "Suche deConz",     "ru": "Найти deConz"},
     "Create API key":      {"en": "Create API key",    "de": "Erstelle API key",    "ru": "Создать ключ API"},
+    "Delete API key":      {"en": "Delete API key",    "de": "Lösche API key",    "ru": "Удалить ключ API"},
     "Enable adapter first": {"en": "Enable adapter first", "de": "Zu erst den Adapter Aktivieren", "ru": "Сначала надо активировать драйвер"},
     "Ok":               {"en": "Ok",            "de": "Ok",                 "ru": "Ok"},
     "Instruction":      {

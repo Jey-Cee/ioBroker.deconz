@@ -17,15 +17,14 @@ You must first link to deConz.
     b) If "Find deConz" will not find your deConz installation you have to enter the ip address.
 2. After IP address is found the USER must be created. For that press the "Create User" button and then press "Link" button on HUE bridge. "Create User" button is only enabled if no USER entered
 
-Deutsch
--------------
-Bindet Philips Hue / LivingColors / LivingWhites Lampen ein. 
-In den Adapter-Settings muss die IP der Hue Bridge sowie ein Username konfiguriert werden. 
-
 ## Notice
 Required node.js >= 0.12.
 
 ## Changelog
+
+### 0.1.1
+
+* (Jey-Cee) Adapter complete rewritten
 
 ### 0.1.0
 

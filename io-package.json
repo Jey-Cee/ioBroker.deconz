@@ -1,8 +1,14 @@
 {
     "common": {
         "name": "deconz",
-        "version": "0.1.0",
+        "version": "0.1.1",
         "news": {
+            "0.1.1": {
+                "en": "Complete adapter rewritten",
+                "de": "Adapter Vollständig neu geschrieben",
+                "ru": "Полный адаптер переписан"
+            }
+        },
             "0.1.0": {
                 "en": "alpha version",
                 "de": "alpha version",
@@ -46,7 +52,7 @@
             "zigbee"
         ],
         "icon": "deconz.jpeg",
-        "extIcon": "https://raw.githubusercontent.com/jey-cee/ioBroker.deconz/master/admin/deconz.jpeg",
+        "extIcon": "https://raw.githubusercontent.com/jey-cee/ioBroker.deconz/master/admin/deconz.png",
         "type": "hardware"
     },
     "native": {
@@ -54,7 +60,9 @@
         "port": 80,
         "user": "",
         "polling": true,
-        "pollingInterval": 30
+        "pollingInterval": 30,
+        "openNetwork": false,
+        "websocketport": 443
     },
     "objects": [
         {

@@ -68,7 +68,7 @@
             var count = 0;
 
             (function sendCreate(){
-                sendTo('deconz.' + instance, 'createAPIkey', $('#bridge.value').val(), function (result) {
+                sendTo('deconz.' + instance, 'createAPIkey', $('#bridge.value').val() + ':' + $('#port.value').val(), function (result) {
                     try {
                         result = JSON.parse(result);
                         if (result.error > 0) {
@@ -91,48 +91,18 @@
             })();
         });
 
-        $('#find').button().click(function () {
-            if (!active) {
-                showMessage(_('Enable adapter first'), 'Warning', 'info');
-                return;
-            }
-
-            $('#dialog-bridges').html(_('Please wait, searching for deConz.')).dialog('open');
-
-            sendTo('deconz.' + instance, 'browse', 5000, function (result) {
-                try{
-                    var arr = JSON.parse(result);
-                    var popup;
-                    if (!arr.length){
-                        popup = 'Cannot find deConz';
-                    }else{
-                        popup = 'Select deConz: <br />';
-                        arr.forEach(function(element, index, array) {
-                            popup = popup + '<a href="#" onclick="$(\'#bridge.value\').val(\'' + element.ipaddress + '\').trigger(\'change\');$(\'#dialog-bridges\').dialog(\'close\')">' + element.ipaddress + '</a><br />';
-                        });
-                    }
-                    $('#dialog-bridges').html(popup);
-                } catch (e) {
-                    alert ("error finding deConz");
-                }
-            });
+        $('#delete').button().click(function () {
+                sendTo('deconz.' + instance, 'deleteAPIkey')
         });
 
-        if (settings.bridge) {
-            $('#find').button('disable');
-        }
+        $('#opennetwork').button().click(function () {
+            sendTo('deconz.' + instance, 'openNetwork')
+            countdown();
+        });
+
         if (settings.user) {
             $('#create').button('disable');
         }
-        $('#bridge').change(function () {
-            if ($(this).val()) {
-                $('#find').button('disable');
-            } else {
-                $('#find').button('enable');
-            }
-        }).keyup(function () {
-            $(this).trigger('change');
-        });
         $('#user').change(function () {
             if ($(this).val()) {
                 $('#create').button('disable');
@@ -142,6 +112,21 @@
         }).keyup(function () {
             $(this).trigger('change');
         });
+    }
+
+    var counter = 60;
+
+    function countdown(){
+        if(counter >0){
+            setTimeout(function(){
+                counter = counter -1;
+                countdown();
+            }, 1000)
+            $('#countdown').html(_('Open for %s seconds', counter));
+        }else if(counter === 0){
+            $('#countdown').html('');
+            counter = 60;
+        }
     }
 
     function save(callback) {
@@ -159,10 +144,16 @@
 </script>
 <style>
     #settings tr {
-        line-height: 2.5em;
+        line-height: 1.5em;
     }
-    #find, #create {
+    #settings td {
+        padding-left: 10px;
+    }
+    #delete, #create, #opennetwork {
         font-size: 14px;
+    }
+    #manage_deconz {
+
     }
 </style>
 </head>
@@ -171,13 +162,11 @@
 <div id="adapter-container">
     <table><tr><td><img src="deconz.png" width="64" height="64"></td><td><h3 class="translate">deConz adapter settings</h3></td></tr></table>
         <div id="settings">
+            <h4 class="translate">Settings</h4>
             <table>
                 <tr>
                     <td><label  class="translate" for="bridge">deConz Address</label></td>
                     <td><input type="text" id="bridge" class="value" /></td>
-                    <td><button id="find"><span class="translate">Find deConz</span></button></td>
-                </tr>
-                <tr>
                     <td><label  class="translate" for="port">Bridge port</label></td>
                     <td><input type="text" id="port" class="value" /></td>
                     <td></td>
@@ -186,16 +175,15 @@
                     <td><label  class="translate" for="bridge">Create API key</label></td>
                     <td><input type="text" id="user" class="value" /></td>
                     <td><button id="create"><span class="translate">Create API key</label></span></button></td>
+                    <td><button id="delete"><span class="translate">Delete API key</label></span></button></td>
                 </tr>
+            </table>
+
+            <h4 class="translate">Manage deConz</h4>
+            <table id="manage_deconz">
                 <tr>
-                    <td><label  class="translate" for="bridge">Polling</label></td>
-                    <td><input type="checkbox" id="polling" class="value" /></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td><label  class="translate" for="bridge">Polling interval (sec)</label></td>
-                    <td><input type="text" id="pollingInterval" class="value" /></td>
-                    <td></td>
+                    <td><button id="opennetwork"><span class="translate">Open Network</label></span></button></td>
+                    <td><span class="translate" id="countdown"></span></td>
                 </tr>
             </table>
 
