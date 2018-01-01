@@ -26,10 +26,7 @@
             "ru": "Подключается к программному обеспечению deConz, которое является шлюзовым решением для ZigBee. deConz работает с ConBee и RaspBee, который также из Дрездена-Электроника."
         },
         "authors": [
-            "Jey Cee <jey-cee@live.com>",
-            "hobbyquaker <hq@ccu.io>",
-            "Pmant <patrickmo@gmx.de>",
-            "Bluefox <dogafox@gmail.com>"
+            "Jey Cee <jey-cee@live.com>"
         ],
         "license": "Apache 2.0",
         "platform": "Javascript/Node.js",
@@ -50,7 +47,7 @@
             "smartlink",
             "zigbee"
         ],
-        "icon": "deconz.jpeg",
+        "icon": "deconz.png",
         "extIcon": "https://raw.githubusercontent.com/jey-cee/ioBroker.deconz/master/admin/deconz.png",
         "type": "hardware"
     },
