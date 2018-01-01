@@ -1,4 +1,4 @@
-![Logo](admin/deconz.jpeg)
+![Logo](admin/deconz.png)
 # ioBroker deConz dresden-elektronik Adapter
 ==============
 
