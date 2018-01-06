@@ -14,11 +14,11 @@
                 "ru": "альфа-версия"
             }
         },
-        "title": "deConz Adapter",
+        "title": "deConz ZigBee",
         "titleLang": {
-            "en": "deConz Adapter",
-            "de": "deConz Adapter",
-            "ru": "Драйвер для deConz"
+            "en": "deConz ZigBee",
+            "de": "deConz ZigBee",
+            "ru": "deConz ZigBee"
         },
         "desc": {
             "en": "Connects to the deConz Software that is an gateway solution for ZigBee. deConz works with ConBee USB stick and RaspBee modul for Raspberry Pi which is also from Dresden-Elektronik.",
