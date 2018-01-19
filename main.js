@@ -498,7 +498,7 @@ function getGroupAttributes(gwName, groupId) {
                     switch (stateName) {
                         case 'on':
                             adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
-                                type: 'state',
+                                type: 'switch',
                                 common: {
                                     name: stateName,
                                     type: 'boolean',
@@ -706,7 +706,7 @@ function getAllSensors(gwName) {
                         switch (stateName) {
                             case 'on':
                                 adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
-                                    type: 'state',
+                                    type: 'switch',
                                     common: {
                                         name: stateName,
                                         type: 'boolean',
@@ -780,7 +780,7 @@ function getSensor(gwName, sensorId){
                     switch (stateName) {
                         case 'on':
                             adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
-                                type: 'state',
+                                type: 'switch',
                                 common: {
                                     name: stateName,
                                     type: 'boolean',
@@ -900,7 +900,7 @@ function getAllLights(gwName){
                             switch (stateName) {
                                 case 'on':
                                     adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
-                                        type: 'state',
+                                        type: 'switch',
                                         common: {
                                             name: stateName,
                                             type: 'boolean',
@@ -1096,7 +1096,7 @@ function getLightState(gwName, lightId){
                         switch (stateName) {
                             case 'on':
                                 adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
-                                    type: 'state',
+                                    type: 'switch',
                                     common: {
                                         name: stateName,
                                         type: 'boolean',
