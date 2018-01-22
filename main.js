@@ -518,7 +518,7 @@ function getGroupAttributes(gwName, groupId) {
                                     type: 'number',
                                     role: 'level.dimmer',
                                     min: 0,
-                                    max: 255,
+                                    max: 254,
                                     read: true,
                                     write: true
                                 },
@@ -532,7 +532,7 @@ function getGroupAttributes(gwName, groupId) {
                                 common: {
                                     name: stateName,
                                     type: 'number',
-                                    role: 'hue.color',
+                                    role: 'level.hue.color',
                                     min: 0,
                                     max: 65535,
                                     read: true,
@@ -548,9 +548,9 @@ function getGroupAttributes(gwName, groupId) {
                                 common: {
                                     name: stateName,
                                     type: 'number',
-                                    role: 'color.saturation',
+                                    role: 'level.color.saturation',
                                     min: 0,
-                                    max: 255,
+                                    max: 254,
                                     read: true,
                                     write: true
                                 },
@@ -675,7 +675,7 @@ function getAllSensors(gwName) {
         var count = Object.keys(list).length - 1;
 
         adapter.log.debug('getAllSensors: ' + body);
-        
+
         if (res.statusCode === 200) {
                 for (var i = 0; i <= count; i++) {
                     var keyName = Object.keys(list)[i];
@@ -888,7 +888,7 @@ function getSensor(gwName, sensorId){
                                 common: {
                                     name: stateName,
                                     type: 'boolean',
-                                    role: 'state',
+                                    role: 'switch',
                                     read: true,
                                     write: true
                                 },
@@ -1093,7 +1093,7 @@ function getAllLights(gwName){
                                             type: 'number',
                                             role: 'level.dimmer',
                                             min: 0,
-                                            max: 255,
+                                            max: 254,
                                             read: true,
                                             write: true
                                         },
@@ -1106,7 +1106,7 @@ function getAllLights(gwName){
                                         common: {
                                             name: stateName,
                                             type: 'number',
-                                            role: 'hue.color',
+                                            role: 'level.hue.color',
                                             min: 0,
                                             max: 65535,
                                             read: true,
@@ -1121,9 +1121,9 @@ function getAllLights(gwName){
                                         common: {
                                             name: stateName,
                                             type: 'number',
-                                            role: 'color.saturation',
+                                            role: 'level.color.saturation',
                                             min: 0,
-                                            max: 255,
+                                            max: 254,
                                             read: true,
                                             write: true
                                         },
@@ -1290,7 +1290,7 @@ function getLightState(gwName, lightId){
                                         type: 'number',
                                         role: 'level.dimmer',
                                         min: 0,
-                                        max: 255,
+                                        max: 254,
                                         read: true,
                                         write: true
                                     },
@@ -1304,7 +1304,7 @@ function getLightState(gwName, lightId){
                                     common: {
                                         name: stateName,
                                         type: 'number',
-                                        role: 'hue.color',
+                                        role: 'level.hue.color',
                                         min: 0,
                                         max: 65535,
                                         read: true,
@@ -1320,9 +1320,9 @@ function getLightState(gwName, lightId){
                                     common: {
                                         name: stateName,
                                         type: 'number',
-                                        role: 'color.saturation',
+                                        role: 'level.color.saturation',
                                         min: 0,
-                                        max: 255,
+                                        max: 254,
                                         read: true,
                                         write: true
                                     },
