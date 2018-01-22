@@ -1,8 +1,13 @@
 {
     "common": {
         "name": "deconz",
-        "version": "0.1.1",
+        "version": "0.1.2",
         "news": {
+            "0.1.2": {
+                "en": "Added new datapoints for sensors (experimental)",
+                "de": "Neue Datenpunkte für Sensoren hinzugefügt (Experimentell)",
+                "ru": "Добавлены новые точки данных для датчиков (Experimental)"
+        },
             "0.1.1": {
                 "en": "Complete adapter rewritten",
                 "de": "Adapter Vollständig neu geschrieben",
