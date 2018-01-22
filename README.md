@@ -22,6 +22,10 @@ Required node.js >= 0.12.
 
 ## Changelog
 
+### 0.1.2
+
+* (Jey-Cee) Added new datapoints for sensors (experimental)
+
 ### 0.1.1
 
 * (Jey-Cee) Adapter complete rewritten
