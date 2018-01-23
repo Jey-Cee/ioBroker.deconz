@@ -718,7 +718,7 @@ function getAllSensors(gwName) {
                                 });
                                 break;
                             case 'battery':
-                                adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
                                     type: 'state',
                                     common: {
                                         name: stateName,
@@ -744,7 +744,7 @@ function getAllSensors(gwName) {
                                 });
                                 break;
                          case 'buttonevent':
-                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                            adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
                                 type: 'state',
                                 common: {
                                     name: stateName,
@@ -757,7 +757,7 @@ function getAllSensors(gwName) {
                             });
                             break;
                         case 'presence':
-                                adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
                                     type: 'state',
                                     common: {
                                         name: stateName,
@@ -770,7 +770,7 @@ function getAllSensors(gwName) {
                                 });
                             break;
                         case 'open':
-                                adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
                                     type: 'state',
                                     common: {
                                         name: stateName,
@@ -783,7 +783,7 @@ function getAllSensors(gwName) {
                                 });
                             break;
                          case 'flag':
-                                adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
                                     type: 'state',
                                     common: {
                                         name: stateName,
@@ -796,7 +796,7 @@ function getAllSensors(gwName) {
                                 });
                             break;
                           case 'temperature':
-                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                            adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
                                 type: 'state',
                                 common: {
                                     name: stateName,
@@ -809,7 +809,7 @@ function getAllSensors(gwName) {
                             });
                             break;
                           case 'status':
-                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                            adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
                                 type: 'state',
                                 common: {
                                     name: stateName,
@@ -822,7 +822,7 @@ function getAllSensors(gwName) {
                             });
                             break;
                          case 'humidity':
-                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                            adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
                                 type: 'state',
                                 common: {
                                     name: stateName,
