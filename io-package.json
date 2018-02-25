@@ -1,8 +1,19 @@
 {
     "common": {
         "name": "deconz",
-        "version": "0.1.2",
+        "version": "0.1.3",
         "news": {
+            "0.1.3":{
+                "en": "Stop Spam in log; Added filter for name to id conversation",
+                "de": "Stoppen Sie Spam im Protokoll; Filter für Name zu ID-Konversation hinzugefügt",
+                "ru": "Остановить спам в журнале; Добавлен фильтр для диалога id в id",
+                "pt": "Pare Spam no log; Filtro adicionado para o nome para id conversação",
+                "nl": "Stop Spam in het logboek; Filter toegevoegd voor naam- en id-conversatie",
+                "fr": "Arrêter le spam dans le journal; Filtre ajouté pour le nom à la conversation d'identification",
+                "it": "Interrompi spam nel registro; Aggiunto filtro per il nome alla conversazione id",
+                "es": "Detener el spam en el registro; Filtro agregado para el nombre de la conversación de id.",
+                "pl": "Zatrzymaj spam w dzienniku; Dodano filtr do konwersacji nazw do ID"
+            },
             "0.1.2": {
                 "en": "Added new datapoints for sensors (experimental)",
                 "de": "Neue Datenpunkte für Sensoren hinzugefügt (Experimentell)",

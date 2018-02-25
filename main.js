@@ -48,7 +48,7 @@ adapter.on('stateChange', function (id, state) {
                 }else{
                     var parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "on": ' + JSON.stringify(state.val) + '}';
                 }
-                adapter.log.info('type: ' + obj.type);
+                //adapter.log.info('type: ' + obj.type);
                 if(obj.type === 'device') {
                     setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on')
                 }else if(obj.type === 'group'){
@@ -125,7 +125,7 @@ adapter.on('stateChange', function (id, state) {
         }else if(dp === 'effect'){
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
                 if(state.val === 'colorloop'){
-                    adapter.log.info(id + ' Effect: colorloop');
+                    //adapter.log.info(id + ' Effect: colorloop');
                     adapter.getState(adapter.name + '.' + adapter.instance + '.' + id + '.colorloopspeed', function(error, colorloopspeed){
                             var controlId = obj.native.id;
                             var speed;
@@ -134,7 +134,7 @@ adapter.on('stateChange', function (id, state) {
                                 speed = 1;
                             }
                             var parameters = '{"colorloopspeed": ' + JSON.stringify(speed) + ', "effect": ' + JSON.stringify(state.val) + '}';
-                            adapter.log.info('parameters: ' + parameters);
+                            //adapter.log.info('parameters: ' + parameters);
                             if (obj.type === 'device') {
                                 setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.effect')
                             } else if (obj.type === 'group') {
@@ -142,7 +142,7 @@ adapter.on('stateChange', function (id, state) {
                             }
                         })
                 }else {
-                    adapter.log.info(id+ 'Effect: none');
+                    //adapter.log.info('ID: ' + id + 'Effect: none');
                     var controlId = obj.native.id;
                     var parameters = '{"effect": ' + JSON.stringify(state.val) + '}';
                     if(obj.type === 'device') {
@@ -284,7 +284,8 @@ function getAutoUpdates(){
         var id = data['id'];
         var type = data['r'];
         var state = data['state'];
-        adapter.log.info(id + ' ' + type);
+        adapter.log.debug('Websocket message: ' + JSON.stringify(data));
+        adapter.log.debug('Id: ' + id + ' Type: ' + type);
 
         switch(type){
             case 'lights':
@@ -292,7 +293,7 @@ function getAutoUpdates(){
                     var count = Object.keys(enums).length - 1;
                     for (var i = 0; i <= count; i++) {
                         var keyName = Object.keys(enums)[i];
-                        if(enums[keyName].common.role === 'light'){
+                        if(enums[keyName].common.role === 'light' && enums[keyName].native.id === id){
                             var gwName = keyName.replace(/\.(\w|\w|\s|\(|\)|\[|\]|\-|\+)*$/, '');
                             getLightState(gwName, id);
                         }
@@ -305,7 +306,7 @@ function getAutoUpdates(){
                     var count = Object.keys(enums).length - 1;
                     for (var i = 0; i <= count; i++) {
                         var keyName = Object.keys(enums)[i];
-                        if(enums[keyName].common.role === 'group') {
+                        if(enums[keyName].common.role === 'group' && enums[keyName].native.id === id) {
                             var gwName = keyName.replace(/\.(\w|\w|\s|\(|\)|\[|\]|\-|\+)*$/, '');
                             getGroupAttributes(gwName, id);
                         }
@@ -317,9 +318,9 @@ function getAutoUpdates(){
                     var count = Object.keys(enums).length - 1;
                     for (var i = 0; i <= count; i++) {
                         var keyName = Object.keys(enums)[i];
-                        if(enums[keyName].common.role === 'sensor') {
+                        if(enums[keyName].common.role === 'sensor' && enums[keyName].native.id === id) {
                             var gwName = keyName.replace(/\.(\w|\w|\s|\(|\)|\[|\]|\-|\+)*$/, '');
-                            getGroupAttributes(gwName, id);
+                            getSensor(gwName, id);
                         }
                     }
                 });
@@ -372,7 +373,9 @@ function getConfig(){
         adapter.log.debug('API version: ' + gateway['apiversion']);
 
         if(res.statusCode === 200) {
-                adapter.setObject(gateway['name'], {
+            var gwName =nameFilter(gateway['name']);
+
+                adapter.setObject(gwName, {
                     type: 'device',
                     common: {
                         name: gateway['name'],
@@ -409,9 +412,9 @@ function getConfig(){
                     }
                 });
                 adapter.config.websocketport = gateway['websocketport'];
-                getAllLights(gateway['name']);
-                getAllSensors(gateway['name']);
-                getAllGroups(gateway['name']);
+                getAllLights(gwName);
+                getAllSensors(gwName);
+                getAllGroups(gwName);
 
         }else{
             logging(res.statusCode, 'Get Config:');
@@ -431,16 +434,19 @@ function getAllGroups(gwName) {
         var list = JSON.parse(body);
         try{var response = JSON.parse(body);} catch(err){}
         var count = Object.keys(list).length - 1;
-        //adapter.log.debug('getAllGroups: ' + JSON.stringify(response));
+        adapter.log.debug('getAllGroups: ' + JSON.stringify(response));
 
         if(res.statusCode === 200){
                 for (var i = 0; i <= count; i++) {
                     var keyName = Object.keys(list)[i];
                     //create object for group
-                    adapter.setObject(gwName + '.' + list[keyName]['name'], {
+                    var objectName = list[keyName]['name'];
+                    var groupName = nameFilter(list[keyName]['name']);
+
+                    adapter.setObject(gwName + '.' + groupName, {
                         type: 'device',
                         common: {
-                            name: list[keyName]['name'],
+                            name: groupName,
                             role: 'group'
                         },
                         native: {
@@ -469,16 +475,17 @@ function getGroupAttributes(gwName, groupId) {
         try{var response = JSON.parse(body);} catch(err){}
         var count = Object.keys(list).length - 1;
 
-        //adapter.log.info('Response: ' + JSON.stringify(response));
+        adapter.log.debug('getGroupAttributes: ' + JSON.stringify(response));
 
         if(res.statusCode === 200){
             for (var i = 0; i <= count; i++) {
                 var keyName = Object.keys(list)[i];
                 //create object for group with attributes
-                adapter.setObject(gwName + '.' + list['name'], {
+                var groupName = nameFilter(list['name']);
+                adapter.setObject(gwName + '.' + groupName, {
                     type: 'device',
                     common: {
-                        name: list['name'],
+                        name: groupName,
                         role: 'group'
                     },
                     native: {
@@ -497,7 +504,7 @@ function getGroupAttributes(gwName, groupId) {
                     var stateName = Object.keys(list['action'])[z];
                     switch (stateName) {
                         case 'on':
-                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                            adapter.setObjectNotExists(gwName + '.' + groupName + '.' + stateName, {
                                 type: 'state',
                                 common: {
                                     name: stateName,
@@ -508,10 +515,10 @@ function getGroupAttributes(gwName, groupId) {
                                 },
                                 native: {}
                             });
-                            adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['action'][stateName], ack: true});
+                            adapter.setState(gwName + '.' + groupName + '.' + stateName, {val: list['action'][stateName], ack: true});
                             break;
                         case 'bri':
-                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                            adapter.setObjectNotExists(gwName + '.' + groupName + '.' + stateName, {
                                 type: 'state',
                                 common: {
                                     name: stateName,
@@ -524,10 +531,10 @@ function getGroupAttributes(gwName, groupId) {
                                 },
                                 native: {}
                             });
-                            adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['action'][stateName], ack: true});
+                            adapter.setState(gwName + '.' + groupName + '.' + stateName, {val: list['action'][stateName], ack: true});
                             break;
                         case 'hue':
-                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                            adapter.setObjectNotExists(gwName + '.' + groupName + '.' + stateName, {
                                 type: 'state',
                                 common: {
                                     name: stateName,
@@ -540,10 +547,10 @@ function getGroupAttributes(gwName, groupId) {
                                 },
                                 native: {}
                             });
-                            adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['action'][stateName], ack: true});
+                            adapter.setState(gwName + '.' + groupName + '.' + stateName, {val: list['action'][stateName], ack: true});
                             break;
                         case 'sat':
-                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                            adapter.setObjectNotExists(gwName + '.' + groupName + '.' + stateName, {
                                 type: 'state',
                                 common: {
                                     name: stateName,
@@ -556,10 +563,10 @@ function getGroupAttributes(gwName, groupId) {
                                 },
                                 native: {}
                             });
-                            adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['action'][stateName], ack: true});
+                            adapter.setState(gwName + '.' + groupName + '.' + stateName, {val: list['action'][stateName], ack: true});
                             break;
                         case 'ct':
-                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                            adapter.setObjectNotExists(gwName + '.' + groupName + '.' + stateName, {
                                 type: 'state',
                                 common: {
                                     name: stateName,
@@ -572,10 +579,10 @@ function getGroupAttributes(gwName, groupId) {
                                 },
                                 native: {}
                             });
-                            adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['action'][stateName], ack: true});
+                            adapter.setState(gwName + '.' + groupName + '.' + stateName, {val: list['action'][stateName], ack: true});
                             break;
                         case 'xy':
-                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                            adapter.setObjectNotExists(gwName + '.' + groupName + '.' + stateName, {
                                 type: 'state',
                                 common: {
                                     name: stateName,
@@ -586,10 +593,10 @@ function getGroupAttributes(gwName, groupId) {
                                 },
                                 native: {}
                             });
-                            adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['action'][stateName], ack: true});
+                            adapter.setState(gwName + '.' + groupName + '.' + stateName, {val: list['action'][stateName], ack: true});
                             break;
                         case 'effect':
-                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                            adapter.setObjectNotExists(gwName + '.' + groupName + '.' + stateName, {
                                 type: 'state',
                                 common: {
                                     name: stateName,
@@ -600,7 +607,7 @@ function getGroupAttributes(gwName, groupId) {
                                 },
                                 native: {}
                             });
-                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.colorloopspeed', {
+                            adapter.setObjectNotExists(gwName + '.' + groupName + '.colorloopspeed', {
                                 type: 'state',
                                 common: {
                                     name: 'colorloopspeed',
@@ -613,11 +620,11 @@ function getGroupAttributes(gwName, groupId) {
                                 },
                                 native: {}
                             });
-                            adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['action'][stateName], ack: true});
+                            adapter.setState(gwName + '.' + groupName + '.' + stateName, {val: list['action'][stateName], ack: true});
                             break;
                     }
                 }
-                adapter.setObjectNotExists(gwName + '.' + list['name'] + '.transitiontime', {
+                adapter.setObjectNotExists(gwName + '.' + groupName + '.transitiontime', {
                     type: 'state',
                     common: {
                         name: 'transitiontime',
@@ -644,9 +651,9 @@ function setGroupState(parameters, groupId, stateId){
     };
 
     request(options, function(error, res, body) {
-        adapter.log.debug('STATUS: ' + res.statusCode);
+        adapter.log.debug('setGroupState STATUS: ' + res.statusCode);
         try{var response = JSON.parse(body);} catch(err){}
-        adapter.log.debug('BODY: ' + JSON.stringify(response));
+        adapter.log.debug('setGroupState BODY: ' + JSON.stringify(response));
 
         if(res.statusCode === 200){
             if(response[0]['success']){
@@ -679,9 +686,9 @@ function getAllSensors(gwName) {
         if (res.statusCode === 200) {
                 for (var i = 0; i <= count; i++) {
                     var keyName = Object.keys(list)[i];
-
+                    var sensorName = nameFilter(list[keyName]['name']);
                     //create object for sensor device
-                    adapter.setObject(gwName + '.' + list[keyName]['name'], {
+                    adapter.setObject(gwName + '.' + sensorName, {
                         type: 'device',
                         common: {
                             name: list[keyName]['name'],
@@ -705,7 +712,7 @@ function getAllSensors(gwName) {
                         var stateName = Object.keys(list[keyName]['state'])[z];
                         switch (stateName) {
                             case 'on':
-                                adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
+                                adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                     type: 'state',
                                     common: {
                                         name: stateName,
@@ -718,7 +725,7 @@ function getAllSensors(gwName) {
                                 });
                                 break;
                             case 'battery':
-                                adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
+                                adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                     type: 'state',
                                     common: {
                                         name: stateName,
@@ -731,7 +738,7 @@ function getAllSensors(gwName) {
                                 });
                             break;
                             case 'reachable':
-                                adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
+                                adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                     type: 'state',
                                     common: {
                                         name: stateName,
@@ -744,7 +751,7 @@ function getAllSensors(gwName) {
                                 });
                                 break;
                          case 'buttonevent':
-                            adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
+                            adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                 type: 'state',
                                 common: {
                                     name: stateName,
@@ -757,7 +764,7 @@ function getAllSensors(gwName) {
                             });
                             break;
                         case 'presence':
-                                adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
+                                adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                     type: 'state',
                                     common: {
                                         name: stateName,
@@ -770,7 +777,7 @@ function getAllSensors(gwName) {
                                 });
                             break;
                         case 'open':
-                                adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
+                                adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                     type: 'state',
                                     common: {
                                         name: stateName,
@@ -783,7 +790,7 @@ function getAllSensors(gwName) {
                                 });
                             break;
                          case 'flag':
-                                adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
+                                adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                     type: 'state',
                                     common: {
                                         name: stateName,
@@ -796,7 +803,7 @@ function getAllSensors(gwName) {
                                 });
                             break;
                           case 'temperature':
-                            adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
+                            adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                 type: 'state',
                                 common: {
                                     name: stateName,
@@ -809,7 +816,7 @@ function getAllSensors(gwName) {
                             });
                             break;
                           case 'status':
-                            adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
+                            adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                 type: 'state',
                                 common: {
                                     name: stateName,
@@ -822,7 +829,7 @@ function getAllSensors(gwName) {
                             });
                             break;
                          case 'humidity':
-                            adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
+                            adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                 type: 'state',
                                 common: {
                                     name: stateName,
@@ -854,12 +861,15 @@ function getSensor(gwName, sensorId){
         } catch (err) {
         }
 
+        adapter.log.debug('getSensor: ' + body);
+
         if (res.statusCode === 200) {
             if (response[0]['success']) {
                 var list = JSON.parse(body);
                 var keyName = Object.keys(list)[0];
+                var sensorName = nameFilter(list['name']);
                 //create object for sensor
-                adapter.setObject(gwName + '.' + list['name'], {
+                adapter.setObject(gwName + '.' + sensorName, {
                     type: 'device',
                     common: {
                         name: list['name'],
@@ -883,7 +893,7 @@ function getSensor(gwName, sensorId){
                     var stateName = Object.keys(list['config'])[z];
                     switch (stateName) {
                         case 'on':
-                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                            adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                 type: 'state',
                                 common: {
                                     name: stateName,
@@ -894,10 +904,10 @@ function getSensor(gwName, sensorId){
                                 },
                                 native: {}
                             });
-                            adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['config'][stateName], ack: true});
+                            adapter.setState(gwName + '.' + sensorName + '.' + stateName, {val: list['config'][stateName], ack: true});
                             break;
                         case 'battery':
-                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                            adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                 type: 'state',
                                 common: {
                                     name: stateName,
@@ -908,10 +918,10 @@ function getSensor(gwName, sensorId){
                                 },
                                 native: {}
                             });
-                            adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['config'][stateName], ack: true});
+                            adapter.setState(gwName + '.' + sensorName + '.' + stateName, {val: list['config'][stateName], ack: true});
                             break;
                         case 'reachable':
-                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                            adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                 type: 'state',
                                 common: {
                                     name: stateName,
@@ -922,10 +932,10 @@ function getSensor(gwName, sensorId){
                                 },
                                 native: {}
                             });
-                            adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['config'][stateName], ack: true});
+                            adapter.setState(gwName + '.' + sensorName + '.' + stateName, {val: list['config'][stateName], ack: true});
                             break;
                         case 'buttonevent':
-                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                            adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                 type: 'state',
                                 common: {
                                     name: stateName,
@@ -936,10 +946,10 @@ function getSensor(gwName, sensorId){
                                 },
                                 native: {}
                             });
-                            adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['state'][stateName], ack: true});
+                            adapter.setState(gwName + '.' + sensorName + '.' + stateName, {val: list['state'][stateName], ack: true});
                             break;
                         case 'presence':
-                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                            adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                 type: 'state',
                                 common: {
                                     name: stateName,
@@ -950,10 +960,10 @@ function getSensor(gwName, sensorId){
                                 },
                                 native: {}
                             });
-                            adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['state'][stateName], ack: true});
+                            adapter.setState(gwName + '.' + sensorName + '.' + stateName, {val: list['state'][stateName], ack: true});
                             break;
                         case 'open':
-                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                            adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                 type: 'state',
                                 common: {
                                     name: stateName,
@@ -964,10 +974,10 @@ function getSensor(gwName, sensorId){
                                 },
                                 native: {}
                             });
-                            adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['state'][stateName], ack: true});
+                            adapter.setState(gwName + '.' + sensorName + '.' + stateName, {val: list['state'][stateName], ack: true});
                             break;
                      case 'flag':
-                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                            adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                 type: 'state',
                                 common: {
                                     name: stateName,
@@ -978,10 +988,10 @@ function getSensor(gwName, sensorId){
                                 },
                                 native: {}
                             });
-                            adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['state'][stateName], ack: true});
+                            adapter.setState(gwName + '.' + sensorName + '.' + stateName, {val: list['state'][stateName], ack: true});
                             break;
                      case 'temperature':
-                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                            adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                 type: 'state',
                                 common: {
                                     name: stateName,
@@ -992,10 +1002,10 @@ function getSensor(gwName, sensorId){
                                 },
                                 native: {}
                             });
-                            adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['state'][stateName], ack: true});
+                            adapter.setState(gwName + '.' + sensorName + '.' + stateName, {val: list['state'][stateName], ack: true});
                             break;
                     case 'humidity':
-                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                            adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                 type: 'state',
                                 common: {
                                     name: stateName,
@@ -1006,10 +1016,10 @@ function getSensor(gwName, sensorId){
                                 },
                                 native: {}
                             });
-                            adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['state'][stateName], ack: true});
+                            adapter.setState(gwName + '.' + sensorName + '.' + stateName, {val: list['state'][stateName], ack: true});
                             break;
                     case 'status':
-                            adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                            adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                 type: 'state',
                                 common: {
                                     name: stateName,
@@ -1020,7 +1030,7 @@ function getSensor(gwName, sensorId){
                                 },
                                 native: {}
                             });
-                            adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['state'][stateName], ack: true});
+                            adapter.setState(gwName + '.' + sensorName + '.' + stateName, {val: list['state'][stateName], ack: true});
                             break;
                     }
 
@@ -1044,13 +1054,16 @@ function getAllLights(gwName){
             var list = JSON.parse(body);
             try{var response = JSON.parse(body);} catch(err){}
             var count = Object.keys(list).length - 1;
-            //adapter.log.info('Light: ' + JSON.stringify(response));
+
+            adapter.log.debug('getAllLights: ' + body);
+
             if (res.statusCode === 200) {
                     for (var i = 0; i <= count; i++) {
                         var keyName = Object.keys(list)[i];
-                        //adapter.log.info('Light: ' + Object.keys(list)[i]);
+                        var lightName = nameFilter(list[keyName]['name']);
+
                         //create object for light device
-                        adapter.setObject(gwName + '.' + list[keyName]['name'], {
+                        adapter.setObjectNotExists(gwName + '.' + lightName, {
                             type: 'device',
                             common: {
                                 name: list[keyName]['name'],
@@ -1073,7 +1086,7 @@ function getAllLights(gwName){
                             var stateName = Object.keys(list[keyName]['state'])[z];
                             switch (stateName) {
                                 case 'on':
-                                    adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
+                                    adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                         type: 'state',
                                         common: {
                                             name: stateName,
@@ -1086,7 +1099,7 @@ function getAllLights(gwName){
                                     });
                                     break;
                                 case 'bri':
-                                    adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
+                                    adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                         type: 'state',
                                         common: {
                                             name: stateName,
@@ -1101,7 +1114,7 @@ function getAllLights(gwName){
                                     });
                                     break;
                                 case 'hue':
-                                    adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
+                                    adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                         type: 'state',
                                         common: {
                                             name: stateName,
@@ -1116,7 +1129,7 @@ function getAllLights(gwName){
                                     });
                                     break;
                                 case 'sat':
-                                    adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
+                                    adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                         type: 'state',
                                         common: {
                                             name: stateName,
@@ -1131,7 +1144,7 @@ function getAllLights(gwName){
                                     });
                                     break;
                                 case 'ct':
-                                    adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
+                                    adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                         type: 'state',
                                         common: {
                                             name: stateName,
@@ -1146,7 +1159,7 @@ function getAllLights(gwName){
                                     });
                                     break;
                                 case 'xy':
-                                    adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
+                                    adapter.setObjectNotExists(gwName + '.' + lightName+ '.' + stateName, {
                                         type: 'state',
                                         common: {
                                             name: stateName,
@@ -1159,7 +1172,7 @@ function getAllLights(gwName){
                                     });
                                     break;
                                 case 'alert':
-                                    adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
+                                    adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                         type: 'state',
                                         common: {
                                             name: stateName,
@@ -1172,7 +1185,7 @@ function getAllLights(gwName){
                                     });
                                     break;
                                 case 'effect':
-                                    adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
+                                    adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                         type: 'state',
                                         common: {
                                             name: stateName,
@@ -1183,7 +1196,7 @@ function getAllLights(gwName){
                                         },
                                         native: {}
                                     });
-                                    adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.colorloopspeed', {
+                                    adapter.setObjectNotExists(gwName + '.' + lightName + '.colorloopspeed', {
                                         type: 'state',
                                         common: {
                                             name: 'colorloopspeed',
@@ -1198,7 +1211,7 @@ function getAllLights(gwName){
                                     });
                                     break;
                                 case 'reachable':
-                                    adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.' + stateName, {
+                                    adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                         type: 'state',
                                         common: {
                                             name: stateName,
@@ -1211,7 +1224,7 @@ function getAllLights(gwName){
                                     });
                                     break;
                             }
-                            adapter.setObjectNotExists(gwName + '.' + list[keyName]['name'] + '.transitiontime', {
+                            adapter.setObjectNotExists(gwName + '.' + lightName + '.transitiontime', {
                                 type: 'state',
                                 common: {
                                     name: 'transitiontime',
@@ -1241,12 +1254,14 @@ function getLightState(gwName, lightId){
             var response = JSON.parse(body);
         } catch (err) {
         }
-        adapter.log.info('getLightState: ' + body);
+        adapter.log.debug('getLightState: ' + body);
+
             if (res.statusCode === 200) {
                 var list = JSON.parse(body);
                 var keyName = Object.keys(list)[0];
+                var lightName = nameFilter(list['name']);
                 //create object for light device
-                    adapter.setObject(gwName + '.' + list['name'], {
+                    adapter.setObject(gwName + '.' + lightName, {
                         type: 'device',
                         common: {
                             name: list['name'],
@@ -1269,7 +1284,7 @@ function getLightState(gwName, lightId){
                         var stateName = Object.keys(list['state'])[z];
                         switch (stateName) {
                             case 'on':
-                                adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                     type: 'state',
                                     common: {
                                         name: stateName,
@@ -1280,10 +1295,10 @@ function getLightState(gwName, lightId){
                                     },
                                     native: {}
                                 });
-                                adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['state'][stateName], ack: true});
+                                adapter.setState(gwName + '.' + lightName + '.' + stateName, {val: list['state'][stateName], ack: true});
                                 break;
                             case 'bri':
-                                adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                     type: 'state',
                                     common: {
                                         name: stateName,
@@ -1296,10 +1311,10 @@ function getLightState(gwName, lightId){
                                     },
                                     native: {}
                                 });
-                                adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['state'][stateName], ack: true});
+                                adapter.setState(gwName + '.' + lightName + '.' + stateName, {val: list['state'][stateName], ack: true});
                                 break;
                             case 'hue':
-                                adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                     type: 'state',
                                     common: {
                                         name: stateName,
@@ -1312,10 +1327,10 @@ function getLightState(gwName, lightId){
                                     },
                                     native: {}
                                 });
-                                adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['state'][stateName], ack: true});
+                                adapter.setState(gwName + '.' + lightName + '.' + stateName, {val: list['state'][stateName], ack: true});
                                 break;
                             case 'sat':
-                                adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                     type: 'state',
                                     common: {
                                         name: stateName,
@@ -1328,10 +1343,10 @@ function getLightState(gwName, lightId){
                                     },
                                     native: {}
                                 });
-                                adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['state'][stateName], ack: true});
+                                adapter.setState(gwName + '.' + lightName + '.' + stateName, {val: list['state'][stateName], ack: true});
                                 break;
                             case 'ct':
-                                adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                     type: 'state',
                                     common: {
                                         name: stateName,
@@ -1344,10 +1359,10 @@ function getLightState(gwName, lightId){
                                     },
                                     native: {}
                                 });
-                                adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['state'][stateName], ack: true});
+                                adapter.setState(gwName + '.' + lightName + '.' + stateName, {val: list['state'][stateName], ack: true});
                                 break;
                             case 'xy':
-                                adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                     type: 'state',
                                     common: {
                                         name: stateName,
@@ -1358,10 +1373,10 @@ function getLightState(gwName, lightId){
                                     },
                                     native: {}
                                 });
-                                adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['state'][stateName], ack: true});
+                                adapter.setState(gwName + '.' + lightName + '.' + stateName, {val: list['state'][stateName], ack: true});
                                 break;
                             case 'alert':
-                                adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                     type: 'state',
                                     common: {
                                         name: stateName,
@@ -1372,10 +1387,10 @@ function getLightState(gwName, lightId){
                                     },
                                     native: {}
                                 });
-                                adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['state'][stateName], ack: true});
+                                adapter.setState(gwName + '.' + lightName + '.' + stateName, {val: list['state'][stateName], ack: true});
                                 break;
                             case 'effect':
-                                adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                     type: 'state',
                                     common: {
                                         name: stateName,
@@ -1386,7 +1401,7 @@ function getLightState(gwName, lightId){
                                     },
                                     native: {}
                                 });
-                                adapter.setObjectNotExists(gwName + '.' + list['name'] + '.colorloopspeed', {
+                                adapter.setObjectNotExists(gwName + '.' + lightName + '.colorloopspeed', {
                                     type: 'state',
                                     common: {
                                         name: 'colorloopspeed',
@@ -1399,10 +1414,10 @@ function getLightState(gwName, lightId){
                                     },
                                     native: {}
                                 });
-                                adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['state'][stateName], ack: true});
+                                adapter.setState(gwName + '.' + lightName + '.' + stateName, {val: list['state'][stateName], ack: true});
                                 break;
                             case 'transitiontime':
-                                adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                     type: 'state',
                                     common: {
                                         name: stateName,
@@ -1415,7 +1430,7 @@ function getLightState(gwName, lightId){
                                 });
                                 break;
                             case 'reachable':
-                                adapter.setObjectNotExists(gwName + '.' + list['name'] + '.' + stateName, {
+                                adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                     type: 'state',
                                     common: {
                                         name: stateName,
@@ -1426,7 +1441,7 @@ function getLightState(gwName, lightId){
                                     },
                                     native: {}
                                 });
-                                adapter.setState(gwName + '.' + list['name'] + '.' + stateName, {val: list['state'][stateName], ack: true});
+                                adapter.setState(gwName + '.' + lightName + '.' + stateName, {val: list['state'][stateName], ack: true});
                                 break;
                         }
 
@@ -1449,7 +1464,8 @@ function setLightState(parameters, lightId, stateId){
         request(options, function(error, res, body) {
             adapter.log.debug('STATUS: ' + res.statusCode);
             try{var response = JSON.parse(body);} catch(err){}
-            adapter.log.debug('BODY: ' + JSON.stringify(response));
+
+            adapter.log.debug('setLightState BODY: ' + JSON.stringify(response));
 
             if(res.statusCode === 200){
                 if(response[0]['success']){
@@ -1473,9 +1489,9 @@ function deleteLight(parameters, lightId){
     };
 
     request(options, function(error, res, body) {
-        adapter.log.debug('STATUS: ' + res.statusCode);
+        adapter.log.debug('deleteLight STATUS: ' + res.statusCode);
         try{var response = JSON.parse(body);} catch(err){}
-        adapter.log.debug('BODY: ' + JSON.stringify(response));
+        adapter.log.debug('deleteLight BODY: ' + JSON.stringify(response));
 
         if(res.statusCode === 200){
             if(response[0]['success']){
@@ -1498,9 +1514,9 @@ function removeFromGroups(lightId){
     };
 
     request(options, function(error, res, body) {
-        adapter.log.debug('STATUS: ' + res.statusCode);
+        adapter.log.debug('removeFromGroups STATUS: ' + res.statusCode);
         try{var response = JSON.parse(body);} catch(err){}
-        adapter.log.debug('BODY: ' + JSON.stringify(response));
+        adapter.log.debug('removeFromGroups BODY: ' + JSON.stringify(response));
 
         if(res.statusCode === 200){
             if(response[0]['success']){
@@ -1538,4 +1554,13 @@ function logging(statusCode, message){
             adapter.log.info(message + ' Code 503: Service unavailable');
             break;
     }
+}
+
+function nameFilter(name){
+    var signs = [String.fromCharCode(46), String.fromCharCode(44), String.fromCharCode(92), String.fromCharCode(47), String.fromCharCode(91), String.fromCharCode(93), String.fromCharCode(123), String.fromCharCode(125)]; //46=. 44=, 92=\ 47=/ 91=[ 93=] 123={ 125=}
+
+    signs.forEach(function(item, index){
+        name = name.replace(item, '_');
+    });
+    return name;
 }

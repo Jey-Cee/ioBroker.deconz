@@ -22,6 +22,11 @@ Required node.js >= 0.12.
 
 ## Changelog
 
+### 0.1.3
+
+* (Jey-Cee) Stop Spam in log
+* (Jey-Cee) Added filter for name to id conversation
+
 ### 0.1.2
 
 * (Jey-Cee) Added new datapoints for sensors (experimental)
