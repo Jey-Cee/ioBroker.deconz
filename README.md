@@ -22,6 +22,11 @@ Required node.js >= 0.12.
 
 ## Changelog
 
+### 0.1.4
+
+* (Jey-Cee) Added support for Admin v3
+* (Jey-Cee) Create API Key without use of WebApp/Phoscon (only with deConz standard password)
+
 ### 0.1.3
 
 * (Jey-Cee) Stop Spam in log

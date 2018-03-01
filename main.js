@@ -221,6 +221,7 @@ function createAPIkey(host, callback){
         method: 'POST',
         headers: {
             'Content-Type': 'text/plain;charset=UTF-8',
+            'Authorization': 'Basic ZGVsaWdodDpkZWxpZ2h0',
             'Content-Length': Buffer.byteLength('{"devicetype": "ioBroker"}')
         }
     };
@@ -238,7 +239,7 @@ function createAPIkey(host, callback){
             }
         });
         req.write('{"devicetype": "ioBroker"}');
-    }catch(err){}
+    }catch(err){adapter.log.error(err)}
 
 }
 
@@ -257,13 +258,12 @@ function deleteAPIkey(){
         if(res.statusCode === 200){
             if(response[0]['success']){
                 adapter.log.info('API key deleted');
-                adapter.config.user = '';
             }else if(response[0]['error']){
                 adapter.log.warn(JSON.stringify(response[0]['error']));
             }
         }else if(res.statusCode === 403){
             adapter.log.warn('You do not have the permission to do this! ');
-        }else if(res.statusCode === 400){
+        }else if(res.statusCode === 404){
             adapter.log.warn('Error 404 Not Found ')
         }
     });
@@ -277,54 +277,57 @@ function getAutoUpdates(){
     var host = adapter.config.bridge;
     var port = adapter.config.websocketport;
 
-    var ws = new WebSocket('ws://' + host + ':' + port);
+    if(adapter.config.user) {
+        var ws = new WebSocket('ws://' + host + ':' + port);
 
-    ws.onmessage = function(msg) {
-        var data = JSON.parse(msg.data);
-        var id = data['id'];
-        var type = data['r'];
-        var state = data['state'];
-        adapter.log.debug('Websocket message: ' + JSON.stringify(data));
-        adapter.log.debug('Id: ' + id + ' Type: ' + type);
 
-        switch(type){
-            case 'lights':
-                adapter.getForeignObjects('*', 'device', function (err, enums){
-                    var count = Object.keys(enums).length - 1;
-                    for (var i = 0; i <= count; i++) {
-                        var keyName = Object.keys(enums)[i];
-                        if(enums[keyName].common.role === 'light' && enums[keyName].native.id === id){
-                            var gwName = keyName.replace(/\.(\w|\w|\s|\(|\)|\[|\]|\-|\+)*$/, '');
-                            getLightState(gwName, id);
-                        }
+        ws.onmessage = function (msg) {
+            var data = JSON.parse(msg.data);
+            var id = data['id'];
+            var type = data['r'];
+            var state = data['state'];
+            adapter.log.debug('Websocket message: ' + JSON.stringify(data));
+            adapter.log.debug('Id: ' + id + ' Type: ' + type);
 
-                    }
-                });
-                break;
-            case 'groups':
-                adapter.getForeignObjects('*', 'device', function (err, enums){
-                    var count = Object.keys(enums).length - 1;
-                    for (var i = 0; i <= count; i++) {
-                        var keyName = Object.keys(enums)[i];
-                        if(enums[keyName].common.role === 'group' && enums[keyName].native.id === id) {
-                            var gwName = keyName.replace(/\.(\w|\w|\s|\(|\)|\[|\]|\-|\+)*$/, '');
-                            getGroupAttributes(gwName, id);
+            switch (type) {
+                case 'lights':
+                    adapter.getForeignObjects('*', 'device', function (err, enums) {
+                        var count = Object.keys(enums).length - 1;
+                        for (var i = 0; i <= count; i++) {
+                            var keyName = Object.keys(enums)[i];
+                            if (enums[keyName].common.role === 'light' && enums[keyName].native.id === id) {
+                                var gwName = keyName.replace(/\.(\w|\w|\s|\(|\)|\[|\]|\-|\+)*$/, '');
+                                getLightState(gwName, id);
+                            }
+
                         }
-                    }
-                });
-                break;
-            case 'sensors':
-                adapter.getForeignObjects('*', 'device', function (err, enums){
-                    var count = Object.keys(enums).length - 1;
-                    for (var i = 0; i <= count; i++) {
-                        var keyName = Object.keys(enums)[i];
-                        if(enums[keyName].common.role === 'sensor' && enums[keyName].native.id === id) {
-                            var gwName = keyName.replace(/\.(\w|\w|\s|\(|\)|\[|\]|\-|\+)*$/, '');
-                            getSensor(gwName, id);
+                    });
+                    break;
+                case 'groups':
+                    adapter.getForeignObjects('*', 'device', function (err, enums) {
+                        var count = Object.keys(enums).length - 1;
+                        for (var i = 0; i <= count; i++) {
+                            var keyName = Object.keys(enums)[i];
+                            if (enums[keyName].common.role === 'group' && enums[keyName].native.id === id) {
+                                var gwName = keyName.replace(/\.(\w|\w|\s|\(|\)|\[|\]|\-|\+)*$/, '');
+                                getGroupAttributes(gwName, id);
+                            }
                         }
-                    }
-                });
-                break;
+                    });
+                    break;
+                case 'sensors':
+                    adapter.getForeignObjects('*', 'device', function (err, enums) {
+                        var count = Object.keys(enums).length - 1;
+                        for (var i = 0; i <= count; i++) {
+                            var keyName = Object.keys(enums)[i];
+                            if (enums[keyName].common.role === 'sensor' && enums[keyName].native.id === id) {
+                                var gwName = keyName.replace(/\.(\w|\w|\s|\(|\)|\[|\]|\-|\+)*$/, '');
+                                getSensor(gwName, id);
+                            }
+                        }
+                    });
+                    break;
+            }
         }
     }
 }
@@ -371,6 +374,7 @@ function getConfig(){
         var gateway = JSON.parse(body);
         try{var response = JSON.parse(body);} catch(err){}
         adapter.log.debug('API version: ' + gateway['apiversion']);
+        //adapter.log.info(JSON.stringify(gateway));
 
         if(res.statusCode === 200) {
             var gwName =nameFilter(gateway['name']);
@@ -412,6 +416,10 @@ function getConfig(){
                     }
                 });
                 adapter.config.websocketport = gateway['websocketport'];
+                adapter.config.gw_name = gateway['name'];
+                adapter.config.swversion = gateway['swversion'];
+                adapter.config.apiversion = gateway['apiversion'];
+                adapter.config.zigbeechannel = gateway['zigbeechannel'];
                 getAllLights(gwName);
                 getAllSensors(gwName);
                 getAllGroups(gwName);
@@ -861,7 +869,7 @@ function getSensor(gwName, sensorId){
         } catch (err) {
         }
 
-        adapter.log.debug('getSensor: ' + body);
+        adapter.log.info('getSensor: ' + body);
 
         if (res.statusCode === 200) {
             if (response[0]['success']) {
@@ -1032,11 +1040,25 @@ function getSensor(gwName, sensorId){
                             });
                             adapter.setState(gwName + '.' + sensorName + '.' + stateName, {val: list['state'][stateName], ack: true});
                             break;
-                    }
+                    case 'lux':
+                    adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
+                        type: 'state',
+                        common: {
+                            name: stateName,
+                            type: 'number',
+                            role: 'indicator.state',
+                            read: true,
+                            write: false
+                        },
+                        native: {}
+                    });
+                    adapter.setState(gwName + '.' + sensorName + '.' + stateName, {val: list['state'][stateName], ack: true});
+                    break;
+                }
 
                 }
             } else{
-                logging(res.statusCode, 'Get light state with ID: ' + lightId);
+                logging(res.statusCode, 'Get sensor state with ID: ' + sensorId);
             }
         }
     })
@@ -1557,7 +1579,7 @@ function logging(statusCode, message){
 }
 
 function nameFilter(name){
-    var signs = [String.fromCharCode(46), String.fromCharCode(44), String.fromCharCode(92), String.fromCharCode(47), String.fromCharCode(91), String.fromCharCode(93), String.fromCharCode(123), String.fromCharCode(125)]; //46=. 44=, 92=\ 47=/ 91=[ 93=] 123={ 125=}
+    var signs = [String.fromCharCode(46), String.fromCharCode(44), String.fromCharCode(92), String.fromCharCode(47), String.fromCharCode(91), String.fromCharCode(93), String.fromCharCode(123), String.fromCharCode(125), String.fromCharCode(32)]; //46=. 44=, 92=\ 47=/ 91=[ 93=] 123={ 125=} 32=Space
 
     signs.forEach(function(item, index){
         name = name.replace(item, '_');

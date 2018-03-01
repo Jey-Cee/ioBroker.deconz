@@ -1,0 +1,250 @@
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="../../css/adapter.css"/>
+    <link rel="stylesheet" type="text/css" href="../../lib/css/materialize.css">
+
+    <script type="text/javascript" src="../../lib/js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="../../socket.io/socket.io.js"></script>
+
+    <script type="text/javascript" src="../../js/translate.js"></script>
+    <script type="text/javascript" src="../../lib/js/materialize.js"></script>
+    <script type="text/javascript" src="../../js/adapter-settings.js"></script>
+    <script type="text/javascript" src="words.js"></script>
+
+    <script type="text/javascript">
+    var bridges = [];
+
+    var active   = false;
+
+    function setValue(id, value, onChange) {
+        var $value = $('#' + id + '.value');
+        if ($value.attr('type') === 'checkbox') {
+            $value.prop('checked', value).change(function() {
+                onChange();
+            });
+        } else {
+            $value.val(value).change(function() {
+                onChange();
+            }).keyup(function() {
+                $(this).trigger('change');
+            });
+        }
+    }
+
+    // the function loadSettings has to exist ...
+    function load(settings, onChange) {
+        if (settings.port === undefined) settings.port = 80;
+
+        $('#dialog-bridges').modal({
+            autoOpen: false,
+            modal:    true,
+            position: {my: 'center top', at: 'center top', of: $('#adapter-container')},
+            open:     function (event) {
+                $(event.target).parent().find('.ui-dialog-titlebar-close .ui-button-text').html('');
+            }
+        });
+        for (var key in settings) {
+            if (settings.hasOwnProperty(key)) setValue(key, settings[key], onChange);
+        }
+        // read if instance is active or enabled
+        getIsAdapterAlive(function (isAlive) {
+            if (isAlive || common.enabled) {
+                active = true;
+            }
+        });
+
+        onChange(false);
+
+        //$('#tabs').tabs();
+        $('#create').click(function () {
+            if (!active) {
+                showMessage(_('Enable adapter first'), 'Warning', 'info');
+                return;
+            }
+
+            $('#dialog-bridges')
+                .modal('open');
+
+            var count = 0;
+
+            (function sendCreate(){
+                sendTo('deconz.' + instance, 'createAPIkey', $('#bridge.value').val() + ':' + $('#port.value').val(), function (result) {
+                    try {
+                        result = JSON.parse(result);
+                        if (result.error > 0) {
+                            if (result.error === 101 && count<10) {
+                                count++;
+                                console.log(count);
+                                setTimeout(sendCreate, 3000);
+                                return;
+                            } else {
+                                showMessage(_('error creating API key: ') + _(result.message), _('Error'), 'info');
+                            }
+                        } else {
+                            $('#user.value').val(result.message).trigger('change');
+                        }
+                    } catch (e) {
+                        showMessage(_('error creating API key'), _('Error'), 'alert');
+                    }
+                    $('#dialog-bridges').modal('close');
+                });
+            })();
+        });
+
+        $('#delete').click(function () {
+                sendTo('deconz.' + instance, 'deleteAPIkey');
+                $('#user.value').val('').trigger('change');
+        });
+
+        $('#opennetwork').click(function () {
+            sendTo('deconz.' + instance, 'openNetwork');
+            $('#opennetwork').addClass('disabled');
+            countdown();
+        });
+
+        if (settings.user) {
+            $('#create').addClass('disabled');
+        } else {
+            $('#delete').addClass('disabled');
+        }
+        $('#user').change(function () {
+            if ($(this).val()) {
+                $('#create').addClass('disabled');
+            } else {
+                $('#create').removeClass('disabled');
+            }
+        }).keyup(function () {
+            $(this).trigger('change');
+        });
+    }
+
+    var counter = 60;
+
+
+    function countdown(){
+        if(counter >0){
+            setTimeout(function(){
+                counter = counter -1;
+                countdown();
+            }, 1000);
+            $('#opennetwork').html(_('Open for %s seconds', counter));
+        }else if(counter === 0){
+            $('#opennetwork').html('Open Network');
+            $('#opennetwork').removeClass('disabled');
+            counter = 60;
+        }
+    }
+
+    function save(callback) {
+        var obj = {};
+        $('.value').each(function () {
+            var $this = $(this);
+            if ($this.attr('type') === 'checkbox') {
+                obj[$this.attr('id')] = $this.prop('checked');
+            } else {
+                obj[$this.attr('id')] = $this.val();
+            }
+        });
+        callback(obj);
+    }
+</script>
+<style>
+    #settings tr {
+        line-height: 1.5em;
+    }
+    #settings td {
+        padding-left: 10px;
+    }
+    #delete, #create, #opennetwork {
+        font-size: 14px;
+    }
+    #manage_deconz {
+
+    }
+</style>
+</head>
+<body>
+<!-- you have to put your config page in a div with id adapter-container -->
+<div class="m adapter-container">
+    <div class="row">
+        <div class="col s12">
+            <ul class="tabs">
+                <li class="tab col s2">
+                    <a href="#tab-main" class="translate active" data-lang="Main settings">Main Settings</a>
+                </li>
+                <li class="tab col s2">
+                    <a href="#tab-manage-devices" class="translate" data-lang="Manage Devices">Manage Devices</a>
+                </li>
+                <li class="tab col s2">
+                    <a href="#tab-manage-deconz" class="translate" data-lang="Manage deConz">Manage deConz</a>
+                </li>
+            </ul>
+        </div>
+
+        <div id="tab-main" class="col s12 page">
+                <div class="row">
+                    <div class="input-field col s6 m4 12">
+                        <img src="deconz.png" class="logo">
+                    </div>
+                </div>
+
+            <div class="row">
+                <div class="input-field col s12 m4 15">
+                    <input class="value text" id="bridge" for="bridge" size="15" maxlength="15" type="text">
+                    <label class="translate active" id="deconz-address" data-lang="deConz Addresse:">deConz IP Adresse</label>
+                </div>
+                <div class="input-field col s12 m8 l3">
+                    <input class="value number" id="port" size="5" maxlength="5" type="number">
+                    <label class="translate active" for="port" data-lang="Bridge Port">Port</label>
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="input-field col s12 m2 14">
+                    <input class="value text" id="user" size="20" maxlength="20" type="text">
+                    <label class="translate active" for="user" data-lang="API key">API key</label>
+                </div>
+                <div class="input-field col s6 m2">
+                    <a class="waves-effect waves-light btn" id="create">
+                        <span class="translate active" data-lang="Create API key">Create API key</span>
+                    </a>
+                </div>
+                <div class="input-field col s6 m2">
+                    <a class="waves-effect waves-light btn" id="delete">
+                        <span class="translate active" data-lang="Delete API key">Delete API key</span>
+                    </a>
+                </div>
+            </div>
+            <div id="dialog-bridges" class="modal" title="Select deConz">
+                <div class="modal-content">
+                    <div class="row">
+                        <img class="col s3 offset-s5" src="instruction.png">
+                    </div>
+                    <div class="row">
+                        <div class="translate col s3 offset-s5" data-lang="Instruction">Instruction</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-manage-devices" class="col s12 page">
+            <div class="row">
+                <div class="input-field col s2">
+                    <a class="waves-effect waves-light btn" id="opennetwork">
+                        <span class="translate" data-lang="Open Network">Open Network</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-manage-deconz" class="col s12 page">
+            <div class="row">
+                <div class="chip col s2" id="swversion">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

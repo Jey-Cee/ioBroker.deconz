@@ -1,8 +1,19 @@
 {
     "common": {
         "name": "deconz",
-        "version": "0.1.3",
+        "version": "0.1.4",
         "news": {
+            "0.1.4":{
+                "en": "Added support for Admin v3",
+                "de": "Unterstützung für Admin v3 hinzugefügt",
+                "ru": "Добавлена ​​поддержка Admin v3",
+                "pt": "Adicionado suporte para Admin v3",
+                "nl": "Ondersteuning toegevoegd voor Admin v3",
+                "fr": "Ajout du support pour Admin v3",
+                "it": "Aggiunto supporto per Admin v3",
+                "es": "Se agregó soporte para Admin v3",
+                "pl": "Dodano obsługę administratora v3"
+            },
             "0.1.3":{
                 "en": "Stop Spam in log; Added filter for name to id conversation",
                 "de": "Stoppen Sie Spam im Protokoll; Filter für Name zu ID-Konversation hinzugefügt",
@@ -34,12 +45,24 @@
         "titleLang": {
             "en": "deConz ZigBee",
             "de": "deConz ZigBee",
-            "ru": "deConz ZigBee"
+            "ru": "deConz ZigBee",
+            "pt": "deConz ZigBee",
+            "nl": "deConz ZigBee",
+            "fr": "deConz ZigBee",
+            "it": "deConz ZigBee",
+            "es": "deConz ZigBee",
+            "pl": "deConz ZigBee"
         },
         "desc": {
             "en": "Connects to the deConz Software that is an gateway solution for ZigBee. deConz works with ConBee USB stick and RaspBee modul for Raspberry Pi which is also from Dresden-Elektronik.",
             "de": "Verbindet sich mit der deConz-Software, die eine Gateway-Lösung für ZigBee ist. deConz arbeitet mit dem ConBee USB Stick und dem RaspBee Modul für den Raspberry Pi, die ebenfalls von Dresden-Elektronik sind.",
-            "ru": "Подключается к программному обеспечению deConz, которое является шлюзовым решением для ZigBee. deConz работает с ConBee и RaspBee, который также из Дрездена-Электроника."
+            "ru": "Подключается к программному обеспечению deConz, которое является шлюзовым решением для ZigBee. deConz работает с ConBee и RaspBee, который также из Дрездена-Электроника.",
+            "pt": "Conecta ao software deConz que é uma solução de gateway para o ZigBee. DeConz trabalha com o conwee USB stick e RaspBee modul para Raspberry Pi que também é de Dresden-Elektronik.",
+            "nl": "Maakt verbinding met de deConz-software die een gateway-oplossing is voor ZigBee. deConz werkt met ConBee USB-stick en RaspBee-module voor Raspberry Pi, die ook van Dresden-Elektronik is.",
+            "fr": "Se connecte au logiciel deConz qui est une solution de passerelle pour ZigBee. deConz fonctionne avec la clé USB ConBee et le module RaspBee pour Raspberry Pi, également de Dresden-Elektronik.",
+            "it": "Si collega al software deConz che è una soluzione gateway per ZigBee. deConz funziona con ConBee USB stick e RaspBee modul per Raspberry Pi, anch'esso di Dresden-Elektronik.",
+            "es": "Se conecta al software deConz que es una solución de puerta de enlace para ZigBee. deConz funciona con el dispositivo USB ConBee y el módulo RaspBee para Raspberry Pi, que también es de Dresden-Elektronik.",
+            "pl": "Łączy się z oprogramowaniem deConz, które jest rozwiązaniem bramkowym dla ZigBee. deConz współpracuje z pamięcią USB ConBee i modułem RaspBee dla Raspberry Pi, który jest również z firmy Dresden-Elektronik."
         },
         "authors": [
             "Jey Cee <jey-cee@live.com>"
@@ -64,6 +87,7 @@
             "zigbee"
         ],
         "icon": "deconz.png",
+        "materialize": true,
         "extIcon": "https://raw.githubusercontent.com/jey-cee/ioBroker.deconz/master/admin/deconz.png",
         "type": "hardware"
     },
@@ -74,7 +98,12 @@
         "polling": true,
         "pollingInterval": 30,
         "openNetwork": false,
-        "websocketport": 443
+        "websocketport": 443,
+        "gw_name": "",
+        "zigbeechannel": "",
+        "swversion": "",
+        "apiversion": ""
+
     },
     "objects": [
         {
