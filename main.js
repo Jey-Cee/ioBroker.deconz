@@ -869,7 +869,7 @@ function getSensor(gwName, sensorId){
         } catch (err) {
         }
 
-        adapter.log.info('getSensor: ' + body);
+        adapter.log.info('getSensor: ' + JSON.stringify(body));
 
         if (res.statusCode === 200) {
             if (response[0]['success']) {
