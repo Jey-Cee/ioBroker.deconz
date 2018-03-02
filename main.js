@@ -417,9 +417,9 @@ function getConfig(){
                 });
                 adapter.config.websocketport = gateway['websocketport'];
                 adapter.config.gw_name = gateway['name'];
-                adapter.config.swversion = gateway['swversion'];
-                adapter.config.apiversion = gateway['apiversion'];
-                adapter.config.zigbeechannel = gateway['zigbeechannel'];
+                adapter.config.sw_version = gateway['swversion'];
+                adapter.config.api_version = gateway['apiversion'];
+                adapter.config.channel = gateway['zigbeechannel'];
                 getAllLights(gwName);
                 getAllSensors(gwName);
                 getAllGroups(gwName);

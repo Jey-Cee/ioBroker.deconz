@@ -99,10 +99,10 @@
         "pollingInterval": 30,
         "openNetwork": false,
         "websocketport": 443,
-        "gw_name": "",
-        "zigbeechannel": "",
-        "swversion": "",
-        "apiversion": ""
+        "gw_name": "dummy",
+        "channel": "1",
+        "sw_version": "1",
+        "api_version": "1"
 
     },
     "objects": [
