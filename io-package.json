@@ -1,8 +1,19 @@
 {
     "common": {
         "name": "deconz",
-        "version": "0.1.4",
+        "version": "0.1.5",
         "news": {
+            "0.1.5":{
+                "en": "Try to fix Sensors",
+                "de": "Versuchen Sie, Sensoren zu reparieren",
+                "ru": "Попробуйте исправить датчики",
+                "pt": "Tente corrigir os sensores",
+                "nl": "Probeer sensoren te repareren",
+                "fr": "Essayez de réparer les capteurs",
+                "it": "Prova a sistemare i sensori",
+                "es": "Intenta reparar los sensores",
+                "pl": "Spróbuj naprawić czujniki"
+            },
             "0.1.4":{
                 "en": "Added support for Admin v3",
                 "de": "Unterstützung für Admin v3 hinzugefügt",

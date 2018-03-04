@@ -22,6 +22,10 @@ Required node.js >= 0.12.
 
 ## Changelog
 
+### 0.1.5
+
+* (Jey-Cee) Try to fix Sensors
+
 ### 0.1.4
 
 * (Jey-Cee) Added support for Admin v3
