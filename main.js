@@ -34,9 +34,9 @@ adapter.on('stateChange', function (id, state) {
                 }else{
                     var parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "bri": ' + JSON.stringify(state.val) + '}';
                 }
-                if(obj.type === 'device') {
+                if(obj.common.role == 'light') {
                     setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri')
-                }else if(obj.type === 'group'){
+                }else if(obj.common.role == 'group'){
                     setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri')
                 }
             });
@@ -48,10 +48,10 @@ adapter.on('stateChange', function (id, state) {
                 }else{
                     var parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "on": ' + JSON.stringify(state.val) + '}';
                 }
-                //adapter.log.info('type: ' + obj.type);
-                if(obj.type === 'device') {
+                //adapter.log.info('type: ' + obj.common.role);
+                if(obj.common.role == 'light') {
                     setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on')
-                }else if(obj.type === 'group'){
+                }else if(obj.common.role == 'group'){
                     setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on')
                 }
             });
@@ -64,9 +64,9 @@ adapter.on('stateChange', function (id, state) {
                     var parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "hue": ' + JSON.stringify(state.val) + '}';
                 }
                 var parameters = '{"hue": ' + JSON.stringify(state.val) + '}';
-                if(obj.type === 'device') {
+                if(obj.common.role == 'light') {
                     setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.hue')
-                }else if(obj.type === 'group'){
+                }else if(obj.common.role == 'group'){
                     setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.hue')
                 }
             });
@@ -78,9 +78,9 @@ adapter.on('stateChange', function (id, state) {
                 }else{
                     var parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "sat": ' + JSON.stringify(state.val) + '}';
                 }
-                if(obj.type === 'device') {
+                if(obj.common.role == 'light') {
                     setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.sat')
-                }else if(obj.type === 'group'){
+                }else if(obj.common.role == 'group'){
                     setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.sat')
                 }
             });
@@ -92,9 +92,9 @@ adapter.on('stateChange', function (id, state) {
                 }else{
                     var parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "ct": ' + JSON.stringify(state.val) + '}';
                 }
-                if(obj.type === 'device') {
+                if(obj.common.role == 'light') {
                     setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.ct')
-                }else if(obj.type === 'group'){
+                }else if(obj.common.role == 'group'){
                     setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.ct')
                 }
             });
@@ -106,9 +106,9 @@ adapter.on('stateChange', function (id, state) {
                 }else{
                     var parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "xy": ' + JSON.stringify(state.val) + '}';
                 }
-                if(obj.type === 'device') {
+                if(obj.common.role == 'light') {
                     setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.xy')
-                }else if(obj.type === 'group'){
+                }else if(obj.common.role == 'group'){
                     setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.xy')
                 }
             });
@@ -135,9 +135,9 @@ adapter.on('stateChange', function (id, state) {
                             }
                             var parameters = '{"colorloopspeed": ' + JSON.stringify(speed) + ', "effect": ' + JSON.stringify(state.val) + '}';
                             //adapter.log.info('parameters: ' + parameters);
-                            if (obj.type === 'device') {
+                            if (obj.common.role == 'light') {
                                 setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.effect')
-                            } else if (obj.type === 'group') {
+                            } else if (obj.common.role == 'group') {
                                 setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.effect')
                             }
                         })
@@ -145,9 +145,9 @@ adapter.on('stateChange', function (id, state) {
                     //adapter.log.info('ID: ' + id + 'Effect: none');
                     var controlId = obj.native.id;
                     var parameters = '{"effect": ' + JSON.stringify(state.val) + '}';
-                    if(obj.type === 'device') {
+                    if(obj.common.role == 'light') {
                         setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.effect')
-                    }else if(obj.type === 'group'){
+                    }else if(obj.common.role == 'group'){
                         setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.effect')
                     }
                 }
@@ -1021,7 +1021,7 @@ function getSensor(gwName, sensorId){
                     }
                 });
                 var count2 = Object.keys(list['state']).length - 1;
-                //create states for light device
+                //create states for sensor device
                 for (var z = 0; z <= count2; z++) {
                     var stateName = Object.keys(list['state'])[z];
                     switch (stateName) {
@@ -1154,7 +1154,7 @@ function getSensor(gwName, sensorId){
                 }
 
                     var count3 = Object.keys(list['config']).length - 1;
-                    //create states for light device
+                    //create config for sensor device
                     for (var x = 0; x <= count3; x++) {
                         var stateName = Object.keys(list['config'])[x];
                         switch (stateName) {
@@ -1768,7 +1768,7 @@ function logging(statusCode, message){
 }
 
 function nameFilter(name){
-    var signs = [String.fromCharCode(46), String.fromCharCode(44), String.fromCharCode(92), String.fromCharCode(47), String.fromCharCode(91), String.fromCharCode(93), String.fromCharCode(123), String.fromCharCode(125), String.fromCharCode(32)]; //46=. 44=, 92=\ 47=/ 91=[ 93=] 123={ 125=} 32=Space
+    var signs = [String.fromCharCode(46), String.fromCharCode(44), String.fromCharCode(92), String.fromCharCode(47), String.fromCharCode(91), String.fromCharCode(93), String.fromCharCode(123), String.fromCharCode(125), String.fromCharCode(32), String.fromCharCode(129), String.fromCharCode(154), String.fromCharCode(132), String.fromCharCode(142), String.fromCharCode(148), String.fromCharCode(153)]; //46=. 44=, 92=\ 47=/ 91=[ 93=] 123={ 125=} 32=Space 129=ü 154=Ü 132=ä 142=Ä 148=ö 153=Ö
 
     signs.forEach(function(item, index){
         var count = name.split(item).length - 1;
