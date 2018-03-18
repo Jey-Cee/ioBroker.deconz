@@ -22,6 +22,10 @@ Required node.js >= 0.12.
 
 ## Changelog
 
+### 0.1.6
+
+* (Jey-Cee) fix Xiaomi Sensors recognition
+
 ### 0.1.5
 
 * (Jey-Cee) Try to fix Sensors

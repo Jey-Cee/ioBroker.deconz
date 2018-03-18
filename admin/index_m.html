@@ -12,9 +12,10 @@
     <script type="text/javascript" src="words.js"></script>
 
     <script type="text/javascript">
-    var bridges = [];
 
+    var namespace = 'deconz.' + instance;
     var active   = false;
+    var devices = {};
 
     function setValue(id, value, onChange) {
         var $value = $('#' + id + '.value');
@@ -29,6 +30,24 @@
                 $(this).trigger('change');
             });
         }
+    }
+
+    function showDevice(obj, isFirst) {
+        var text = '';
+        text += '<td style="text-align: center; white-space: nowrap;">' + obj.common.name + '</td>';
+        text += '<td style="text-align: center; white-space: nowrap;">' + obj.native.id + '</td>';
+        text += '<td style="text-align: center; white-space: nowrap;">' + obj.native.manufacturername + '</td>';
+        text += '<td style="text-align: center; white-space: nowrap;">' + obj.native.modelid + '</td>';
+        text += '<td style="text-align: center; white-space: nowrap;">' + obj.common.role + '</td>';
+
+        text += '<td style="text-align: center;">' + '' +
+            '<a id="' + obj.native.id  + ' ' + obj.common.role + '" data-id="' + obj.native.id + '" data-command="delete" class="values-buttons btn-floating btn-small waves-effect waves-light red"><i class="material-icons">delete</i></a>';
+
+        text += '</select></td>';
+        text = '<tr data-id="' + obj.native.id + '">' + text + '</tr>';
+        $('#devices').append(text);
+        $('#' + obj.native.id + obj.common.role).change({id : obj.native.id}, onSelect);
+        $('#' + obj.native.id + obj.common.role).select();
     }
 
     // the function loadSettings has to exist ...
@@ -143,6 +162,24 @@
             $('#swversion.value').val(settings.sw_version).trigger('change');
         });*/
 
+        // subscribe to changes
+        socket.emit('subscribeStates', namespace + '.info.*');
+        socket.emit('subscribeObjects', namespace + '.*'); // seems, this doesn't work
+
+        // populate the list of known devices
+        socket.emit('getObjectView', 'system', 'device', { startkey: 'deconz.' + instance + '.', endkey: 'deconz.' + instance + '.\u9999', include_docs: true }, function (err, _devices) {
+            socket.emit('getStates', function (err, _values) {
+                var namespace = 'deconz.' + instance + '.';
+                var len = namespace.length;
+                if (_devices && _devices.rows && _devices.rows.length) {
+                    for (var j = 0; j < _devices.rows.length; j++) {
+                        devices[_devices.rows[j].value._id] = _devices.rows[j].value;
+                        showDevice(_devices.rows[j].value, true);
+                    }
+                }
+            });
+        });
+
 
         onChange(false);
         M.updateTextFields();
@@ -206,9 +243,6 @@
                 <li class="tab col s2">
                     <a href="#tab-manage-devices" class="translate" data-lang="Manage Devices">Manage Devices</a>
                 </li>
-                <li class="tab col s2">
-                    <a href="#tab-manage-deconz" class="translate" id="mtabdeconz" data-lang="Manage deConz">Manage deConz</a>
-                </li>
             </ul>
         </div>
 
@@ -266,20 +300,25 @@
                     </a>
                 </div>
             </div>
-        </div>
 
-        <div id="tab-manage-deconz" class="col s12 page">
-            <div class="row">
-                <div class="input-field col s2">
-                    <input class="value" id="sw_version" size="20" maxlength="20" type="text">
-                    <label class="translate active" data-lang="deConz Version">deConz Version</label>
-                </div>
-                <div class="input-field col s2">
-                    <input class="value text" id="api_version" size="20" maxlength="20" type="text">
-                    <label class="translate active" data-lang="deConz REST API Version">deConz REST API Version</label>
-                </div>
+            <div class="table-values-div">
+                <table class="table-values">
+                    <thead>
+                    <tr>
+                        <th class="translate">Name</th>
+                        <th class="translate">ID</th>
+                        <th class="translate">Manufacturer</th>
+                        <th class="translate">Model ID</th>
+                        <th class="translate">Type</th>
+                        <th class="translate"></th>
+                    </tr>
+                    </thead>
+
+                </table>
             </div>
         </div>
+
+
     </div>
 </div>
 </body>

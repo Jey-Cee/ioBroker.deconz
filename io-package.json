@@ -1,8 +1,19 @@
 {
     "common": {
         "name": "deconz",
-        "version": "0.1.5",
+        "version": "0.1.6",
         "news": {
+            "0.1.6": {
+                "en": "fix Xiaomi Sensor recognition",
+                "de": "Xiaomi Sensorerkennung beheben",
+                "ru": "исправить распознавание датчика Xiaomi",
+                "pt": "conserte o reconhecimento do sensor Xiaomi",
+                "nl": "fix Xiaomi sensorherkenning",
+                "fr": "Correction de la reconnaissance du capteur Xiaomi",
+                "it": "correggere il riconoscimento del sensore Xiaomi",
+                "es": "arreglar el reconocimiento del sensor Xiaomi",
+                "pl": "naprawić rozpoznawanie czujnika Xiaomi"
+            },
             "0.1.5":{
                 "en": "Try to fix Sensors",
                 "de": "Versuchen Sie, Sensoren zu reparieren",
