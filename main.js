@@ -184,6 +184,10 @@ adapter.on('message', function (obj) {
                 modifyConfig(parameters);
                 wait = true;
                 break;
+            case 'deleteLight':
+
+                wait = true;
+                break;
             default:
                 adapter.log.warn("Unknown command: " + obj.command);
                 break;
@@ -454,7 +458,7 @@ function getAllGroups(gwName) {
                     adapter.setObject(gwName + '.' + groupName, {
                         type: 'device',
                         common: {
-                            name: groupName,
+                            name: list[keyName],
                             role: 'group'
                         },
                         native: {
@@ -493,7 +497,7 @@ function getGroupAttributes(gwName, groupId) {
                 adapter.setObject(gwName + '.' + groupName, {
                     type: 'device',
                     common: {
-                        name: groupName,
+                        name: list['name'],
                         role: 'group'
                     },
                     native: {
@@ -515,7 +519,7 @@ function getGroupAttributes(gwName, groupId) {
                             adapter.setObjectNotExists(gwName + '.' + groupName + '.' + stateName, {
                                 type: 'state',
                                 common: {
-                                    name: stateName,
+                                    name: list['name'] + ' ' +stateName,
                                     type: 'boolean',
                                     role: 'switch',
                                     read: true,
@@ -529,7 +533,7 @@ function getGroupAttributes(gwName, groupId) {
                             adapter.setObjectNotExists(gwName + '.' + groupName + '.' + stateName, {
                                 type: 'state',
                                 common: {
-                                    name: stateName,
+                                    name: list['name'] + ' ' +stateName,
                                     type: 'number',
                                     role: 'level.dimmer',
                                     min: 0,
@@ -545,7 +549,7 @@ function getGroupAttributes(gwName, groupId) {
                             adapter.setObjectNotExists(gwName + '.' + groupName + '.' + stateName, {
                                 type: 'state',
                                 common: {
-                                    name: stateName,
+                                    name: list['name'] + ' ' +stateName,
                                     type: 'number',
                                     role: 'hue.color',
                                     min: 0,
@@ -561,7 +565,7 @@ function getGroupAttributes(gwName, groupId) {
                             adapter.setObjectNotExists(gwName + '.' + groupName + '.' + stateName, {
                                 type: 'state',
                                 common: {
-                                    name: stateName,
+                                    name: list['name'] + ' ' +stateName,
                                     type: 'number',
                                     role: 'color.saturation',
                                     min: 0,
@@ -577,7 +581,7 @@ function getGroupAttributes(gwName, groupId) {
                             adapter.setObjectNotExists(gwName + '.' + groupName + '.' + stateName, {
                                 type: 'state',
                                 common: {
-                                    name: stateName,
+                                    name: list['name'] + ' ' +stateName,
                                     type: 'number',
                                     role: 'color.temp',
                                     min: 153,
@@ -593,7 +597,7 @@ function getGroupAttributes(gwName, groupId) {
                             adapter.setObjectNotExists(gwName + '.' + groupName + '.' + stateName, {
                                 type: 'state',
                                 common: {
-                                    name: stateName,
+                                    name: list['name'] + ' ' +stateName,
                                     type: 'string',
                                     role: 'color.CIE',
                                     read: true,
@@ -607,7 +611,7 @@ function getGroupAttributes(gwName, groupId) {
                             adapter.setObjectNotExists(gwName + '.' + groupName + '.' + stateName, {
                                 type: 'state',
                                 common: {
-                                    name: stateName,
+                                    name: list['name'] + ' ' +stateName,
                                     type: 'string',
                                     role: 'action',
                                     read: true,
@@ -618,7 +622,7 @@ function getGroupAttributes(gwName, groupId) {
                             adapter.setObjectNotExists(gwName + '.' + groupName + '.colorloopspeed', {
                                 type: 'state',
                                 common: {
-                                    name: 'colorloopspeed',
+                                    name: list['name'] + ' ' + 'colorloopspeed',
                                     type: 'number',
                                     role: 'argument',
                                     min: 1,
@@ -635,7 +639,7 @@ function getGroupAttributes(gwName, groupId) {
                 adapter.setObjectNotExists(gwName + '.' + groupName + '.transitiontime', {
                     type: 'state',
                     common: {
-                        name: 'transitiontime',
+                        name: list['name'] + ' ' + 'transitiontime',
                         type: 'number',
                         role: 'argument',
                         read: true,
@@ -745,7 +749,7 @@ function getAllSensors(gwName) {
                                 adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                     type: 'state',
                                     common: {
-                                        name: stateName,
+                                        name: list[keyName]['name'] + ' ' + stateName,
                                         type: 'number',
                                         role: 'state',
                                         read: true,
@@ -760,7 +764,7 @@ function getAllSensors(gwName) {
                                 adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                     type: 'state',
                                     common: {
-                                        name: stateName,
+                                        name: list[keyName]['name'] + ' ' + stateName,
                                         type: 'number',
                                         role: 'state',
                                         read: true,
@@ -778,7 +782,7 @@ function getAllSensors(gwName) {
                                 adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                      type: 'state',
                                      common: {
-                                        name: stateName,
+                                        name: list[keyName]['name'] + ' ' + stateName,
                                         type: 'boolean',
                                             role: 'state',
                                             read: true,
@@ -791,8 +795,10 @@ function getAllSensors(gwName) {
                         }
                     }
                 }
-
+            
+            adapter.log.info('keyName before config: ' +  list[keyName]);
             var count3 = Object.keys(list[keyName]['config']).length - 1;
+            adapter.log.info('keyName after config: ' +  list[keyName]);
             //create states for sensor device
             for (var x = 0; x <= count3; x++) {
                 var stateName = Object.keys(list[keyName]['config'])[x];
@@ -803,7 +809,7 @@ function getAllSensors(gwName) {
                         adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                             type: 'state',
                             common: {
-                                name: stateName,
+                                name: list[keyName]['name'] + ' ' + stateName,
                                 type: 'boolean',
                                 role: 'state',
                                 read: true,
@@ -817,7 +823,7 @@ function getAllSensors(gwName) {
                         adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                             type: 'state',
                             common: {
-                                name: stateName,
+                                name: list[keyName]['name'] + ' ' + stateName,
                                 type: 'string',
                                 role: 'state',
                                 read: true,
@@ -831,7 +837,7 @@ function getAllSensors(gwName) {
                         adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                             type: 'state',
                             common: {
-                                name: stateName,
+                                name: list[keyName]['name'] + ' ' + stateName,
                                 type: 'number',
                                 role: 'indicator.battery',
                                 read: true,
@@ -845,7 +851,7 @@ function getAllSensors(gwName) {
                         adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                             type: 'state',
                             common: {
-                                name: stateName,
+                                name: list[keyName]['name'] + ' ' + stateName,
                                 type: 'number',
                                 role: 'indicator.duration',
                                 read: true,
@@ -859,7 +865,7 @@ function getAllSensors(gwName) {
                         adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                             type: 'state',
                             common: {
-                                name: stateName,
+                                name: list[keyName]['name'] + ' ' + stateName,
                                 type: 'boolean',
                                 role: 'indicator.reachable',
                                 read: true,
@@ -873,7 +879,7 @@ function getAllSensors(gwName) {
                         adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                             type: 'state',
                             common: {
-                                name: stateName,
+                                name: list[keyName]['name'] + ' ' + stateName,
                                 type: 'mixed',
                                 role: 'info',
                                 read: true,
@@ -890,7 +896,7 @@ function getAllSensors(gwName) {
                         adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                             type: 'state',
                             common: {
-                                name: stateName,
+                                name: list[keyName]['name'] + ' ' + stateName,
                                 type: 'number',
                                 role: 'state',
                                 read: true,
@@ -960,7 +966,7 @@ function getSensor(gwName, sensorId){
                             adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                 type: 'state',
                                 common: {
-                                    name: stateName,
+                                    name: list[keyName]['name'] + ' ' + stateName,
                                     type: 'number',
                                     role: 'state',
                                     read: true,
@@ -975,7 +981,7 @@ function getSensor(gwName, sensorId){
                             adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                 type: 'state',
                                 common: {
-                                    name: stateName,
+                                    name: list[keyName]['name'] + ' ' + stateName,
                                     type: 'number',
                                     role: 'state',
                                     read: true,
@@ -993,7 +999,7 @@ function getSensor(gwName, sensorId){
                             adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                 type: 'state',
                                 common: {
-                                    name: stateName,
+                                    name: list[keyName]['name'] + ' ' + stateName,
                                     type: 'boolean',
                                     role: 'state',
                                     read: true,
@@ -1016,7 +1022,7 @@ function getSensor(gwName, sensorId){
                                 adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                     type: 'state',
                                     common: {
-                                        name: stateName,
+                                        name: list[keyName]['name'] + ' ' + stateName,
                                         type: 'boolean',
                                         role: 'state',
                                         read: true,
@@ -1033,7 +1039,7 @@ function getSensor(gwName, sensorId){
                                 adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                     type: 'state',
                                     common: {
-                                        name: stateName,
+                                        name: list[keyName]['name'] + ' ' + stateName,
                                         type: 'number',
                                         role: 'indicator.battery',
                                         read: true,
@@ -1050,7 +1056,7 @@ function getSensor(gwName, sensorId){
                                 adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                     type: 'state',
                                     common: {
-                                        name: stateName,
+                                        name: list[keyName]['name'] + ' ' + stateName,
                                         type: 'boolean',
                                         role: 'indicator.reachable',
                                         read: true,
@@ -1067,7 +1073,7 @@ function getSensor(gwName, sensorId){
                                 adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                     type: 'state',
                                     common: {
-                                        name: stateName,
+                                        name: list[keyName]['name'] + ' ' + stateName,
                                         type: 'boolean',
                                         role: 'indicator.reachable',
                                         read: true,
@@ -1084,7 +1090,7 @@ function getSensor(gwName, sensorId){
                                 adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                     type: 'state',
                                     common: {
-                                        name: stateName,
+                                        name: list[keyName]['name'] + ' ' + stateName,
                                         type: 'number',
                                         role: 'indicator.duration',
                                         read: true,
@@ -1101,7 +1107,7 @@ function getSensor(gwName, sensorId){
                                 adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                     type: 'state',
                                     common: {
-                                        name: stateName,
+                                        name: list[keyName]['name'] + ' ' + stateName,
                                         type: 'mixed',
                                         role: 'info',
                                         read: true,
@@ -1121,7 +1127,7 @@ function getSensor(gwName, sensorId){
                                 adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                     type: 'state',
                                     common: {
-                                        name: stateName,
+                                        name: list[keyName]['name'] + ' ' + stateName,
                                         type: 'number',
                                         role: 'state',
                                         read: true,
@@ -1191,7 +1197,7 @@ function getAllLights(gwName){
                                     adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                         type: 'state',
                                         common: {
-                                            name: stateName,
+                                            name: list[keyName]['name'] + ' ' + stateName,
                                             type: 'boolean',
                                             role: 'switch',
                                             read: true,
@@ -1204,7 +1210,7 @@ function getAllLights(gwName){
                                     adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                         type: 'state',
                                         common: {
-                                            name: stateName,
+                                            name: list[keyName]['name'] + ' ' + stateName,
                                             type: 'number',
                                             role: 'level.dimmer',
                                             min: 0,
@@ -1219,7 +1225,7 @@ function getAllLights(gwName){
                                     adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                         type: 'state',
                                         common: {
-                                            name: stateName,
+                                            name: list[keyName]['name'] + ' ' + stateName,
                                             type: 'number',
                                             role: 'hue.color',
                                             min: 0,
@@ -1234,7 +1240,7 @@ function getAllLights(gwName){
                                     adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                         type: 'state',
                                         common: {
-                                            name: stateName,
+                                            name: list[keyName]['name'] + ' ' + stateName,
                                             type: 'number',
                                             role: 'color.saturation',
                                             min: 0,
@@ -1249,7 +1255,7 @@ function getAllLights(gwName){
                                     adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                         type: 'state',
                                         common: {
-                                            name: stateName,
+                                            name: list[keyName]['name'] + ' ' + stateName,
                                             type: 'number',
                                             role: 'color.temp',
                                             min: 153,
@@ -1264,7 +1270,7 @@ function getAllLights(gwName){
                                     adapter.setObjectNotExists(gwName + '.' + lightName+ '.' + stateName, {
                                         type: 'state',
                                         common: {
-                                            name: stateName,
+                                            name: list[keyName]['name'] + ' ' + stateName,
                                             type: 'string',
                                             role: 'color.CIE',
                                             read: true,
@@ -1277,7 +1283,7 @@ function getAllLights(gwName){
                                     adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                         type: 'state',
                                         common: {
-                                            name: stateName,
+                                            name: list[keyName]['name'] + ' ' + stateName,
                                             type: 'string',
                                             role: 'action',
                                             read: true,
@@ -1290,7 +1296,7 @@ function getAllLights(gwName){
                                     adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                         type: 'state',
                                         common: {
-                                            name: stateName,
+                                            name: list[keyName]['name'] + ' ' + stateName,
                                             type: 'string',
                                             role: 'action',
                                             read: true,
@@ -1301,7 +1307,7 @@ function getAllLights(gwName){
                                     adapter.setObjectNotExists(gwName + '.' + lightName + '.colorloopspeed', {
                                         type: 'state',
                                         common: {
-                                            name: 'colorloopspeed',
+                                            name: list[keyName]['name'] + ' ' + 'colorloopspeed',
                                             type: 'number',
                                             role: 'argument',
                                             min: 1,
@@ -1316,7 +1322,7 @@ function getAllLights(gwName){
                                     adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                         type: 'state',
                                         common: {
-                                            name: stateName,
+                                            name: list[keyName]['name'] + ' ' + stateName,
                                             type: 'boolean',
                                             role: 'indicator.reachable',
                                             read: true,
@@ -1329,7 +1335,7 @@ function getAllLights(gwName){
                             adapter.setObjectNotExists(gwName + '.' + lightName + '.transitiontime', {
                                 type: 'state',
                                 common: {
-                                    name: 'transitiontime',
+                                    name: list[keyName]['name'] + ' ' + 'transitiontime',
                                     type: 'number',
                                     role: 'argument',
                                     read: true,
@@ -1389,7 +1395,7 @@ function getLightState(gwName, lightId){
                                 adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                     type: 'state',
                                     common: {
-                                        name: stateName,
+                                        name: list['name'] + ' ' + stateName,
                                         type: 'boolean',
                                         role: 'switch',
                                         read: true,
@@ -1403,7 +1409,7 @@ function getLightState(gwName, lightId){
                                 adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                     type: 'state',
                                     common: {
-                                        name: stateName,
+                                        name: list['name'] + ' ' + stateName,
                                         type: 'number',
                                         role: 'level.dimmer',
                                         min: 0,
@@ -1419,7 +1425,7 @@ function getLightState(gwName, lightId){
                                 adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                     type: 'state',
                                     common: {
-                                        name: stateName,
+                                        name: list['name'] + ' ' + stateName,
                                         type: 'number',
                                         role: 'hue.color',
                                         min: 0,
@@ -1435,7 +1441,7 @@ function getLightState(gwName, lightId){
                                 adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                     type: 'state',
                                     common: {
-                                        name: stateName,
+                                        name: list['name'] + ' ' + stateName,
                                         type: 'number',
                                         role: 'color.saturation',
                                         min: 0,
@@ -1451,7 +1457,7 @@ function getLightState(gwName, lightId){
                                 adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                     type: 'state',
                                     common: {
-                                        name: stateName,
+                                        name: list['name'] + ' ' + stateName,
                                         type: 'number',
                                         role: 'color.temp',
                                         min: 153,
@@ -1467,7 +1473,7 @@ function getLightState(gwName, lightId){
                                 adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                     type: 'state',
                                     common: {
-                                        name: stateName,
+                                        name: list['name'] + ' ' + stateName,
                                         type: 'string',
                                         role: 'color.CIE',
                                         read: true,
@@ -1481,7 +1487,7 @@ function getLightState(gwName, lightId){
                                 adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                     type: 'state',
                                     common: {
-                                        name: stateName,
+                                        name: list['name'] + ' ' + stateName,
                                         type: 'string',
                                         role: 'action',
                                         read: true,
@@ -1495,7 +1501,7 @@ function getLightState(gwName, lightId){
                                 adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                     type: 'state',
                                     common: {
-                                        name: stateName,
+                                        name: list['name'] + ' ' + stateName,
                                         type: 'string',
                                         role: 'action',
                                         read: true,
@@ -1506,7 +1512,7 @@ function getLightState(gwName, lightId){
                                 adapter.setObjectNotExists(gwName + '.' + lightName + '.colorloopspeed', {
                                     type: 'state',
                                     common: {
-                                        name: 'colorloopspeed',
+                                        name: list['name'] + ' ' + 'colorloopspeed',
                                         type: 'number',
                                         role: 'argument',
                                         min: 1,
@@ -1522,7 +1528,7 @@ function getLightState(gwName, lightId){
                                 adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                     type: 'state',
                                     common: {
-                                        name: stateName,
+                                        name: list['name'] + ' ' + stateName,
                                         type: 'number',
                                         role: 'argument',
                                         read: true,
@@ -1535,7 +1541,7 @@ function getLightState(gwName, lightId){
                                 adapter.setObjectNotExists(gwName + '.' + lightName + '.' + stateName, {
                                     type: 'state',
                                     common: {
-                                        name: stateName,
+                                        name: list['name'] + ' ' + stateName,
                                         type: 'boolean',
                                         role: 'indicator.reachable',
                                         read: true,

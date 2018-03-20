@@ -34,21 +34,29 @@
 
     function showDevice(obj, isFirst) {
         var text = '';
-        text += '<td style="text-align: center; white-space: nowrap;">' + obj.common.name + '</td>';
-        text += '<td style="text-align: center; white-space: nowrap;">' + obj.native.id + '</td>';
-        text += '<td style="text-align: center; white-space: nowrap;">' + obj.native.manufacturername + '</td>';
-        text += '<td style="text-align: center; white-space: nowrap;">' + obj.native.modelid + '</td>';
-        text += '<td style="text-align: center; white-space: nowrap;">' + obj.common.role + '</td>';
+        if(obj.common.role != 'gateway' && obj.common.role != 'group') {
+            text += '<td>' + obj.common.name + '</td>';
+            text += '<td>' + obj.native.id + '</td>';
+            text += '<td>' + obj.native.manufacturername + '</td>';
+            text += '<td>' + obj.native.modelid + '</td>';
+            text += '<td>' + obj.common.role + '</td>';
 
-        text += '<td style="text-align: center;">' + '' +
-            '<a id="' + obj.native.id  + ' ' + obj.common.role + '" data-id="' + obj.native.id + '" data-command="delete" class="values-buttons btn-floating btn-small waves-effect waves-light red"><i class="material-icons">delete</i></a>';
+            text += '<td>' + '' +
+                '<a id="'+ obj.native.id + obj.common.role + '" class="delete-device values-buttons btn-floating btn-small waves-effect waves-light red"><i class="material-icons">delete</i></a>';
 
-        text += '</select></td>';
-        text = '<tr data-id="' + obj.native.id + '">' + text + '</tr>';
-        $('#devices').append(text);
-        $('#' + obj.native.id + obj.common.role).change({id : obj.native.id}, onSelect);
-        $('#' + obj.native.id + obj.common.role).select();
+            text += '</select></td>';
+            text = '<tr data-id="' + obj.native.id + '">' + text + '</tr>';
+            $('#devices').append(text);
+
+            /*$('#' + obj.native.id + obj.common.role).change({id : obj.native.id}, onSelect);
+        $('#' + obj.native.id + obj.common.role).select();*/
+            $('#' + obj.native.id + obj.common.role).click(function(){
+                alert('Test: ' + obj.common.role);
+            });
+        }
     }
+
+
 
     // the function loadSettings has to exist ...
     function load(settings, onChange) {
@@ -302,7 +310,7 @@
             </div>
 
             <div class="table-values-div">
-                <table class="table-values">
+                <table class="table-values centered">
                     <thead>
                     <tr>
                         <th class="translate">Name</th>
@@ -313,7 +321,7 @@
                         <th class="translate"></th>
                     </tr>
                     </thead>
-
+                    <tbody id="devices"></tbody>
                 </table>
             </div>
         </div>
