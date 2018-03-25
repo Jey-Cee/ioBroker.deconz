@@ -1,6 +1,6 @@
 {
   "name": "iobroker.deconz",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "deConz can handle various ZigBee devices, such as Hue, Tradfri, Lightify, etc.",
   "author": {
     "name": "Jey Cee",

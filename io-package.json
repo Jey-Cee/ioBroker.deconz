@@ -1,8 +1,19 @@
 {
     "common": {
         "name": "deconz",
-        "version": "0.1.6",
+        "version": "0.1.7",
         "news": {
+            "0.1.7":{
+                "en": "add possibility to delete devices from deConz; fix issue on getAll... functions when there are is nothing;",
+                "de": "Möglichkeit hinzufügen, Geräte von deConz zu löschen; Problem beheben bei getAll ... Funktionen, wenn es nichts gibt;",
+                "ru": "добавить возможность удаления устройств из deConz; исправить проблему на getAll ... функции, когда есть ничего;",
+                "pt": "adicionar possibilidade de excluir dispositivos de deConz; corrigir problema em funções getAll ... quando não há nada;",
+                "nl": "mogelijkheid toevoegen om apparaten van deConz te verwijderen; probleem oplossen op getAll ... functies wanneer er niets is;",
+                "fr": "ajouter la possibilité de supprimer des périphériques de deConz; résoudre le problème sur getAll ... fonctions quand il n'y a rien;",
+                "it": "aggiungere la possibilità di eliminare i dispositivi da DeConz; risolvere il problema su getAll ... funzioni quando non ci sono nulla;",
+                "es": "agregar la posibilidad de eliminar dispositivos de deConz; soluciona el problema en las funciones getAll ... cuando no hay nada;",
+                "pl": "dodaj możliwość usunięcia urządzeń z deConz; Napraw problem na getAll ... funkcje, gdy nie ma nic;"
+            },
             "0.1.6": {
                 "en": "fix Xiaomi Sensor recognition",
                 "de": "Xiaomi Sensorerkennung beheben",

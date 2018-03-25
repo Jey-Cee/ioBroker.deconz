@@ -179,13 +179,25 @@ adapter.on('message', function (obj) {
                 deleteAPIkey();
                 wait = true;
                 break;
+            case 'getConfig':
+                getConfig();
+                wait = true;
+                break;
             case 'openNetwork':
                 var parameters = '{"permitjoin": 60}';
                 modifyConfig(parameters);
                 wait = true;
                 break;
             case 'deleteLight':
-
+                deleteLight(obj.message, function (res) {
+                    if (obj.callback) adapter.sendTo(obj.from, obj.command, JSON.stringify(res), obj.callback);
+                });
+                wait = true;
+                break;
+            case 'deleteSensor':
+                deleteSensor(obj.message, function (res) {
+                    if (obj.callback) adapter.sendTo(obj.from, obj.command, JSON.stringify(res), obj.callback);
+                });
                 wait = true;
                 break;
             default:
@@ -209,6 +221,7 @@ function main() {
         adapter.config.port = parseInt(adapter.config.port, 10);
     }
     if(adapter.config.user === '' || adapter.config.user === null){
+        adapter.log.warn('No API Key found');
     }else {
         getConfig();
     }
@@ -328,6 +341,7 @@ function getAutoUpdates(){
                                 try{var gwName = keyName.replace(/\.(\w|\w|\s|\(|\)|\[|\]|\-|\+)*$/, '');}catch(err){adapter.log.error(err)}
                                 getSensor(gwName, id);
                             }
+
                         }
                     });
                     break;
@@ -448,7 +462,7 @@ function getAllGroups(gwName) {
         var count = Object.keys(list).length - 1;
         adapter.log.debug('getAllGroups: ' + JSON.stringify(response));
 
-        if(res.statusCode === 200){
+        if(res.statusCode === 200 && body != '{}'){
                 for (var i = 0; i <= count; i++) {
                     var keyName = Object.keys(list)[i];
                     //create object for group
@@ -684,6 +698,7 @@ function setGroupState(parameters, groupId, stateId){
 
 //START  Sensor functions ----------------------------------------------------------------------------------------------
 function getAllSensors(gwName) {
+
     var options = {
         url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/sensors',
         method: 'GET'
@@ -695,7 +710,7 @@ function getAllSensors(gwName) {
 
         adapter.log.debug('getAllSensors: ' + body);
         
-        if (res.statusCode === 200) {
+        if (res.statusCode === 200 && body != '{}') {
                 for (var i = 0; i <= count; i++) {
                     var keyName = Object.keys(list)[i];
                     var sensorName = nameFilter(list[keyName]['name']);
@@ -795,10 +810,10 @@ function getAllSensors(gwName) {
                         }
                     }
                 }
-            
-            adapter.log.info('keyName before config: ' +  list[keyName]);
+
+
             var count3 = Object.keys(list[keyName]['config']).length - 1;
-            adapter.log.info('keyName after config: ' +  list[keyName]);
+
             //create states for sensor device
             for (var x = 0; x <= count3; x++) {
                 var stateName = Object.keys(list[keyName]['config'])[x];
@@ -1149,6 +1164,52 @@ function getSensor(gwName, sensorId){
         }
     })
 } //END getSensor
+
+function deleteSensor(sensorId){
+    var options = {
+        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/sensors/' + sensorId,
+        method: 'DELETE',
+        headers: 'Content-Type" : "application/json',
+        //body: parameters
+    };
+
+    request(options, function(error, res, body) {
+        adapter.log.debug('deleteSensor STATUS: ' + res.statusCode);
+        try{var response = JSON.parse(body);} catch(err){}
+        adapter.log.debug('deleteSensor BODY: ' + JSON.stringify(response));
+
+        if(res.statusCode === 200){
+            if(response[0]['success']){
+                adapter.log.info('The sensor with id ' + sensorId + ' was removed.')
+                adapter.getForeignObjects('*', 'device', function (err, enums) {                    //alle Objekte des Adapters suchen
+                    var count = Object.keys(enums).length - 1;                                      //Anzahl der Objekte
+                    for (var i = 0; i <= count; i++) {                                              //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ sensor handelt
+                        var keyName = Object.keys(enums)[i];
+                        if (enums[keyName].common.role == 'sensor' && enums[keyName].native.id == sensorId) {
+                            try{var gwName = keyName.replace(/^\w*\.\d\..*(?:\.)/, '');}catch(err){adapter.log.error(err)}
+                            adapter.log.info('delete device Object: ' + enums[keyName].common.name);
+                            var name = enums[keyName].common.name;
+                            /*adapter.delObject(keyName, function(err){
+                                adapter.log.info(err);
+                            });*/
+
+                            /*adapter.deleteDevice('deCONZ-GW.TRADFRI_motion_sensor', function(err){
+                                adapter.log.info(err);
+                            });*/
+                        }
+
+                    }
+                });
+            }else if(response[0]['error']){
+                //adapter.setState(stateId, {ack: false});
+                adapter.log.warn(JSON.stringify(response[0]['error']));
+            }
+        }else{
+            logging(res.statusCode, 'Delete sensor with ID: ' + sensorId);
+        }
+    });
+}
+
 //END  Sensor functions ------------------------------------------------------------------------------------------------
 
 
@@ -1165,7 +1226,7 @@ function getAllLights(gwName){
 
             adapter.log.debug('getAllLights: ' + body);
 
-            if (res.statusCode === 200) {
+            if (res.statusCode === 200 && body != '{}') {
                     for (var i = 0; i <= count; i++) {
                         var keyName = Object.keys(list)[i];
                         var lightName = nameFilter(list[keyName]['name']);
@@ -1561,7 +1622,7 @@ function getLightState(gwName, lightId){
 } //END getLightState
 
 function setLightState(parameters, lightId, stateId){
-
+        adapter.log.info('setLightState: ' + parameters + ' ' + lightId + ' ' + stateId);
         var options = {
             url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/lights/' + lightId + '/state',
             method: 'PUT',
@@ -1572,7 +1633,7 @@ function setLightState(parameters, lightId, stateId){
         request(options, function(error, res, body) {
             adapter.log.debug('STATUS: ' + res.statusCode);
             try{var response = JSON.parse(body);} catch(err){}
-
+            adapter.log.info('options: ' + JSON.stringify(options));
             adapter.log.debug('setLightState BODY: ' + JSON.stringify(response));
 
             if(res.statusCode === 200){
@@ -1588,12 +1649,12 @@ function setLightState(parameters, lightId, stateId){
         });
 } //END setLightState
 
-function deleteLight(parameters, lightId){
+function deleteLight(lightId){
     var options = {
         url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/lights/' + lightId,
         method: 'DELETE',
         headers: 'Content-Type" : "application/json',
-        body: parameters
+        //body: parameters
     };
 
     request(options, function(error, res, body) {

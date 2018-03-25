@@ -22,6 +22,11 @@ Required node.js >= 0.12.
 
 ## Changelog
 
+### 0.17
+
+* (Jey-Cee) add possibility to delete devices from deConz
+* (Jey-Cee) fix issue on getAll... functions when there are is nothing
+
 ### 0.1.6
 
 * (Jey-Cee) fix Xiaomi Sensors recognition

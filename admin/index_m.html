@@ -17,6 +17,10 @@
     var active   = false;
     var devices = {};
 
+
+
+
+
     function setValue(id, value, onChange) {
         var $value = $('#' + id + '.value');
         if ($value.attr('type') === 'checkbox') {
@@ -42,16 +46,40 @@
             text += '<td>' + obj.common.role + '</td>';
 
             text += '<td>' + '' +
-                '<a id="'+ obj.native.id + obj.common.role + '" class="delete-device values-buttons btn-floating btn-small waves-effect waves-light red"><i class="material-icons">delete</i></a>';
+
+                '<a id="'+ obj.native.id + obj.common.role + '" class="delete-device values-buttons btn-floating btn-small waves-effect waves-light red"><i class="material-icons" title="Delete device from deConz">delete</i></a>';
 
             text += '</select></td>';
             text = '<tr data-id="' + obj.native.id + '">' + text + '</tr>';
             $('#devices').append(text);
 
+
             /*$('#' + obj.native.id + obj.common.role).change({id : obj.native.id}, onSelect);
         $('#' + obj.native.id + obj.common.role).select();*/
             $('#' + obj.native.id + obj.common.role).click(function(){
-                alert('Test: ' + obj.common.role);
+                if(obj.common.role === 'sensor') {
+                    sendTo('deconz.' + instance, 'deleteSensor', obj.native.id);
+                    //$('#user.value').val('').trigger('change');
+                }else if(obj.common.role === 'light'){
+                    sendTo('deconz.' + instance, 'deleteLight', obj.native.id);
+                }
+                //document.getElementById("devices").remove();
+                $("#devices > tr").remove();
+                    // populate the list of known devices
+                setTimeout(function(){
+                    socket.emit('getObjectView', 'system', 'device', { startkey: 'deconz.' + instance + '.', endkey: 'deconz.' + instance + '.\u9999', include_docs: true }, function (err, _devices) {
+                        socket.emit('getStates', function (err, _values) {
+                            var namespace = 'deconz.' + instance + '.';
+                            var len = namespace.length;
+                            if (_devices && _devices.rows && _devices.rows.length) {
+                                for (var j = 0; j < _devices.rows.length; j++) {
+                                    devices[_devices.rows[j].value._id] = _devices.rows[j].value;
+                                    showDevice(_devices.rows[j].value, true);
+                                }
+                            }
+                        });
+                    });
+                }, 1000);
             });
         }
     }
@@ -61,6 +89,7 @@
     // the function loadSettings has to exist ...
     function load(settings, onChange) {
         if (settings.port === undefined) settings.port = 8080;
+
 
         if (!settings) return;
         $('.value').each(function () {
@@ -139,7 +168,7 @@
             })();
         });
 
-        $('#delete').click(function () {
+        $('#deleteAPIkey').click(function () {
                 sendTo('deconz.' + instance, 'deleteAPIkey');
                 $('#user.value').val('').trigger('change');
         });
@@ -153,7 +182,7 @@
         if (settings.user) {
             $('#create').addClass('disabled');
         } else {
-            $('#delete').addClass('disabled');
+            $('#deleteAPIkey').addClass('disabled');
         }
         $('#user').change(function () {
             if ($(this).val()) {
@@ -208,6 +237,7 @@
             $('#opennetwork').html('Open Network');
             $('#opennetwork').removeClass('disabled');
             counter = 60;
+            sendTo('deconz.' + instance, 'getConfig');
         }
     }
 
@@ -223,6 +253,8 @@
         });
         callback(obj);
     }
+
+
 </script>
 <style>
     #settings tr {
@@ -231,7 +263,7 @@
     #settings td {
         padding-left: 10px;
     }
-    #delete, #create, #opennetwork {
+    #deleteAPIkey, #create, #opennetwork {
         font-size: 14px;
     }
     #manage_deconz {
@@ -283,7 +315,7 @@
                     </a>
                 </div>
                 <div class="input-field col s6 m2">
-                    <a class="waves-effect waves-light btn" id="delete">
+                    <a class="waves-effect waves-light btn" id="deleteAPIkey">
                         <span class="translate active" data-lang="Delete API key">Delete API key</span>
                     </a>
                 </div>
@@ -304,7 +336,7 @@
             <div class="row">
                 <div class="input-field col s2">
                     <a class="waves-effect waves-light btn" id="opennetwork">
-                        <span class="translate" data-lang="Open Network">Open Network</span>
+                        <span class="translate tooltiped" data-position="bottom" data-delay="50" data-tooltip="I am a tooltip" data-lang="Open Network">Open Network</span>
                     </a>
                 </div>
             </div>
