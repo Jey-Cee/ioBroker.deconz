@@ -337,11 +337,14 @@ function getAutoUpdates(){
                         var count = Object.keys(enums).length - 1;                                      //Anzahl der Objekte
                         for (var i = 0; i <= count; i++) {                                              //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ sensor handelt
                             var keyName = Object.keys(enums)[i];
-                            if (enums[keyName].common.role == 'sensor' && enums[keyName].native.id == id) {
-                                try{var gwName = keyName.replace(/\.(\w|\w|\s|\(|\)|\[|\]|\-|\+)*$/, '');}catch(err){adapter.log.error(err)}
-                                getSensor(gwName, id);
+                            if(enums[keyName] != undefined){
+                                if (enums[keyName].common.role == 'sensor' && enums[keyName].native.id == id) {
+                                    try{var gwName = keyName.replace(/\.(\w|\w|\s|\(|\)|\[|\]|\-|\+)*$/, '');}catch(err){adapter.log.error(err)}
+                                    getSensor(gwName, id);
+                                }
+                            }else{
+                                adapter.log.info('Objekt zum Sensor nicht gefunden: ' + id);
                             }
-
                         }
                     });
                     break;
@@ -746,6 +749,10 @@ function getAllSensors(gwName) {
                         case 'lux':
                         case 'buttonevent':
                         case 'status':
+                        case 'power':
+                        case 'voltage':
+                        case 'current':
+                        case 'consumption':
                             adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                 type: 'state',
                                 common: {
@@ -784,6 +791,7 @@ function getAllSensors(gwName) {
                         case 'flag':
                         case 'water':
                         case 'tampered':
+                        case 'fire':
                         adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                             type: 'state',
                             common: {
@@ -1026,6 +1034,10 @@ function getSensor(gwName, sensorId){
                         case 'lux':
                         case 'buttonevent':
                         case 'status':
+                        case 'power':
+                        case 'voltage':
+                        case 'current':
+                        case 'consumption':
                             adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                 type: 'state',
                                 common: {
@@ -1061,6 +1073,7 @@ function getSensor(gwName, sensorId){
                         case 'flag':
                         case 'water':
                         case 'tampered':
+                        case 'fire':
                             adapter.setObjectNotExists(gwName + '.' + sensorName + '.' + stateName, {
                                 type: 'state',
                                 common: {
