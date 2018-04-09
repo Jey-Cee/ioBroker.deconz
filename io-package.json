@@ -1,7 +1,7 @@
 {
     "common": {
         "name": "deconz",
-        "version": "0.1.7",
+        "version": "0.1.8",
         "news": {
             "0.1.7":{
                 "en": "add possibility to delete devices from deConz; fix issue on getAll... functions when there are is nothing;",

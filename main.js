@@ -304,54 +304,36 @@ function getAutoUpdates(){
             var type = data['r'];
             var state = data['state'];
             adapter.log.debug('Websocket message: ' + JSON.stringify(data));
-            adapter.log.debug('Id: ' + id + ' Type: ' + type);
 
-            switch (type) {
-                case 'lights':
-                    adapter.getForeignObjects('*', 'device', function (err, enums) {
-                        var count = Object.keys(enums).length - 1;
-                        for (var i = 0; i <= count; i++) {
-                            var keyName = Object.keys(enums)[i];
-                            if (enums[keyName].common.role === 'light' && enums[keyName].native.id === id) {
-                                var gwName = keyName.replace(/\.(\w|\w|\s|\(|\)|\[|\]|\-|\+)*$/, '');
-                                getLightState(gwName, id);
-                            }
 
-                        }
-                    });
-                    break;
-                case 'groups':
-                    adapter.getForeignObjects('*', 'device', function (err, enums) {
-                        var count = Object.keys(enums).length - 1;
-                        for (var i = 0; i <= count; i++) {
-                            var keyName = Object.keys(enums)[i];
-                            if (enums[keyName].common.role === 'group' && enums[keyName].native.id === id) {
-                                var gwName = keyName.replace(/\.(\w|\w|\s|\(|\)|\[|\]|\-|\+)*$/, '');
-                                getGroupAttributes(gwName, id);
-                            }
-                        }
-                    });
-                    break;
-                case 'sensors':
-                    adapter.getForeignObjects('*', 'device', function (err, enums) {                    //alle Objekte des Adapters suchen
+
+                    adapter.getForeignObjects('deconz*', 'device', function (err, enums) {                    //alle Objekte des Adapters suchen
                         var count = Object.keys(enums).length - 1;                                      //Anzahl der Objekte
+                        adapter.log.debug('Id: ' + id + ' Type: ' + type);
+                        var role = type.replace(/(s)$/, '');
                         for (var i = 0; i <= count; i++) {                                              //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ sensor handelt
                             var keyName = Object.keys(enums)[i];
-                            if(enums[keyName] != undefined){
-                                if (enums[keyName].common.role == 'sensor' && enums[keyName].native.id == id) {
-                                    try{var gwName = keyName.replace(/\.(\w|\w|\s|\(|\)|\[|\]|\-|\+)*$/, '');}catch(err){adapter.log.error(err)}
-                                    getSensor(gwName, id);
+                                if (enums[keyName].common.role == role && enums[keyName].native.id == id) {
+                                    var gwName = keyName.replace(/\.(\w|\w|\s|\(|\)|\[|\]|\-|\+)*$/, '');
+                                    switch (type) {
+                                        case 'lights':
+                                            getLightState(gwName, id);
+                                            break;
+                                        case 'groups':
+                                            getGroupAttributes(gwName, id);
+                                            break;
+                                        case 'sensors':
+                                            getSensor(gwName, id);
+                                            break;
+                                    }
                                 }
-                            }else{
-                                adapter.log.info('Objekt zum Sensor nicht gefunden: ' + id);
-                            }
                         }
                     });
-                    break;
+
             }
         }
     }
-}
+
 
 //START deConz config --------------------------------------------------------------------------------------------------
 function modifyConfig(parameters){
@@ -1273,17 +1255,14 @@ function deleteSensor(sensorId){
         if(res.statusCode === 200){
             if(response[0]['success']){
                 adapter.log.info('The sensor with id ' + sensorId + ' was removed.')
-                adapter.getForeignObjects('*', 'device', function (err, enums) {                    //alle Objekte des Adapters suchen
+                adapter.getForeignObjects('deconz*', 'device', function (err, enums) {                    //alle Objekte des Adapters suchen
                     var count = Object.keys(enums).length - 1;                                      //Anzahl der Objekte
                     for (var i = 0; i <= count; i++) {                                              //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ sensor handelt
                         var keyName = Object.keys(enums)[i];
                         if (enums[keyName].common.role == 'sensor' && enums[keyName].native.id == sensorId) {
-                            try{var gwName = keyName.replace(/^\w*\.\d\..*(?:\.)/, '');}catch(err){adapter.log.error(err)}
+                            var gwName = keyName.replace(/^\w*\.\d\..*(?:\.)/, '');
                             adapter.log.info('delete device Object: ' + enums[keyName].common.name);
                             var name = enums[keyName].common.name;
-                            /*adapter.delObject(keyName, function(err){
-                                adapter.log.info(err);
-                            });*/
 
                             /*adapter.deleteDevice('deCONZ-GW.TRADFRI_motion_sensor', function(err){
                                 adapter.log.info(err);
