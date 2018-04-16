@@ -16,7 +16,7 @@
     var namespace = 'deconz.' + instance;
     var active   = false;
     var devices = {};
-
+    var selectId;
 
 
 
@@ -35,6 +35,8 @@
             });
         }
     }
+
+
 
     function showDevice(obj, isFirst) {
         var text = '';
@@ -63,7 +65,7 @@
                 }else if(obj.common.role === 'light'){
                     sendTo('deconz.' + instance, 'deleteLight', obj.native.id);
                 }
-                //document.getElementById("devices").remove();
+
                 $("#devices > tr").remove();
                     // populate the list of known devices
                 setTimeout(function(){
@@ -84,6 +86,69 @@
         }
     }
 
+    function showGroups(obj, isFirst) {
+        var text = '';
+        if(obj.common.role == 'group') {
+            text += '<td>' + obj.common.name + '</td>';
+            text += '<td>' + obj.native.id + '</td>';
+            text += '<td>' + obj.native.devicemembership + '</td>';
+            text += '<td>' + obj.native.lights + '</td>';
+
+            text += '<td>' + '' +
+
+                '<a id="'+ obj.native.id + obj.common.role + '" class="delete-device values-buttons btn-floating btn-small waves-effect waves-light red"><i class="material-icons" title="Delete group from deConz">delete</i></a>';
+
+            text += '</select></td>';
+            text = '<tr data-id="' + obj.native.id + '">' + text + '</tr>';
+            $('#groups').append(text);
+
+
+            /*$('#' + obj.native.id + obj.common.role).change({id : obj.native.id}, onSelect);
+        $('#' + obj.native.id + obj.common.role).select();*/
+            $('#' + obj.native.id + obj.common.role).click(function(){
+                if(obj.common.role === 'group') {
+                    sendTo('deconz.' + instance, 'deleteGroup', obj.native.id);
+                    //$('#user.value').val('').trigger('change');
+                }
+                //document.getElementById("devices").remove();
+                $("#groups > tr").remove();
+                // populate the list of known devices
+                setTimeout(function(){
+                    emitGroups();
+                }, 1000);
+            });
+        }
+    }
+
+    function emitDevices(){
+        socket.emit('getObjectView', 'system', 'device', { startkey: 'deconz.' + instance + '.', endkey: 'deconz.' + instance + '.\u9999', include_docs: true }, function (err, _devices) {
+            socket.emit('getStates', function (err, _values) {
+                var namespace = 'deconz.' + instance + '.';
+                var len = namespace.length;
+                if (_devices && _devices.rows && _devices.rows.length) {
+                    for (var j = 0; j < _devices.rows.length; j++) {
+                        devices[_devices.rows[j].value._id] = _devices.rows[j].value;
+                        showDevice(_devices.rows[j].value, true);
+                    }
+                }
+            });
+        });
+    }
+
+    function emitGroups(){
+        socket.emit('getObjectView', 'system', 'device', { startkey: 'deconz.' + instance + '.', endkey: 'deconz.' + instance + '.\u9999', include_docs: true }, function (err, _groups) {
+            socket.emit('getStates', function (err, _values) {
+                var namespace = 'deconz.' + instance + '.';
+                var len = namespace.length;
+                if (_groups && _groups.rows && _groups.rows.length) {
+                    for (var j = 0; j < _groups.rows.length; j++) {
+                        groups[_groups.rows[j].value._id] = _groups.rows[j].value;
+                        showGroups(_groups.rows[j].value, true);
+                    }
+                }
+            });
+        });
+    }
 
 
     // the function loadSettings has to exist ...
@@ -179,6 +244,27 @@
             countdown();
         });
 
+        $('#create_group').click(function () {
+            sendTo('deconz.' + instance, 'createGroup', $('#group_name.value').val(), function(result){
+                try {
+                    result = JSON.parse(result);
+                    if (result.error === 0) {
+                        if (result.error === 0 && result.message === 'success') {
+                            $("#groups > tr").remove();
+                            $('#group_name.value').val(null);
+                            setTimeout(function(){
+                                emitGroups();
+                            },500);
+                        }
+                    } else {
+                        $('#group_name.value').val('').trigger('change');
+                    }
+                } catch (e) {
+                    showMessage(_('error creating new group ' + result), _('Error'), 'alert');
+                }
+            });
+        });
+
         if (settings.user) {
             $('#create').addClass('disabled');
         } else {
@@ -204,19 +290,13 @@
         socket.emit('subscribeObjects', namespace + '.*'); // seems, this doesn't work
 
         // populate the list of known devices
-        socket.emit('getObjectView', 'system', 'device', { startkey: 'deconz.' + instance + '.', endkey: 'deconz.' + instance + '.\u9999', include_docs: true }, function (err, _devices) {
-            socket.emit('getStates', function (err, _values) {
-                var namespace = 'deconz.' + instance + '.';
-                var len = namespace.length;
-                if (_devices && _devices.rows && _devices.rows.length) {
-                    for (var j = 0; j < _devices.rows.length; j++) {
-                        devices[_devices.rows[j].value._id] = _devices.rows[j].value;
-                        showDevice(_devices.rows[j].value, true);
-                    }
-                }
-            });
-        });
+        emitDevices();
 
+        // populate the list of known groups
+        emitGroups();
+
+        $('#bridge').focusout(function(){$('.btn-save').trigger('click')});
+        $('#port').focusout(function(){$('.btn-save').trigger('click')});
 
         onChange(false);
         M.updateTextFields();
@@ -282,6 +362,9 @@
                 </li>
                 <li class="tab col s2">
                     <a href="#tab-manage-devices" class="translate" data-lang="Manage Devices">Manage Devices</a>
+                </li>
+                <li class="tab col s2">
+                    <a href="#tab-manage-groups" class="translate" data-lang="Manage Groups">Manage Groups</a>
                 </li>
             </ul>
         </div>
@@ -354,6 +437,34 @@
                     </tr>
                     </thead>
                     <tbody id="devices"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-manage-groups" class="col s12 page">
+                <div class="row">
+                    <div class="input-field col s2">
+                        <input class="value text" id="group_name"  size="15" maxlength="15" type="text">
+                        <label class="translate active" data-lang="Name of new the new group:">Name of the new group</label>
+                    </div>
+                    <div class="input-field col s2">
+                        <a class="waves-effect waves-light btn" id="create_group">
+                            <span class="translate tooltiped" data-position="bottom" data-delay="50" data-tooltip="I am a tooltip" data-lang="Create Group">Create Group</span>
+                        </a>
+                    </div>
+                </div>
+            <div class="table-values-div">
+                <table class="table-values centered">
+                    <thead>
+                    <tr>
+                        <th class="translate">Name</th>
+                        <th class="translate">ID</th>
+                        <th class="translate">Devicemembership</th>
+                        <th class="translate">Lights</th>
+                        <th class="translate"></th>
+                    </tr>
+                    </thead>
+                    <tbody id="groups"></tbody>
                 </table>
             </div>
         </div>

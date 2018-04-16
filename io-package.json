@@ -1,8 +1,19 @@
 {
     "common": {
         "name": "deconz",
-        "version": "0.1.8",
+        "version": "0.2.0",
         "news": {
+            "0.2.0":{
+                "en": "next Try with Xiaomi Sensors; Added \"pressure\" sensor; Added create group to adapter config;",
+                "de": "nächster Versuch mit Xiaomi Sensoren; Hinzugefügt \"Druck\" -Sensor; Gruppe zu Adapterkonfiguration hinzugefügt hinzugefügt;",
+                "ru": "следующее Попробуйте с датчиками Xiaomi; Добавлен датчик давления; Добавлена ​​возможность создания группы в конфигурацию адаптера;",
+                "pt": "next Experimente com o Xiaomi Sensors; Adicionado sensor de \"pressão\"; Adicionado criar grupo para configuração do adaptador;",
+                "nl": "volgende Probeer met Xiaomi-sensoren; Toegevoegd \"druk\" sensor; Groep toevoegen aan adapterconfiguratie toegevoegd;",
+                "fr": "suivant Essayez avec Xiaomi Sensors; Ajout d'un capteur \"pression\" Ajout du groupe de création à la configuration de l'adaptateur;",
+                "it": "avanti Prova con Xiaomi Sensors; Aggiunto sensore \"pressione\"; Aggiunto creare un gruppo per la configurazione dell'adattatore;",
+                "es": "Siguiente Prueba con Xiaomi Sensors; Sensor de \"presión\" agregado; Se agregó crear grupo a la configuración del adaptador;",
+                "pl": "dalej Wypróbuj Xiaomi Sensors; Dodano czujnik \"ciśnienia\"; Dodano tworzenie grupy do konfiguracji adaptera;"
+            },
             "0.1.7":{
                 "en": "add possibility to delete devices from deConz; fix issue on getAll... functions when there are is nothing;",
                 "de": "Möglichkeit hinzufügen, Geräte von deConz zu löschen; Problem beheben bei getAll ... Funktionen, wenn es nichts gibt;",

@@ -22,7 +22,12 @@ Required node.js >= 0.12.
 
 ## Changelog
 
-### 0.17
+### 0.2.0
+* (Jey-Cee) next Try with Xiaomi Sensors
+* (Jey-Cee) Added "pressure" sensor
+* (Jey-Cee) Added create group to adapter config
+
+### 0.1.7
 
 * (Jey-Cee) add possibility to delete devices from deConz
 * (Jey-Cee) fix issue on getAll... functions when there are is nothing
