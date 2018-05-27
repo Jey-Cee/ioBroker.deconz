@@ -6,6 +6,7 @@
     <script type="text/javascript" src="../../lib/js/jquery-3.2.1.min.js"></script>
     <script type="text/javascript" src="../../socket.io/socket.io.js"></script>
 
+
     <script type="text/javascript" src="../../js/translate.js"></script>
     <script type="text/javascript" src="../../lib/js/materialize.js"></script>
     <script type="text/javascript" src="../../js/adapter-settings.js"></script>
@@ -16,9 +17,7 @@
     var namespace = 'deconz.' + instance;
     var active   = false;
     var devices = {};
-    var selectId;
-
-
+    var counter;
 
 
     function setValue(id, value, onChange) {
@@ -195,8 +194,6 @@
             }
         });
 
-
-
         //$('#tabs').tabs();
         $('#create').click(function () {
             if (!active) {
@@ -301,22 +298,23 @@
         onChange(false);
         M.updateTextFields();
 
+        $('#sw_version').text('deConz Version: ' + settings.sw_version);
+        $('#api_version').text('API Version: ' + settings.api_version);
+        counter = settings.permit;
     }
 
-    var counter = 60;
-
-
     function countdown(){
+
         if(counter >0){
             setTimeout(function(){
                 counter = counter -1;
                 countdown();
             }, 1000);
             $('#opennetwork').html(_('Open for %s seconds', counter));
-        }else if(counter === 0){
+        }else if(i === 0){
             $('#opennetwork').html('Open Network');
             $('#opennetwork').removeClass('disabled');
-            counter = 60;
+            counter = $('permit').val();
             sendTo('deconz.' + instance, 'getConfig');
         }
     }
@@ -377,6 +375,13 @@
                 </div>
 
             <div class="row">
+                <div class="chip" id="sw_version">
+                </div>
+                <div class="chip" id="api_version">
+                </div>
+            </div>
+
+            <div class="row">
                 <div class="input-field col s12 m4 15">
                     <input class="value text" id="bridge" for="bridge" size="15" maxlength="15" type="text">
                     <label class="translate active" id="deconz-address" data-lang="deConz Addresse:">deConz IP Adresse</label>
@@ -416,23 +421,28 @@
         </div>
 
         <div id="tab-manage-devices" class="col s12 page">
-            <div class="row">
-                <div class="input-field col s2">
-                    <a class="waves-effect waves-light btn" id="opennetwork">
-                        <span class="translate tooltiped" data-position="bottom" data-delay="50" data-tooltip="I am a tooltip" data-lang="Open Network">Open Network</span>
-                    </a>
+            <div class="row"></div>
+                <div class="row">
+                    <div class="input-field col s2">
+                        <a class="waves-effect waves-light btn" id="opennetwork">
+                            <span class="translate tooltiped" data-position="bottom" data-delay="50" data-tooltip="I am a tooltip" data-lang="Open Network">Open Network</span>
+                        </a>
+                    </div>
+                    <div class="input-field col s1 m1">
+                        <input class="value number" id="permit" size="10" maxlength="10" type="number">
+                        <label class="translate active" for="permit" data-lang="Duration">Duration</label>
+                    </div>
                 </div>
-            </div>
 
             <div class="table-values-div">
                 <table class="table-values centered">
                     <thead>
                     <tr>
-                        <th class="translate">Name</th>
+                        <th class="translate" data-lang="Name">Name</th>
                         <th class="translate">ID</th>
-                        <th class="translate">Manufacturer</th>
-                        <th class="translate">Model ID</th>
-                        <th class="translate">Type</th>
+                        <th class="translate" data-lang="Manufacturer">Manufacturer</th>
+                        <th class="translate" data-lang="Model ID">Model ID</th>
+                        <th class="translate" data-lang="Type">Type</th>
                         <th class="translate"></th>
                     </tr>
                     </thead>
@@ -445,7 +455,7 @@
                 <div class="row">
                     <div class="input-field col s2">
                         <input class="value text" id="group_name"  size="15" maxlength="15" type="text">
-                        <label class="translate active" data-lang="Name of new the new group:">Name of the new group</label>
+                        <label class="translate active" data-lang="Name of the new group:">Name of the new group</label>
                     </div>
                     <div class="input-field col s2">
                         <a class="waves-effect waves-light btn" id="create_group">
@@ -453,20 +463,25 @@
                         </a>
                     </div>
                 </div>
+
+
             <div class="table-values-div">
                 <table class="table-values centered">
                     <thead>
                     <tr>
-                        <th class="translate">Name</th>
+                        <th class="translate" data-lang="Name">Name</th>
                         <th class="translate">ID</th>
-                        <th class="translate">Devicemembership</th>
-                        <th class="translate">Lights</th>
+                        <th class="translate" data-lang="Devices (ID of Device)">Devices (ID of Device)</th>
+                        <th class="translate" data-lang="Lights (ID of Light)">Lights (ID of Light)</th>
                         <th class="translate"></th>
                     </tr>
                     </thead>
                     <tbody id="groups"></tbody>
                 </table>
             </div>
+
+            </div>
+
         </div>
 
 

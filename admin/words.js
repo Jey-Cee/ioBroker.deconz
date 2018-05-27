@@ -22,5 +22,104 @@ systemDictionary = {
     "Manage Groups":{                                "en": "Manage Groups",                                   "de": "Gruppen verwalten",                                "ru": "Управление группами",                            "pt": "Gerenciar Grupos",                               "nl": "Groepen beheren",                                  "fr": "Gérer les groupes",                               "it": "Gestisci gruppi",                                 "es": "Administrar grupos",                              "pl": "Zarządzaj grupami"},
     "deConz Version":{                               "en": "deConz Version",                                  "de": "deConz Version",                                   "ru": "Версия deConz",                                  "pt": "Versão deConz",                                  "nl": "deConz-versie",                                    "fr": "Version deConz",                                  "it": "versione deConz",                                 "es": "Versión deConz",                                  "pl": "Wersja deConz"},
     "deConz REST API Version":{                      "en": "deConz REST API Version",                         "de": "deConz REST API Version",                          "ru": "Версия API REST deConz",                         "pt": "Versão da API DEConz REST",                      "nl": "deConz REST API-versie",                           "fr": "Version de l'API REST deConz",                    "it": "Versione dell'API REST deConz",                   "es": "Versión de la API REST deConz",                   "pl": "Wersja programu REST API deConz"},
-    "Create Group": {                                "en": "Create Group",                                    "de": "Gruppe erstellen",                                 "ru": "Создать группу",                                 "pt": "Criar grupo",                                    "nl": "Maak een groep",                                   "fr": "Créer un groupe",                                 "it": "Creare un gruppo",                                "es": "Crea un grupo",                                   "pl": "Stworzyć grupę"}
+    "Create Group": {                                "en": "Create Group",                                    "de": "Gruppe erstellen",                                 "ru": "Создать группу",                                 "pt": "Criar grupo",                                    "nl": "Maak een groep",                                   "fr": "Créer un groupe",                                 "it": "Creare un gruppo",                                "es": "Crea un grupo",                                   "pl": "Stworzyć grupę"},
+    "Open Network": {
+        "en": "Open Network",
+        "de": "Netzwerk öffnen",
+        "ru": "Открытая сеть",
+        "pt": "Rede Aberta",
+        "nl": "Open netwerk",
+        "fr": "Réseau ouvert",
+        "it": "Apri la rete",
+        "es": "Red abierta",
+        "pl": "Otwórz sieć"
+    },
+    "Duration": {
+        "en": "Duration",
+        "de": "Dauer",
+        "ru": "продолжительность",
+        "pt": "Duração",
+        "nl": "Looptijd",
+        "fr": "Durée",
+        "it": "Durata",
+        "es": "Duración",
+        "pl": "Trwanie"
+    },
+    "Name": {
+        "en": "Name",
+        "de": "Name",
+        "ru": "имя",
+        "pt": "Nome",
+        "nl": "Naam",
+        "fr": "prénom",
+        "it": "Nome",
+        "es": "Nombre",
+        "pl": "Nazwa"
+    },
+    "Manufacturer": {
+        "en": "Manufacturer",
+        "de": "Hersteller",
+        "ru": "производитель",
+        "pt": "Fabricante",
+        "nl": "Fabrikant",
+        "fr": "Fabricant",
+        "it": "fabbricante",
+        "es": "Fabricante",
+        "pl": "Producent"
+    },
+    "Model ID": {
+        "en": "Model ID",
+        "de": "Modell-ID",
+        "ru": "ID модели",
+        "pt": "ID do modelo",
+        "nl": "Model ID",
+        "fr": "ID du modèle",
+        "it": "ID modello",
+        "es": "ID de modelo",
+        "pl": "ID modelu"
+    },
+    "Type": {
+        "en": "Type",
+        "de": "Art",
+        "ru": "Тип",
+        "pt": "Tipo",
+        "nl": "Type",
+        "fr": "Type",
+        "it": "genere",
+        "es": "Tipo",
+        "pl": "Rodzaj"
+    },
+    "Devices (ID of Device)": {
+        "en": "Devices (ID of Device)",
+        "de": "Geräte (ID des Geräts)",
+        "ru": "Устройства (ID устройства)",
+        "pt": "Dispositivos (ID do dispositivo)",
+        "nl": "Apparaten (ID van apparaat)",
+        "fr": "Périphériques (ID du périphérique)",
+        "it": "Dispositivi (ID del dispositivo)",
+        "es": "Dispositivos (ID del dispositivo)",
+        "pl": "Urządzenia (identyfikator urządzenia)"
+    },
+    "Lights (ID of Light)": {
+        "en": "Lights (ID of Light)",
+        "de": "Lampen (ID der Lampe)",
+        "ru": "Свет (ID света)",
+        "pt": "Luzes (ID da Luz)",
+        "nl": "Lichten (ID van licht)",
+        "fr": "Lumières (ID de la lumière)",
+        "it": "Luci (ID della luce)",
+        "es": "Luces (ID de luz)",
+        "pl": "Światła (ID światła)"
+    },
+    "Name of the new group:": {
+        "en": "Name of the new group:",
+        "de": "Name der neuen Gruppe:",
+        "ru": "Название новой группы:",
+        "pt": "Nome do novo grupo:",
+        "nl": "Naam van de nieuwe groep:",
+        "fr": "Nom du nouveau groupe:",
+        "it": "Nome del nuovo gruppo:",
+        "es": "Nombre del nuevo grupo:",
+        "pl": "Nazwa nowej grupy:"
+    }
 };

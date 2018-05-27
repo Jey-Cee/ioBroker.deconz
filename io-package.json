@@ -1,8 +1,19 @@
 {
     "common": {
         "name": "deconz",
-        "version": "0.2.0",
+        "version": "0.2.1",
         "news": {
+            "0.2.1":{
+                "en": "Added new elements to config; Changed some small things",
+                "de": "Neue Elemente zur Konfiguration hinzugefügt; Einige kleine Dinge geändert",
+                "ru": "Добавлены новые элементы в config; Изменены некоторые мелочи",
+                "pt": "Adicionado novos elementos à configuração; Mudou algumas pequenas coisas",
+                "nl": "Nieuwe elementen toegevoegd aan config; Een paar kleine dingen veranderd",
+                "fr": "Ajout de nouveaux éléments à config; Changé quelques petites choses",
+                "it": "Aggiunti nuovi elementi alla configurazione; Cambiato alcune piccole cose",
+                "es": "Se agregaron nuevos elementos a config; Cambió algunas cosas pequeñas",
+                "pl": "Dodano nowe elementy do konfiguracji; Zmieniono kilka małych rzeczy"
+            },
             "0.2.0":{
                 "en": "next Try with Xiaomi Sensors; Added \"pressure\" sensor; Added create group to adapter config;",
                 "de": "nächster Versuch mit Xiaomi Sensoren; Hinzugefügt \"Druck\" -Sensor; Gruppe zu Adapterkonfiguration hinzugefügt hinzugefügt;",
@@ -143,11 +154,10 @@
         "pollingInterval": 30,
         "openNetwork": false,
         "websocketport": 443,
-        "gw_name": "dummy",
-        "channel": "1",
-        "sw_version": "1",
-        "api_version": "1"
-
+        "sw_version": "",
+        "channel": "",
+        "api_version": "",
+        "permit": "60"
     },
     "objects": [
         {
