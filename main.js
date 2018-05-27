@@ -1,9 +1,9 @@
 'use strict';
 
-var utils     = require(__dirname + '/lib/utils'); // Get common adapter utils
-var request = require('request');
+const utils     = require(__dirname + '/lib/utils'); // Get common adapter utils
+const request = require('request');
 
-var adapter   = new utils.Adapter('deconz');
+const adapter   = new utils.Adapter('deconz');
 
 adapter.on('stateChange', function (id, state) {
     if (!id || !state || state.ack) {
@@ -11,13 +11,12 @@ adapter.on('stateChange', function (id, state) {
     }
 
     adapter.log.debug('stateChange ' + id + ' ' + JSON.stringify(state));
-    var tmp = id.split('.');
-    var dp = tmp.pop();
+    let tmp = id.split('.');
+    let dp = tmp.pop();
     id = tmp.slice(2).join('.');
     adapter.log.debug('dp: ' + dp + '; id:' + id);
 
     adapter.getState(adapter.name + '.' + adapter.instance + '.' + id + '.transitiontime', function (err, ttime){
-        var ttime;
         if(err){
             ttime = 'none';
         }else if(ttime === null) {
@@ -28,11 +27,12 @@ adapter.on('stateChange', function (id, state) {
 
         if(dp === 'bri'){
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
-                var controlId = obj.native.id;
+                let controlId = obj.native.id;
+                let parameters;
                 if(ttime === 'none'){
-                    var parameters = '{"bri": ' + JSON.stringify(state.val) + '}';
+                    parameters = '{"bri": ' + JSON.stringify(state.val) + '}';
                 }else{
-                    var parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "bri": ' + JSON.stringify(state.val) + '}';
+                    parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "bri": ' + JSON.stringify(state.val) + '}';
                 }
                 if(obj.common.role == 'light') {
                     setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri')
@@ -42,11 +42,12 @@ adapter.on('stateChange', function (id, state) {
             });
         }else if(dp === 'on'){
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
-                var controlId = obj.native.id;
+                let controlId = obj.native.id;
+                let parameters;
                 if(ttime === 'none'){
-                    var parameters = '{"on": ' + JSON.stringify(state.val) + '}';
+                    parameters = '{"on": ' + JSON.stringify(state.val) + '}';
                 }else{
-                    var parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "on": ' + JSON.stringify(state.val) + '}';
+                    parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "on": ' + JSON.stringify(state.val) + '}';
                 }
                 //adapter.log.info('type: ' + obj.common.role);
                 if(obj.common.role == 'light') {
@@ -57,13 +58,14 @@ adapter.on('stateChange', function (id, state) {
             });
         }else if(dp === 'hue'){
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
-                var controlId = obj.native.id;
+                let controlId = obj.native.id;
+                let parameters;
                 if(ttime === 'none'){
-                    var parameters = '{"hue": ' + JSON.stringify(state.val) + '}';
+                    parameters = '{"hue": ' + JSON.stringify(state.val) + '}';
                 }else{
-                    var parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "hue": ' + JSON.stringify(state.val) + '}';
+                    parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "hue": ' + JSON.stringify(state.val) + '}';
                 }
-                var parameters = '{"hue": ' + JSON.stringify(state.val) + '}';
+                parameters = '{"hue": ' + JSON.stringify(state.val) + '}';
                 if(obj.common.role == 'light') {
                     setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.hue')
                 }else if(obj.common.role == 'group'){
@@ -72,11 +74,12 @@ adapter.on('stateChange', function (id, state) {
             });
         }else if(dp === 'sat'){
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
-                var controlId = obj.native.id;
+                let controlId = obj.native.id;
+                let parameters;
                 if(ttime === 'none'){
-                    var parameters = '{"sat": ' + JSON.stringify(state.val) + '}';
+                    parameters = '{"sat": ' + JSON.stringify(state.val) + '}';
                 }else{
-                    var parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "sat": ' + JSON.stringify(state.val) + '}';
+                    parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "sat": ' + JSON.stringify(state.val) + '}';
                 }
                 if(obj.common.role == 'light') {
                     setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.sat')
@@ -86,11 +89,12 @@ adapter.on('stateChange', function (id, state) {
             });
         }else if(dp === 'ct'){
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
-                var controlId = obj.native.id;
+                let controlId = obj.native.id;
+                let parameters;
                 if(ttime === 'none'){
-                    var parameters = '{"ct": ' + JSON.stringify(state.val) + '}';
+                    parameters = '{"ct": ' + JSON.stringify(state.val) + '}';
                 }else{
-                    var parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "ct": ' + JSON.stringify(state.val) + '}';
+                    parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "ct": ' + JSON.stringify(state.val) + '}';
                 }
                 if(obj.common.role == 'light') {
                     setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.ct')
@@ -100,11 +104,12 @@ adapter.on('stateChange', function (id, state) {
             });
         }else if(dp === 'xy'){
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
-                var controlId = obj.native.id;
+                let controlId = obj.native.id;
+                let parameters;
                 if(ttime === 'none'){
-                    var parameters = '{"xy": ' + JSON.stringify(state.val) + '}';
+                    parameters = '{"xy": ' + JSON.stringify(state.val) + '}';
                 }else{
-                    var parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "xy": ' + JSON.stringify(state.val) + '}';
+                    parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "xy": ' + JSON.stringify(state.val) + '}';
                 }
                 if(obj.common.role == 'light') {
                     setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.xy')
@@ -114,26 +119,28 @@ adapter.on('stateChange', function (id, state) {
             });
         }else if(dp === 'alert'){
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
-                var controlId = obj.native.id;
+                let controlId = obj.native.id;
+                let parameters;
                 if(ttime === 'none'){
-                    var parameters = '{"alert": ' + JSON.stringify(state.val) + '}';
+                    parameters = '{"alert": ' + JSON.stringify(state.val) + '}';
                 }else{
-                    var parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "alert": ' + JSON.stringify(state.val) + '}';
+                    parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "alert": ' + JSON.stringify(state.val) + '}';
                 }
                 setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.alert')
             });
         }else if(dp === 'effect'){
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+                let parameters;
                 if(state.val === 'colorloop'){
                     //adapter.log.info(id + ' Effect: colorloop');
                     adapter.getState(adapter.name + '.' + adapter.instance + '.' + id + '.colorloopspeed', function(error, colorloopspeed){
-                            var controlId = obj.native.id;
-                            var speed;
+                            let controlId = obj.native.id;
+                            let speed;
                             try{speed = colorloopspeed.val;} catch(err){}
                             if (speed === null || speed === undefined) {
                                 speed = 1;
                             }
-                            var parameters = '{"colorloopspeed": ' + JSON.stringify(speed) + ', "effect": ' + JSON.stringify(state.val) + '}';
+                            parameters = '{"colorloopspeed": ' + JSON.stringify(speed) + ', "effect": ' + JSON.stringify(state.val) + '}';
                             //adapter.log.info('parameters: ' + parameters);
                             if (obj.common.role == 'light') {
                                 setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.effect')
@@ -143,8 +150,8 @@ adapter.on('stateChange', function (id, state) {
                         })
                 }else {
                     //adapter.log.info('ID: ' + id + 'Effect: none');
-                    var controlId = obj.native.id;
-                    var parameters = '{"effect": ' + JSON.stringify(state.val) + '}';
+                    let controlId = obj.native.id;
+                    let parameters = '{"effect": ' + JSON.stringify(state.val) + '}';
                     if(obj.common.role == 'light') {
                         setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.effect')
                     }else if(obj.common.role == 'group'){
@@ -160,7 +167,7 @@ adapter.on('stateChange', function (id, state) {
 
 // New message arrived. obj is array with current messages
 adapter.on('message', function (obj) {
-    var wait = false;
+    let wait = false;
     if (obj) {
         switch (obj.command) {
             case 'browse':
@@ -184,7 +191,8 @@ adapter.on('message', function (obj) {
                 wait = true;
                 break;
             case 'openNetwork':
-                var parameters = '{"permitjoin": 60}';
+                let opentime = adapter.config.permit;
+                let parameters = `{"permitjoin": ${opentime}}`;
                 modifyConfig(parameters);
                 wait = true;
                 break;
@@ -243,9 +251,9 @@ function main() {
 }
 
 function createAPIkey(host, callback){
-    var newApiKey = null;
-    var userDescription = 'iobroker.deconz';
-    var options = {
+    let newApiKey = null;
+    const userDescription = 'iobroker.deconz';
+    let options = {
         url: 'http://' + host + '/api',
         method: 'POST',
         headers: {
@@ -256,12 +264,12 @@ function createAPIkey(host, callback){
     };
     adapter.log.info(host);
     try{
-        var req = request(options, function (error, res, body){
+        let req = request(options, function (error, res, body){
             adapter.log.info('STATUS: ' + res.statusCode);
             if(res.statusCode === 403){
                 callback({error: 101, message: 'Unlock Key not pressed'});
             }else if(res.statusCode === 200){
-                var apiKey = JSON.parse(body);
+                let apiKey = JSON.parse(body);
                 adapter.log.info(JSON.stringify(apiKey[0]['success']['username']));
                 callback({error: 0, message: apiKey[0]['success']['username']});
                 getConfig();
@@ -274,7 +282,7 @@ function createAPIkey(host, callback){
 
 function deleteAPIkey(){
     adapter.log.info('deleteAPIkey');
-    var options = {
+    let options = {
         url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/config/whitelist/' + adapter.config.user,
         method: 'DELETE',
         headers: {
@@ -283,7 +291,8 @@ function deleteAPIkey(){
     };
 
     request(options, function(error, res, body) {
-        try{var response = JSON.parse(body);} catch(err){}
+        let response;
+        try{response = JSON.parse(body);} catch(err){}
         if(res.statusCode === 200){
             if(response[0]['success']){
                 adapter.log.info('API key deleted');
@@ -300,31 +309,31 @@ function deleteAPIkey(){
 
 
 //Make Abo using websocket
-var WebSocket = require('ws');
+const WebSocket = require('ws');
 
 function getAutoUpdates(){
-    var host = adapter.config.bridge;
-    var port = adapter.config.websocketport;
+    let host = adapter.config.bridge;
+    let port = adapter.config.websocketport;
 
     if(adapter.config.user) {
-        var ws = new WebSocket('ws://' + host + ':' + port);
+        let ws = new WebSocket('ws://' + host + ':' + port);
 
 
         ws.onmessage = function (msg) {
-            var data = JSON.parse(msg.data);
-            var id = data['id'];
-            var type = data['r'];
-            var state = data['state'];
+            let data = JSON.parse(msg.data);
+            let id = data['id'];
+            let type = data['r'];
+            let state = data['state'];
             adapter.log.debug('Websocket message: ' + JSON.stringify(data));
 
 
 
                     adapter.getForeignObjects('deconz*', 'device', function (err, enums) {                    //alle Objekte des Adapters suchen
-                        var count = Object.keys(enums).length - 1;                                      //Anzahl der Objekte
+                        let count = Object.keys(enums).length - 1;                                      //Anzahl der Objekte
                         adapter.log.debug('Id: ' + id + ' Type: ' + type);
-                        var role = type.replace(/(s)$/, '');
-                        for (var i = 0; i <= count; i++) {                                              //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ sensor handelt
-                            var keyName = Object.keys(enums)[i];
+                        let role = type.replace(/(s)$/, '');
+                        for (let i = 0; i <= count; i++) {                                              //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ sensor handelt
+                            let keyName = Object.keys(enums)[i];
                                 if (enums[keyName].common.role == role && enums[keyName].native.id == id) {
                                     switch (type) {
                                         case 'lights':
@@ -348,7 +357,7 @@ function getAutoUpdates(){
 
 //START deConz config --------------------------------------------------------------------------------------------------
 function modifyConfig(parameters){
-    var options = {
+    let options = {
         url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/config',
         method: 'PUT',
         headers: 'Content-Type" : "application/json',
@@ -356,14 +365,16 @@ function modifyConfig(parameters){
     };
 
     request(options, function(error, res, body) {
-        try{var response = JSON.parse(body);} catch(err){}
+        let response;
+        try{response = JSON.parse(body);} catch(err){}
 
 
         if(res.statusCode === 200){
             if(response[0]['success']){
+                let ot = adapter.config.permit;
                 switch (JSON.stringify(response[0]['success'])) {
-                    case '{"/config/permitjoin":60}':
-                        adapter.log.info('Network is now open for 60 seconds to register new devices.');
+                    case  `{"/config/permitjoin":${ot}}`:
+                        adapter.log.info(`Network is now open for ${ot} seconds to register new devices.`);
                         break;
                 }
             }else if(response[0]['error']){
@@ -379,14 +390,15 @@ function modifyConfig(parameters){
 }
 
 function getConfig(){
-    var options = {
+    let options = {
         url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/config',
         method: 'GET'
     };
 
     request(options, function(error, res, body){
-        var gateway = JSON.parse(body);
-        try{var response = JSON.parse(body);} catch(err){}
+        let gateway = JSON.parse(body);
+        let response;
+        try{response = JSON.parse(body);} catch(err){}
         adapter.log.debug('API version: ' + gateway['apiversion']);
         //adapter.log.info(JSON.stringify(gateway));
 
@@ -428,11 +440,16 @@ function getConfig(){
                         zigbeechannel: gateway['zigbeechannel']
                     }
                 });
-                adapter.config.websocketport = gateway['websocketport'];
-                adapter.config.gw_name = gateway['name'];
-                adapter.config.sw_version = gateway['swversion'];
-                adapter.config.api_version = gateway['apiversion'];
-                adapter.config.channel = gateway['zigbeechannel'];
+                let updateInfos;
+                if(adapter.config.sw_version !== gateway['swversion'] || adapter.config.api_version !== gateway['apiversion']){
+                    adapter.extendForeignObject('system.adapter.' + adapter.name + '.' + adapter.instance, {
+                        native: {
+                            sw_version: gateway['swversion'],
+                            api_version: gateway['apiversion']
+                        }
+                    });
+                }
+
                 getAllLights();
                 getAllSensors();
                 getAllGroups();
@@ -447,22 +464,23 @@ function getConfig(){
 
 //START  Group functions -----------------------------------------------------------------------------------------------
 function getAllGroups() {
-    var options = {
+    let options = {
         url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/groups',
         method: 'GET'
     };
     request(options, function (error, res, body) {
-        var list = JSON.parse(body);
-        try{var response = JSON.parse(body);} catch(err){}
-        var count = Object.keys(list).length - 1;
+        let list = JSON.parse(body);
+        let response;
+        try{response = JSON.parse(body);} catch(err){}
+        let count = Object.keys(list).length - 1;
         adapter.log.debug('getAllGroups: ' + JSON.stringify(response));
 
         if(res.statusCode === 200 && body != '{}'){
-                for (var i = 0; i <= count; i++) {
-                    var keyName = Object.keys(list)[i];
+                for (let i = 0; i <= count; i++) {
+                    let keyName = Object.keys(list)[i];
                     //create object for group
-                    var objectName = list[keyName]['name'];
-                    var groupName = nameFilter(list[keyName]['name']);
+                    let objectName = list[keyName]['name'];
+                    let groupName = nameFilter(list[keyName]['name']);
 
                     adapter.setObject(groupName, {
                         type: 'device',
@@ -487,22 +505,23 @@ function getAllGroups() {
 } //END getAllGroups
 
 function getGroupAttributes(groupId) {
-    var options = {
+    let options = {
         url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/groups/' + groupId,
         method: 'GET'
     };
     request(options, function (error, res, body) {
-        var list = JSON.parse(body);
-        try{var response = JSON.parse(body);} catch(err){}
-        var count = Object.keys(list).length - 1;
+        let list = JSON.parse(body);
+        let response;
+        try{response = JSON.parse(body);} catch(err){}
+        let count = Object.keys(list).length - 1;
 
         adapter.log.debug('getGroupAttributes: ' + JSON.stringify(response));
 
         if(res.statusCode === 200){
-            for (var i = 0; i <= count; i++) {
-                var keyName = Object.keys(list)[i];
+            for (let i = 0; i <= count; i++) {
+                let keyName = Object.keys(list)[i];
                 //create object for group with attributes
-                var groupName = nameFilter(list['name']);
+                let groupName = nameFilter(list['name']);
                 adapter.setObject(groupName, {
                     type: 'device',
                     common: {
@@ -519,10 +538,10 @@ function getGroupAttributes(groupId) {
                         multideviceids: list['multideviceids']
                     }
                 });
-                var count2 = Object.keys(list['action']).length - 1;
+                let count2 = Object.keys(list['action']).length - 1;
                 //create states for light device
-                for (var z = 0; z <= count2; z++) {
-                    var stateName = Object.keys(list['action'])[z];
+                for (let z = 0; z <= count2; z++) {
+                    let stateName = Object.keys(list['action'])[z];
                     switch (stateName) {
                         case 'on':
                             adapter.setObjectNotExists(groupName + '.' + stateName, {
@@ -664,7 +683,7 @@ function getGroupAttributes(groupId) {
 } //END getGroupAttributes
 
 function setGroupState(parameters, groupId, stateId){
-    var options = {
+    let options = {
         url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/groups/' + groupId + '/action',
         method: 'PUT',
         headers: 'Content-Type" : "application/json',
@@ -673,7 +692,8 @@ function setGroupState(parameters, groupId, stateId){
 
     request(options, function(error, res, body) {
         adapter.log.debug('setGroupState STATUS: ' + res.statusCode);
-        try{var response = JSON.parse(body);} catch(err){}
+        let response;
+        try{response = JSON.parse(body);} catch(err){}
         adapter.log.debug('setGroupState BODY: ' + JSON.stringify(response));
 
         if(res.statusCode === 200){
@@ -690,7 +710,7 @@ function setGroupState(parameters, groupId, stateId){
 } //END setGroupState
 
 function createGroup(name, callback) {
-    var options = {
+    let options = {
         url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/groups',
         method: 'POST',
         headers: {
@@ -699,7 +719,7 @@ function createGroup(name, callback) {
         }
     };
     try{
-        var req = request(options, function (error, res, body){
+        let req = request(options, function (error, res, body){
             adapter.log.info('STATUS: ' + res.statusCode);
             if(res.statusCode === 200){
                 var apiKey = JSON.parse(body);
@@ -713,7 +733,7 @@ function createGroup(name, callback) {
 } //END createGroup
 
 function deleteGroup(groupId){
-    var options = {
+    let options = {
         url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/groups/' + groupId,
         method: 'DELETE',
         headers: 'Content-Type" : "application/json'
@@ -724,7 +744,8 @@ function deleteGroup(groupId){
 
     request(options, function(error, res, body) {
         adapter.log.debug('deleteGroup STATUS: ' + res.statusCode);
-        try{var response = JSON.parse(body);} catch(err){}
+        let response;
+        try{response = JSON.parse(body);} catch(err){}
         adapter.log.debug('deleteGroup BODY: ' + JSON.stringify(response));
 
 
@@ -732,12 +753,12 @@ function deleteGroup(groupId){
             if(response[0]['success']){
             adapter.log.info('The group with id ' + groupId + ' was removed.');
             adapter.getForeignObjects(adapter.name + '.' + adapter.instance + '*', 'device', function (err, enums) {                    //alle Objekte des Adapters suchen
-                var count = Object.keys(enums).length - 1;                                      //Anzahl der Objekte
-                for (var i = 0; i <= count; i++) {                                              //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ sensor handelt
-                    var keyName = Object.keys(enums)[i];
+                let count = Object.keys(enums).length - 1;                                      //Anzahl der Objekte
+                for (let i = 0; i <= count; i++) {                                              //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ sensor handelt
+                    let keyName = Object.keys(enums)[i];
                     if (enums[keyName].common.role == 'group' && enums[keyName].native.id == groupId) {
                         adapter.log.info('Delete device Object: ' + enums[keyName].common.name);
-                        var name = enums[keyName].common.name;
+                        let name = enums[keyName].common.name;
 
                         adapter.deleteDevice(name, function(err){
                             adapter.log.info(err);
@@ -763,24 +784,25 @@ function deleteGroup(groupId){
 //START  Sensor functions ----------------------------------------------------------------------------------------------
 function getAllSensors() {
 
-    var options = {
+    let options = {
         url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/sensors',
         method: 'GET'
     };
     request(options, function (error, res, body) {
-        var list = JSON.parse(body);
-        try{var response = JSON.parse(body);} catch(err){}
-        var count = Object.keys(list).length - 1;
+        let list = JSON.parse(body);
+        let response;
+        try{response = JSON.parse(body);} catch(err){}
+        let count = Object.keys(list).length - 1;
 
         adapter.log.debug('getAllSensors: ' + body);
         
         if (res.statusCode === 200 && body != '{}') {
-            for (var i = 0; i <= count; i++) {              //Get each Sensor
-                var keyName = Object.keys(list)[i];
-                var sensorName = nameFilter(list[keyName]['name']);
+            for (let i = 0; i <= count; i++) {              //Get each Sensor
+                let keyName = Object.keys(list)[i];
+                let sensorName = nameFilter(list[keyName]['name']);
                 //create object for sensor device
-                var patt = new RegExp(/\d$/g);
-                var match = patt.test(sensorName);
+                const patt = new RegExp(/\d$/g);
+                let match = patt.test(sensorName);
                 if(match === true && list[keyName]['ep'] > 1){
                     sensorName = sensorName + '_' + keyName;
                 }
@@ -804,10 +826,10 @@ function getAllSensors() {
                     }
                 });
 
-                var count2 = Object.keys(list[keyName]['state']).length - 1;
+                let count2 = Object.keys(list[keyName]['state']).length - 1;
                 //create states for sensor device
-                for (var z = 0; z <= count2; z++) {
-                    var stateName = Object.keys(list[keyName]['state'])[z];
+                for (let z = 0; z <= count2; z++) {
+                    let stateName = Object.keys(list[keyName]['state'])[z];
                     switch (stateName) {
                         case 'lightlevel':
                         case 'daylight':
@@ -848,7 +870,7 @@ function getAllSensors() {
                                 },
                                 native: {}
                             });
-                            var value = list[keyName]['state'][stateName] / 100;
+                            let value = list[keyName]['state'][stateName] / 100;
                             adapter.setState(sensorName + '.' + stateName, {val: value, ack: true});
                             break;
                         case 'presence':
@@ -895,10 +917,10 @@ function getAllSensors() {
                 }
 
 
-                var count3 = Object.keys(list[keyName]['config']).length - 1;
+                let count3 = Object.keys(list[keyName]['config']).length - 1;
                 //create config states for sensor device
-                for (var x = 0; x <= count3; x++) {
-                    var stateName = Object.keys(list[keyName]['config'])[x];
+                for (let x = 0; x <= count3; x++) {
+                    let stateName = Object.keys(list[keyName]['config'])[x];
                     switch (stateName) {
                         case 'on':
                         case 'ledindication':
@@ -1037,7 +1059,7 @@ function getAllSensors() {
                                 },
                                 native: {}
                             });
-                            var value = list[keyName]['config'][stateName] / 100;
+                            let value = list[keyName]['config'][stateName] / 100;
                             adapter.setState(sensorName + '.' + stateName, {val: value, ack: true});
                             break;
                     }
@@ -1053,24 +1075,25 @@ function getAllSensors() {
 } //END getAllSensors
 
 function getSensor(sensorId){
-    var options = {
+    let options = {
         url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/sensors/' + sensorId,
         method: 'GET'
     };
     request(options, function (error, res, body) {
+        let response;
         try {
-            var response = JSON.parse(body);
+            response = JSON.parse(body);
         } catch (err) {
         }
 
         adapter.log.debug('getSensor: ' + JSON.stringify(body));
 
         if (res.statusCode === 200) {
-                var list = JSON.parse(body);
-                var keyName = Object.keys(list)[0];
-                var sensorName = nameFilter(list['name']);
-                var patt = new RegExp(/\d$/g);
-                var match = patt.test(sensorName);
+                let list = JSON.parse(body);
+                let keyName = Object.keys(list)[0];
+                let sensorName = nameFilter(list['name']);
+                const patt = new RegExp(/\d$/g);
+                let match = patt.test(sensorName);
                 if(match === true && list['ep'] > 1){
                     sensorName = sensorName + '_' + sensorId;
                 }
@@ -1095,10 +1118,10 @@ function getSensor(sensorId){
                         uniqueid: list['uniqueid']
                     }
                 });
-                var count2 = Object.keys(list['state']).length - 1;
+                let count2 = Object.keys(list['state']).length - 1;
                 //create states for sensor device
-                for (var z = 0; z <= count2; z++) {
-                    var stateName = Object.keys(list['state'])[z];
+                for (let z = 0; z <= count2; z++) {
+                    let stateName = Object.keys(list['state'])[z];
                     switch (stateName) {
                         case 'lightlevel':
                         case 'daylight':
@@ -1136,7 +1159,7 @@ function getSensor(sensorId){
                                 },
                                 native: {}
                             });
-                            var value = list['state'][stateName]/100;
+                            let value = list['state'][stateName]/100;
                             adapter.setState(sensorName + '.' + stateName, {val: value, ack: true});
                             break;
                         case 'presence':
@@ -1175,10 +1198,10 @@ function getSensor(sensorId){
                             break;
                 }
 
-                    var count3 = Object.keys(list['config']).length - 1;
+                    let count3 = Object.keys(list['config']).length - 1;
                     //create config for sensor device
-                    for (var x = 0; x <= count3; x++) {
-                        var stateName = Object.keys(list['config'])[x];
+                    for (let x = 0; x <= count3; x++) {
+                        let stateName = Object.keys(list['config'])[x];
                         switch (stateName) {
                             case 'on':
                             case 'ledindication':
@@ -1317,7 +1340,7 @@ function getSensor(sensorId){
                                     },
                                     native: {}
                                 });
-                                var value = list['config'][stateName]/100;
+                                let value = list['config'][stateName]/100;
                                 adapter.setState(sensorName + '.' + stateName, {val: value, ack: true});
                                 break;
                         }
@@ -1330,7 +1353,7 @@ function getSensor(sensorId){
 } //END getSensor
 
 function deleteSensor(sensorId){
-    var options = {
+    let options = {
         url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/sensors/' + sensorId,
         method: 'DELETE',
         headers: 'Content-Type" : "application/json',
@@ -1339,19 +1362,20 @@ function deleteSensor(sensorId){
 
     request(options, function(error, res, body) {
         adapter.log.debug('deleteSensor STATUS: ' + res.statusCode);
-        try{var response = JSON.parse(body);} catch(err){}
+        let response;
+        try{response = JSON.parse(body);} catch(err){}
         adapter.log.debug('deleteSensor BODY: ' + JSON.stringify(response));
 
         if(res.statusCode === 200){
             if(response[0]['success']){
-                adapter.log.info('The sensor with id ' + sensorId + ' was removed.')
+                adapter.log.info('The sensor with id ' + sensorId + ' was removed.');
                 adapter.getForeignObjects(adapter.name + '.' + adapter.instance + '*', 'device', function (err, enums) {                    //alle Objekte des Adapters suchen
-                    var count = Object.keys(enums).length - 1;                                      //Anzahl der Objekte
-                    for (var i = 0; i <= count; i++) {                                              //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ sensor handelt
-                        var keyName = Object.keys(enums)[i];
+                    let count = Object.keys(enums).length - 1;                                      //Anzahl der Objekte
+                    for (let i = 0; i <= count; i++) {                                              //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ sensor handelt
+                        let keyName = Object.keys(enums)[i];
                         if (enums[keyName].common.role == 'sensor' && enums[keyName].native.id == sensorId) {
                             adapter.log.info('delete device Object: ' + enums[keyName].common.name);
-                            var name = enums[keyName].common.name;
+                            let name = enums[keyName].common.name;
 
                             adapter.deleteDevice(name, function(err){
                                 adapter.log.info(err);
@@ -1375,21 +1399,22 @@ function deleteSensor(sensorId){
 
 //START  Light functions -----------------------------------------------------------------------------------------------
 function getAllLights(){
-    var options = {
+    let options = {
         url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/lights',
         method: 'GET'
     };
         request(options, function (error, res, body) {
-            var list = JSON.parse(body);
-            try{var response = JSON.parse(body);} catch(err){}
-            var count = Object.keys(list).length - 1;
+            let list = JSON.parse(body);
+            let response;
+            try{response = JSON.parse(body);} catch(err){}
+            let count = Object.keys(list).length - 1;
 
             adapter.log.debug('getAllLights: ' + body);
 
             if (res.statusCode === 200 && body != '{}') {
-                    for (var i = 0; i <= count; i++) {
-                        var keyName = Object.keys(list)[i];
-                        var lightName = nameFilter(list[keyName]['name']);
+                    for (let i = 0; i <= count; i++) {
+                        let keyName = Object.keys(list)[i];
+                        let lightName = nameFilter(list[keyName]['name']);
 
                         //create object for light device
                         adapter.setObjectNotExists(lightName, {
@@ -1409,10 +1434,10 @@ function getAllLights(){
                                 uniqueid: list[keyName]['uniqueid']
                             }
                         });
-                        var count2 = Object.keys(list[keyName]['state']).length - 1;
+                        let count2 = Object.keys(list[keyName]['state']).length - 1;
                         //create states for light device
-                        for (var z = 0; z <= count2; z++) {
-                            var stateName = Object.keys(list[keyName]['state'])[z];
+                        for (let z = 0; z <= count2; z++) {
+                            let stateName = Object.keys(list[keyName]['state'])[z];
                             switch (stateName) {
                                 case 'on':
                                     adapter.setObjectNotExists(lightName + '.' + stateName, {
@@ -1574,21 +1599,22 @@ function getAllLights(){
 } //END getAllLights
 
 function getLightState(lightId){
-    var options = {
+    let options = {
         url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/lights/' + lightId,
         method: 'GET'
     };
     request(options, function (error, res, body) {
+        let response;
         try {
-            var response = JSON.parse(body);
+            response = JSON.parse(body);
         } catch (err) {
         }
         adapter.log.debug('getLightState: ' + body);
 
             if (res.statusCode === 200) {
-                var list = JSON.parse(body);
-                var keyName = Object.keys(list)[0];
-                var lightName = nameFilter(list['name']);
+                let list = JSON.parse(body);
+                let keyName = Object.keys(list)[0];
+                let lightName = nameFilter(list['name']);
                 //create object for light device
                     adapter.setObject(lightName, {
                         type: 'device',
@@ -1607,10 +1633,10 @@ function getLightState(lightId){
                             uniqueid: list['uniqueid']
                         }
                     });
-                    var count2 = Object.keys(list['state']).length - 1;
+                    let count2 = Object.keys(list['state']).length - 1;
                     //create states for light device
-                    for (var z = 0; z <= count2; z++) {
-                        var stateName = Object.keys(list['state'])[z];
+                    for (let z = 0; z <= count2; z++) {
+                        let stateName = Object.keys(list['state'])[z];
                         switch (stateName) {
                             case 'on':
                                 adapter.setObjectNotExists(lightName + '.' + stateName, {
@@ -1783,7 +1809,7 @@ function getLightState(lightId){
 
 function setLightState(parameters, lightId, stateId){
         adapter.log.info('setLightState: ' + parameters + ' ' + lightId + ' ' + stateId);
-        var options = {
+        let options = {
             url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/lights/' + lightId + '/state',
             method: 'PUT',
             headers: 'Content-Type" : "application/json',
@@ -1792,7 +1818,8 @@ function setLightState(parameters, lightId, stateId){
 
         request(options, function(error, res, body) {
             adapter.log.debug('STATUS: ' + res.statusCode);
-            try{var response = JSON.parse(body);} catch(err){}
+            let response;
+            try{response = JSON.parse(body);} catch(err){}
             adapter.log.info('options: ' + JSON.stringify(options));
             adapter.log.debug('setLightState BODY: ' + JSON.stringify(response));
 
@@ -1810,7 +1837,7 @@ function setLightState(parameters, lightId, stateId){
 } //END setLightState
 
 function deleteLight(lightId){
-    var options = {
+    let options = {
         url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/lights/' + lightId,
         method: 'DELETE',
         headers: 'Content-Type" : "application/json',
@@ -1819,7 +1846,8 @@ function deleteLight(lightId){
 
     request(options, function(error, res, body) {
         adapter.log.debug('deleteLight STATUS: ' + res.statusCode);
-        try{var response = JSON.parse(body);} catch(err){}
+        let response;
+        try{response = JSON.parse(body);} catch(err){}
         adapter.log.debug('deleteLight BODY: ' + JSON.stringify(response));
 
         if(res.statusCode === 200){
@@ -1836,7 +1864,7 @@ function deleteLight(lightId){
 }
 
 function removeFromGroups(lightId){
-    var options = {
+    let options = {
         url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/lights/' + lightId + '/groups',
         method: 'DELETE',
         headers: 'Content-Type" : "application/json'
@@ -1844,7 +1872,8 @@ function removeFromGroups(lightId){
 
     request(options, function(error, res, body) {
         adapter.log.debug('removeFromGroups STATUS: ' + res.statusCode);
-        try{var response = JSON.parse(body);} catch(err){}
+        let response;
+        try{response = JSON.parse(body);} catch(err){}
         adapter.log.debug('removeFromGroups BODY: ' + JSON.stringify(response));
 
         if(res.statusCode === 200){
@@ -1886,16 +1915,16 @@ function logging(statusCode, message){
 }
 
 function nameFilter(name){
-    var signs = [String.fromCharCode(46), String.fromCharCode(44), String.fromCharCode(92), String.fromCharCode(47), String.fromCharCode(91), String.fromCharCode(93), String.fromCharCode(123), String.fromCharCode(125), String.fromCharCode(32), String.fromCharCode(129), String.fromCharCode(154), String.fromCharCode(132), String.fromCharCode(142), String.fromCharCode(148), String.fromCharCode(153)]; //46=. 44=, 92=\ 47=/ 91=[ 93=] 123={ 125=} 32=Space 129=ü 154=Ü 132=ä 142=Ä 148=ö 153=Ö
+    let signs = [String.fromCharCode(46), String.fromCharCode(44), String.fromCharCode(92), String.fromCharCode(47), String.fromCharCode(91), String.fromCharCode(93), String.fromCharCode(123), String.fromCharCode(125), String.fromCharCode(32), String.fromCharCode(129), String.fromCharCode(154), String.fromCharCode(132), String.fromCharCode(142), String.fromCharCode(148), String.fromCharCode(153)]; //46=. 44=, 92=\ 47=/ 91=[ 93=] 123={ 125=} 32=Space 129=ü 154=Ü 132=ä 142=Ä 148=ö 153=Ö
 
     signs.forEach(function(item, index){
-        var count = name.split(item).length - 1;
+        let count = name.split(item).length - 1;
 
-        for(var i = 0; i < count; i++) {
+        for(let i = 0; i < count; i++) {
             name = name.replace(item, '_');
         }
 
-        var result = name.search (/_$/);
+        let result = name.search (/_$/);
         if(result != -1){
             name = name.replace(/_$/, '');
         }

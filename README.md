@@ -22,6 +22,10 @@ Required node.js >= 0.12.
 
 ## Changelog
 
+### 0.2.1
+* (Jey-Cee) Added new elements to config
+* (Jey-Cee) Changed som small things
+
 ### 0.2.0
 * (Jey-Cee) next Try with Xiaomi Sensors
 * (Jey-Cee) Added "pressure" sensor

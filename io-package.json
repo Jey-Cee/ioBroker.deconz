@@ -143,11 +143,10 @@
         "pollingInterval": 30,
         "openNetwork": false,
         "websocketport": 443,
-        "gw_name": "dummy",
-        "channel": "1",
-        "sw_version": "1",
-        "api_version": "1"
-
+        "sw_version": "",
+        "channel": "",
+        "api_version": "",
+        "permit": "60"
     },
     "objects": [
         {
