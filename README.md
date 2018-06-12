@@ -18,6 +18,9 @@ You must first link to deConz.
 2. After IP address is found the USER must be created. For that press the "Create User" button and then press "Link" button on HUE bridge. "Create User" button is only enabled if no USER entered
 
 ## Notice
+
+#No Support for Beta Versions of deConz
+
 Required node.js >= 0.12.
 
 ## Changelog
