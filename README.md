@@ -19,11 +19,15 @@ You must first link to deConz.
 
 ## Notice
 
-#No Support for Beta Versions of deConz
+### No Support for Beta Versions of deConz
 
 Required node.js >= 0.12.
 
 ## Changelog
+
+### 0.2.2
+*  Changed id naming
+*  Use websocket messages instead polling afterwards
 
 ### 0.2.1
 * (Jey-Cee) Added new elements to config
@@ -76,6 +80,5 @@ Apache 2.0
 Copyright (c) 2017 Jey Cee <jey-cee@live.com>
 Copyright (c) 2017 Bluefox <dogafox@gmail.com>
 Copyright (c) 2014-2016 hobbyquaker
-
 
 

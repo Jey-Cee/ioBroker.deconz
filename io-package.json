@@ -1,9 +1,21 @@
 {
     "common": {
         "name": "deconz",
-        "version": "0.2.1",
+        "version": "0.2.2",
         "news": {
-            "0.2.1":{
+
+            "0.2.2": {
+                "en": "Changed id naming \n Use websocket messages instead polling afterwards",
+                "de": "Geänderte ID-Benennung \n Verwenden von Websocket-Nachrichten, anstelle von polling",
+                "ru": "Изменено имя именования имен \n Использовать сообщения websocket вместо опроса потом",
+                "pt": "Nomenclatura de ID alterada \n Use mensagens de websocket em vez de pesquisar depois",
+                "nl": "Namen van id's gewijzigd \n Gebruik websocket-berichten in plaats daarvan navraag achteraf",
+                "fr": "Modification de l'identifiant de l'identifiant \n Utilisation des messages websocket à la place de l'interrogation ultérieure",
+                "it": "Nome id cambiato \n Usa i messaggi websocket, poi esegui il polling in seguito",
+                "es": "Se cambió el nombre de la identificación \n Use los mensajes de websocket en lugar de sondear después",
+                "pl": "Zmieniono nazewnictwo nazw \n Użyj zamiast tego komunikatów websocket zamiast odpytywania"
+            },
+            "0.2.1": {
                 "en": "Added new elements to config; Changed some small things",
                 "de": "Neue Elemente zur Konfiguration hinzugefügt; Einige kleine Dinge geändert",
                 "ru": "Добавлены новые элементы в config; Изменены некоторые мелочи",
@@ -14,7 +26,7 @@
                 "es": "Se agregaron nuevos elementos a config; Cambió algunas cosas pequeñas",
                 "pl": "Dodano nowe elementy do konfiguracji; Zmieniono kilka małych rzeczy"
             },
-            "0.2.0":{
+            "0.2.0": {
                 "en": "next Try with Xiaomi Sensors; Added \"pressure\" sensor; Added create group to adapter config;",
                 "de": "nächster Versuch mit Xiaomi Sensoren; Hinzugefügt \"Druck\" -Sensor; Gruppe zu Adapterkonfiguration hinzugefügt hinzugefügt;",
                 "ru": "следующее Попробуйте с датчиками Xiaomi; Добавлен датчик давления; Добавлена ​​возможность создания группы в конфигурацию адаптера;",
@@ -25,7 +37,7 @@
                 "es": "Siguiente Prueba con Xiaomi Sensors; Sensor de \"presión\" agregado; Se agregó crear grupo a la configuración del adaptador;",
                 "pl": "dalej Wypróbuj Xiaomi Sensors; Dodano czujnik \"ciśnienia\"; Dodano tworzenie grupy do konfiguracji adaptera;"
             },
-            "0.1.7":{
+            "0.1.7": {
                 "en": "add possibility to delete devices from deConz; fix issue on getAll... functions when there are is nothing;",
                 "de": "Möglichkeit hinzufügen, Geräte von deConz zu löschen; Problem beheben bei getAll ... Funktionen, wenn es nichts gibt;",
                 "ru": "добавить возможность удаления устройств из deConz; исправить проблему на getAll ... функции, когда есть ничего;",
@@ -47,7 +59,7 @@
                 "es": "arreglar el reconocimiento del sensor Xiaomi",
                 "pl": "naprawić rozpoznawanie czujnika Xiaomi"
             },
-            "0.1.5":{
+            "0.1.5": {
                 "en": "Try to fix Sensors",
                 "de": "Versuchen Sie, Sensoren zu reparieren",
                 "ru": "Попробуйте исправить датчики",
@@ -58,7 +70,7 @@
                 "es": "Intenta reparar los sensores",
                 "pl": "Spróbuj naprawić czujniki"
             },
-            "0.1.4":{
+            "0.1.4": {
                 "en": "Added support for Admin v3",
                 "de": "Unterstützung für Admin v3 hinzugefügt",
                 "ru": "Добавлена ​​поддержка Admin v3",
@@ -69,7 +81,7 @@
                 "es": "Se agregó soporte para Admin v3",
                 "pl": "Dodano obsługę administratora v3"
             },
-            "0.1.3":{
+            "0.1.3": {
                 "en": "Stop Spam in log; Added filter for name to id conversation",
                 "de": "Stoppen Sie Spam im Protokoll; Filter für Name zu ID-Konversation hinzugefügt",
                 "ru": "Остановить спам в журнале; Добавлен фильтр для диалога id в id",
@@ -84,12 +96,12 @@
                 "en": "Added new datapoints for sensors (experimental)",
                 "de": "Neue Datenpunkte für Sensoren hinzugefügt (Experimentell)",
                 "ru": "Добавлены новые точки данных для датчиков (Experimental)"
-        },
+            },
             "0.1.1": {
                 "en": "Complete adapter rewritten",
                 "de": "Adapter Vollständig neu geschrieben",
                 "ru": "Полный адаптер переписан"
-        },
+            },
             "0.1.0": {
                 "en": "alpha version",
                 "de": "alpha version",
