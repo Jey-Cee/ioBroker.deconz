@@ -5,7 +5,7 @@
         "news": {
 
             "0.2.2": {
-                ""en": "Changed id naming \n Use websocket messages instead polling afterwards",
+                "en": "Changed id naming \n Use websocket messages instead polling afterwards",
                 "de": "Geänderte ID-Benennung \n Verwenden von Websocket-Nachrichten, anstelle von polling",
                 "ru": "Изменено имя именования имен \n Использовать сообщения websocket вместо опроса потом",
                 "pt": "Nomenclatura de ID alterada \n Use mensagens de websocket em vez de pesquisar depois",
