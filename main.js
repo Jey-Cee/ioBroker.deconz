@@ -320,6 +320,7 @@ function getAutoUpdates(){
 
 
         ws.onmessage = function (msg) {
+            let value;
             let data = JSON.parse(msg.data);
             let id = data['id'];
             let type = data['r'];
@@ -367,6 +368,35 @@ function getAutoUpdates(){
                                                 case 'current':
                                                 case 'consumption':
                                                 case 'pressure':
+                                                    adapter.setObjectNotExists(`Sensor_${id}` + '.' + obj, {
+                                                        type: 'state',
+                                                        common: {
+                                                            name: list['name'] + ' ' + obj,
+                                                            type: 'number',
+                                                            role: 'state',
+                                                            read: true,
+                                                            write: false
+                                                        },
+                                                        native: {}
+                                                    });
+                                                    adapter.setState(`Sensor_${id}` + '.' + obj, {val: state[obj], ack: true});
+                                                    break;
+                                                case 'temperature':
+                                                case 'humidity':
+                                                    adapter.setObjectNotExists(`Sensor_${id}` + '.' + obj, {
+                                                        type: 'state',
+                                                        common: {
+                                                            name: list['name'] + ' ' + obj,
+                                                            type: 'number',
+                                                            role: 'state',
+                                                            read: true,
+                                                            write: false
+                                                        },
+                                                        native: {}
+                                                    });
+                                                    value = state[obj]/100;
+                                                    adapter.setState(`Sensor_${id}` + '.' + obj, {val: value, ack: true});
+                                                    break;
                                                 case 'presence':
                                                 case 'dark':
                                                 case 'open':
@@ -374,13 +404,37 @@ function getAutoUpdates(){
                                                 case 'water':
                                                 case 'tampered':
                                                 case 'fire':
+                                                    adapter.setObjectNotExists(`Sensor_${id}` + '.' + obj, {
+                                                        type: 'state',
+                                                        common: {
+                                                            name: list['name'] + ' ' + obj,
+                                                            type: 'boolean',
+                                                            role: 'state',
+                                                            read: true,
+                                                            write: false
+                                                        },
+                                                        native: {}
+                                                    });
+                                                    adapter.setState(`Sensor_${id}` + '.' + obj, {val: state[obj], ack: true});
+                                                    break;
                                                 case 'lowbattery':
                                                 case 'lastupdated':
+                                                    adapter.setObjectNotExists(`Sensor_${id}` + '.' + obj, {
+                                                        type: 'state',
+                                                        common: {
+                                                            name: list['name'] + ' ' + obj,
+                                                            type: 'boolean',
+                                                            role: 'indicator.battery',
+                                                            read: true,
+                                                            write: false
+                                                        },
+                                                        native: {}
+                                                    });
                                                     adapter.setState(`Sensor_${id}` + '.' + obj, {val: state[obj], ack: true});
                                                     break;
                                                 case 'temperature':
                                                 case 'humidity':
-                                                    let value = state[obj]/100;
+                                                    value = state[obj]/100;
                                                     adapter.setState(`Sensor_${id}` + '.' + obj, {val: value, ack: true});
                                                     break;
                                             }
@@ -396,6 +450,35 @@ function getAutoUpdates(){
                                                 case 'current':
                                                 case 'consumption':
                                                 case 'pressure':
+                                                    adapter.setObjectNotExists(`Sensor_${id}` + '.' + obj, {
+                                                        type: 'state',
+                                                        common: {
+                                                            name: list['name'] + ' ' + obj,
+                                                            type: 'number',
+                                                            role: 'state',
+                                                            read: true,
+                                                            write: false
+                                                        },
+                                                        native: {}
+                                                    });
+                                                    adapter.setState(`Sensor_${id}` + '.' + obj, {val: state[obj], ack: true});
+                                                    break;
+                                                case 'temperature':
+                                                case 'humidity':
+                                                    adapter.setObjectNotExists(`Sensor_${id}` + '.' + obj, {
+                                                        type: 'state',
+                                                        common: {
+                                                            name: list['name'] + ' ' + obj,
+                                                            type: 'number',
+                                                            role: 'state',
+                                                            read: true,
+                                                            write: false
+                                                        },
+                                                        native: {}
+                                                    });
+                                                    value = state[obj]/100;
+                                                    adapter.setState(`Sensor_${id}` + '.' + obj, {val: value, ack: true});
+                                                    break;
                                                 case 'presence':
                                                 case 'dark':
                                                 case 'open':
@@ -403,13 +486,37 @@ function getAutoUpdates(){
                                                 case 'water':
                                                 case 'tampered':
                                                 case 'fire':
+                                                    adapter.setObjectNotExists(`Sensor_${id}` + '.' + obj, {
+                                                        type: 'state',
+                                                        common: {
+                                                            name: list['name'] + ' ' + obj,
+                                                            type: 'boolean',
+                                                            role: 'state',
+                                                            read: true,
+                                                            write: false
+                                                        },
+                                                        native: {}
+                                                    });
+                                                    adapter.setState(`Sensor_${id}` + '.' + obj, {val: state[obj], ack: true});
+                                                    break;
                                                 case 'lowbattery':
                                                 case 'lastupdated':
+                                                    adapter.setObjectNotExists(`Sensor_${id}` + '.' + obj, {
+                                                        type: 'state',
+                                                        common: {
+                                                            name: list['name'] + ' ' + obj,
+                                                            type: 'boolean',
+                                                            role: 'indicator.battery',
+                                                            read: true,
+                                                            write: false
+                                                        },
+                                                        native: {}
+                                                    });
                                                     adapter.setState(`Sensor_${id}` + '.' + obj, {val: state[obj], ack: true});
                                                     break;
                                                 case 'temperature':
                                                 case 'humidity':
-                                                    let value = state[obj]/100;
+                                                    value = state[obj]/100;
                                                     adapter.setState(`Sensor_${id}` + '.' + obj, {val: value, ack: true});
                                                     break;
                                             }
@@ -424,20 +531,120 @@ function getAutoUpdates(){
                                         case 'on':
                                         case 'ledindication':
                                         case 'usertest':
+                                            adapter.setObjectNotExists(`Sensor_${id}` + '.' + obj, {
+                                                type: 'state',
+                                                common: {
+                                                    name: list['name'] + ' ' + obj,
+                                                    type: 'boolean',
+                                                    role: 'state',
+                                                    read: true,
+                                                    write: true
+                                                },
+                                                native: {}
+                                            });
+                                            adapter.setState(`Sensor_${id}` + '.' + obj, {val: config[obj], ack: true});
+                                            break;
                                         case 'battery':
+                                            adapter.setObjectNotExists(`Sensor_${id}` + '.' + obj, {
+                                                type: 'state',
+                                                common: {
+                                                    name: list['name'] + ' ' + obj,
+                                                    type: 'number',
+                                                    role: 'indicator.battery',
+                                                    read: true,
+                                                    write: false
+                                                },
+                                                native: {}
+                                            });
+                                            adapter.setState(`Sensor_${id}` + '.' + obj, {val: config[obj], ack: true});
+                                            break;
                                         case 'reachable':
+                                            adapter.setObjectNotExists(`Sensor_${id}` + '.' + obj, {
+                                                type: 'state',
+                                                common: {
+                                                    name: list['name'] + ' ' + obj,
+                                                    type: 'boolean',
+                                                    role: 'indicator.reachable',
+                                                    read: true,
+                                                    write: false
+                                                },
+                                                native: {}
+                                            });
+                                            adapter.setState(`Sensor_${id}` + '.' + obj, {val: config[obj], ack: true});
+                                            break;
                                         case 'alert':
+                                            adapter.setObjectNotExists(`Sensor_${id}` + '.' + obj, {
+                                                type: 'state',
+                                                common: {
+                                                    name: list['name'] + ' ' + obj,
+                                                    type: 'boolean',
+                                                    role: 'indicator.reachable',
+                                                    read: true,
+                                                    write: false
+                                                },
+                                                native: {}
+                                            });
+                                            adapter.setState(`Sensor_${id}` + '.' + obj, {val: config[obj], ack: true});
+                                            break;
                                         case 'duration':
+                                            adapter.setObjectNotExists(`Sensor_${sensorId}` + '.' + obj, {
+                                                type: 'state',
+                                                common: {
+                                                    name: list['name'] + ' ' + obj,
+                                                    type: 'number',
+                                                    role: 'indicator.duration',
+                                                    read: true,
+                                                    write: false
+                                                },
+                                                native: {}
+                                            });
+                                            adapter.setState(`Sensor_${id}` + '.' + obj, {val: config[obj], ack: true});
+                                            break;
                                         case 'pending':
+                                            adapter.setObjectNotExists(`Sensor_${id}` + '.' + obj, {
+                                                type: 'state',
+                                                common: {
+                                                    name: list['name'] + ' ' + obj,
+                                                    type: 'mixed',
+                                                    role: 'info',
+                                                    read: true,
+                                                    write: false
+                                                },
+                                                native: {}
+                                            });
+                                            adapter.setState(`Sensor_${id}` + '.' + obj, {val: config[obj], ack: true});
+                                            break;
                                         case 'sensitivity':
                                         case 'sensitivitymax':
                                         case 'tholddark':
                                         case 'tholdoffset':
                                         case 'offset':
+                                            adapter.setObjectNotExists(`Sensor_${id}` + '.' + obj, {
+                                                type: 'state',
+                                                common: {
+                                                    name: list['name'] + ' ' + obj,
+                                                    type: 'number',
+                                                    role: 'state',
+                                                    read: true,
+                                                    write: false
+                                                },
+                                                native: {}
+                                            });
                                             adapter.setState(`Sensor_${id}` + '.' + obj, {val: config[obj], ack: true});
                                             break;
                                         case 'temperature':
-                                            let value = config[obj]/100;
+                                            adapter.setObjectNotExists(`Sensor_${id}` + '.' + obj, {
+                                                type: 'state',
+                                                common: {
+                                                    name: list['name'] + ' ' + obj,
+                                                    type: 'number',
+                                                    role: 'state',
+                                                    read: true,
+                                                    write: false
+                                                },
+                                                native: {}
+                                            });
+                                            value = config[obj]/100;
                                             adapter.setState(`Sensor_${id}` + '.' + obj, {val: value, ack: true});
                                             break;
                                         case 'group':
