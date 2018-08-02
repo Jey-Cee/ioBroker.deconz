@@ -25,10 +25,11 @@ Required node.js >= 0.12.
 
 ## Changelog
 
+### 0.2.4
+* Fix create objects during running adapter
+
 ### 0.2.3
 * Create objects during runing adapter
-
-
 
 ### 0.2.2
 *  Changed id naming

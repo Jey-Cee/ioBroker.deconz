@@ -371,7 +371,7 @@ function getAutoUpdates(){
                                                     adapter.setObjectNotExists(`Sensor_${id}` + '.' + obj, {
                                                         type: 'state',
                                                         common: {
-                                                            name: list['name'] + ' ' + obj,
+                                                            name: 'Sensor' + id + ' ' + obj,
                                                             type: 'number',
                                                             role: 'state',
                                                             read: true,
@@ -386,7 +386,7 @@ function getAutoUpdates(){
                                                     adapter.setObjectNotExists(`Sensor_${id}` + '.' + obj, {
                                                         type: 'state',
                                                         common: {
-                                                            name: list['name'] + ' ' + obj,
+                                                            name: 'Sensor' + id + ' ' + obj,
                                                             type: 'number',
                                                             role: 'state',
                                                             read: true,
@@ -407,7 +407,7 @@ function getAutoUpdates(){
                                                     adapter.setObjectNotExists(`Sensor_${id}` + '.' + obj, {
                                                         type: 'state',
                                                         common: {
-                                                            name: list['name'] + ' ' + obj,
+                                                            name: 'Sensor' + id + ' ' + obj,
                                                             type: 'boolean',
                                                             role: 'state',
                                                             read: true,
@@ -422,7 +422,7 @@ function getAutoUpdates(){
                                                     adapter.setObjectNotExists(`Sensor_${id}` + '.' + obj, {
                                                         type: 'state',
                                                         common: {
-                                                            name: list['name'] + ' ' + obj,
+                                                            name: 'Sensor' + id + ' ' + obj,
                                                             type: 'boolean',
                                                             role: 'indicator.battery',
                                                             read: true,
@@ -453,7 +453,7 @@ function getAutoUpdates(){
                                                     adapter.setObjectNotExists(`Sensor_${id}` + '.' + obj, {
                                                         type: 'state',
                                                         common: {
-                                                            name: list['name'] + ' ' + obj,
+                                                            name: 'Sensor' + id + ' ' + obj,
                                                             type: 'number',
                                                             role: 'state',
                                                             read: true,
@@ -468,7 +468,7 @@ function getAutoUpdates(){
                                                     adapter.setObjectNotExists(`Sensor_${id}` + '.' + obj, {
                                                         type: 'state',
                                                         common: {
-                                                            name: list['name'] + ' ' + obj,
+                                                            name: 'Sensor' + id + ' ' + obj,
                                                             type: 'number',
                                                             role: 'state',
                                                             read: true,
@@ -489,7 +489,7 @@ function getAutoUpdates(){
                                                     adapter.setObjectNotExists(`Sensor_${id}` + '.' + obj, {
                                                         type: 'state',
                                                         common: {
-                                                            name: list['name'] + ' ' + obj,
+                                                            name: 'Sensor' + id + ' ' + obj,
                                                             type: 'boolean',
                                                             role: 'state',
                                                             read: true,
@@ -504,7 +504,7 @@ function getAutoUpdates(){
                                                     adapter.setObjectNotExists(`Sensor_${id}` + '.' + obj, {
                                                         type: 'state',
                                                         common: {
-                                                            name: list['name'] + ' ' + obj,
+                                                            name: 'Sensor' + id + ' ' + obj,
                                                             type: 'boolean',
                                                             role: 'indicator.battery',
                                                             read: true,
@@ -534,7 +534,7 @@ function getAutoUpdates(){
                                             adapter.setObjectNotExists(`Sensor_${id}` + '.' + obj, {
                                                 type: 'state',
                                                 common: {
-                                                    name: list['name'] + ' ' + obj,
+                                                    name: 'Sensor' + id + ' ' + obj,
                                                     type: 'boolean',
                                                     role: 'state',
                                                     read: true,
@@ -548,7 +548,7 @@ function getAutoUpdates(){
                                             adapter.setObjectNotExists(`Sensor_${id}` + '.' + obj, {
                                                 type: 'state',
                                                 common: {
-                                                    name: list['name'] + ' ' + obj,
+                                                    name: 'Sensor' + id + ' ' + obj,
                                                     type: 'number',
                                                     role: 'indicator.battery',
                                                     read: true,
@@ -562,7 +562,7 @@ function getAutoUpdates(){
                                             adapter.setObjectNotExists(`Sensor_${id}` + '.' + obj, {
                                                 type: 'state',
                                                 common: {
-                                                    name: list['name'] + ' ' + obj,
+                                                    name: 'Sensor' + id + ' ' + obj,
                                                     type: 'boolean',
                                                     role: 'indicator.reachable',
                                                     read: true,
@@ -576,7 +576,7 @@ function getAutoUpdates(){
                                             adapter.setObjectNotExists(`Sensor_${id}` + '.' + obj, {
                                                 type: 'state',
                                                 common: {
-                                                    name: list['name'] + ' ' + obj,
+                                                    name: 'Sensor' + id + ' ' + obj,
                                                     type: 'boolean',
                                                     role: 'indicator.reachable',
                                                     read: true,
@@ -590,7 +590,7 @@ function getAutoUpdates(){
                                             adapter.setObjectNotExists(`Sensor_${sensorId}` + '.' + obj, {
                                                 type: 'state',
                                                 common: {
-                                                    name: list['name'] + ' ' + obj,
+                                                    name: 'Sensor' + id + ' ' + obj,
                                                     type: 'number',
                                                     role: 'indicator.duration',
                                                     read: true,
@@ -604,7 +604,7 @@ function getAutoUpdates(){
                                             adapter.setObjectNotExists(`Sensor_${id}` + '.' + obj, {
                                                 type: 'state',
                                                 common: {
-                                                    name: list['name'] + ' ' + obj,
+                                                    name: 'Sensor' + id + ' ' + obj,
                                                     type: 'mixed',
                                                     role: 'info',
                                                     read: true,
@@ -622,7 +622,7 @@ function getAutoUpdates(){
                                             adapter.setObjectNotExists(`Sensor_${id}` + '.' + obj, {
                                                 type: 'state',
                                                 common: {
-                                                    name: list['name'] + ' ' + obj,
+                                                    name: 'Sensor' + id + ' ' + obj,
                                                     type: 'number',
                                                     role: 'state',
                                                     read: true,
@@ -636,7 +636,7 @@ function getAutoUpdates(){
                                             adapter.setObjectNotExists(`Sensor_${id}` + '.' + obj, {
                                                 type: 'state',
                                                 common: {
-                                                    name: list['name'] + ' ' + obj,
+                                                    name: 'Sensor' + id + ' ' + obj,
                                                     type: 'number',
                                                     role: 'state',
                                                     read: true,
