@@ -1,7 +1,7 @@
 {
     "common": {
         "name": "deconz",
-        "version": "0.2.4",
+        "version": "0.2.5",
         "news": {
             "0.2.2": {
                 "en": "Changed id naming \n Use websocket messages instead polling afterwards",
@@ -119,6 +119,17 @@
             },
             "0.2.4": {
                 "en": "Fix create objects during running adapter;",
+                "de": "",
+                "ru": "",
+                "pt": "",
+                "nl": "",
+                "fr": "",
+                "it": "",
+                "es": "",
+                "pl": ""
+            },
+            "0.2.5": {
+                "en": "Fix/Change handling create objects during running Adapter",
                 "de": "",
                 "ru": "",
                 "pt": "",

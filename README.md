@@ -25,6 +25,9 @@ Required node.js >= 0.12.
 
 ## Changelog
 
+### 0.2.5
+* Fix/Change handling create objects during running Adapter
+
 ### 0.2.4
 * Fix create objects during running adapter
 
