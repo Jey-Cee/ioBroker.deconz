@@ -1213,11 +1213,11 @@ function getSensor(sensorId){
                 let list = JSON.parse(body);
                 let keyName = Object.keys(list)[0];
                 let sensorName = nameFilter(list['name']);
-                const patt = new RegExp(/\d$/g);
+                /*const patt = new RegExp(/\d$/g);
                 let match = patt.test(sensorName);
                 if(match === true && list['ep'] > 1){
                     sensorName = sensorName + '_' + sensorId;
-                }
+                }*/
 
                 //create object for sensor
                 adapter.setObject(`Sensor_${sensorId}`, {
@@ -1265,7 +1265,21 @@ function getSensor(sensorId){
                                 },
                                 native: {}
                             });
-                            adapter.setState(`Sensor_${sensorId}` + '.' + stateName, {val: list['state'][stateName], ack: true});
+							if (stateName == 'buttonevent' && list['modelid'] == 'lumi.sensor_switch.aq2') {
+								let LastUpdate = Number(new Date(list['state']['lastupdated']));
+								let Now = Number(new Date().getTime());
+								let dateoff = new Date();
+								let TimeOffset = dateoff.getTimezoneOffset() * 60000;
+
+								if ((Now - LastUpdate + TimeOffset) < 2000) {
+									adapter.setState(`Sensor_${sensorId}` + '.' + stateName, {val: list['state'][stateName], ack: true});
+									//adapter.log.debug('buttonevent updated, time diff: ' + ((Now - LastUpdate + TimeOffset)/1000) + 'sec update to now');
+								} else {
+									adapter.log.info('buttonevent NOT updated for ' + list['name'] + ', too old: ' + ((Now - LastUpdate + TimeOffset)/1000) + 'sec time difference update to now');
+								};
+							} else {
+								adapter.setState(`Sensor_${sensorId}` + '.' + stateName, {val: list['state'][stateName], ack: true});
+							}
                         break;
                         case 'temperature':
                         case 'humidity':
