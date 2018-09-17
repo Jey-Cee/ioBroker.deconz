@@ -1265,22 +1265,22 @@ function getSensor(sensorId){
                                 },
                                 native: {}
                             });
-							if (stateName == 'buttonevent' && list['modelid'] == 'lumi.sensor_switch.aq2') {
-								let LastUpdate = Number(new Date(list['state']['lastupdated']));
-								let Now = Number(new Date().getTime());
-								let dateoff = new Date();
-								let TimeOffset = dateoff.getTimezoneOffset() * 60000;
-
-								if ((Now - LastUpdate + TimeOffset) < 2000) {
-									adapter.setState(`Sensor_${sensorId}` + '.' + stateName, {val: list['state'][stateName], ack: true});
-									//adapter.log.debug('buttonevent updated, time diff: ' + ((Now - LastUpdate + TimeOffset)/1000) + 'sec update to now');
-								} else {
-									adapter.log.info('buttonevent NOT updated for ' + list['name'] + ', too old: ' + ((Now - LastUpdate + TimeOffset)/1000) + 'sec time difference update to now');
-								};
-							} else {
-								adapter.setState(`Sensor_${sensorId}` + '.' + stateName, {val: list['state'][stateName], ack: true});
-							}
-                        break;
+                            if (stateName == 'buttonevent' && list['modelid'] == 'lumi.sensor_switch.aq2') {
+                                let LastUpdate = Number(new Date(list['state']['lastupdated']));
+                                let Now = Number(new Date().getTime());
+                                let dateoff = new Date();
+                                let TimeOffset = dateoff.getTimezoneOffset() * 60000;
+				
+                                if ((Now - LastUpdate + TimeOffset) < 2000) {
+                                    adapter.setState(`Sensor_${sensorId}` + '.' + stateName, {val: list['state'][stateName], ack: true});
+                                    //adapter.log.debug('buttonevent updated, time diff: ' + ((Now - LastUpdate + TimeOffset)/1000) + 'sec update to now');
+                                } else {
+                                    adapter.log.info('buttonevent NOT updated for ' + list['name'] + ', too old: ' + ((Now - LastUpdate + TimeOffset)/1000) + 'sec time difference update to now');
+                                };
+                            } else {
+                                adapter.setState(`Sensor_${sensorId}` + '.' + stateName, {val: list['state'][stateName], ack: true});
+                            }
+                            break;
                         case 'temperature':
                         case 'humidity':
                             adapter.setObjectNotExists(`Sensor_${sensorId}` + '.' + stateName, {
