@@ -107,9 +107,9 @@ adapter.on('stateChange', function (id, state) {
                 let controlId = obj.native.id;
                 let parameters;
                 if(ttime === 'none'){
-                    parameters = '{"xy": [' + JSON.stringify(state.val) + ']}';
+                    parameters = '{"xy": [' + state.val + ']}';
                 }else{
-                    parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "xy": [' + JSON.stringify(state.val) + ']}';
+                    parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "xy": [' + state.val + ']}';
                 }
                 if(obj.common.role == 'light') {
                     setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.xy')
