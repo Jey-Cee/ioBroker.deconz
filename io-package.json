@@ -171,7 +171,7 @@
         "mode": "daemon",
         "messagebox": true,
         "enabled": true,
-        "readme": "https://github.com/jey-cee/ioBroker.deconz/blob/master/README.md",
+        "readme": "https://github.com/iobroker-community-adapters/ioBroker.deconz/blob/master/README.md",
         "loglevel": "info",
         "keywords": [
             "deconz",
@@ -187,7 +187,7 @@
         ],
         "icon": "deconz.png",
         "materialize": true,
-        "extIcon": "https://raw.githubusercontent.com/jey-cee/ioBroker.deconz/master/admin/deconz.png",
+        "extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.deconz/master/admin/deconz.png",
         "type": "hardware"
     },
     "native": {
