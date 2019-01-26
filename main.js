@@ -159,9 +159,78 @@ adapter.on('stateChange', function (id, state) {
                     }
                 }
             });
+        }else if(dp === 'createscene'){
+            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+                if(obj.common.role == 'group'){
+                    let controlId = obj.native.id;
+                    let parameters = `{ "name": "${state.ts}" }`;
+                    setGroupScene(parameters, controlId, 0, '', '', 'POST');
+                    getAllGroups();
+                }
+            });
+        }else if(dp === 'delete'){
+            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+                if(obj.common.role == 'scene'){
+                    let parentDevicelId = id.split(".")[0];
+                    adapter.log.info(id + " ---" + adapter.name + '.' + adapter.instance + '.' + parentDevicelId);
+                    //deviceObject = adapter.getObject(adapter.name + '.' + adapter.instance + '.' + parentDevicelId);
+                    adapter.getObject(adapter.name + '.' + adapter.instance + '.' + parentDevicelId, function(err, objParent) {
+                        let parentId = objParent.native.id;
+                        let controlId = obj.native.id;
+                        let parameters = '';
+                        setGroupScene(parameters, parentId, controlId, '', '', 'DELETE');
+                    });
+                    adapter.delObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {});
+                }
+            });
+        }else if(dp === 'store'){
+            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+                if(obj.common.role == 'scene'){
+                    let parentDevicelId = id.split(".")[0];
+                    adapter.log.info(id + " ---" + adapter.name + '.' + adapter.instance + '.' + parentDevicelId);
+                    //deviceObject = adapter.getObject(adapter.name + '.' + adapter.instance + '.' + parentDevicelId);
+                    adapter.getObject(adapter.name + '.' + adapter.instance + '.' + parentDevicelId, function(err, objParent) {
+                        let parentId = objParent.native.id;
+                        let controlId = obj.native.id;
+                        let parameters = '';
+                        setGroupScene(parameters, parentId, controlId, 'store', '', 'PUT');
+                    });
+                }
+            });
+        }else if(dp === 'recall'){
+            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+                if(obj.common.role == 'scene'){
+                    let parentDevicelId = id.split(".")[0];
+                    adapter.log.info(id + " ---" + adapter.name + '.' + adapter.instance + '.' + parentDevicelId);
+                    //deviceObject = adapter.getObject(adapter.name + '.' + adapter.instance + '.' + parentDevicelId);
+                    adapter.getObject(adapter.name + '.' + adapter.instance + '.' + parentDevicelId, function(err, objParent) {
+                        let parentId = objParent.native.id;
+                        let controlId = obj.native.id;
+                        let parameters = '';
+                        setGroupScene(parameters, parentId, controlId, 'recall', '', 'PUT');
+                    });
+                }
+            });
+        }else if(dp === 'name'){
+            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+                if(obj.common.role == 'scene'){
+                    let parentDevicelId = id.split(".")[0];
+                    //deviceObject = adapter.getObject(adapter.name + '.' + adapter.instance + '.' + parentDevicelId);
+                    adapter.getObject(adapter.name + '.' + adapter.instance + '.' + parentDevicelId, function(err, objParent) {
+                        let parentId = objParent.native.id;
+                        let controlId = obj.native.id;
+                        let parameters = `{ "name": "${state.val}" }`;
+                        setGroupScene(parameters, parentId, controlId, '', '', 'PUT');
+                        adapter.extendObject(adapter.name + '.' + adapter.instance + '.' + id, {
+                            common: {
+                                name: state.val
+                            }
+                        });
+                    });
+                }
+            });
         }
     })
-
 });
 //END on StateChange
 
@@ -618,12 +687,104 @@ function getAllGroups() {
                         }
                     });
                     getGroupAttributes(list[keyName]['id']);
-                }
+                    getGroupScenes(`Group_${groupID}`, list[keyName]['scenes']);
+                 }
         }else{
             logging(res.statusCode, 'Get all Groups:');
         }
     });
 } //END getAllGroups
+
+function getGroupScenes(group, sceneList) {
+    adapter.log.debug("SzenenID (JSON): " + JSON.stringify(sceneList));
+    adapter.setObjectNotExists(`${group}.createscene`, {
+        type: 'state',
+            common: {
+                name: "createscene",
+                role: 'button'
+            }
+        });
+    if(sceneList.length == 0)
+    {
+        return;    
+    }
+
+    sceneList.forEach(function(scene) {
+        if(scene.lightcount > 0) {
+            adapter.setObjectNotExists(`${group}.Scene_${scene.id}`, {
+                type: 'device',
+                    common: {
+                        name: scene.name,
+                        role: 'scene'
+                    },
+                    native: {
+                        type: 'scene',
+                        id: scene.id
+                    }
+                });
+
+            adapter.setObjectNotExists(`${group}.Scene_${scene.id}.recall`, {
+                type: 'state',
+                    common: {
+                        name: "recall",
+                        role: 'button'
+                    }
+                });
+                adapter.setObjectNotExists(`${group}.Scene_${scene.id}.store`, {
+                type: 'state',
+                    common: {
+                        name: "store",
+                        role: 'button'
+                    }
+                });
+            adapter.setObjectNotExists(`${group}.Scene_${scene.id}.delete`, {
+                type: 'state',
+                    common: {
+                        name: "delete",
+                        role: 'button'
+                    }
+                });
+            adapter.setObjectNotExists(`${group}.Scene_${scene.id}.lightcount`, {
+                type: 'state',
+                    common: {
+                        name: "lightcount",
+                        role: 'state',
+                        type: 'number',
+                        read: true,
+                        write: false
+                    }
+                });
+            adapter.setState(`${group}.Scene_${scene.id}.lightcount`, scene.lightcount, true);
+            adapter.setObjectNotExists(`${group}.Scene_${scene.id}.transitiontime`, {
+                type: 'state',
+                    common: {
+                        name: "transitiontime",
+                        role: 'argument',
+                        type: 'number',
+                        read: true,
+                        write: false
+                    }
+                });
+            adapter.setState(`${group}.Scene_${scene.id}.transitiontime`, scene.transitiontime, true);
+            adapter.setObjectNotExists(`${group}.Scene_${scene.id}.name`, {
+                type: 'state',
+                    common: {
+                        name: "name",
+                        role: 'state',
+                        type: 'string',
+                        read: true,
+                        write: true
+                    }
+                });
+            adapter.setState(`${group}.Scene_${scene.id}.name`, scene.name, true);
+            adapter.extendObject(group, {
+                common: {
+                    name: scene.name
+                }
+            });
+            }
+    });
+} //END getGroupScenes
 
 function getGroupAttributes(groupId) {
     let options = {
@@ -829,6 +990,40 @@ function setGroupState(parameters, groupId, stateId){
         }
     });
 } //END setGroupState
+
+function setGroupScene(parameters, groupId, sceneId, action, stateId, method){
+    let sceneString = '';
+    if(sceneId > 0){
+        sceneString = '/' + sceneId;
+        if(action != ''){
+            sceneString += '/' + action;
+        }
+    }
+    let options = {
+        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/groups/' + groupId + '/scenes' + sceneString,
+        method: method,
+        headers: 'Content-Type" : "application/json',
+        body: parameters
+    };
+
+    request(options, function(error, res, body) {
+        adapter.log.debug('setGroupState STATUS: ' + res.statusCode);
+        let response;
+        try{response = JSON.parse(body);} catch(err){}
+        adapter.log.debug('setGroupState BODY: ' + JSON.stringify(response));
+
+        if(res.statusCode === 200){
+            if(response[0]['success']){
+                adapter.setState(stateId, {ack: true});
+            }else if(response[0]['error']){
+                //adapter.setState(stateId, {ack: false});
+                adapter.log.warn(JSON.stringify(response[0]['error']));
+            }
+        }else{
+            logging(res.statusCode, 'Set group state with ID: ' + groupId + ' parameter: ' + parameters);
+        }
+    });
+} //END setGroupScene
 
 function createGroup(name, callback) {
     let options = {
