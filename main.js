@@ -172,8 +172,6 @@ adapter.on('stateChange', function (id, state) {
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
                 if(obj.common.role == 'scene'){
                     let parentDevicelId = id.split(".")[0];
-                    adapter.log.info(id + " ---" + adapter.name + '.' + adapter.instance + '.' + parentDevicelId);
-                    //deviceObject = adapter.getObject(adapter.name + '.' + adapter.instance + '.' + parentDevicelId);
                     adapter.getObject(adapter.name + '.' + adapter.instance + '.' + parentDevicelId, function(err, objParent) {
                         let parentId = objParent.native.id;
                         let controlId = obj.native.id;
@@ -187,8 +185,6 @@ adapter.on('stateChange', function (id, state) {
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
                 if(obj.common.role == 'scene'){
                     let parentDevicelId = id.split(".")[0];
-                    adapter.log.info(id + " ---" + adapter.name + '.' + adapter.instance + '.' + parentDevicelId);
-                    //deviceObject = adapter.getObject(adapter.name + '.' + adapter.instance + '.' + parentDevicelId);
                     adapter.getObject(adapter.name + '.' + adapter.instance + '.' + parentDevicelId, function(err, objParent) {
                         let parentId = objParent.native.id;
                         let controlId = obj.native.id;
@@ -201,8 +197,6 @@ adapter.on('stateChange', function (id, state) {
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
                 if(obj.common.role == 'scene'){
                     let parentDevicelId = id.split(".")[0];
-                    adapter.log.info(id + " ---" + adapter.name + '.' + adapter.instance + '.' + parentDevicelId);
-                    //deviceObject = adapter.getObject(adapter.name + '.' + adapter.instance + '.' + parentDevicelId);
                     adapter.getObject(adapter.name + '.' + adapter.instance + '.' + parentDevicelId, function(err, objParent) {
                         let parentId = objParent.native.id;
                         let controlId = obj.native.id;
@@ -215,7 +209,6 @@ adapter.on('stateChange', function (id, state) {
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
                 if(obj.common.role == 'scene'){
                     let parentDevicelId = id.split(".")[0];
-                    //deviceObject = adapter.getObject(adapter.name + '.' + adapter.instance + '.' + parentDevicelId);
                     adapter.getObject(adapter.name + '.' + adapter.instance + '.' + parentDevicelId, function(err, objParent) {
                         let parentId = objParent.native.id;
                         let controlId = obj.native.id;
