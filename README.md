@@ -25,6 +25,11 @@ Required node.js >= 0.12.
 
 ## Changelog
 
+### 0.3.0
+* Added scene support
+*  Drop nodejs 4 support
+
+
 ### 0.2.5
 * Fix/Change handling create objects during running Adapter
 

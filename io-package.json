@@ -1,7 +1,7 @@
 {
     "common": {
         "name": "deconz",
-        "version": "0.2.5",
+        "version": "0.3.0",
         "news": {
             "0.2.2": {
                 "en": "Changed id naming \n Use websocket messages instead polling afterwards",
@@ -138,6 +138,17 @@
                 "it": "",
                 "es": "",
                 "pl": ""
+            },
+            "0.3.0": {
+                "en": "Added scene support Drop nodejs 4 support\n",
+                "de": "Szenenunterstützung hinzugefügt \n",
+                "ru": "Добавлена ​​поддержка сцены \n",
+                "pt": "Adicionado suporte de cena \n",
+                "nl": "Ondersteuning van scènes toegevoegd \n",
+                "fr": "Ajout du support de scène \n",
+                "it": "Aggiunto supporto alla scena \n",
+                "es": "Añadido soporte de escena \n",
+                "pl": "Dodano obsługę scen \n"
             }
         },
         "title": "deConz ZigBee",

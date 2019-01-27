@@ -1031,7 +1031,7 @@ function createGroup(name, callback) {
         let req = request(options, function (error, res, body){
             adapter.log.info('STATUS: ' + res.statusCode);
             if(res.statusCode === 200){
-                var apiKey = JSON.parse(body);
+                let apiKey = JSON.parse(body);
                 adapter.log.info(JSON.stringify(apiKey[0]['success']['id']));
                 callback({error: 0, message: 'success'});
                 getGroupAttributes(apiKey[0]['success']['id']);
