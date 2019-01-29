@@ -1,7 +1,7 @@
 {
     "common": {
         "name": "deconz",
-        "version": "0.3.0", 
+        "version": "0.3.1",
         "news": {
             "0.2.2": {
                 "en": "Changed id naming \n Use websocket messages instead polling afterwards",
@@ -149,6 +149,17 @@
                 "it": "Aggiunto supporto alla scena \n",
                 "es": "Añadido soporte de escena \n",
                 "pl": "Dodano obsługę scen \n"
+            },
+            "0.3.1": {
+                "en": "Fixing hue from range 0-65535 to 0-360\n",
+                "de": "Farbton im Bereich von 0-65535 bis 0-360\n",
+                "ru": "Фиксация оттенка в диапазоне от 0-65535 до 0-360\n",
+                "pt": "Correção de matiz do intervalo 0-65535 a 0-360\n",
+                "nl": "Tint vastzetten van bereik 0-65535 tot 0-360\n",
+                "fr": "Teinte de fixation comprise entre 0-65535 et 0-360\n",
+                "it": "Fixing hue nell'intervallo 0-65535 a 0-360\n",
+                "es": "Tono de fijación desde el rango 0-65535 a 0-360\n",
+                "pl": "Naprawianie barwy od zakresu 0-65535 do 0-360\n"
             }
         },
         "title": "deConz ZigBee",

@@ -25,6 +25,10 @@ Required node.js >= 0.12.
 
 ## Changelog
 
+### 0.3.1
+* Fixing hue from range 0-65535 to 0-360
+
+
 ### 0.3.0
 * Added scene support
 *  Drop nodejs 4 support

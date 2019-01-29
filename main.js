@@ -60,12 +60,13 @@ adapter.on('stateChange', function (id, state) {
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
                 let controlId = obj.native.id;
                 let parameters;
+                let hue_factor = 182.041666667;
                 if(ttime === 'none'){
-                    parameters = '{"hue": ' + JSON.stringify(state.val) + '}';
+                    parameters = '{"hue": ' + parseInt(JSON.stringify(state.val)) * hue_factor + '}';
                 }else{
-                    parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "hue": ' + JSON.stringify(state.val) + '}';
+                    parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "hue": ' + parseInt(JSON.stringify(state.val)) * hue_factor + '}';
                 }
-                parameters = '{"hue": ' + JSON.stringify(state.val) + '}';
+                //parameters = '{"hue": ' + parseInt(JSON.stringify(state.val)) * hue_factor + '}';
                 if(obj.common.role == 'light') {
                     setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.hue')
                 }else if(obj.common.role == 'group'){
@@ -856,7 +857,7 @@ function getGroupAttributes(groupId) {
                                     type: 'number',
                                     role: 'hue.color',
                                     min: 0,
-                                    max: 65535,
+                                    max: 360,
                                     read: true,
                                     write: true
                                 },
@@ -1798,7 +1799,7 @@ function getAllLights(){
                                             type: 'number',
                                             role: 'hue.color',
                                             min: 0,
-                                            max: 65535,
+                                            max: 360,
                                             read: true,
                                             write: true
                                         },
@@ -1999,7 +2000,7 @@ function getLightState(lightId){
                                         type: 'number',
                                         role: 'hue.color',
                                         min: 0,
-                                        max: 65535,
+                                        max: 360,
                                         read: true,
                                         write: true
                                     },
