@@ -1,6 +1,6 @@
 {
     "name": "iobroker.deconz",
-    "version": "0.2.5",
+    "version": "0.3.1",
     "description": "deConz can handle various ZigBee devices, such as Hue, Tradfri, Lightify, etc.",
     "author": {
         "name": "Jey Cee",
@@ -10,7 +10,7 @@
     "engines": {
         "node": ">=0.12"
     },
-    "homepage": "https://github.com/jey-cee/ioBroker.deconz",
+    "homepage": "https://github.com/iobroker-community-adapters/ioBroker.deconz",
     "license": "Apache 2.0",
     "keywords": [
         "ioBroker",
@@ -26,15 +26,15 @@
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/jey-cee/ioBroker.deconz"
+        "url": "https://github.com/iobroker-community-adapters/ioBroker.deconz"
     },
     "dependencies": {
         "request": "^2.83.0",
-        "ws": "^4.1.0"
+        "ws": "^6.1.2"
     },
     "devDependencies": {
-        "gulp": "^3.9.1",
-        "mocha": "^4.1.0",
+        "gulp": "^4.0.0",
+        "mocha": "^5.2.0",
         "chai": "^4.1.2"
     },
     "main": "main.js",
@@ -42,7 +42,7 @@
         "test": "node node_modules/mocha/bin/mocha --exit"
     },
     "bugs": {
-        "url": "https://github.com/jey-cee/ioBroker.deconz/issues"
+        "url": "https://github.com/iobroker-community-adapters/ioBroker.deconz/issues"
     },
     "readmeFilename": "README.md"
 }

@@ -5,7 +5,7 @@
 [![NPM version](http://img.shields.io/npm/v/iobroker.deconz.svg)](https://www.npmjs.com/package/iobroker.deconz)
 [![Downloads](https://img.shields.io/npm/dm/iobroker.deconz.svg)](https://www.npmjs.com/package/iobroker.deconz)
 
-[![NPM](https://nodei.co/npm/iobroker.deconz.png?downloads=true)](https://nodei.co/npm/iobroker.deconz/)
+[![NPM](https://nodei.co/npm/iobroker.deconz.png?downloads=true)](https://nodei.co/npm/iobroker.deconz/) [![Greenkeeper badge](https://badges.greenkeeper.io/iobroker-community-adapters/ioBroker.deconz.svg)](https://greenkeeper.io/)
 
 English
 --------------------
@@ -24,6 +24,15 @@ You must first link to deConz.
 Required node.js >= 0.12.
 
 ## Changelog
+
+### 0.3.1
+* Fixing hue from range 0-65535 to 0-360
+
+
+### 0.3.0
+* Added scene support
+*  Drop nodejs 4 support
+
 
 ### 0.2.5
 * Fix/Change handling create objects during running Adapter
