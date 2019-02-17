@@ -185,6 +185,24 @@ adapter.on('stateChange', function (id, state) {
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
                 adapter.setState(adapter.name + '.' + adapter.instance + '.' + id + '.dimspeed', {ack: true});
             });
+        }else if(dp === 'action'){
+            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+                let action = state.val;
+                if (action === null || action === undefined || action == 0) 
+                {
+                    return;
+                }
+                let controlId = obj.native.id;
+                let parameters = `{ ${action} }`;
+                switch(obj.common.role){
+                    case 'group':
+                        setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.action');
+                        break;
+                    case 'light':
+                        setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.action');
+                        break;
+                }
+            });
         }else if(dp === 'createscene'){
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
                 if(obj.common.role == 'group'){
@@ -1001,6 +1019,16 @@ function getGroupAttributes(groupId) {
                         common: {
                             name: list['name'] + ' ' + 'dimdown',
                             role: 'button'
+                        }
+                });
+                adapter.setObjectNotExists(`Group_${groupId}.action`, {
+                    type: 'state',
+                        common: {
+                            name: list['name'] + ' ' + 'action',
+                            role: 'argument',
+                            type: 'string',
+                            read: false,
+                            write: true    
                         }
                 });
                 }
@@ -1992,6 +2020,16 @@ function getAllLights(){
                                         role: 'button'
                                     }
                             });            
+                            adapter.setObjectNotExists(`Light_${lightID}.action`, {
+                                type: 'state',
+                                    common: {
+                                        name: list[keyName]['name'] + ' ' + 'action',
+                                        role: 'argument',
+                                        type: 'string',
+                                        read: false,
+                                        write: true    
+                                    }
+                            });
                         }
                     }
             }else{
