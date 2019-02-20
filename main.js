@@ -162,6 +162,49 @@ adapter.on('stateChange', function (id, state) {
                     }
                 }
             });
+        }else if(dp === 'dimup' || dp === 'dimdown'){
+            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+                adapter.getState(adapter.name + '.' + adapter.instance + '.' + id + '.dimspeed', function(error, dimspeed){
+                    if (dimspeed === null || dimspeed === undefined || dimspeed == 0) 
+                    {
+                        dimspeed = 10;
+                        adapter.setState(adapter.name + '.' + adapter.instance + '.' + id + '.dimspeed', 10, true);
+                    }
+                    let speed = dp === 'dimup' ? dimspeed.val : dimspeed.val * -1;
+                    let controlId = obj.native.id;
+                    let parameters = `{ "bri_inc": ${speed} }`;
+                    switch(obj.common.role){
+                        case 'group':
+                            setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri');
+                            break;
+                        case 'light':
+                            setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri');
+                            break;
+                    }
+                });
+            });
+        }else if(dp === 'dimspeed'){
+            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+                adapter.setState(adapter.name + '.' + adapter.instance + '.' + id + '.dimspeed', {ack: true});
+            });
+        }else if(dp === 'action'){
+            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+                let action = state.val;
+                if (action === null || action === undefined || action == 0) 
+                {
+                    return;
+                }
+                let controlId = obj.native.id;
+                let parameters = `{ ${action} }`;
+                switch(obj.common.role){
+                    case 'group':
+                        setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.action');
+                        break;
+                    case 'light':
+                        setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.action');
+                        break;
+                }
+            });
         }else if(dp === 'createscene'){
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
                 if(obj.common.role == 'group'){
@@ -952,6 +995,43 @@ function getGroupAttributes(groupId) {
                         write: true
                     },
                     native: {}
+                });
+                adapter.setObjectNotExists(`Group_${groupId}.dimspeed`, {
+                    type: 'state',
+                    common: {
+                        name: list['name'] + ' ' + 'dimspeed',
+                        type: 'number',
+                        role: 'level.dimspeed',
+                        min: 0,
+                        max: 254,
+                        read: false,
+                        write: true
+                    },
+                    native: {}
+                });
+                adapter.setObjectNotExists(`Group_${groupId}.dimup`, {
+                    type: 'state',
+                        common: {
+                            name: list['name'] + ' ' + 'dimup',
+                            role: 'button'
+                        }
+                });
+                adapter.setObjectNotExists(`Group_${groupId}.dimdown`, {
+                    type: 'state',
+                        common: {
+                            name: list['name'] + ' ' + 'dimdown',
+                            role: 'button'
+                        }
+                });
+                adapter.setObjectNotExists(`Group_${groupId}.action`, {
+                    type: 'state',
+                        common: {
+                            name: list['name'] + ' ' + 'action',
+                            role: 'argument',
+                            type: 'string',
+                            read: false,
+                            write: true    
+                        }
                 });
                 }
         }else{
@@ -1915,7 +1995,43 @@ function getAllLights(){
                                 },
                                 native: {}
                             });
-
+                            adapter.setObjectNotExists(`Light_${lightID}.dimspeed`, {
+                                type: 'state',
+                                common: {
+                                    name: list[keyName]['name'] + ' ' + 'dimspeed',
+                                    type: 'number',
+                                    role: 'level.dimspeed',
+                                    min: 0,
+                                    max: 254,
+                                    read: false,
+                                    write: true
+                                },
+                                native: {}
+                            });
+                            adapter.setObjectNotExists(`Light_${lightID}.dimup`, {
+                                type: 'state',
+                                    common: {
+                                        name: list[keyName]['name'] + ' ' + 'dimup',
+                                        role: 'button'
+                                    }
+                            });
+                            adapter.setObjectNotExists(`Light_${lightID}.dimdown`, {
+                                type: 'state',
+                                    common: {
+                                        name: list[keyName]['name'] + ' ' + 'dimdown',
+                                        role: 'button'
+                                    }
+                            });            
+                            adapter.setObjectNotExists(`Light_${lightID}.action`, {
+                                type: 'state',
+                                    common: {
+                                        name: list[keyName]['name'] + ' ' + 'action',
+                                        role: 'argument',
+                                        type: 'string',
+                                        read: false,
+                                        write: true    
+                                    }
+                            });
                         }
                     }
             }else{
