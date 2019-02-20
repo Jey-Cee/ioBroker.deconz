@@ -11,7 +11,7 @@
         "node": ">=0.12"
     },
     "homepage": "https://github.com/iobroker-community-adapters/ioBroker.deconz",
-    "license": "Apache 2.0",
+    "license": "Apache-2.0",
     "keywords": [
         "ioBroker",
         "deconz",
