@@ -25,8 +25,10 @@ Required node.js >= 0.12.
 
 ## Changelog
 
-### 0.3.2
-* (asgothian) Fix for hue change 
+### 0.4.0
+* (asgothian) Fix for hue change
+* (halloamt)  Added support for dimming lights and groups
+* (halloamt)  Added support for custom actions
 
 ### 0.3.1
 * Fixing hue from range 0-65535 to 0-360
