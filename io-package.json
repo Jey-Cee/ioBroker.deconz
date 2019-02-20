@@ -172,6 +172,7 @@
                 "es": "Corrección para el cambio de tono; Añadido soporte para atenuar luces y grupos; Añadido soporte para acciones personalizadas;",
                 "pl": "Napraw dla zmiany barwy; Dodano obsługę ściemniania świateł i grup; Dodano obsługę niestandardowych działań;",
                 "zh-cn": "修复色调变化;增加了对调光灯和组的支持;添加了对自定义操作的支持"
+            }
         },
         "title": "deConz ZigBee",
         "titleLang": {
@@ -248,4 +249,4 @@
         }
     ]
 }
-}
+
