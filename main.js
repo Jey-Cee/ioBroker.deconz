@@ -5,6 +5,8 @@ const request = require('request');
 
 const adapter   = new utils.Adapter('deconz');
 
+let hue_factor = 182.041666667;
+
 adapter.on('stateChange', function (id, state) {
     if (!id || !state || state.ack) {
         return;
@@ -62,9 +64,9 @@ adapter.on('stateChange', function (id, state) {
                 let parameters;
                 let hue_factor = 182.041666667;
                 if(ttime === 'none'){
-                    parameters = '{"hue": ' + parseInt(JSON.stringify(state.val)) * hue_factor + '}';
+                    parameters = '{"hue": ' + Math.round(parseInt(JSON.stringify(state.val)) * hue_factor) + '}';
                 }else{
-                    parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "hue": ' + parseInt(JSON.stringify(state.val)) * hue_factor + '}';
+                    parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "hue": ' + Math.round(parseInt(JSON.stringify(state.val)) * hue_factor) + '}';
                 }
                 //parameters = '{"hue": ' + parseInt(JSON.stringify(state.val)) * hue_factor + '}';
                 if(obj.common.role == 'light') {
@@ -700,7 +702,7 @@ function getGroupScenes(group, sceneList) {
         });
     if(sceneList.length == 0)
     {
-        return;    
+        return;
     }
 
     sceneList.forEach(function(scene) {
@@ -863,7 +865,7 @@ function getGroupAttributes(groupId) {
                                 },
                                 native: {}
                             });
-                            adapter.setState(`Group_${groupId}` + '.' + stateName, {val: list['action'][stateName], ack: true});
+                            adapter.setState(`Group_${groupId}` + '.' + stateName, {val: Math.round(list['action'][stateName] * 100 / hue_factor) / 100, ack: true});
                             break;
                         case 'sat':
                             adapter.setObjectNotExists(`Group_${groupId}` + '.' + stateName, {
@@ -1105,7 +1107,7 @@ function getAllSensors() {
         let count = Object.keys(list).length - 1;
 
         adapter.log.debug('getAllSensors: ' + body);
-        
+
         if (res.statusCode === 200 && body != '{}') {
             for (let i = 0; i <= count; i++) {              //Get each Sensor
                 let keyName = Object.keys(list)[i];
@@ -1459,7 +1461,7 @@ function getSensor(sensorId){
                                 let Now = Number(new Date().getTime());
                                 let dateoff = new Date();
                                 let TimeOffset = dateoff.getTimezoneOffset() * 60000;
-				
+
                                 if ((Now - LastUpdate + TimeOffset) < 2000) {
                                     adapter.setState(`Sensor_${sensorId}` + '.' + stateName, {val: list['state'][stateName], ack: true});
                                     //adapter.log.debug('buttonevent updated, time diff: ' + ((Now - LastUpdate + TimeOffset)/1000) + 'sec update to now');
@@ -2006,7 +2008,7 @@ function getLightState(lightId){
                                     },
                                     native: {}
                                 });
-                                adapter.setState(`Light_${lightId}` + '.' + stateName, {val: list['state'][stateName], ack: true});
+                                adapter.setState(`Light_${lightId}` + '.' + stateName, {val: Math.round(list['state'][stateName] * 100 / hue_factor) / 100, ack: true});
                                 break;
                             case 'sat':
                                 adapter.setObjectNotExists(`Light_${lightId}` + '.' + stateName, {
