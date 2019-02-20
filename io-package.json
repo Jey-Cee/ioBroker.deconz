@@ -1,7 +1,7 @@
 {
     "common": {
         "name": "deconz",
-        "version": "0.3.1",
+        "version": "0.4.0",
         "news": {
             "0.2.2": {
                 "en": "Changed id naming \n Use websocket messages instead polling afterwards",
@@ -160,6 +160,20 @@
                 "it": "Fixing hue nell'intervallo 0-65535 a 0-360\n",
                 "es": "Tono de fijación desde el rango 0-65535 a 0-360\n",
                 "pl": "Naprawianie barwy od zakresu 0-65535 do 0-360\n"
+            },
+            {
+            "0.4.0": {
+                "en": "Fix for hue change; Added support for dimming lights and groups; Added support for custom actions;",
+                "de": "Fix für Farbtonänderung; Unterstützung für das Dimmen von Licht und Gruppen hinzugefügt; Unterstützung für benutzerdefinierte Aktionen hinzugefügt;",
+                "ru": "Исправлена ​​смена оттенка; Добавлена ​​поддержка диммирования огней и групп; Добавлена ​​поддержка пользовательских действий;",
+                "pt": "Correção para alteração de matiz; Adicionado suporte para escurecimento de luzes e grupos; Adicionado suporte para ações personalizadas;",
+                "nl": "Oplossing voor tintverandering; Ondersteuning toegevoegd voor het dimmen van lichten en groepen; Ondersteuning voor aangepaste acties toegevoegd;",
+                "fr" : "Correction du changement de teinte; Ajout du support pour atténuer les lumières et les groupes; Ajout du support pour les actions personnalisées;",
+                "it": "Correzione per il cambiamento di tonalità; Aggiunto supporto per luci soffuse e gruppi; Aggiunto supporto per azioni personalizzate;",
+                "es": "Corrección para el cambio de tono; Añadido soporte para atenuar luces y grupos; Añadido soporte para acciones personalizadas;",
+                "pl": "Napraw dla zmiany barwy; Dodano obsługę ściemniania świateł i grup; Dodano obsługę niestandardowych działań;",
+                "zh-cn": "修复色调变化;增加了对调光灯和组的支持;添加了对自定义操作的支持"
+                }
             }
         },
         "title": "deConz ZigBee",
