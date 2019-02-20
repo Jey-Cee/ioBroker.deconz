@@ -25,6 +25,9 @@ Required node.js >= 0.12.
 
 ## Changelog
 
+### 0.3.2
+* (asgothian) Fix for hue change 
+
 ### 0.3.1
 * Fixing hue from range 0-65535 to 0-360
 
