@@ -5,6 +5,8 @@ const request = require('request');
 
 const adapter   = new utils.Adapter('deconz');
 
+let hue_factor = 182.041666667;
+
 adapter.on('stateChange', function (id, state) {
     if (!id || !state || state.ack) {
         return;
@@ -62,9 +64,9 @@ adapter.on('stateChange', function (id, state) {
                 let parameters;
                 let hue_factor = 182.041666667;
                 if(ttime === 'none'){
-                    parameters = '{"hue": ' + parseInt(JSON.stringify(state.val)) * hue_factor + '}';
+                    parameters = '{"hue": ' + Math.round(parseInt(JSON.stringify(state.val)) * hue_factor) + '}';
                 }else{
-                    parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "hue": ' + parseInt(JSON.stringify(state.val)) * hue_factor + '}';
+                    parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "hue": ' + Math.round(parseInt(JSON.stringify(state.val)) * hue_factor) + '}';
                 }
                 //parameters = '{"hue": ' + parseInt(JSON.stringify(state.val)) * hue_factor + '}';
                 if(obj.common.role == 'light') {
@@ -158,6 +160,49 @@ adapter.on('stateChange', function (id, state) {
                     }else if(obj.common.role == 'group'){
                         setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.effect')
                     }
+                }
+            });
+        }else if(dp === 'dimup' || dp === 'dimdown'){
+            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+                adapter.getState(adapter.name + '.' + adapter.instance + '.' + id + '.dimspeed', function(error, dimspeed){
+                    if (dimspeed === null || dimspeed === undefined || dimspeed == 0) 
+                    {
+                        dimspeed = 10;
+                        adapter.setState(adapter.name + '.' + adapter.instance + '.' + id + '.dimspeed', 10, true);
+                    }
+                    let speed = dp === 'dimup' ? dimspeed.val : dimspeed.val * -1;
+                    let controlId = obj.native.id;
+                    let parameters = `{ "bri_inc": ${speed} }`;
+                    switch(obj.common.role){
+                        case 'group':
+                            setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri');
+                            break;
+                        case 'light':
+                            setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri');
+                            break;
+                    }
+                });
+            });
+        }else if(dp === 'dimspeed'){
+            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+                adapter.setState(adapter.name + '.' + adapter.instance + '.' + id + '.dimspeed', {ack: true});
+            });
+        }else if(dp === 'action'){
+            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+                let action = state.val;
+                if (action === null || action === undefined || action == 0) 
+                {
+                    return;
+                }
+                let controlId = obj.native.id;
+                let parameters = `{ ${action} }`;
+                switch(obj.common.role){
+                    case 'group':
+                        setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.action');
+                        break;
+                    case 'light':
+                        setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.action');
+                        break;
                 }
             });
         }else if(dp === 'createscene'){
@@ -700,7 +745,7 @@ function getGroupScenes(group, sceneList) {
         });
     if(sceneList.length == 0)
     {
-        return;    
+        return;
     }
 
     sceneList.forEach(function(scene) {
@@ -863,7 +908,7 @@ function getGroupAttributes(groupId) {
                                 },
                                 native: {}
                             });
-                            adapter.setState(`Group_${groupId}` + '.' + stateName, {val: list['action'][stateName], ack: true});
+                            adapter.setState(`Group_${groupId}` + '.' + stateName, {val: Math.round(list['action'][stateName] * 100 / hue_factor) / 100, ack: true});
                             break;
                         case 'sat':
                             adapter.setObjectNotExists(`Group_${groupId}` + '.' + stateName, {
@@ -950,6 +995,43 @@ function getGroupAttributes(groupId) {
                         write: true
                     },
                     native: {}
+                });
+                adapter.setObjectNotExists(`Group_${groupId}.dimspeed`, {
+                    type: 'state',
+                    common: {
+                        name: list['name'] + ' ' + 'dimspeed',
+                        type: 'number',
+                        role: 'level.dimspeed',
+                        min: 0,
+                        max: 254,
+                        read: false,
+                        write: true
+                    },
+                    native: {}
+                });
+                adapter.setObjectNotExists(`Group_${groupId}.dimup`, {
+                    type: 'state',
+                        common: {
+                            name: list['name'] + ' ' + 'dimup',
+                            role: 'button'
+                        }
+                });
+                adapter.setObjectNotExists(`Group_${groupId}.dimdown`, {
+                    type: 'state',
+                        common: {
+                            name: list['name'] + ' ' + 'dimdown',
+                            role: 'button'
+                        }
+                });
+                adapter.setObjectNotExists(`Group_${groupId}.action`, {
+                    type: 'state',
+                        common: {
+                            name: list['name'] + ' ' + 'action',
+                            role: 'argument',
+                            type: 'string',
+                            read: false,
+                            write: true    
+                        }
                 });
                 }
         }else{
@@ -1105,7 +1187,7 @@ function getAllSensors() {
         let count = Object.keys(list).length - 1;
 
         adapter.log.debug('getAllSensors: ' + body);
-        
+
         if (res.statusCode === 200 && body != '{}') {
             for (let i = 0; i <= count; i++) {              //Get each Sensor
                 let keyName = Object.keys(list)[i];
@@ -1459,7 +1541,7 @@ function getSensor(sensorId){
                                 let Now = Number(new Date().getTime());
                                 let dateoff = new Date();
                                 let TimeOffset = dateoff.getTimezoneOffset() * 60000;
-				
+
                                 if ((Now - LastUpdate + TimeOffset) < 2000) {
                                     adapter.setState(`Sensor_${sensorId}` + '.' + stateName, {val: list['state'][stateName], ack: true});
                                     //adapter.log.debug('buttonevent updated, time diff: ' + ((Now - LastUpdate + TimeOffset)/1000) + 'sec update to now');
@@ -1913,7 +1995,43 @@ function getAllLights(){
                                 },
                                 native: {}
                             });
-
+                            adapter.setObjectNotExists(`Light_${lightID}.dimspeed`, {
+                                type: 'state',
+                                common: {
+                                    name: list[keyName]['name'] + ' ' + 'dimspeed',
+                                    type: 'number',
+                                    role: 'level.dimspeed',
+                                    min: 0,
+                                    max: 254,
+                                    read: false,
+                                    write: true
+                                },
+                                native: {}
+                            });
+                            adapter.setObjectNotExists(`Light_${lightID}.dimup`, {
+                                type: 'state',
+                                    common: {
+                                        name: list[keyName]['name'] + ' ' + 'dimup',
+                                        role: 'button'
+                                    }
+                            });
+                            adapter.setObjectNotExists(`Light_${lightID}.dimdown`, {
+                                type: 'state',
+                                    common: {
+                                        name: list[keyName]['name'] + ' ' + 'dimdown',
+                                        role: 'button'
+                                    }
+                            });            
+                            adapter.setObjectNotExists(`Light_${lightID}.action`, {
+                                type: 'state',
+                                    common: {
+                                        name: list[keyName]['name'] + ' ' + 'action',
+                                        role: 'argument',
+                                        type: 'string',
+                                        read: false,
+                                        write: true    
+                                    }
+                            });
                         }
                     }
             }else{
@@ -2006,7 +2124,7 @@ function getLightState(lightId){
                                     },
                                     native: {}
                                 });
-                                adapter.setState(`Light_${lightId}` + '.' + stateName, {val: list['state'][stateName], ack: true});
+                                adapter.setState(`Light_${lightId}` + '.' + stateName, {val: Math.round(list['state'][stateName] * 100 / hue_factor) / 100, ack: true});
                                 break;
                             case 'sat':
                                 adapter.setObjectNotExists(`Light_${lightId}` + '.' + stateName, {
