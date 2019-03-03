@@ -1548,6 +1548,20 @@ function getSensor(sensorId){
                                 } else {
                                     adapter.log.info('buttonevent NOT updated for ' + list['name'] + ', too old: ' + ((Now - LastUpdate + TimeOffset)/1000) + 'sec time difference update to now');
                                 };
+                            } elseif (stateName == 'buttonevent' && list['modelid'] == 'ZYCT-202') {
+                                adapter.setObjectNotExists(`Sensor_${sensorId}` + '.buttoneventgroup', {
+                                    type: 'state',
+                                    common: {
+                                        name: list['name'] + ' buttoneventgroup',
+                                        type: 'number',
+                                        role: 'state',
+                                        read: true,
+                                        write: false
+                                    },
+                                    native: {}
+                                });
+                                adapter.setState(`Sensor_${sensorId}` + '.buttoneventgroup', {val: list['config']['group'], ack: true});
+                                adapter.setState(`Sensor_${sensorId}` + '.' + stateName, {val: list['state'][stateName], ack: true});
                             } else {
                                 adapter.setState(`Sensor_${sensorId}` + '.' + stateName, {val: list['state'][stateName], ack: true});
                             }
