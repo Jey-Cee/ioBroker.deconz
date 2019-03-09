@@ -1,48 +1,49 @@
 {
-    "name": "iobroker.deconz",
-    "version": "0.2.5",
-    "description": "deConz can handle various ZigBee devices, such as Hue, Tradfri, Lightify, etc.",
-    "author": {
-        "name": "Jey Cee",
-        "email": "jey-cee@live.com"
-    },
-    "contributors": [],
-    "engines": {
-        "node": ">=0.12"
-    },
-    "homepage": "https://github.com/iobroker-community-adapters/ioBroker.deconz",
-    "license": "Apache 2.0",
-    "keywords": [
-        "ioBroker",
-        "deconz",
-        "hue",
-        "tradfri",
-        "lightify",
-        "led",
-        "rgb",
-        "smartlink",
-        "zigbee",
-        "home automation"
-    ],
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/iobroker-community-adapters/ioBroker.deconz"
-    },
-    "dependencies": {
-        "request": "^2.83.0",
-        "ws": "^4.1.0"
-    },
-    "devDependencies": {
-        "gulp": "^3.9.1",
-        "mocha": "^4.1.0",
-        "chai": "^4.1.2"
-    },
-    "main": "main.js",
-    "scripts": {
-        "test": "node node_modules/mocha/bin/mocha --exit"
-    },
-    "bugs": {
-        "url": "https://github.com/iobroker-community-adapters/ioBroker.deconz/issues"
-    },
-    "readmeFilename": "README.md"
+  "name": "iobroker.deconz",
+  "version": "0.2.5",
+  "description": "deConz can handle various ZigBee devices, such as Hue, Tradfri, Lightify, etc.",
+  "author": {
+    "name": "Jey Cee",
+    "email": "jey-cee@live.com"
+  },
+  "contributors": [],
+  "engines": {
+    "node": ">=0.12"
+  },
+  "homepage": "https://github.com/iobroker-community-adapters/ioBroker.deconz",
+  "license": "Apache 2.0",
+  "keywords": [
+    "ioBroker",
+    "deconz",
+    "hue",
+    "tradfri",
+    "lightify",
+    "led",
+    "rgb",
+    "smartlink",
+    "zigbee",
+    "home automation"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iobroker-community-adapters/ioBroker.deconz"
+  },
+  "dependencies": {
+    "request": "^2.83.0",
+    "ws": "^4.1.0",
+    "@iobroker/adapter-core": "^1.0.3"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "mocha": "^4.1.0",
+    "chai": "^4.1.2"
+  },
+  "main": "main.js",
+  "scripts": {
+    "test": "node node_modules/mocha/bin/mocha --exit"
+  },
+  "bugs": {
+    "url": "https://github.com/iobroker-community-adapters/ioBroker.deconz/issues"
+  },
+  "readmeFilename": "README.md"
 }
