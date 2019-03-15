@@ -737,7 +737,7 @@ function getAllGroups() {
 function getGroupScenes(group, sceneList) {
     adapter.log.debug("SzenenID (JSON): " + JSON.stringify(sceneList));
 
-    let obj = adapter.getObject(group);
+    let obj = adapter.getObject(adapter.name + '.' + adapter.instance + '.' + group);
 
     let regex = new RegExp("helper[0-9]+ for group [0-9]+");
     adapter.log.info("Group: " + group);
