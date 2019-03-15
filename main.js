@@ -745,7 +745,7 @@ function getGroupScenes(group, sceneList) {
 adapter.log.info("Name: " + obj.name.name);
 
     if(!regex.test(obj.common.name.name)){
-        adapter.setObjectNotExists(`${group}.createscene`, {
+        adapter.setObjectNotExists(`deconz.0.${group}.createscene`, {
             type: 'state',
                 common: {
                     name: "createscene",
