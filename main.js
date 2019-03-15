@@ -742,10 +742,9 @@ function getGroupScenes(group, sceneList) {
     let regex = new RegExp("helper[0-9]+ for group [0-9]+");
     adapter.log.info("Group: " + group);
     adapter.log.info(JSON.stringify(obj));
-adapter.log.info("Name: " + obj.name.name);
 
-    if(!regex.test(obj.common.name.name)){
-        adapter.setObjectNotExists(`deconz.0.${group}.createscene`, {
+    if(obj != undefined && !regex.test(obj.common.name.name)){
+        adapter.setObjectNotExists(`${group}.createscene`, {
             type: 'state',
                 common: {
                     name: "createscene",
