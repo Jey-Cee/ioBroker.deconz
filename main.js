@@ -740,6 +740,8 @@ function getGroupScenes(group, sceneList) {
     let obj = adapter.getObject(group);
 
     let regex = new RegExp("helper[0-9]+ for group [0-9]+");
+    adapter.log.info("Group: " + group);
+    adapter.log.info(JSON.stringify(obj));
 adapter.log.info("Name: " + obj.name.name);
 
     if(!regex.test(obj.common.name.name)){
