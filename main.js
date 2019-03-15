@@ -36,6 +36,15 @@ adapter.on('stateChange', function (id, state) {
                 }else{
                     parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "bri": ' + JSON.stringify(state.val) + '}';
                 }
+                adapter.log.info(id);
+                adapter.log.info(adapter.name + '.' + adapter.instance + '.' + id + '.on');
+                adapter.log.info(state.val);
+                if(state.val > 0)
+                {
+                    adapter.setState(adapter.name + '.' + adapter.instance + '.' + id + '.on', true, false);
+                } else {
+                    adapter.setState(adapter.name + '.' + adapter.instance + '.' + id + '.on', false, false);
+                }
                 if(obj.common.role == 'light') {
                     setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri')
                 }else if(obj.common.role == 'group'){
