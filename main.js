@@ -48,7 +48,7 @@ adapter.on('stateChange', function (id, state) {
                     });
                 } else {
                     setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri', function() {
-                        setLightState(parameters2, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on');
+                        setLightState('{"on": false }', controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on');
                     });
                 }
 
