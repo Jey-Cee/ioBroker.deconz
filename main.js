@@ -723,8 +723,7 @@ function getAllGroups() {
                             type: 'device',
                             common: {
                                 name: list[keyName],
-                                role: 'group',
-                                smartName: smart
+                                role: 'group'
                             },
                             native: {
                                 devicemembership: list[keyName]['devicemembership'],
