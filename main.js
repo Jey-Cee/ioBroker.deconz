@@ -843,6 +843,16 @@ function getGroupAttributes(groupId) {
                 let keyName = Object.keys(list)[i];
                 //create object for group with attributes
                 let groupID = list[keyName]['id'];
+
+                let regex = new RegExp("helper[0-9]+ for group [0-9]+");
+                if(regex.test(list['name']))
+                    adapter.log.info(list['name'] + " ja");
+                    else
+                    adapter.log.info(list['name'] + " nein");
+                if(regex.test(list['name']))
+                    continue;
+
+
                 adapter.setObject(`Group_${groupId}`, {
                     type: 'device',
                     common: {
