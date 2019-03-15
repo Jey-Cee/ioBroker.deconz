@@ -45,11 +45,13 @@ adapter.on('stateChange', function (id, state) {
                 } else {
                     adapter.setState(adapter.name + '.' + adapter.instance + '.' + id + '.on', false, false);
                 }
-                if(obj.common.role == 'light') {
-                    setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri')
-                }else if(obj.common.role == 'group'){
-                    setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri')
-                }
+                setTimeout(function() {
+                    if(obj.common.role == 'light') {
+                        setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri')
+                    }else if(obj.common.role == 'group'){
+                        setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri')
+                    }
+                }, 500);
             });
         }else if(dp === 'on'){
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
