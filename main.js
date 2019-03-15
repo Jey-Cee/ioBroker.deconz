@@ -736,93 +736,101 @@ function getAllGroups() {
 
 function getGroupScenes(group, sceneList) {
     adapter.log.debug("SzenenID (JSON): " + JSON.stringify(sceneList));
-    adapter.setObjectNotExists(`${group}.createscene`, {
-        type: 'state',
-            common: {
-                name: "createscene",
-                role: 'button'
-            }
-        });
-    if(sceneList.length == 0)
-    {
-        return;
-    }
 
-    sceneList.forEach(function(scene) {
-        if(scene.lightcount > 0) {
-            adapter.setObjectNotExists(`${group}.Scene_${scene.id}`, {
-                type: 'device',
-                    common: {
-                        name: scene.name,
-                        role: 'scene'
-                    },
-                    native: {
-                        type: 'scene',
-                        id: scene.id
-                    }
-                });
+    let obj = adapter.getObject(group);
 
-            adapter.setObjectNotExists(`${group}.Scene_${scene.id}.recall`, {
-                type: 'state',
-                    common: {
-                        name: "recall",
-                        role: 'button'
-                    }
-                });
-                adapter.setObjectNotExists(`${group}.Scene_${scene.id}.store`, {
-                type: 'state',
-                    common: {
-                        name: "store",
-                        role: 'button'
-                    }
-                });
-            adapter.setObjectNotExists(`${group}.Scene_${scene.id}.delete`, {
-                type: 'state',
-                    common: {
-                        name: "delete",
-                        role: 'button'
-                    }
-                });
-            adapter.setObjectNotExists(`${group}.Scene_${scene.id}.lightcount`, {
-                type: 'state',
-                    common: {
-                        name: "lightcount",
-                        role: 'state',
-                        type: 'number',
-                        read: true,
-                        write: false
-                    }
-                });
-            adapter.setState(`${group}.Scene_${scene.id}.lightcount`, scene.lightcount, true);
-            adapter.setObjectNotExists(`${group}.Scene_${scene.id}.transitiontime`, {
-                type: 'state',
-                    common: {
-                        name: "transitiontime",
-                        role: 'argument',
-                        type: 'number',
-                        read: true,
-                        write: false
-                    }
-                });
-            adapter.setState(`${group}.Scene_${scene.id}.transitiontime`, scene.transitiontime, true);
-            adapter.setObjectNotExists(`${group}.Scene_${scene.id}.name`, {
-                type: 'state',
-                    common: {
-                        name: "name",
-                        role: 'state',
-                        type: 'string',
-                        read: true,
-                        write: true
-                    }
-                });
-            adapter.setState(`${group}.Scene_${scene.id}.name`, scene.name, true);
-            adapter.extendObject(group, {
+    let regex = new RegExp("helper[0-9]+ for group [0-9]+");
+adapter.log.info("Name: " + obj.name.name);
+
+    if(!regex.test(obj.common.name.name)){
+        adapter.setObjectNotExists(`${group}.createscene`, {
+            type: 'state',
                 common: {
-                    name: scene.name
+                    name: "createscene",
+                    role: 'button'
                 }
             });
-            }
-    });
+        if(sceneList.length == 0)
+        {
+            return;
+        }
+
+        sceneList.forEach(function(scene) {
+            if(scene.lightcount > 0) {
+                adapter.setObjectNotExists(`${group}.Scene_${scene.id}`, {
+                    type: 'device',
+                        common: {
+                            name: scene.name,
+                            role: 'scene'
+                        },
+                        native: {
+                            type: 'scene',
+                            id: scene.id
+                        }
+                    });
+
+                adapter.setObjectNotExists(`${group}.Scene_${scene.id}.recall`, {
+                    type: 'state',
+                        common: {
+                            name: "recall",
+                            role: 'button'
+                        }
+                    });
+                    adapter.setObjectNotExists(`${group}.Scene_${scene.id}.store`, {
+                    type: 'state',
+                        common: {
+                            name: "store",
+                            role: 'button'
+                        }
+                    });
+                adapter.setObjectNotExists(`${group}.Scene_${scene.id}.delete`, {
+                    type: 'state',
+                        common: {
+                            name: "delete",
+                            role: 'button'
+                        }
+                    });
+                adapter.setObjectNotExists(`${group}.Scene_${scene.id}.lightcount`, {
+                    type: 'state',
+                        common: {
+                            name: "lightcount",
+                            role: 'state',
+                            type: 'number',
+                            read: true,
+                            write: false
+                        }
+                    });
+                adapter.setState(`${group}.Scene_${scene.id}.lightcount`, scene.lightcount, true);
+                adapter.setObjectNotExists(`${group}.Scene_${scene.id}.transitiontime`, {
+                    type: 'state',
+                        common: {
+                            name: "transitiontime",
+                            role: 'argument',
+                            type: 'number',
+                            read: true,
+                            write: false
+                        }
+                    });
+                adapter.setState(`${group}.Scene_${scene.id}.transitiontime`, scene.transitiontime, true);
+                adapter.setObjectNotExists(`${group}.Scene_${scene.id}.name`, {
+                    type: 'state',
+                        common: {
+                            name: "name",
+                            role: 'state',
+                            type: 'string',
+                            read: true,
+                            write: true
+                        }
+                    });
+                adapter.setState(`${group}.Scene_${scene.id}.name`, scene.name, true);
+                adapter.extendObject(group, {
+                    common: {
+                        name: scene.name
+                    }
+                });
+                }
+        });
+    }
 } //END getGroupScenes
 
 function getGroupAttributes(groupId) {
