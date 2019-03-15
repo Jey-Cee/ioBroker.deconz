@@ -46,25 +46,6 @@ adapter.on('stateChange', function (id, state) {
                         setLightState('{"on": false }', controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on');
                     });
                 }
-
-                
-
-
-                /*if(state.val > 0) {
-                    adapter.setState(adapter.name + '.' + adapter.instance + '.' + id + '.on', true, false);
-                } else {
-                    parameters = '{"on": false}';
-                    adapter.setState(adapter.name + '.' + adapter.instance + '.' + id + '.on', false, false);
-                }
-                
-                setTimeout(function() {
-                    if(obj.common.role == 'light') {
-                        setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri')
-                    }else if(obj.common.role == 'group'){
-                        setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri')
-                    }
-                    
-                }, 1000);*/
             });
         }else if(dp === 'on'){
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
@@ -738,13 +719,12 @@ function getAllGroups() {
                     //Changed check if is helper group, if skip it
                     let regex = new RegExp("helper[0-9]+ for group [0-9]+");
                     if(!regex.test(objectName)) {
-
-
                         adapter.setObject(`Group_${groupID}`, {
                             type: 'device',
                             common: {
                                 name: list[keyName],
-                                role: 'group'
+                                role: 'group',
+                                smartName: smart
                             },
                             native: {
                                 devicemembership: list[keyName]['devicemembership'],
@@ -941,7 +921,7 @@ function getGroupAttributes(groupId) {
                                     common: {
                                         name: list['name'] + ' ' +stateName,
                                         type: 'number',
-                                        role: 'hue.color',
+                                        role: 'level.color.hue',
                                         min: 0,
                                         max: 360,
                                         read: true,
@@ -957,7 +937,7 @@ function getGroupAttributes(groupId) {
                                     common: {
                                         name: list['name'] + ' ' +stateName,
                                         type: 'number',
-                                        role: 'color.saturation',
+                                        role: 'level.color.saturation',
                                         min: 0,
                                         max: 255,
                                         read: true,
@@ -1921,7 +1901,7 @@ function getAllLights(){
                                         common: {
                                             name: list[keyName]['name'] + ' ' + stateName,
                                             type: 'number',
-                                            role: 'hue.color',
+                                            role: 'level.color.hue',
                                             min: 0,
                                             max: 360,
                                             read: true,
@@ -1936,7 +1916,7 @@ function getAllLights(){
                                         common: {
                                             name: list[keyName]['name'] + ' ' + stateName,
                                             type: 'number',
-                                            role: 'color.saturation',
+                                            role: 'level.color.saturation',
                                             min: 0,
                                             max: 255,
                                             read: true,
@@ -2158,7 +2138,7 @@ function getLightState(lightId){
                                     common: {
                                         name: list['name'] + ' ' + stateName,
                                         type: 'number',
-                                        role: 'hue.color',
+                                        role: 'level.color.hue',
                                         min: 0,
                                         max: 360,
                                         read: true,
@@ -2174,7 +2154,7 @@ function getLightState(lightId){
                                     common: {
                                         name: list['name'] + ' ' + stateName,
                                         type: 'number',
-                                        role: 'color.saturation',
+                                        role: 'level.color.saturation',
                                         min: 0,
                                         max: 255,
                                         read: true,
