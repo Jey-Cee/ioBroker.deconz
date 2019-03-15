@@ -845,205 +845,200 @@ function getGroupAttributes(groupId) {
                 let groupID = list[keyName]['id'];
 
                 let regex = new RegExp("helper[0-9]+ for group [0-9]+");
-                if(regex.test(list['name']))
-                    adapter.log.info(list['name'] + " ja");
-                    else
-                    adapter.log.info(list['name'] + " nein");
-                if(regex.test(list['name']))
-                    continue;
+                if(!regex.test(list['name'])) {
 
-
-                adapter.setObject(`Group_${groupId}`, {
-                    type: 'device',
-                    common: {
-                        name: list['name'],
-                        role: 'group'
-                    },
-                    native: {
-                        devicemembership: list['devicemembership'],
-                        etag: list['etag'],
-                        hidden: list['hidden'],
-                        id: groupId,
-                        lights: list['lights'],
-                        lightsequence: list['lightsequence'],
-                        multideviceids: list['multideviceids']
-                    }
-                });
-                let count2 = Object.keys(list['action']).length - 1;
-                //create states for light device
-                for (let z = 0; z <= count2; z++) {
-                    let stateName = Object.keys(list['action'])[z];
-                    switch (stateName) {
-                        case 'on':
-                            adapter.setObjectNotExists(`Group_${groupId}` + '.' + stateName, {
-                                type: 'state',
-                                common: {
-                                    name: list['name'] + ' ' +stateName,
-                                    type: 'boolean',
-                                    role: 'switch',
-                                    read: true,
-                                    write: true
-                                },
-                                native: {}
-                            });
-                            adapter.setState(`Group_${groupId}` + '.' + stateName, {val: list['action'][stateName], ack: true});
-                            break;
-                        case 'bri':
-                            adapter.setObjectNotExists(`Group_${groupId}` + '.' + stateName, {
-                                type: 'state',
-                                common: {
-                                    name: list['name'] + ' ' +stateName,
-                                    type: 'number',
-                                    role: 'level.dimmer',
-                                    min: 0,
-                                    max: 255,
-                                    read: true,
-                                    write: true
-                                },
-                                native: {}
-                            });
-                            adapter.setState(`Group_${groupId}` + '.' + stateName, {val: list['action'][stateName], ack: true});
-                            break;
-                        case 'hue':
-                            adapter.setObjectNotExists(`Group_${groupId}` + '.' + stateName, {
-                                type: 'state',
-                                common: {
-                                    name: list['name'] + ' ' +stateName,
-                                    type: 'number',
-                                    role: 'hue.color',
-                                    min: 0,
-                                    max: 360,
-                                    read: true,
-                                    write: true
-                                },
-                                native: {}
-                            });
-                            adapter.setState(`Group_${groupId}` + '.' + stateName, {val: Math.round(list['action'][stateName] * 100 / hue_factor) / 100, ack: true});
-                            break;
-                        case 'sat':
-                            adapter.setObjectNotExists(`Group_${groupId}` + '.' + stateName, {
-                                type: 'state',
-                                common: {
-                                    name: list['name'] + ' ' +stateName,
-                                    type: 'number',
-                                    role: 'color.saturation',
-                                    min: 0,
-                                    max: 255,
-                                    read: true,
-                                    write: true
-                                },
-                                native: {}
-                            });
-                            adapter.setState(`Group_${groupId}` + '.' + stateName, {val: list['action'][stateName], ack: true});
-                            break;
-                        case 'ct':
-                            adapter.setObjectNotExists(`Group_${groupId}` + '.' + stateName, {
-                                type: 'state',
-                                common: {
-                                    name: list['name'] + ' ' +stateName,
-                                    type: 'number',
-                                    role: 'color.temp',
-                                    min: 153,
-                                    max: 500,
-                                    read: true,
-                                    write: true
-                                },
-                                native: {}
-                            });
-                            adapter.setState(`Group_${groupId}` + '.' + stateName, {val: list['action'][stateName], ack: true});
-                            break;
-                        case 'xy':
-                            adapter.setObjectNotExists(`Group_${groupId}` + '.' + stateName, {
-                                type: 'state',
-                                common: {
-                                    name: list['name'] + ' ' +stateName,
-                                    type: 'string',
-                                    role: 'color.CIE',
-                                    read: true,
-                                    write: true
-                                },
-                                native: {}
-                            });
-                            adapter.setState(`Group_${groupId}` + '.' + stateName, {val: list['action'][stateName], ack: true});
-                            break;
-                        case 'effect':
-                            adapter.setObjectNotExists(`Group_${groupId}` + '.' + stateName, {
-                                type: 'state',
-                                common: {
-                                    name: list['name'] + ' ' +stateName,
-                                    type: 'string',
-                                    role: 'action',
-                                    read: true,
-                                    write: true
-                                },
-                                native: {}
-                            });
-                            adapter.setObjectNotExists(`Group_${groupId}` + '.colorloopspeed', {
-                                type: 'state',
-                                common: {
-                                    name: list['name'] + ' ' + 'colorloopspeed',
-                                    type: 'number',
-                                    role: 'argument',
-                                    min: 1,
-                                    max: 255,
-                                    read: true,
-                                    write: true
-                                },
-                                native: {}
-                            });
-                            adapter.setState(`Group_${groupId}` + '.' + stateName, {val: list['action'][stateName], ack: true});
-                            break;
-                    }
-                }
-                adapter.setObjectNotExists(`Group_${groupId}` + '.transitiontime', {
-                    type: 'state',
-                    common: {
-                        name: list['name'] + ' ' + 'transitiontime',
-                        type: 'number',
-                        role: 'argument',
-                        read: true,
-                        write: true
-                    },
-                    native: {}
-                });
-                adapter.setObjectNotExists(`Group_${groupId}.dimspeed`, {
-                    type: 'state',
-                    common: {
-                        name: list['name'] + ' ' + 'dimspeed',
-                        type: 'number',
-                        role: 'level.dimspeed',
-                        min: 0,
-                        max: 254,
-                        read: false,
-                        write: true
-                    },
-                    native: {}
-                });
-                adapter.setObjectNotExists(`Group_${groupId}.dimup`, {
-                    type: 'state',
+                    adapter.setObject(`Group_${groupId}`, {
+                        type: 'device',
                         common: {
-                            name: list['name'] + ' ' + 'dimup',
-                            role: 'button'
+                            name: list['name'],
+                            role: 'group'
+                        },
+                        native: {
+                            devicemembership: list['devicemembership'],
+                            etag: list['etag'],
+                            hidden: list['hidden'],
+                            id: groupId,
+                            lights: list['lights'],
+                            lightsequence: list['lightsequence'],
+                            multideviceids: list['multideviceids']
                         }
-                });
-                adapter.setObjectNotExists(`Group_${groupId}.dimdown`, {
-                    type: 'state',
-                        common: {
-                            name: list['name'] + ' ' + 'dimdown',
-                            role: 'button'
+                    });
+                    let count2 = Object.keys(list['action']).length - 1;
+                    //create states for light device
+                    for (let z = 0; z <= count2; z++) {
+                        let stateName = Object.keys(list['action'])[z];
+                        switch (stateName) {
+                            case 'on':
+                                adapter.setObjectNotExists(`Group_${groupId}` + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: list['name'] + ' ' +stateName,
+                                        type: 'boolean',
+                                        role: 'switch',
+                                        read: true,
+                                        write: true
+                                    },
+                                    native: {}
+                                });
+                                adapter.setState(`Group_${groupId}` + '.' + stateName, {val: list['action'][stateName], ack: true});
+                                break;
+                            case 'bri':
+                                adapter.setObjectNotExists(`Group_${groupId}` + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: list['name'] + ' ' +stateName,
+                                        type: 'number',
+                                        role: 'level.dimmer',
+                                        min: 0,
+                                        max: 255,
+                                        read: true,
+                                        write: true
+                                    },
+                                    native: {}
+                                });
+                                adapter.setState(`Group_${groupId}` + '.' + stateName, {val: list['action'][stateName], ack: true});
+                                break;
+                            case 'hue':
+                                adapter.setObjectNotExists(`Group_${groupId}` + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: list['name'] + ' ' +stateName,
+                                        type: 'number',
+                                        role: 'hue.color',
+                                        min: 0,
+                                        max: 360,
+                                        read: true,
+                                        write: true
+                                    },
+                                    native: {}
+                                });
+                                adapter.setState(`Group_${groupId}` + '.' + stateName, {val: Math.round(list['action'][stateName] * 100 / hue_factor) / 100, ack: true});
+                                break;
+                            case 'sat':
+                                adapter.setObjectNotExists(`Group_${groupId}` + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: list['name'] + ' ' +stateName,
+                                        type: 'number',
+                                        role: 'color.saturation',
+                                        min: 0,
+                                        max: 255,
+                                        read: true,
+                                        write: true
+                                    },
+                                    native: {}
+                                });
+                                adapter.setState(`Group_${groupId}` + '.' + stateName, {val: list['action'][stateName], ack: true});
+                                break;
+                            case 'ct':
+                                adapter.setObjectNotExists(`Group_${groupId}` + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: list['name'] + ' ' +stateName,
+                                        type: 'number',
+                                        role: 'color.temp',
+                                        min: 153,
+                                        max: 500,
+                                        read: true,
+                                        write: true
+                                    },
+                                    native: {}
+                                });
+                                adapter.setState(`Group_${groupId}` + '.' + stateName, {val: list['action'][stateName], ack: true});
+                                break;
+                            case 'xy':
+                                adapter.setObjectNotExists(`Group_${groupId}` + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: list['name'] + ' ' +stateName,
+                                        type: 'string',
+                                        role: 'color.CIE',
+                                        read: true,
+                                        write: true
+                                    },
+                                    native: {}
+                                });
+                                adapter.setState(`Group_${groupId}` + '.' + stateName, {val: list['action'][stateName], ack: true});
+                                break;
+                            case 'effect':
+                                adapter.setObjectNotExists(`Group_${groupId}` + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: list['name'] + ' ' +stateName,
+                                        type: 'string',
+                                        role: 'action',
+                                        read: true,
+                                        write: true
+                                    },
+                                    native: {}
+                                });
+                                adapter.setObjectNotExists(`Group_${groupId}` + '.colorloopspeed', {
+                                    type: 'state',
+                                    common: {
+                                        name: list['name'] + ' ' + 'colorloopspeed',
+                                        type: 'number',
+                                        role: 'argument',
+                                        min: 1,
+                                        max: 255,
+                                        read: true,
+                                        write: true
+                                    },
+                                    native: {}
+                                });
+                                adapter.setState(`Group_${groupId}` + '.' + stateName, {val: list['action'][stateName], ack: true});
+                                break;
                         }
-                });
-                adapter.setObjectNotExists(`Group_${groupId}.action`, {
-                    type: 'state',
+                    }
+                    adapter.setObjectNotExists(`Group_${groupId}` + '.transitiontime', {
+                        type: 'state',
                         common: {
-                            name: list['name'] + ' ' + 'action',
+                            name: list['name'] + ' ' + 'transitiontime',
+                            type: 'number',
                             role: 'argument',
-                            type: 'string',
+                            read: true,
+                            write: true
+                        },
+                        native: {}
+                    });
+                    adapter.setObjectNotExists(`Group_${groupId}.dimspeed`, {
+                        type: 'state',
+                        common: {
+                            name: list['name'] + ' ' + 'dimspeed',
+                            type: 'number',
+                            role: 'level.dimspeed',
+                            min: 0,
+                            max: 254,
                             read: false,
-                            write: true    
-                        }
-                });
+                            write: true
+                        },
+                        native: {}
+                    });
+                    adapter.setObjectNotExists(`Group_${groupId}.dimup`, {
+                        type: 'state',
+                            common: {
+                                name: list['name'] + ' ' + 'dimup',
+                                role: 'button'
+                            }
+                    });
+                    adapter.setObjectNotExists(`Group_${groupId}.dimdown`, {
+                        type: 'state',
+                            common: {
+                                name: list['name'] + ' ' + 'dimdown',
+                                role: 'button'
+                            }
+                    });
+                    adapter.setObjectNotExists(`Group_${groupId}.action`, {
+                        type: 'state',
+                            common: {
+                                name: list['name'] + ' ' + 'action',
+                                role: 'argument',
+                                type: 'string',
+                                read: false,
+                                write: true    
+                            }
+                    });
                 }
+            }
         }else{
             logging(res.statusCode, 'Get group attributes: ' + groupId);
         }
