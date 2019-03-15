@@ -36,14 +36,16 @@ adapter.on('stateChange', function (id, state) {
                 }else{
                     parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "bri": ' + JSON.stringify(state.val) + '}';
                 }
-                adapter.log.info(id);
-                adapter.log.info(adapter.name + '.' + adapter.instance + '.' + id + '.on');
-                adapter.log.info(controlId);
                 
-                parameters2 = '{"on": ' + state.val > 0 ? 'true':'false' + '}';
+                let parameters2 = '{"on": ' + state.val > 0 ? 'true':'false' + '}';
                 
+                adapter.log.info("Set lightstate on");
+
                 setLightState(parameters2, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on', function() {
-                    setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri')
+                    adapter.log.info("on was set to " + state.val > 0);
+                    setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri', function() {
+                        adapter.log.info("bri was set");
+                    });
                 });
 
 
@@ -2315,7 +2317,8 @@ function setLightState(parameters, lightId, stateId, callback){
                 logging(res.statusCode, 'Set light state with ID: ' + lightId + ' parameter: ' + parameters);
             }
 
-            callback();
+            if(callback)
+                callback();
         });
 } //END setLightState
 
