@@ -38,20 +38,30 @@ adapter.on('stateChange', function (id, state) {
                 }
                 adapter.log.info(id);
                 adapter.log.info(adapter.name + '.' + adapter.instance + '.' + id + '.on');
-                adapter.log.info(state.val);
+                adapter.log.info(controlId);
                 
-                if(obj.common.role == 'light') {
+                parameters = '{"on": ' + state.val > 0 ? 'true':'false' + '}';
+                
+                setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri', function() {
                     setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri')
-                }else if(obj.common.role == 'group'){
-                    setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri')
+                });
+
+
+                /*if(state.val > 0) {
+                    adapter.setState(adapter.name + '.' + adapter.instance + '.' + id + '.on', true, false);
+                } else {
+                    parameters = '{"on": false}';
+                    adapter.setState(adapter.name + '.' + adapter.instance + '.' + id + '.on', false, false);
                 }
+                
                 setTimeout(function() {
-                    if(state.val > 0) {
-                        adapter.setState(adapter.name + '.' + adapter.instance + '.' + id + '.on', true, false);
-                    } else {
-                        adapter.setState(adapter.name + '.' + adapter.instance + '.' + id + '.on', false, false);
+                    if(obj.common.role == 'light') {
+                        setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri')
+                    }else if(obj.common.role == 'group'){
+                        setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri')
                     }
-                }, 500);
+                    
+                }, 1000);*/
             });
         }else if(dp === 'on'){
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
@@ -2278,7 +2288,7 @@ function getLightState(lightId){
     })
 } //END getLightState
 
-function setLightState(parameters, lightId, stateId){
+function setLightState(parameters, lightId, stateId, callback){
         adapter.log.info('setLightState: ' + parameters + ' ' + lightId + ' ' + stateId);
         let options = {
             url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/lights/' + lightId + '/state',
@@ -2304,6 +2314,8 @@ function setLightState(parameters, lightId, stateId){
             }else{
                 logging(res.statusCode, 'Set light state with ID: ' + lightId + ' parameter: ' + parameters);
             }
+
+            callback();
         });
 } //END setLightState
 
