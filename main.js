@@ -39,11 +39,17 @@ adapter.on('stateChange', function (id, state) {
                 
                 if(state.val > 0){
                     setLightState('{"on": true }', controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on', function() {
-                        setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri');
+                        if(obj.common.role == 'light')
+                            setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri');
+                        else if(obj.common.role == 'group')
+                            setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri')
                     });
                 } else {
                     setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri', function() {
-                        setLightState('{"on": false }', controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on');
+                        if(obj.common.role == 'light')
+                            setLightState('{"on": false }', controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on');
+                        else if(obj.common.role == 'group')
+                            setGroupState('{"on": false }', controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on')
                     });
                 }
             });
