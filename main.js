@@ -40,9 +40,9 @@ adapter.on('stateChange', function (id, state) {
                 adapter.log.info(adapter.name + '.' + adapter.instance + '.' + id + '.on');
                 adapter.log.info(controlId);
                 
-                parameters = '{"on": ' + state.val > 0 ? 'true':'false' + '}';
+                parameters2 = '{"on": ' + state.val > 0 ? 'true':'false' + '}';
                 
-                setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri', function() {
+                setLightState(parameters2, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on', function() {
                     setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri')
                 });
 
