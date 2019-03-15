@@ -37,11 +37,6 @@ adapter.on('stateChange', function (id, state) {
                     parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "bri": ' + JSON.stringify(state.val) + '}';
                 }
                 
-                let parameters2 = '{"on": ' + state.val > 0 ? 'true':'false' + ' }';
-                
-                adapter.log.info("Set lightstate on");
-                adapter.log.info(JSON.stringify(parameters2));
-
                 if(state.val > 0){
                     setLightState('{"on": true }', controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on', function() {
                         setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri');
