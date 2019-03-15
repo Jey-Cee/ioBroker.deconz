@@ -711,23 +711,28 @@ function getAllGroups() {
                     let objectName = list[keyName]['name'];
                     let groupID = list[keyName]['id'];
 
-                    adapter.setObject(`Group_${groupID}`, {
-                        type: 'device',
-                        common: {
-                            name: list[keyName],
-                            role: 'group'
-                        },
-                        native: {
-                            devicemembership: list[keyName]['devicemembership'],
-                            etag: list[keyName]['etag'],
-                            id: list[keyName]['id'],
-                            hidden: list[keyName]['hidden'],
-                            type: 'group'
-                        }
-                    });
-                    getGroupAttributes(list[keyName]['id']);
-                    getGroupScenes(`Group_${groupID}`, list[keyName]['scenes']);
-                 }
+                    let regex = new RegExp("helper[0-9]+ for group [0-9]+");
+                    if(!regex.test(objectName)) {
+
+
+                        adapter.setObject(`Group_${groupID}`, {
+                            type: 'device',
+                            common: {
+                                name: list[keyName],
+                                role: 'group'
+                            },
+                            native: {
+                                devicemembership: list[keyName]['devicemembership'],
+                                etag: list[keyName]['etag'],
+                                id: list[keyName]['id'],
+                                hidden: list[keyName]['hidden'],
+                                type: 'group'
+                            }
+                        });
+                        getGroupAttributes(list[keyName]['id']);
+                        getGroupScenes(`Group_${groupID}`, list[keyName]['scenes']);
+                    }
+                }
         }else{
             logging(res.statusCode, 'Get all Groups:');
         }
@@ -739,10 +744,8 @@ function getGroupScenes(group, sceneList) {
 
     adapter.getObject(adapter.name + '.' + adapter.instance + '.' + group, function(err, obj) {
 
+        //TODO check if regex is needed
     let regex = new RegExp("helper[0-9]+ for group [0-9]+");
-    adapter.log.info("Group: " + group);
-    adapter.log.info(adapter.name + '.' + adapter.instance + '.' + group);
-    adapter.log.info(JSON.stringify(obj));
 
     if(obj != undefined && !regex.test(obj.common.name.name)){
         adapter.setObjectNotExists(`${group}.createscene`, {
