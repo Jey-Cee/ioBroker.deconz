@@ -1,7 +1,7 @@
 {
     "common": {
         "name": "deconz",
-        "version": "0.4.0",
+        "version": "0.4.1",
         "news": {
             "0.2.2": {
                 "en": "Changed id naming \n Use websocket messages instead polling afterwards",

@@ -37,12 +37,21 @@ adapter.on('stateChange', function (id, state) {
                     parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "bri": ' + JSON.stringify(state.val) + '}';
                 }
                 if(obj.common.role == 'light') {
+					if(state.val > 0) {
+						setLightState('{"on": ' + JSON.stringify(true) + '}', controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on')
+					}
                     setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri')
 					if(state.val <= 0) {
 						setLightState('{"on": ' + JSON.stringify(false) + '}', controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on')
-					}	
+					}
                 }else if(obj.common.role == 'group'){
+					if(state.val > 0) {
+						setGroupState('{"on": ' + JSON.stringify(true) + '}', controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on')
+					}
                     setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri')
+					if(state.val <= 0) {
+						setGroupState('{"on": ' + JSON.stringify(false) + '}', controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on')
+					}
                 }
             });
         }else if(dp === 'on'){
@@ -178,11 +187,23 @@ adapter.on('stateChange', function (id, state) {
                     let parameters = `{ "bri_inc": ${speed} }`;
                     switch(obj.common.role){
                         case 'group':
+                            if(speed > 0) {
+								setGroupState('{"on": ' + JSON.stringify(true) + '}', controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on')
+							}
                             setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri');
+                            if(speed <= 0) {
+								setGroupState('{"on": ' + JSON.stringify(false) + '}', controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on')
+							}
                             break;
                         case 'light':
+                            if(speed > 0) {
+								setLightState('{"on": ' + JSON.stringify(true) + '}', controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on')
+							}
                             setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri');
-                            break;
+                            if(speed <= 0) {
+								setLightState('{"on": ' + JSON.stringify(false) + '}', controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on')
+							}
+							break;
                     }
                 });
             });
