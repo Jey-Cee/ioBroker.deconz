@@ -38,6 +38,9 @@ adapter.on('stateChange', function (id, state) {
                 }
                 if(obj.common.role == 'light') {
                     setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri')
+					if(state.val <= 0) {
+						setLightState('{"on": ' + JSON.stringify(false) + '}', controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on')
+					}	
                 }else if(obj.common.role == 'group'){
                     setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri')
                 }
