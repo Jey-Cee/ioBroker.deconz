@@ -47,16 +47,11 @@ adapter.on('stateChange', function (id, state) {
                             setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri');
                         });
                     }
-                    
                 } else {
                     if(obj.common.role == 'light'){
-                        setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri', function() {
-                            setLightState('{"on": false }', controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on');
-                        });
+                        setLightState('{"on": false }', controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on');
                     } else if(obj.common.role == 'group'){
-                        setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri', function() {
-                            setGroupState('{"on": false }', controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on')
-                        });
+                        setGroupState('{"on": false }', controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on')
                     }
                 }
             });
@@ -732,6 +727,11 @@ function getAllGroups() {
                     //Changed check if is helper group, if skip it
                     let regex = new RegExp("helper[0-9]+ for group [0-9]+");
                     if(!regex.test(objectName)) {
+                        adapter.getObject(`Group_${groupID}`, (err, obj) =>{
+                            adapter.log.info(`Group_${groupID}`);
+                            adapter.log.info(obj);
+                            adapter.log.info(JSON.stringify(obj));
+                        });
                         adapter.setObject(`Group_${groupID}`, {
                             type: 'device',
                             common: {
