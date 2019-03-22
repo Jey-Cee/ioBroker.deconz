@@ -237,6 +237,28 @@
         "api_version": "",
         "permit": "60"
     },
+    "instanceObjects": [{
+        "_id": "Groups",
+        "type": "channel",
+        "common": {
+            "name": "Information"
+        },
+        "native": {}
+    },{
+        "_id": "Lights",
+        "type": "channel",
+        "common": {
+            "name": "Information"
+        },
+        "native": {}
+    },{
+        "_id": "Sensors",
+        "type": "channel",
+        "common": {
+            "name": "Information"
+        },
+        "native": {}
+    }],
     "objects": [
         {
             "_id": "enum.functions.color",
