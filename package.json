@@ -30,7 +30,7 @@
     },
     "dependencies": {
         "request": "^2.83.0",
-        "ws": "^6.1.2"
+        "ws": "^6.2.1"
     },
     "devDependencies": {
         "gulp": "^4.0.0",
