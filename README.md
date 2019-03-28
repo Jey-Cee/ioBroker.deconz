@@ -33,6 +33,8 @@ Required node.js >= 0.12.
 *  (jey-cee) added object group for remotes
 *  (jey-cee) stop overwrite objects on adapter start
 *  (jey-cee) prepared for compact mode
+*  (jey-cee) new possible to change offset (if the device accept it)
+*  (jey-cee) new possible to change duration (if the device accept it)
 
 
 ### 0.4.0

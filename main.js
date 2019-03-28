@@ -288,6 +288,18 @@ function startAdapter(options) {
                     });
                 }
             });
+        }else if(dp === 'offset'){
+            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+                let controlId = obj.native.id;
+                let parameters = `{ "offset": "${state.val}" }`;
+                setSensorParameters(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.offset')
+            });
+        }else if(dp === 'duration'){
+            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+                let controlId = obj.native.id;
+                let parameters = `{ "duration": "${state.val}" }`;
+                setSensorParameters(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.duration')
+            });
         }
     })
 },
@@ -1428,7 +1440,7 @@ function getAllSensors() {
                                         type: 'number',
                                         role: 'indicator.duration',
                                         read: true,
-                                        write: false
+                                        write: true
                                     },
                                     native: {}
                                 });
@@ -1483,7 +1495,7 @@ function getAllSensors() {
                                         type: 'number',
                                         role: 'state',
                                         read: true,
-                                        write: false
+                                        write: true
                                     },
                                     native: {}
                                 });
@@ -1741,7 +1753,7 @@ function getSensor(sensorId){
                                         type: 'number',
                                         role: 'indicator.duration',
                                         read: true,
-                                        write: false
+                                        write: true
                                     },
                                     native: {}
                                 });
@@ -1779,7 +1791,7 @@ function getSensor(sensorId){
                                         type: 'number',
                                         role: 'state',
                                         read: true,
-                                        write: false
+                                        write: true
                                     },
                                     native: {}
                                 });
@@ -1811,6 +1823,38 @@ function getSensor(sensorId){
         }
     })
 } //END getSensor
+
+function setSensorParameters(parameters, sensorId, stateId, callback){
+    adapter.log.info('setSensorParameters: ' + parameters + ' ' + sensorId + ' ' + stateId);
+    let options = {
+        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/sensors/' + sensorId + '/config',
+        method: 'PUT',
+        headers: 'Content-Type" : "application/json',
+        body: parameters
+    };
+
+    request(options, function(error, res, body) {
+        adapter.log.debug('STATUS: ' + res.statusCode);
+        let response;
+        try{response = JSON.parse(body);} catch(err){}
+        adapter.log.info('options: ' + JSON.stringify(options));
+        adapter.log.debug('setSensorParameters BODY: ' + JSON.stringify(response));
+
+        if(res.statusCode === 200){
+            if(response[0]['success']){
+                adapter.setState(stateId, {ack: true});
+            }else if(response[0]['error']){
+                //adapter.setState(stateId, {ack: false});
+                adapter.log.warn(JSON.stringify(response[0]['error']));
+            }
+        }else{
+            logging(res.statusCode, 'Set sensor parameters with ID: ' + sensorId + ' parameter: ' + parameters);
+        }
+
+        if(callback)
+            callback();
+    });
+} //END setSensorParameters
 
 function deleteSensor(sensorId){
     let options = {
