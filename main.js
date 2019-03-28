@@ -3,11 +3,18 @@
 const utils = require('@iobroker/adapter-core'); // Get common adapter utils
 const request = require('request');
 
-const adapter   = new utils.Adapter('deconz');
+let adapter;
+
+
+
 
 let hue_factor = 182.041666667;
 
-adapter.on('stateChange', function (id, state) {
+function startAdapter(options) {
+    options = options || {};
+    Object.assign(options, {
+        name: 'deconz',
+        stateChange: function (id, state) {
     if (!id || !state || state.ack) {
         return;
     }
@@ -283,11 +290,11 @@ adapter.on('stateChange', function (id, state) {
             });
         }
     })
-});
+},
 //END on StateChange
 
 // New message arrived. obj is array with current messages
-adapter.on('message', function (obj) {
+        message: function (obj) {
     let wait = false;
     if (obj) {
         switch (obj.command) {
@@ -350,9 +357,16 @@ adapter.on('message', function (obj) {
         adapter.sendTo(obj.from, obj.command, obj.message, obj.callback);
     }
     return true;
-});
+},
 
-adapter.on('ready', main);
+        ready: main,
+
+    });
+    adapter = new utils.Adapter(options);
+
+    return adapter;
+}
+
 
 function main() {
     adapter.subscribeStates('*');
@@ -501,6 +515,7 @@ function getAutoUpdates(){
                                                         case 'tampered':
                                                         case 'fire':
                                                         case 'lowbattery':
+                                                        case 'group':
                                                             adapter.setState(`Sensors.${id}` + '.' + obj, {val: state[obj], ack: true});
                                                             break;
                                                         case 'lastupdated':
@@ -544,6 +559,7 @@ function getAutoUpdates(){
                                                         case 'fire':
                                                         case 'lowbattery':
                                                         case 'lastupdated':
+                                                        case 'group':
                                                             adapter.setState(`Sensors.${id}` + '.' + obj, {val: state[obj], ack: true});
                                                             break;
                                                         case 'temperature':
@@ -732,7 +748,7 @@ function getAllGroups() {
                             adapter.log.info(obj);
                             adapter.log.info(JSON.stringify(obj));
                         });
-                        adapter.setObject(`Groups.${groupID}`, {
+                        adapter.setObjectNotExists(`Groups.${groupID}`, {
                             type: 'device',
                             common: {
                                 name: list[keyName],
@@ -876,7 +892,7 @@ function getGroupAttributes(groupId) {
                 let regex = new RegExp("helper[0-9]+ for group [0-9]+");
                 if(!regex.test(list['name'])) {
 
-                    adapter.setObject(`Groups.${groupId}`, {
+                    adapter.setObjectNotExists(`Groups.${groupId}`, {
                         type: 'device',
                         common: {
                             name: list['name'],
@@ -1235,7 +1251,7 @@ function getAllSensors() {
 
                 let regex = new RegExp("CLIP-Sensor TOOGLE-");
                 if(!regex.test(list[keyName]['name'])) {
-                    adapter.setObject(`Sensors.${sensorID}`, {
+                    adapter.setObjectNotExists(`Sensors.${sensorID}`, {
                         type: 'device',
                         common: {
                             name: list[keyName]['name'],
@@ -1269,6 +1285,7 @@ function getAllSensors() {
                             case 'current':
                             case 'consumption':
                             case 'pressure':
+                            case 'group':
                                 adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
                                     type: 'state',
                                     common: {
@@ -1527,7 +1544,7 @@ function getSensor(sensorId){
                 }*/
 
                 //create object for sensor
-                adapter.setObject(`Sensors.${sensorId}`, {
+                adapter.setObjectNotExists(`Sensors.${sensorId}`, {
                     type: 'device',
                     common: {
                         name: list['name'],
@@ -1561,6 +1578,7 @@ function getSensor(sensorId){
                         case 'current':
                         case 'consumption':
                         case 'pressure':
+                        case 'group':
                             adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
                                 type: 'state',
                                 common: {
@@ -2415,3 +2433,14 @@ function nameFilter(name){
     });
     return name;
 }
+
+
+// If started as allInOne/compact mode => return function to create instance
+if (module && module.parent) {
+    module.exports = startAdapter;
+} else {
+    // or start the instance directly
+    startAdapter();
+}
+
+
