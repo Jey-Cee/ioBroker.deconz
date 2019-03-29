@@ -9,7 +9,6 @@ systemDictionary = {
     "Create API key": {                              "en": "Create API key",                                  "de": "Erstelle API key",                                "ru": "Создать ключ API",                                "pt": "Create API key",                                  "nl": "Create API key",                                  "fr": "Create API key",                                  "it": "Create API key",                                  "es": "Create API key",                                  "pl": "Create API key"},
     "Delete API key": {                              "en": "Delete API key",                                  "de": "Lösche API key",                                  "ru": "Удалить ключ API",                                "pt": "Delete API key",                                  "nl": "Delete API key",                                  "fr": "Delete API key",                                  "it": "Delete API key",                                  "es": "Delete API key",                                  "pl": "Delete API key"},
     "Enable adapter first": {                        "en": "Enable adapter first",                            "de": "Zu erst den Adapter Aktivieren",                  "ru": "Сначала надо активировать драйвер",               "pt": "Enable adapter first",                            "nl": "Enable adapter first",                            "fr": "Enable adapter first",                            "it": "Enable adapter first",                            "es": "Enable adapter first",                            "pl": "Enable adapter first"},
-    "Instruction": {                                 "en": "Please click \"Unlock Gateway\" now! <br />You have 30 seconds.", "de": "Bitte Klicken sie jetzt auf \"Unlock Gateway\"! <br />Sie haben 30 Sekunden.", "ru": "Нажмите «Разблокировать шлюз» прямо сейчас! <br /> У вас есть 30 секунд.", "pt": "Please click \"Unlock Gateway\" now! <br />You have 30 seconds.", "nl": "Please click \"Unlock Gateway\" now! <br />You have 30 seconds.", "fr": "Please click \"Unlock Gateway\" now! <br />You have 30 seconds.", "it": "Please click \"Unlock Gateway\" now! <br />You have 30 seconds.", "es": "Please click \"Unlock Gateway\" now! <br />You have 30 seconds.", "pl": "Please click \"Unlock Gateway\" now! <br />You have 30 seconds."},
     "Ok": {                                          "en": "Ok",                                              "de": "Ok",                                              "ru": "Ok",                                              "pt": "Ok",                                              "nl": "Ok",                                              "fr": "Ok",                                              "it": "Ok",                                              "es": "Ok",                                              "pl": "Ok"},
     "Settings": {                                    "en": "Settings",                                        "de": "Einstellungen",                                   "ru": "Настройки",                                       "pt": "Settings",                                        "nl": "Settings",                                        "fr": "Settings",                                        "it": "Settings",                                        "es": "Settings",                                        "pl": "Settings"},
     "deConz Address": {                              "en": "deConz Address",                                  "de": "deConz Adresse",                                  "ru": "Адрес deConz",                                    "pt": "deConz Address",                                  "nl": "deConz Address",                                  "fr": "deConz Address",                                  "it": "deConz Address",                                  "es": "deConz Address",                                  "pl": "deConz Address"},
@@ -121,5 +120,29 @@ systemDictionary = {
         "it": "Nome del nuovo gruppo:",
         "es": "Nombre del nuevo grupo:",
         "pl": "Nazwa nowej grupy:"
+    },
+    "OR": {
+        "en": "or",
+            "de": "oder",
+            "ru": "или же",
+            "pt": "ou",
+            "nl": "of",
+            "fr": "ou",
+            "it": "o",
+            "es": "o",
+            "pl": "lub",
+            "zh-cn": "要么"
+    },
+    "Instruction": {
+        "en": "Go to Phoscon APP -> Settings -> Advanced and click on \"Unlock Gateway\". Timelimit 30 seconds. Leave this message open.",
+        "de": "Gehen Sie zu Phoscon APP -> Einstellungen -> Erweitert und klicken Sie auf \"Unlock Gateway\". Zeitlimit 30 Sekunden. Lassen Sie diese Nachricht geöffnet.",
+        "ru": "Зайдите в Phoscon APP -> Настройки -> Дополнительно и нажмите «Разблокировать шлюз». Ограничение по времени 30 секунд. Оставьте это сообщение открытым.",
+        "pt": "Vá para Phoscon APP -> Configurações -> Avançado e clique em \"Desbloquear Gateway\". Intervalo de tempo 30 segundos. Deixe esta mensagem aberta.",
+        "nl": "Ga naar Phoscon APP -> Instellingen -> Geavanceerd en klik op \"Gateway ontgrendelen\". Tijdlimiet 30 seconden. Laat dit bericht open.",
+        "fr": "Allez sur Phoscon APP -> Paramètres -> Avancé et cliquez sur \"Déverrouiller la passerelle\". Timelimit 30 secondes. Laissez ce message ouvert.",
+        "it": "Vai su Phoscon APP -> Impostazioni -> Avanzate e clicca su \"Unlock Gateway\". Timelimit 30 secondi. Lasciare questo messaggio aperto.",
+        "es": "Vaya a la APLICACIÓN Phoscon -> Configuración -> Avanzada y haga clic en \"Desbloquear Gateway\". Timelimit 30 segundos. Deja este mensaje abierto.",
+        "pl": "Przejdź do aplikacji Phoscon -> Ustawienia -> Zaawansowane i kliknij „Odblokuj bramę”. Timelimit 30 sekund. Pozostaw tę wiadomość otwartą.",
+        "zh-cn": "转到Phoscon APP  - >设置 - >高级，然后单击“解锁网关”。时间限制为30秒。保持此消息打开。"
     }
 };

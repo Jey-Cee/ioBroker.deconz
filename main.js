@@ -317,7 +317,7 @@ function startAdapter(options) {
                 wait = true;
                 break;
             case 'createAPIkey':
-                createAPIkey(obj.message, function (res) {
+                createAPIkey(obj.message.host, obj.message.credentials, function (res) {
                     if (obj.callback) adapter.sendTo(obj.from, obj.command, JSON.stringify(res), obj.callback);
                 });
                 wait = true;
@@ -397,19 +397,27 @@ function main() {
     }, 10000);
 }
 
-function createAPIkey(host, callback){
+function createAPIkey(host, credentials, callback){
     let newApiKey = null;
     const userDescription = 'iobroker.deconz';
+    let auth;
+
+    if(credentials !== null){
+        auth = Buffer.from(credentials).toString('base64');
+    }else{
+        auth = 'ZGVsaWdodDpkZWxpZ2h0';
+    }
+
     let options = {
         url: 'http://' + host + '/api',
         method: 'POST',
         headers: {
             'Content-Type': 'text/plain;charset=UTF-8',
-            'Authorization': 'Basic ZGVsaWdodDpkZWxpZ2h0',
+            'Authorization': `Basic ${auth}`,
             'Content-Length': Buffer.byteLength('{"devicetype": "ioBroker"}')
         }
     };
-    adapter.log.info(host);
+    adapter.log.info(host + 'auth: ' + auth);
     try{
         let req = request(options, function (error, res, body){
             adapter.log.info('STATUS: ' + res.statusCode);
@@ -442,6 +450,7 @@ function deleteAPIkey(){
         try{response = JSON.parse(body);} catch(err){}
         if(res.statusCode === 200){
             if(response[0]['success']){
+                adapter.config.user = '';
                 adapter.log.info('API key deleted');
             }else if(response[0]['error']){
                 adapter.log.warn(JSON.stringify(response[0]['error']));

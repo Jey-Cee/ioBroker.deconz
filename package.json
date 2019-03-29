@@ -29,6 +29,7 @@
         "url": "https://github.com/iobroker-community-adapters/ioBroker.deconz"
     },
     "dependencies": {
+        "@iobroker/adapter-core": "^1.0.3",
         "request": "^2.83.0",
         "ws": "^6.1.2"
     },

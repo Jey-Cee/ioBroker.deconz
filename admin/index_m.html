@@ -204,14 +204,29 @@
             $('#dialog-bridges')
                 .modal('open');
 
-            var count = 0;
+            let count = 0;
+
+            $('#userCredentials').click(function (){
+                sendTo('deconz.' + instance, 'createAPIkey', {'host': $('#bridge.value').val() + ':' + $('#port.value').val(), "credentials": $('#username.value').val() + ':' + $('#password.value').val()}, (result) => {
+                    result = JSON.parse(result);
+                    if(result.error === 0) {
+                        $('#user.value').val(result.message).trigger('change');
+                        count = 10;
+                        showMessage(_('Done'), _('Error'), 'info');
+                        return;
+                    }else{
+                        showMessage(_('error creating API key with credentials: ') + _(result.message), _('Error'), 'info');
+                    }
+                    $('#dialog-bridges').modal('close');
+                })
+            });
 
             (function sendCreate(){
-                sendTo('deconz.' + instance, 'createAPIkey', $('#bridge.value').val() + ':' + $('#port.value').val(), function (result) {
+                sendTo('deconz.' + instance, 'createAPIkey', {'host': $('#bridge.value').val() + ':' + $('#port.value').val(), "credentials": null}, (result) => {
                     try {
                         result = JSON.parse(result);
                         if (result.error > 0) {
-                            if (result.error === 101 && count<10) {
+                            if (result.error === 101 && count<10 && ($('#user.value').val() !== null || $('#user.value').val() !== undefined || $('#user.value').val() !== '')) {
                                 count++;
                                 console.log(count);
                                 setTimeout(sendCreate, 3000);
@@ -229,6 +244,7 @@
                 });
             })();
         });
+
 
         $('#deleteAPIkey').click(function () {
                 sendTo('deconz.' + instance, 'deleteAPIkey');
@@ -411,12 +427,28 @@
             <div id="dialog-bridges" class="modal" title="Select deConz">
                 <div class="modal-content">
                     <div class="row">
-                        <img class="col s3 offset-s5" src="instruction.png">
-                    </div>
-                    <div class="row">
-                        <div class="translate col s3 offset-s5" data-lang="Instruction">Instruction</div>
+                        <div class="col s4 offset-s4">
+                            <div class="input-field col s12">
+                                <input placeholder="delight (standard)" class="value text" id="username" size="20" maxlength="20" type="text">
+                                <label class="translate active" for="username" data-lang="Username">Username</label>
+                            </div>
+                            <div class="input-field col s12">
+                                <input class="value text" id="password" size="20" maxlength="20" type="password">
+                                <label class="translate active" for="password" data-lang="Password">Password</label>
+                            </div>
+                            <div class="input-field col s2 offset-s4">
+                                <div class="waves-effect waves-light btn" id="userCredentials">
+                                <span>OK</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                    <div class="row">
+                        <div class="translate col s4 offset-s4 center-align" data-lang="OR">or</div>
+                    </div>
+                    <div class="row">
+                        <div class="translate col s4 offset-s4 center-align" data-lang="Instruction">Instruction</div>
+                    </div>
             </div>
         </div>
 
