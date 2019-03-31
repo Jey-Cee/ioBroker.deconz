@@ -1,7 +1,7 @@
 {
     "common": {
         "name": "deconz",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "news": {
             "0.2.2": {
                 "en": "Changed id naming \n Use websocket messages instead polling afterwards",
@@ -184,6 +184,18 @@
                 "es": "saltar grupos de ayuda; Canales agregados para luces, grupos y sensores; saltar sensores inutilizables; encienda la luz / grupos cuando cambie el brillo; Grupo de objetos añadidos para mandos a distancia; detener la sobrescritura de objetos en el inicio del adaptador; preparado para el modo compacto;",
                 "pl": "pomiń grupy pomocnicze; dodane kanały dla świateł, grup i czujników; pomiń bezużyteczne czujniki; włącz światło / grupy przy zmianie jasności; dodano grupę objet dla pilotów; zatrzymaj nadpisywanie obiektów na początku adaptera; przygotowany do trybu kompaktowego;",
                 "zh-cn": "跳过辅助组; 增加了灯，组和传感器的通道; 跳过不可用的传感器; 改变亮度时打开灯/组; 为遥控器添加了objet组; 在适配器启动时停止覆盖对象; 准备紧凑模式;"
+            },
+            "1.0.1": {
+                "en": "small fixes\n",
+                "de": "kleine Korrekturen\n",
+                "ru": "небольшие исправления\n",
+                "pt": "pequenas correções\n",
+                "nl": "kleine fixes\n",
+                "fr": "petites corrections\n",
+                "it": "piccole correzioni\n",
+                "es": "pequeñas correcciones\n",
+                "pl": "małe poprawki\n",
+                "zh-cn": "小修正\n"
             }
         },
         "title": "deConz ZigBee",

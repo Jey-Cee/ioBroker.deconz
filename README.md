@@ -25,6 +25,10 @@ Required node.js >= 0.12.
 
 ## Changelog
 
+### 1.0.1
+* small fixes
+
+
 ### 1.0.0
 *  (thewhobox) skip helper groups
 *  (thewhobox) added channels for lights, groups and sensors
