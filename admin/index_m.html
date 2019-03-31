@@ -205,6 +205,7 @@
                 .modal('open');
 
             let count = 0;
+            let manDone = false;
 
             $('#userCredentials').click(function (){
                 sendTo('deconz.' + instance, 'createAPIkey', {'host': $('#bridge.value').val() + ':' + $('#port.value').val(), "credentials": $('#username.value').val() + ':' + $('#password.value').val()}, (result) => {
@@ -213,6 +214,7 @@
                         $('#user.value').val(result.message).trigger('change');
                         count = 10;
                         showMessage(_('Done'), _('Error'), 'info');
+                        manDone = true;
                         return;
                     }else{
                         showMessage(_('error creating API key with credentials: ') + _(result.message), _('Error'), 'info');
@@ -225,8 +227,8 @@
                 sendTo('deconz.' + instance, 'createAPIkey', {'host': $('#bridge.value').val() + ':' + $('#port.value').val(), "credentials": null}, (result) => {
                     try {
                         result = JSON.parse(result);
-                        if (result.error > 0) {
-                            if (result.error === 101 && count<10 && ($('#user.value').val() !== null || $('#user.value').val() !== undefined || $('#user.value').val() !== '')) {
+                        if (result.error > 0 && manDone !== true) {
+                            if (result.error === 101 && count < 10 && ($('#user.value').val() !== null || $('#user.value').val() !== undefined || $('#user.value').val() !== '')) {
                                 count++;
                                 console.log(count);
                                 setTimeout(sendCreate, 3000);
@@ -234,6 +236,9 @@
                             } else {
                                 showMessage(_('error creating API key: ') + _(result.message), _('Error'), 'info');
                             }
+                        }else if(manDone === true){
+                            $('#dialog-bridges').modal('close');
+                            return;
                         } else {
                             $('#user.value').val(result.message).trigger('change');
                         }
