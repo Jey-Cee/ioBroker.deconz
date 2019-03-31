@@ -230,7 +230,6 @@
                         if (result.error > 0 && manDone !== true) {
                             if (result.error === 101 && count < 10 && ($('#user.value').val() !== null || $('#user.value').val() !== undefined || $('#user.value').val() !== '')) {
                                 count++;
-                                console.log(count);
                                 setTimeout(sendCreate, 3000);
                                 return;
                             } else {
@@ -456,6 +455,7 @@
                     </div>
             </div>
         </div>
+        </div>
 
         <div id="tab-manage-devices" class="col s12 page">
             <div class="row"></div>
@@ -488,6 +488,8 @@
             </div>
         </div>
 
+
+
         <div id="tab-manage-groups" class="col s12 page">
                 <div class="row">
                     <div class="input-field col s2">
@@ -500,6 +502,7 @@
                         </a>
                     </div>
                 </div>
+
 
 
             <div class="table-values-div">
