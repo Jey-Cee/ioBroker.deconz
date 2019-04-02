@@ -5,9 +5,7 @@ const request = require('request');
 
 let adapter;
 
-
-
-
+let started;
 let hue_factor = 182.041666667;
 
 function startAdapter(options) {
@@ -38,29 +36,21 @@ function startAdapter(options) {
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
                 let controlId = obj.native.id;
                 let parameters;
-                if(ttime === 'none'){
-                    parameters = '{"bri": ' + JSON.stringify(state.val) + '}';
+                if(state.val >0 && ttime === 'none'){
+                    parameters = '{"bri": ' + JSON.stringify(state.val) + ', "on": true}';
+                }else if(state.val >0){
+                    parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "bri": ' + JSON.stringify(state.val) + ', "on": true}';
                 }else{
-                    parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "bri": ' + JSON.stringify(state.val) + '}';
+                    parameters = '{"bri": ' + JSON.stringify(state.val) + ', "on": false}';
                 }
                 
-                if(state.val > 0){
-                    if(obj.common.role == 'light'){
-                        setLightState('{"on": true }', controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on', function() {
-                            setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri');
-                        });
-                    }else if(obj.common.role == 'group'){
-                        setGroupState('{"on": true }', controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on', function() {
-                            setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri');
-                        });
-                    }
-                } else {
-                    if(obj.common.role == 'light'){
-                        setLightState('{"on": false }', controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on');
-                    } else if(obj.common.role == 'group'){
-                        setGroupState('{"on": false }', controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on')
-                    }
+
+                if(obj.common.role == 'light'){
+                    setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri');
+                }else if(obj.common.role == 'group'){
+                    setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri');
                 }
+
             });
         }else if(dp === 'on'){
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
@@ -82,13 +72,13 @@ function startAdapter(options) {
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
                 let controlId = obj.native.id;
                 let parameters;
-                let hue_factor = 182.041666667;
+                //let hue_factor = 182.041666667;
                 if(ttime === 'none'){
                     parameters = '{"hue": ' + Math.round(parseInt(JSON.stringify(state.val)) * hue_factor) + '}';
                 }else{
                     parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "hue": ' + Math.round(parseInt(JSON.stringify(state.val)) * hue_factor) + '}';
                 }
-                //parameters = '{"hue": ' + parseInt(JSON.stringify(state.val)) * hue_factor + '}';
+
                 if(obj.common.role == 'light') {
                     setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.hue')
                 }else if(obj.common.role == 'group'){

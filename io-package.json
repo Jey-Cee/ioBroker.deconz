@@ -1,7 +1,7 @@
 {
     "common": {
         "name": "deconz",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "news": {
             "0.2.2": {
                 "en": "Changed id naming \n Use websocket messages instead polling afterwards",
@@ -196,6 +196,18 @@
                 "es": "pequeñas correcciones\n",
                 "pl": "małe poprawki\n",
                 "zh-cn": "小修正\n"
+            },
+            "1.0.2": {
+                "en": "fix set bri for groups\n",
+                "de": "Fixset bri für Gruppen\n",
+                "ru": "исправить набор bri для групп\n",
+                "pt": "fix set bri para grupos\n",
+                "nl": "fixeer bri voor groepen\n",
+                "fr": "ensemble fixe pour les groupes\n",
+                "it": "fix set bri per gruppi\n",
+                "es": "arreglo conjunto bri para grupos\n",
+                "pl": "popraw zestaw bri dla grup\n",
+                "zh-cn": "修复群组bri\n"
             }
         },
         "title": "deConz ZigBee",
