@@ -43,7 +43,7 @@ function startAdapter(options) {
                 }else{
                     parameters = '{"bri": ' + JSON.stringify(state.val) + ', "on": false}';
                 }
-                
+
 
                 if(obj.common.role == 'light'){
                     setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri');
@@ -175,7 +175,7 @@ function startAdapter(options) {
         }else if(dp === 'dimup' || dp === 'dimdown'){
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
                 adapter.getState(adapter.name + '.' + adapter.instance + '.' + id + '.dimspeed', function(error, dimspeed){
-                    if (dimspeed === null || dimspeed === undefined || dimspeed == 0) 
+                    if (dimspeed === null || dimspeed === undefined || dimspeed == 0)
                     {
                         dimspeed = 10;
                         adapter.setState(adapter.name + '.' + adapter.instance + '.' + id + '.dimspeed', 10, true);
@@ -200,7 +200,7 @@ function startAdapter(options) {
         }else if(dp === 'action'){
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
                 let action = state.val;
-                if (action === null || action === undefined || action == 0) 
+                if (action === null || action === undefined || action == 0)
                 {
                     return;
                 }
@@ -554,7 +554,6 @@ function getAutoUpdates(){
                                                         case 'lightlevel':
                                                         case 'daylight':
                                                         case 'lux':
-                                                        case 'buttonevent':
                                                         case 'status':
                                                         case 'power':
                                                         case 'voltage':
@@ -577,6 +576,22 @@ function getAutoUpdates(){
                                                         case 'humidity':
                                                             value = state[obj]/100;
                                                             adapter.setState(`Sensors.${id}` + '.' + obj, {val: value, ack: true});
+                                                            break;
+                                                        case 'buttonevent':
+                                                            adapter.setState(`Sensors.${id}` + '.' + obj, {val: state[obj], ack: true});
+                                                            adapter.setObjectNotExists(`Sensors.${id}` + '.' + "buttonpressed", {
+                                                                type: 'state',
+                                                                common: {
+                                                                    name: 'Sensor' + id + ' ' +'buttonpressed',
+                                                                    type: 'number',
+                                                                    role: 'state',
+                                                                    read: true,
+                                                                    write: false
+                                                                },
+                                                                native: {}
+                                                            });
+                                                            adapter.setState(`Sensors.${id}` + '.' + 'buttonpressed', {val: true, ack: true});
+                                                            setTimeout(function() { adapter.setState(`Sensors.${id}` + '.' + 'buttonpressed', {val: false, ack: true})}, 1000);
                                                             break;
                                                     }
                                                 }
@@ -993,7 +1008,7 @@ function getGroupAttributes(groupId) {
                                 role: 'argument',
                                 type: 'string',
                                 read: false,
-                                write: true    
+                                write: true
                             }
                     });
                 }
@@ -2154,7 +2169,7 @@ function getAllLights(){
                                         name: list[keyName]['name'] + ' ' + 'dimdown',
                                         role: 'button'
                                     }
-                            });            
+                            });
                             adapter.setObjectNotExists(`Lights.${lightID}.action`, {
                                 type: 'state',
                                     common: {
@@ -2162,7 +2177,7 @@ function getAllLights(){
                                         role: 'argument',
                                         type: 'string',
                                         read: false,
-                                        write: true    
+                                        write: true
                                     }
                             });
                         }
@@ -2521,5 +2536,3 @@ if (module && module.parent) {
     // or start the instance directly
     startAdapter();
 }
-
-
