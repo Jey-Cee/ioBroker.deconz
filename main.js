@@ -755,9 +755,9 @@ function getAllGroups() {
                     let regex = new RegExp("helper[0-9]+ for group [0-9]+");
                     if(!regex.test(objectName)) {
                         adapter.getObject(`Groups.${groupID}`, (err, obj) =>{
-                            adapter.log.info(`Groups.${groupID}`);
-                            adapter.log.info(obj);
-                            adapter.log.info(JSON.stringify(obj));
+                            //adapter.log.info(`Groups.${groupID}`);
+                            //adapter.log.info(obj);
+                            //adapter.log.info(JSON.stringify(obj));
                         });
                         adapter.setObjectNotExists(`Groups.${groupID}`, {
                             type: 'device',
@@ -782,103 +782,6 @@ function getAllGroups() {
         }
     });
 } //END getAllGroups
-
-function getGroupScenes(group, sceneList) {
-    adapter.log.debug("SzenenID (JSON): " + JSON.stringify(sceneList));
-
-    //Changed check if group exists, if not skip it
-    adapter.getObject(adapter.name + '.' + adapter.instance + '.' + group, function(err, obj) {
-        if(obj != undefined){
-            adapter.setObjectNotExists(`${group}.createscene`, {
-                type: 'state',
-                    common: {
-                        name: "createscene",
-                        role: 'button'
-                    }
-                });
-            if(sceneList.length == 0)
-            {
-                return;
-            }
-
-            sceneList.forEach(function(scene) {
-                if(scene.lightcount > 0) {
-                    adapter.setObjectNotExists(`${group}.Scene_${scene.id}`, {
-                        type: 'device',
-                            common: {
-                                name: scene.name,
-                                role: 'scene'
-                            },
-                            native: {
-                                type: 'scene',
-                                id: scene.id
-                            }
-                        });
-
-                    adapter.setObjectNotExists(`${group}.Scene_${scene.id}.recall`, {
-                        type: 'state',
-                            common: {
-                                name: "recall",
-                                role: 'button'
-                            }
-                        });
-                        adapter.setObjectNotExists(`${group}.Scene_${scene.id}.store`, {
-                        type: 'state',
-                            common: {
-                                name: "store",
-                                role: 'button'
-                            }
-                        });
-                    adapter.setObjectNotExists(`${group}.Scene_${scene.id}.delete`, {
-                        type: 'state',
-                            common: {
-                                name: "delete",
-                                role: 'button'
-                            }
-                        });
-                    adapter.setObjectNotExists(`${group}.Scene_${scene.id}.lightcount`, {
-                        type: 'state',
-                            common: {
-                                name: "lightcount",
-                                role: 'state',
-                                type: 'number',
-                                read: true,
-                                write: false
-                            }
-                        });
-                    adapter.setState(`${group}.Scene_${scene.id}.lightcount`, scene.lightcount, true);
-                    adapter.setObjectNotExists(`${group}.Scene_${scene.id}.transitiontime`, {
-                        type: 'state',
-                            common: {
-                                name: "transitiontime",
-                                role: 'argument',
-                                type: 'number',
-                                read: true,
-                                write: false
-                            }
-                        });
-                    adapter.setState(`${group}.Scene_${scene.id}.transitiontime`, scene.transitiontime, true);
-                    adapter.setObjectNotExists(`${group}.Scene_${scene.id}.name`, {
-                        type: 'state',
-                            common: {
-                                name: "name",
-                                role: 'state',
-                                type: 'string',
-                                read: true,
-                                write: true
-                            }
-                        });
-                    adapter.setState(`${group}.Scene_${scene.id}.name`, scene.name, true);
-                    adapter.extendObject(group, {
-                        common: {
-                            name: scene.name
-                        }
-                    });
-                    }
-            });
-        }
-    });
-} //END getGroupScenes
 
 function getGroupAttributes(groupId) {
     let options = {
@@ -1094,12 +997,111 @@ function getGroupAttributes(groupId) {
                             }
                     });
                 }
+                getGroupScenes(`Groups.${groupID}`, list[keyName]['scenes']);
             }
+
         }else{
             logging(res.statusCode, 'Get group attributes: ' + groupId);
         }
     })
 } //END getGroupAttributes
+
+function getGroupScenes(group, sceneList) {
+    adapter.log.debug("getGroupScenes for " + group + ": " + JSON.stringify(sceneList));
+
+    //Changed check if group exists, if not skip it
+    adapter.getObject(adapter.name + '.' + adapter.instance + '.' + group, function(err, obj) {
+        if(obj != undefined){
+            adapter.setObjectNotExists(`${group}.createscene`, {
+                type: 'state',
+                common: {
+                    name: "createscene",
+                    role: 'button'
+                }
+            });
+            if(sceneList.length == 0)
+            {
+                return;
+            }
+
+            sceneList.forEach(function(scene) {
+                if(scene.lightcount > 0) {
+                    adapter.setObjectNotExists(`${group}.Scene_${scene.id}`, {
+                        type: 'device',
+                        common: {
+                            name: scene.name,
+                            role: 'scene'
+                        },
+                        native: {
+                            type: 'scene',
+                            id: scene.id
+                        }
+                    });
+
+                    adapter.setObjectNotExists(`${group}.Scene_${scene.id}.recall`, {
+                        type: 'state',
+                        common: {
+                            name: "recall",
+                            role: 'button'
+                        }
+                    });
+                    adapter.setObjectNotExists(`${group}.Scene_${scene.id}.store`, {
+                        type: 'state',
+                        common: {
+                            name: "store",
+                            role: 'button'
+                        }
+                    });
+                    adapter.setObjectNotExists(`${group}.Scene_${scene.id}.delete`, {
+                        type: 'state',
+                        common: {
+                            name: "delete",
+                            role: 'button'
+                        }
+                    });
+                    adapter.setObjectNotExists(`${group}.Scene_${scene.id}.lightcount`, {
+                        type: 'state',
+                        common: {
+                            name: "lightcount",
+                            role: 'state',
+                            type: 'number',
+                            read: true,
+                            write: false
+                        }
+                    });
+                    adapter.setState(`${group}.Scene_${scene.id}.lightcount`, scene.lightcount, true);
+                    adapter.setObjectNotExists(`${group}.Scene_${scene.id}.transitiontime`, {
+                        type: 'state',
+                        common: {
+                            name: "transitiontime",
+                            role: 'argument',
+                            type: 'number',
+                            read: true,
+                            write: false
+                        }
+                    });
+                    adapter.setState(`${group}.Scene_${scene.id}.transitiontime`, scene.transitiontime, true);
+                    adapter.setObjectNotExists(`${group}.Scene_${scene.id}.name`, {
+                        type: 'state',
+                        common: {
+                            name: "name",
+                            role: 'state',
+                            type: 'string',
+                            read: true,
+                            write: true
+                        }
+                    });
+                    adapter.setState(`${group}.Scene_${scene.id}.name`, scene.name, true);
+                    adapter.extendObject(group, {
+                        common: {
+                            name: scene.name
+                        }
+                    });
+                }
+            });
+        }
+    });
+} //END getGroupScenes
 
 function setGroupState(parameters, groupId, stateId){
     let options = {
@@ -1314,6 +1316,21 @@ function getAllSensors() {
                                 });
                                 break;
                             case 'temperature':
+                                adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: list[keyName]['name'] + ' ' + stateName,
+                                        type: 'number',
+                                        role: 'state',
+                                        unit: '°C',
+                                        read: true,
+                                        write: false
+                                    },
+                                    native: {}
+                                });
+                                let temp = list[keyName]['state'][stateName] / 100;
+                                adapter.setState(`Sensors.${sensorID}` + '.' + stateName, {val: temp, ack: true});
+                                break;
                             case 'humidity':
                                 adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
                                     type: 'state',
@@ -1321,13 +1338,14 @@ function getAllSensors() {
                                         name: list[keyName]['name'] + ' ' + stateName,
                                         type: 'number',
                                         role: 'state',
+                                        unit: '%',
                                         read: true,
                                         write: false
                                     },
                                     native: {}
                                 });
-                                let value = list[keyName]['state'][stateName] / 100;
-                                adapter.setState(`Sensors.${sensorID}` + '.' + stateName, {val: value, ack: true});
+                                let humidity = list[keyName]['state'][stateName] / 100;
+                                adapter.setState(`Sensors.${sensorID}` + '.' + stateName, {val: humidity, ack: true});
                                 break;
                             case 'presence':
                             case 'dark':
@@ -1510,6 +1528,7 @@ function getAllSensors() {
                                         name: list[keyName]['name'] + ' ' + stateName,
                                         type: 'number',
                                         role: 'state',
+                                        unit: '°C',
                                         read: true,
                                         write: false
                                     },
@@ -1618,6 +1637,21 @@ function getSensor(sensorId){
                             }
                             break;
                         case 'temperature':
+                            adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
+                                type: 'state',
+                                common: {
+                                    name: list['name'] + ' ' + stateName,
+                                    type: 'number',
+                                    role: 'state',
+                                    unit: '°C',
+                                    read: true,
+                                    write: false
+                                },
+                                native: {}
+                            });
+                            let value = list['state'][stateName]/100;
+                            adapter.setState(`Sensors.${sensorId}` + '.' + stateName, {val: value, ack: true});
+                            break;
                         case 'humidity':
                             adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
                                 type: 'state',
@@ -1625,6 +1659,7 @@ function getSensor(sensorId){
                                     name: list['name'] + ' ' + stateName,
                                     type: 'number',
                                     role: 'state',
+                                    unit: '%',
                                     read: true,
                                     write: false
                                 },
@@ -1806,6 +1841,7 @@ function getSensor(sensorId){
                                         name: list['name'] + ' ' + stateName,
                                         type: 'number',
                                         role: 'state',
+                                        unit: '°c',
                                         read: true,
                                         write: false
                                     },
