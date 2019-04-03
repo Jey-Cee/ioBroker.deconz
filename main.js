@@ -591,7 +591,7 @@ function getAutoUpdates(){
                                                                 native: {}
                                                             });
                                                             adapter.setState(`Sensors.${id}` + '.' + 'buttonpressed', {val: state[obj], ack: true});
-                                                            setTimeout(function() { adapter.setState(`Sensors.${id}` + '.' + 'buttonpressed', {val: 0, ack: true})}, 1000);
+                                                            setTimeout(function() { adapter.setState(`Sensors.${id}` + '.' + 'buttonpressed', {val: 0, ack: true})}, 800);
                                                             break;
                                                     }
                                                 }
