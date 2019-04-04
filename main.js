@@ -754,15 +754,12 @@ function getAllGroups() {
                     //Changed check if is helper group, if skip it
                     let regex = new RegExp("helper[0-9]+ for group [0-9]+");
                     if(!regex.test(objectName)) {
-                        adapter.getObject(`Groups.${groupID}`, (err, obj) =>{
-                            //adapter.log.info(`Groups.${groupID}`);
-                            //adapter.log.info(obj);
-                            //adapter.log.info(JSON.stringify(obj));
-                        });
+
+
                         adapter.setObjectNotExists(`Groups.${groupID}`, {
                             type: 'device',
                             common: {
-                                name: list[keyName],
+                                name: list[keyName]['name'],
                                 role: 'group'
                             },
                             native: {
@@ -772,9 +769,11 @@ function getAllGroups() {
                                 hidden: list[keyName]['hidden'],
                                 type: 'group'
                             }
+                        }, ()=>{
+                            getGroupAttributes(list[keyName]['id']);
+                            getGroupScenes(`Groups.${groupID}`, list[keyName]['scenes']);
                         });
-                        getGroupAttributes(list[keyName]['id']);
-                        getGroupScenes(`Groups.${groupID}`, list[keyName]['scenes']);
+
                     }
                 }
         }else{
