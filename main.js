@@ -352,6 +352,7 @@ function startAdapter(options) {
                 break;
             default:
                 adapter.log.warn("Unknown command: " + obj.command);
+                return false;
                 break;
         }
     }
