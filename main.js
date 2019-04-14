@@ -762,6 +762,7 @@ function getAllGroups() {
         if(res.statusCode === 200 && body != '{}'){
                 for (let i = 0; i <= count; i++) {
                     let keyName = Object.keys(list)[i];
+                    
                     //create object for group
                     let objectName = list[keyName]['name'];
                     let groupID = list[keyName]['id'];
@@ -777,7 +778,7 @@ function getAllGroups() {
                         adapter.setObjectNotExists(`Groups.${groupID}`, {
                             type: 'device',
                             common: {
-                                name: list[keyName],
+                                name: objectName,//name: list[keyName],
                                 role: 'group'
                             },
                             native: {
@@ -2398,7 +2399,7 @@ function getLightState(lightId){
 } //END getLightState
 
 function setLightState(parameters, lightId, stateId, callback){
-        adapter.log.info('setLightState: ' + parameters + ' ' + lightId + ' ' + stateId);
+        //adapter.log.info('setLightState: ' + parameters + ' ' + lightId + ' ' + stateId);
         let options = {
             url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/lights/' + lightId + '/state',
             method: 'PUT',
@@ -2410,7 +2411,7 @@ function setLightState(parameters, lightId, stateId, callback){
             adapter.log.debug('STATUS: ' + res.statusCode);
             let response;
             try{response = JSON.parse(body);} catch(err){}
-            adapter.log.info('options: ' + JSON.stringify(options));
+            //adapter.log.info('options: ' + JSON.stringify(options));
             adapter.log.debug('setLightState BODY: ' + JSON.stringify(response));
 
             if(res.statusCode === 200){
