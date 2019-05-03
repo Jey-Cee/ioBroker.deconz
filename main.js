@@ -227,8 +227,8 @@ function startAdapter(options) {
         }else if(dp === 'delete'){
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
                 if(obj.common.role == 'scene'){
-                    let parentDevicelId = id.split(".")[0];
-                    adapter.getObject(adapter.name + '.' + adapter.instance + '.' + parentDevicelId, function(err, objParent) {
+                    let parentDevicelId = id.split(".")[1];
+                    adapter.getObject(adapter.name + '.' + adapter.instance + '.Groups.' + parentDevicelId, function(err, objParent) {
                         let parentId = objParent.native.id;
                         let controlId = obj.native.id;
                         let parameters = '';
@@ -240,8 +240,8 @@ function startAdapter(options) {
         }else if(dp === 'store'){
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
                 if(obj.common.role == 'scene'){
-                    let parentDevicelId = id.split(".")[0];
-                    adapter.getObject(adapter.name + '.' + adapter.instance + '.' + parentDevicelId, function(err, objParent) {
+                    let parentDevicelId = id.split(".")[1];
+                    adapter.getObject(adapter.name + '.' + adapter.instance + '.Groups.' + parentDevicelId, function(err, objParent) {
                         let parentId = objParent.native.id;
                         let controlId = obj.native.id;
                         let parameters = '';
@@ -252,8 +252,8 @@ function startAdapter(options) {
         }else if(dp === 'recall'){
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
                 if(obj.common.role == 'scene'){
-                    let parentDevicelId = id.split(".")[0];
-                    adapter.getObject(adapter.name + '.' + adapter.instance + '.' + parentDevicelId, function(err, objParent) {
+                    let parentDeviceId = id.split(".")[1];
+                    adapter.getObject(adapter.name + '.' + adapter.instance + '.Groups.' + parentDeviceId, function(err, objParent) {
                         let parentId = objParent.native.id;
                         let controlId = obj.native.id;
                         let parameters = '';
@@ -265,7 +265,7 @@ function startAdapter(options) {
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
                 if(obj.common.role == 'scene'){
                     let parentDevicelId = id.split(".")[0];
-                    adapter.getObject(adapter.name + '.' + adapter.instance + '.' + parentDevicelId, function(err, objParent) {
+                    adapter.getObject(adapter.name + '.' + adapter.instance + '.Groups.' + parentDevicelId, function(err, objParent) {
                         let parentId = objParent.native.id;
                         let controlId = obj.native.id;
                         let parameters = `{ "name": "${state.val}" }`;
