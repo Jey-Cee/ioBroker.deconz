@@ -352,6 +352,7 @@ function startAdapter(options) {
                 break;
             default:
                 adapter.log.warn("Unknown command: " + obj.command);
+                return false;
                 break;
         }
     }
@@ -527,6 +528,10 @@ function getAutoUpdates(){
                                                         case 'fire':
                                                         case 'lowbattery':
                                                         case 'group':
+                                                        case 'orientation':
+                                                        case 'tiltangle':
+                                                        case 'vibration':
+                                                        case 'vibrationstrength':
                                                             adapter.setState(`Sensors.${id}` + '.' + obj, {val: state[obj], ack: true});
                                                             break;
                                                         case 'lastupdated':
@@ -554,7 +559,6 @@ function getAutoUpdates(){
                                                         case 'lightlevel':
                                                         case 'daylight':
                                                         case 'lux':
-                                                        case 'buttonevent':
                                                         case 'status':
                                                         case 'power':
                                                         case 'voltage':
@@ -571,12 +575,32 @@ function getAutoUpdates(){
                                                         case 'lowbattery':
                                                         case 'lastupdated':
                                                         case 'group':
+                                                        case 'orientation':
+                                                        case 'tiltangle':
+                                                        case 'vibration':
+                                                        case 'vibrationstrength':
                                                             adapter.setState(`Sensors.${id}` + '.' + obj, {val: state[obj], ack: true});
                                                             break;
                                                         case 'temperature':
                                                         case 'humidity':
                                                             value = state[obj]/100;
                                                             adapter.setState(`Sensors.${id}` + '.' + obj, {val: value, ack: true});
+                                                            break;
+                                                        case 'buttonevent':
+                                                            adapter.setState(`Sensors.${id}` + '.' + obj, {val: state[obj], ack: true});
+                                                            adapter.setObjectNotExists(`Sensors.${id}` + '.' + "buttonpressed", {
+                                                                type: 'state',
+                                                                common: {
+                                                                    name: 'Sensor' + id + ' ' +'buttonpressed',
+                                                                    type: 'number',
+                                                                    role: 'state',
+                                                                    read: true,
+                                                                    write: false
+                                                                },
+                                                                native: {}
+                                                            });
+                                                            adapter.setState(`Sensors.${id}` + '.' + 'buttonpressed', {val: true, ack: true});
+                                                            setTimeout(function() { adapter.setState(`Sensors.${id}` + '.' + 'buttonpressed', {val: false, ack: true})}, 800);
                                                             break;
                                                     }
                                                 }
@@ -1298,6 +1322,8 @@ function getAllSensors() {
                             case 'consumption':
                             case 'pressure':
                             case 'group':
+                            case 'tiltangle':
+                            case 'vibrationstrength':
                                 adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
                                     type: 'state',
                                     common: {
@@ -1353,6 +1379,7 @@ function getAllSensors() {
                             case 'water':
                             case 'tampered':
                             case 'fire':
+                            case 'vibration':
                             adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
                                 type: 'state',
                                 common: {
@@ -1386,6 +1413,22 @@ function getAllSensors() {
                                     ack: true
                                 });
                                 break;
+                            case 'orientation':
+                                adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: list[keyName]['name'] + ' ' + stateName,
+                                        type: 'string',
+                                        read: true,
+                                        write: false
+                                    },
+                                    native: {}
+                                });
+                                adapter.setState(`Sensors.${sensorID}` + '.' + stateName, {
+                                    val: list[keyName]['state'][stateName],
+                                    ack: true
+                                });
+                                break;
                         }
                     }
 
@@ -1394,6 +1437,7 @@ function getAllSensors() {
                     //create config states for sensor device
                     for (let x = 0; x <= count3; x++) {
                         let stateName = Object.keys(list[keyName]['config'])[x];
+                        let value = null;
                         switch (stateName) {
                             case 'on':
                             case 'ledindication':
@@ -1533,7 +1577,7 @@ function getAllSensors() {
                                     },
                                     native: {}
                                 });
-                                let value = list[keyName]['config'][stateName] / 100;
+                                value = list[keyName]['config'][stateName] / 100;
                                 adapter.setState(`Sensors.${sensorID}` + '.' + stateName, {val: value, ack: true});
                                 break;
                         }
@@ -1596,6 +1640,7 @@ function getSensor(sensorId){
                 //create states for sensor device
                 for (let z = 0; z <= count2; z++) {
                     let stateName = Object.keys(list['state'])[z];
+                    let value = null;
                     switch (stateName) {
                         case 'lightlevel':
                         case 'daylight':
@@ -1608,6 +1653,8 @@ function getSensor(sensorId){
                         case 'consumption':
                         case 'pressure':
                         case 'group':
+                        case 'tiltangle':
+                        case 'vibrationstrength':
                             adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
                                 type: 'state',
                                 common: {
@@ -1648,7 +1695,7 @@ function getSensor(sensorId){
                                 },
                                 native: {}
                             });
-                            let value = list['state'][stateName]/100;
+                            value = list['state'][stateName]/100;
                             adapter.setState(`Sensors.${sensorId}` + '.' + stateName, {val: value, ack: true});
                             break;
                         case 'humidity':
@@ -1664,7 +1711,7 @@ function getSensor(sensorId){
                                 },
                                 native: {}
                             });
-                            let value = list['state'][stateName]/100;
+                            value = list['state'][stateName]/100;
                             adapter.setState(`Sensors.${sensorId}` + '.' + stateName, {val: value, ack: true});
                             break;
                         case 'presence':
@@ -1674,6 +1721,7 @@ function getSensor(sensorId){
                         case 'water':
                         case 'tampered':
                         case 'fire':
+                        case 'vibration':
                             adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
                                 type: 'state',
                                 common: {
@@ -1694,6 +1742,19 @@ function getSensor(sensorId){
                                     name: list['name'] + ' ' + stateName,
                                     type: 'boolean',
                                     role: 'indicator.battery',
+                                    read: true,
+                                    write: false
+                                },
+                                native: {}
+                            });
+                            adapter.setState(`Sensors.${sensorId}` + '.' + stateName, {val: list['state'][stateName], ack: true});
+                            break;
+                        case 'vibration':
+                            adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
+                                type: 'state',
+                                common: {
+                                    name: list['name'] + ' ' + stateName,
+                                    type: 'boolean',
                                     read: true,
                                     write: false
                                 },
@@ -1846,7 +1907,7 @@ function getSensor(sensorId){
                                     },
                                     native: {}
                                 });
-                                let value = list['config'][stateName]/100;
+                                value = list['config'][stateName]/100;
                                 adapter.setState(`Sensors.${sensorId}` + '.' + stateName, {val: value, ack: true});
                                 break;
                         }

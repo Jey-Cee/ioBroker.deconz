@@ -1,7 +1,7 @@
 {
     "common": {
         "name": "deconz",
-        "version": "1.0.2",
+        "version": "1.1.1",
         "news": {
             "0.2.2": {
                 "en": "Changed id naming \n Use websocket messages instead polling afterwards",
@@ -208,6 +208,18 @@
                 "es": "arreglo conjunto bri para grupos\n",
                 "pl": "popraw zestaw bri dla grup\n",
                 "zh-cn": "修复群组bri\n"
+            },
+            "1.1.0": {
+                "en": "added objects for \"tiltangle\", \"vibration\", \"vibrationstrength\" and \"orientation\" added object \"buttonpressd\" some fixes\n",
+                "de": "hinzugefügte Objekte für \"Tiltangle\", \"Vibration\", \"Vibrationsstärke\" und \"Orientierung\" \n",
+                "ru": "добавлены объекты для «угла наклона», «вибрации», «силы вибрации» и «ориентации» \n",
+                "pt": "objetos adicionados para \"tiltangle\", \"vibração\", \"vibrationstrength\" e \"orientação\" \n",
+                "nl": "toegevoegde objecten voor \"tiltangle\", \"vibration\", \"vibrationstrength\" en \"orientation\" \n",
+                "fr": "objets ajoutés pour \"tiltangle\", \"vibration\", \"vibrationstrength\" et \"orientation\" \n",
+                "it": "aggiunto oggetti per \"tiltangle\", \"vibrazione\", \"vibrationstrength\" e \"orientation\" \n",
+                "es": "objetos añadidos para \"tiltangle\", \"vibration\", \"vibrationstrength\" y \"orientación\" \n",
+                "pl": "dodane obiekty dla „tiltangle”, „vibration”, „vibrationstreth” i „orientation” \n",
+                "zh-cn": "添加了“倾斜角”，“振动”，“振动强度”和“方向”的对象\n"
             }
         },
         "title": "deConz ZigBee",
@@ -236,7 +248,7 @@
         "authors": [
             "Jey Cee <jey-cee@live.com>"
         ],
-        "license": "Apache 2.0",
+        "license": "Apache-2.0",
         "platform": "Javascript/Node.js",
         "mode": "daemon",
         "compact": true,
