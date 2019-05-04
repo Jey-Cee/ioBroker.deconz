@@ -1115,7 +1115,7 @@ function getGroupScenes(group, sceneList) {
                         }
                     });
                     adapter.setState(`${group}.Scene_${scene.id}.name`, scene.name, true);
-                    adapter.extendObject(group, {
+                    adapter.extendObject(`${group}.Scene_${scene.id}`, {
                         common: {
                             name: scene.name
                         }
@@ -1418,7 +1418,7 @@ function getAllSensors() {
                                     type: 'state',
                                     common: {
                                         name: list[keyName]['name'] + ' ' + stateName,
-                                        type: 'string',
+                                        type: 'array',
                                         read: true,
                                         write: false
                                     },
