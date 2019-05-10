@@ -1,7 +1,7 @@
 {
     "common": {
         "name": "deconz",
-        "version": "1.1.1",
+        "version": "1.1.2",
         "news": {
             "0.2.2": {
                 "en": "Changed id naming \n Use websocket messages instead polling afterwards",
@@ -35,76 +35,6 @@
                 "it": "avanti Prova con Xiaomi Sensors; Aggiunto sensore \"pressione\"; Aggiunto creare un gruppo per la configurazione dell'adattatore;",
                 "es": "Siguiente Prueba con Xiaomi Sensors; Sensor de \"presión\" agregado; Se agregó crear grupo a la configuración del adaptador;",
                 "pl": "dalej Wypróbuj Xiaomi Sensors; Dodano czujnik \"ciśnienia\"; Dodano tworzenie grupy do konfiguracji adaptera;"
-            },
-            "0.1.7": {
-                "en": "add possibility to delete devices from deConz; fix issue on getAll... functions when there are is nothing;",
-                "de": "Möglichkeit hinzufügen, Geräte von deConz zu löschen; Problem beheben bei getAll ... Funktionen, wenn es nichts gibt;",
-                "ru": "добавить возможность удаления устройств из deConz; исправить проблему на getAll ... функции, когда есть ничего;",
-                "pt": "adicionar possibilidade de excluir dispositivos de deConz; corrigir problema em funções getAll ... quando não há nada;",
-                "nl": "mogelijkheid toevoegen om apparaten van deConz te verwijderen; probleem oplossen op getAll ... functies wanneer er niets is;",
-                "fr": "ajouter la possibilité de supprimer des périphériques de deConz; résoudre le problème sur getAll ... fonctions quand il n'y a rien;",
-                "it": "aggiungere la possibilità di eliminare i dispositivi da DeConz; risolvere il problema su getAll ... funzioni quando non ci sono nulla;",
-                "es": "agregar la posibilidad de eliminar dispositivos de deConz; soluciona el problema en las funciones getAll ... cuando no hay nada;",
-                "pl": "dodaj możliwość usunięcia urządzeń z deConz; Napraw problem na getAll ... funkcje, gdy nie ma nic;"
-            },
-            "0.1.6": {
-                "en": "fix Xiaomi Sensor recognition",
-                "de": "Xiaomi Sensorerkennung beheben",
-                "ru": "исправить распознавание датчика Xiaomi",
-                "pt": "conserte o reconhecimento do sensor Xiaomi",
-                "nl": "fix Xiaomi sensorherkenning",
-                "fr": "Correction de la reconnaissance du capteur Xiaomi",
-                "it": "correggere il riconoscimento del sensore Xiaomi",
-                "es": "arreglar el reconocimiento del sensor Xiaomi",
-                "pl": "naprawić rozpoznawanie czujnika Xiaomi"
-            },
-            "0.1.5": {
-                "en": "Try to fix Sensors",
-                "de": "Versuchen Sie, Sensoren zu reparieren",
-                "ru": "Попробуйте исправить датчики",
-                "pt": "Tente corrigir os sensores",
-                "nl": "Probeer sensoren te repareren",
-                "fr": "Essayez de réparer les capteurs",
-                "it": "Prova a sistemare i sensori",
-                "es": "Intenta reparar los sensores",
-                "pl": "Spróbuj naprawić czujniki"
-            },
-            "0.1.4": {
-                "en": "Added support for Admin v3",
-                "de": "Unterstützung für Admin v3 hinzugefügt",
-                "ru": "Добавлена ​​поддержка Admin v3",
-                "pt": "Adicionado suporte para Admin v3",
-                "nl": "Ondersteuning toegevoegd voor Admin v3",
-                "fr": "Ajout du support pour Admin v3",
-                "it": "Aggiunto supporto per Admin v3",
-                "es": "Se agregó soporte para Admin v3",
-                "pl": "Dodano obsługę administratora v3"
-            },
-            "0.1.3": {
-                "en": "Stop Spam in log; Added filter for name to id conversation",
-                "de": "Stoppen Sie Spam im Protokoll; Filter für Name zu ID-Konversation hinzugefügt",
-                "ru": "Остановить спам в журнале; Добавлен фильтр для диалога id в id",
-                "pt": "Pare Spam no log; Filtro adicionado para o nome para id conversação",
-                "nl": "Stop Spam in het logboek; Filter toegevoegd voor naam- en id-conversatie",
-                "fr": "Arrêter le spam dans le journal; Filtre ajouté pour le nom à la conversation d'identification",
-                "it": "Interrompi spam nel registro; Aggiunto filtro per il nome alla conversazione id",
-                "es": "Detener el spam en el registro; Filtro agregado para el nombre de la conversación de id.",
-                "pl": "Zatrzymaj spam w dzienniku; Dodano filtr do konwersacji nazw do ID"
-            },
-            "0.1.2": {
-                "en": "Added new datapoints for sensors (experimental)",
-                "de": "Neue Datenpunkte für Sensoren hinzugefügt (Experimentell)",
-                "ru": "Добавлены новые точки данных для датчиков (Experimental)"
-            },
-            "0.1.1": {
-                "en": "Complete adapter rewritten",
-                "de": "Adapter Vollständig neu geschrieben",
-                "ru": "Полный адаптер переписан"
-            },
-            "0.1.0": {
-                "en": "alpha version",
-                "de": "alpha version",
-                "ru": "альфа-версия"
             },
             "0.2.3": {
                 "en": "Create objects during runing adapter;",
@@ -220,6 +150,18 @@
                 "es": "objetos añadidos para \"tiltangle\", \"vibration\", \"vibrationstrength\" y \"orientación\" \n",
                 "pl": "dodane obiekty dla „tiltangle”, „vibration”, „vibrationstreth” i „orientation” \n",
                 "zh-cn": "添加了“倾斜角”，“振动”，“振动强度”和“方向”的对象\n"
+            },
+            "1.1.2": {
+                "en": "fix button objects changed buttonpressed from boolean to number\n",
+                "de": "Knopfobjekte reparieren \nKnopfdruck von Boolean in Zahl geändert\n",
+                "ru": "исправить кнопки объектов \nизменена кнопка с логического значения на число\n",
+                "pt": "fixar objetos de botão \nmudou buttonpressed de booleano para número\n",
+                "nl": "fix knop objecten \nveranderd van buttonpressed van boolean naar nummer\n",
+                "fr": "fixer des objets de bouton \nchangé le bouton en booléen en nombre\n",
+                "it": "correggere gli oggetti pulsante \ncambiato bottone premuto da booleano in numero\n",
+                "es": "arreglar objetos de botón \nbotón pulsado cambiado de booleano a número\n",
+                "pl": "naprawić obiekty przycisków \nzmieniono naciśnięcie przycisku z boolean na numer\n",
+                "zh-cn": "修复按钮对象\n将按钮从布尔值更改为数字\n"
             }
         },
         "title": "deConz ZigBee",

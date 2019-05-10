@@ -17,6 +17,7 @@ function startAdapter(options) {
         return;
     }
 
+
     adapter.log.debug('stateChange ' + id + ' ' + JSON.stringify(state));
     let tmp = id.split('.');
     let dp = tmp.pop();
@@ -599,8 +600,8 @@ function getAutoUpdates(){
                                                                 },
                                                                 native: {}
                                                             });
-                                                            adapter.setState(`Sensors.${id}` + '.' + 'buttonpressed', {val: true, ack: true});
-                                                            setTimeout(function() { adapter.setState(`Sensors.${id}` + '.' + 'buttonpressed', {val: false, ack: true})}, 800);
+                                                            adapter.setState(`Sensors.${id}` + '.' + 'buttonpressed', {val: state[obj], ack: true});
+                                                            setTimeout(function() { adapter.setState(`Sensors.${id}` + '.' + 'buttonpressed', {val: 0, ack: true})}, 800);
                                                             break;
                                                     }
                                                 }
@@ -1065,21 +1066,30 @@ function getGroupScenes(group, sceneList) {
                         type: 'state',
                         common: {
                             name: "recall",
-                            role: 'button'
+                            role: 'button',
+                            type: 'boolean',
+                            read: false,
+                            write: true
                         }
                     });
                     adapter.setObjectNotExists(`${group}.Scene_${scene.id}.store`, {
                         type: 'state',
                         common: {
                             name: "store",
-                            role: 'button'
+                            role: 'button',
+                            type: 'boolean',
+                            read: false,
+                            write: true
                         }
                     });
                     adapter.setObjectNotExists(`${group}.Scene_${scene.id}.delete`, {
                         type: 'state',
                         common: {
                             name: "delete",
-                            role: 'button'
+                            role: 'button',
+                            type: 'boolean',
+                            read: false,
+                            write: true
                         }
                     });
                     adapter.setObjectNotExists(`${group}.Scene_${scene.id}.lightcount`, {
@@ -1235,8 +1245,8 @@ function deleteGroup(groupId){
                 for (let i = 0; i <= count; i++) {                                              //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ sensor handelt
                     let keyName = Object.keys(enums)[i];
                     if (enums[keyName].common.role == 'group' && enums[keyName].native.id == groupId) {
-                        adapter.log.info('Delete device Object: ' + enums[keyName].common.name);
-                        let name = enums[keyName].common.name;
+                        adapter.log.info('Delete device Object: ' + enums[keyName].id);
+                        let name = enums[keyName]._id;
 
                         adapter.deleteDevice(name, function(err){
                             adapter.log.info(err);
@@ -1973,8 +1983,8 @@ function deleteSensor(sensorId){
                     for (let i = 0; i <= count; i++) {                                              //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ sensor handelt
                         let keyName = Object.keys(enums)[i];
                         if (enums[keyName].common.role == 'sensor' && enums[keyName].native.id == sensorId) {
-                            adapter.log.info('delete device Object: ' + enums[keyName].common.name);
-                            let name = enums[keyName].id;
+                            adapter.log.info('delete device Object: ' + enums[keyName]._id);
+                            let name = enums[keyName]._id;
 
                             adapter.deleteDevice(name, function(err){
                                 adapter.log.info(err);
