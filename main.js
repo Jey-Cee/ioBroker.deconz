@@ -919,7 +919,7 @@ function getGroupAttributes(groupId) {
                                     common: {
                                         name: list['name'] + ' ' +stateName,
                                         type: 'number',
-                                        role: 'color.temp',
+                                        role: 'level.color.temperature',
                                         min: 153,
                                         max: 500,
                                         read: true,
@@ -2112,7 +2112,7 @@ function getAllLights(){
                                         common: {
                                             name: list[keyName]['name'] + ' ' + stateName,
                                             type: 'number',
-                                            role: 'color.temp',
+                                            role: 'level.color.temperature',
                                             min: 153,
                                             max: 500,
                                             read: true,
@@ -2351,7 +2351,7 @@ function getLightState(lightId){
                                     common: {
                                         name: list['name'] + ' ' + stateName,
                                         type: 'number',
-                                        role: 'color.temp',
+                                        role: 'level.color.temperature',
                                         min: 153,
                                         max: 500,
                                         read: true,
