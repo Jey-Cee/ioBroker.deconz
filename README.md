@@ -18,9 +18,9 @@ You must first link to deConz.
 2. After IP address and port is entered and saved hit "Create API Key" Button. Now you can enter the credentials for deConz or go to Phoscon APP and register ioBroker as third party APP.
 
 ## Links
-[deConz](https://www.dresden-elektronik.de/funktechnik/products/software/pc/deconz/)
-[REST plugin](https://github.com/dresden-elektronik/deconz-rest-plugin)
-[Gateways (Hardware)](https://www.dresden-elektronik.de/funktechnik/solutions/wireless-light-control/gateways/)
+[deConz](https://www.dresden-elektronik.de/funktechnik/products/software/pc/deconz/)  
+[REST plugin](https://github.com/dresden-elektronik/deconz-rest-plugin)  
+[Gateways (Hardware)](https://www.dresden-elektronik.de/funktechnik/solutions/wireless-light-control/gateways/)  
 
 ## Notice
 
