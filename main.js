@@ -1356,7 +1356,7 @@ function getAllSensors() {
                                     common: {
                                         name: list[keyName]['name'] + ' ' + stateName,
                                         type: 'number',
-                                        role: 'state',
+                                        role: 'value.temperature',
                                         unit: '°C',
                                         read: true,
                                         write: false
@@ -1372,7 +1372,7 @@ function getAllSensors() {
                                     common: {
                                         name: list[keyName]['name'] + ' ' + stateName,
                                         type: 'number',
-                                        role: 'state',
+                                        role: 'value.humidity',
                                         unit: '%',
                                         read: true,
                                         write: false
