@@ -3,6 +3,19 @@
         "name": "deconz",
         "version": "1.1.2",
         "news": {
+            "0.2.3": {
+              "Changed default port to 80": {
+                "en": "Changed default port to 80",
+                "de": "Der Standardport wurde in 80 geändert",
+                "ru": "Изменен порт по умолчанию на 80",
+                "pt": "Porta padrão alterada para 80",
+                "nl": "Standaardpoort gewijzigd in 80",
+                "fr": "Port par défaut modifié à 80",
+                "it": "Porta predefinita modificata a 80",
+                "es": "Se cambió el puerto predeterminado a 80",
+                "pl": "Zmieniono domyślny port na 80",
+                "zh-cn": "将默认端口更改为80"
+            },
             "0.2.2": {
                 "en": "Changed id naming \n Use websocket messages instead polling afterwards",
                 "de": "Geänderte ID-Benennung \n Verwenden von Websocket-Nachrichten, anstelle von polling",
@@ -217,7 +230,7 @@
     },
     "native": {
         "bridge": "0.0.0.0",
-        "port": 8080,
+        "port": 80,
         "user": "",
         "polling": true,
         "pollingInterval": 30,
