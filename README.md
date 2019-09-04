@@ -30,6 +30,9 @@ Required node.js >= 0.12.
 
 ## Changelog
 
+### 2.3
+* Changed default port to 80
+
 ### 1.1.2
 * fix button objects
 *  changed buttonpressed from boolean to number
