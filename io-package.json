@@ -3,94 +3,6 @@
         "name": "deconz",
         "version": "1.1.2",
         "news": {
-            "0.2.2": {
-                "en": "Changed id naming \n Use websocket messages instead polling afterwards",
-                "de": "Geänderte ID-Benennung \n Verwenden von Websocket-Nachrichten, anstelle von polling",
-                "ru": "Изменено имя именования имен \n Использовать сообщения websocket вместо опроса потом",
-                "pt": "Nomenclatura de ID alterada \n Use mensagens de websocket em vez de pesquisar depois",
-                "nl": "Namen van id's gewijzigd \n Gebruik websocket-berichten in plaats daarvan navraag achteraf",
-                "fr": "Modification de l'identifiant de l'identifiant \n Utilisation des messages websocket à la place de l'interrogation ultérieure",
-                "it": "Nome id cambiato \n Usa i messaggi websocket, poi esegui il polling in seguito",
-                "es": "Se cambió el nombre de la identificación \n Use los mensajes de websocket en lugar de sondear después",
-                "pl": "Zmieniono nazewnictwo nazw \n Użyj zamiast tego komunikatów websocket zamiast odpytywania"
-            },
-            "0.2.1": {
-                "en": "Added new elements to config; Changed some small things",
-                "de": "Neue Elemente zur Konfiguration hinzugefügt; Einige kleine Dinge geändert",
-                "ru": "Добавлены новые элементы в config; Изменены некоторые мелочи",
-                "pt": "Adicionado novos elementos à configuração; Mudou algumas pequenas coisas",
-                "nl": "Nieuwe elementen toegevoegd aan config; Een paar kleine dingen veranderd",
-                "fr": "Ajout de nouveaux éléments à config; Changé quelques petites choses",
-                "it": "Aggiunti nuovi elementi alla configurazione; Cambiato alcune piccole cose",
-                "es": "Se agregaron nuevos elementos a config; Cambió algunas cosas pequeñas",
-                "pl": "Dodano nowe elementy do konfiguracji; Zmieniono kilka małych rzeczy"
-            },
-            "0.2.0": {
-                "en": "next Try with Xiaomi Sensors; Added \"pressure\" sensor; Added create group to adapter config;",
-                "de": "nächster Versuch mit Xiaomi Sensoren; Hinzugefügt \"Druck\" -Sensor; Gruppe zu Adapterkonfiguration hinzugefügt hinzugefügt;",
-                "ru": "следующее Попробуйте с датчиками Xiaomi; Добавлен датчик давления; Добавлена ​​возможность создания группы в конфигурацию адаптера;",
-                "pt": "next Experimente com o Xiaomi Sensors; Adicionado sensor de \"pressão\"; Adicionado criar grupo para configuração do adaptador;",
-                "nl": "volgende Probeer met Xiaomi-sensoren; Toegevoegd \"druk\" sensor; Groep toevoegen aan adapterconfiguratie toegevoegd;",
-                "fr": "suivant Essayez avec Xiaomi Sensors; Ajout d'un capteur \"pression\" Ajout du groupe de création à la configuration de l'adaptateur;",
-                "it": "avanti Prova con Xiaomi Sensors; Aggiunto sensore \"pressione\"; Aggiunto creare un gruppo per la configurazione dell'adattatore;",
-                "es": "Siguiente Prueba con Xiaomi Sensors; Sensor de \"presión\" agregado; Se agregó crear grupo a la configuración del adaptador;",
-                "pl": "dalej Wypróbuj Xiaomi Sensors; Dodano czujnik \"ciśnienia\"; Dodano tworzenie grupy do konfiguracji adaptera;"
-            },
-            "0.2.3": {
-                "en": "Create objects during runing adapter;",
-                "de": "",
-                "ru": "",
-                "pt": "",
-                "nl": "",
-                "fr": "",
-                "it": "",
-                "es": "",
-                "pl": ""
-            },
-            "0.2.4": {
-                "en": "Fix create objects during running adapter;",
-                "de": "",
-                "ru": "",
-                "pt": "",
-                "nl": "",
-                "fr": "",
-                "it": "",
-                "es": "",
-                "pl": ""
-            },
-            "0.2.5": {
-                "en": "Fix/Change handling create objects during running Adapter",
-                "de": "",
-                "ru": "",
-                "pt": "",
-                "nl": "",
-                "fr": "",
-                "it": "",
-                "es": "",
-                "pl": ""
-            },
-            "0.3.0": {
-                "en": "Added scene support Drop nodejs 4 support\n",
-                "de": "Szenenunterstützung hinzugefügt \n",
-                "ru": "Добавлена ​​поддержка сцены \n",
-                "pt": "Adicionado suporte de cena \n",
-                "nl": "Ondersteuning van scènes toegevoegd \n",
-                "fr": "Ajout du support de scène \n",
-                "it": "Aggiunto supporto alla scena \n",
-                "es": "Añadido soporte de escena \n",
-                "pl": "Dodano obsługę scen \n"
-            },
-            "0.3.1": {
-                "en": "Fixing hue from range 0-65535 to 0-360\n",
-                "de": "Farbton im Bereich von 0-65535 bis 0-360\n",
-                "ru": "Фиксация оттенка в диапазоне от 0-65535 до 0-360\n",
-                "pt": "Correção de matiz do intervalo 0-65535 a 0-360\n",
-                "nl": "Tint vastzetten van bereik 0-65535 tot 0-360\n",
-                "fr": "Teinte de fixation comprise entre 0-65535 et 0-360\n",
-                "it": "Fixing hue nell'intervallo 0-65535 a 0-360\n",
-                "es": "Tono de fijación desde el rango 0-65535 a 0-360\n",
-                "pl": "Naprawianie barwy od zakresu 0-65535 do 0-360\n"
-            },
             "0.4.0": {
                 "en": "Fix for hue change; Added support for dimming lights and groups; Added support for custom actions;",
                 "de": "Fix für Farbtonänderung; Unterstützung für das Dimmen von Licht und Gruppen hinzugefügt; Unterstützung für benutzerdefinierte Aktionen hinzugefügt;",
@@ -162,6 +74,18 @@
                 "es": "arreglar objetos de botón \nbotón pulsado cambiado de booleano a número\n",
                 "pl": "naprawić obiekty przycisków \nzmieniono naciśnięcie przycisku z boolean na numer\n",
                 "zh-cn": "修复按钮对象\n将按钮从布尔值更改为数字\n"
+            },
+            "1.1.3": {
+                "en": "Changed default port to 80",
+                "de": "Der Standardport wurde in 80 geändert",
+                "ru": "Изменен порт по умолчанию на 80",
+                "pt": "Porta padrão alterada para 80",
+                "nl": "Standaardpoort gewijzigd in 80",
+                "fr": "Port par défaut modifié à 80",
+                "it": "Porta predefinita modificata a 80",
+                "es": "Se cambió el puerto predeterminado a 80",
+                "pl": "Zmieniono domyślny port na 80",
+                "zh-cn": "将默认端口更改为80"
             }
         },
         "title": "deConz ZigBee",
@@ -217,7 +141,7 @@
     },
     "native": {
         "bridge": "0.0.0.0",
-        "port": 8080,
+        "port": 80,
         "user": "",
         "polling": true,
         "pollingInterval": 30,
