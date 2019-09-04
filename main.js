@@ -1140,7 +1140,7 @@ function setGroupState(parameters, groupId, stateId){
     let options = {
         url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/groups/' + groupId + '/action',
         method: 'PUT',
-        headers: 'Content-Type" : "application/json',
+        headers: 'Content-Type : application/json',
         body: parameters
     };
 
