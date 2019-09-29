@@ -616,6 +616,7 @@ function getAutoUpdates(){
                                                 case 'ledindication':
                                                 case 'usertest':
                                                 case 'battery':
+                                                case 'delay':
                                                 case 'reachable':
                                                 case 'alert':
                                                 case 'duration':
@@ -1502,6 +1503,7 @@ function getAllSensors() {
                                     ack: true
                                 });
                                 break;
+                            case 'delay':
                             case 'duration':
                                 adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
                                     type: 'state',
@@ -1849,6 +1851,7 @@ function getSensor(sensorId){
                                     ack: true
                                 });
                                 break;
+                            case 'delay':
                             case 'duration':
                                 adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
                                     type: 'state',
