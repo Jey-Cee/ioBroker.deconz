@@ -279,19 +279,13 @@ function startAdapter(options) {
                     });
                 }
             });
-        }else if(dp === 'offset'){
+        } else if(dp === 'offset' || dp === 'sensitivity' || dp === 'usertest' || dp === 'ledindication' || dp === 'duration' || dp === 'delay') {
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
                 let controlId = obj.native.id;
-                let parameters = `{ "offset": "${state.val}" }`;
-                setSensorParameters(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.offset')
+                let parameters = `{ "${dp}": "${state.val}" }`;
+                setSensorParameters(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.' + dp)
             });
-        }else if(dp === 'duration'){
-            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
-                let controlId = obj.native.id;
-                let parameters = `{ "duration": "${state.val}" }`;
-                setSensorParameters(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.duration')
-            });
-        }
+        } //on is not working
     })
 },
 //END on StateChange
@@ -616,6 +610,7 @@ function getAutoUpdates(){
                                                 case 'ledindication':
                                                 case 'usertest':
                                                 case 'battery':
+                                                case 'delay':
                                                 case 'reachable':
                                                 case 'alert':
                                                 case 'duration':
@@ -1502,6 +1497,7 @@ function getAllSensors() {
                                     ack: true
                                 });
                                 break;
+                            case 'delay':
                             case 'duration':
                                 adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
                                     type: 'state',
@@ -1849,6 +1845,7 @@ function getSensor(sensorId){
                                     ack: true
                                 });
                                 break;
+                            case 'delay':
                             case 'duration':
                                 adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
                                     type: 'state',
