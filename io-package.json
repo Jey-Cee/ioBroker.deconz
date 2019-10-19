@@ -1,67 +1,19 @@
 {
     "common": {
         "name": "deconz",
-        "version": "1.1.2",
+        "version": "1.1.3",
         "news": {
-            "0.4.0": {
-                "en": "Fix for hue change; Added support for dimming lights and groups; Added support for custom actions;",
-                "de": "Fix für Farbtonänderung; Unterstützung für das Dimmen von Licht und Gruppen hinzugefügt; Unterstützung für benutzerdefinierte Aktionen hinzugefügt;",
-                "ru": "Исправлена ​​смена оттенка; Добавлена ​​поддержка диммирования огней и групп; Добавлена ​​поддержка пользовательских действий;",
-                "pt": "Correção para alteração de matiz; Adicionado suporte para escurecimento de luzes e grupos; Adicionado suporte para ações personalizadas;",
-                "nl": "Oplossing voor tintverandering; Ondersteuning toegevoegd voor het dimmen van lichten en groepen; Ondersteuning voor aangepaste acties toegevoegd;",
-                "fr": "Correction du changement de teinte; Ajout du support pour atténuer les lumières et les groupes; Ajout du support pour les actions personnalisées;",
-                "it": "Correzione per il cambiamento di tonalità; Aggiunto supporto per luci soffuse e gruppi; Aggiunto supporto per azioni personalizzate;",
-                "es": "Corrección para el cambio de tono; Añadido soporte para atenuar luces y grupos; Añadido soporte para acciones personalizadas;",
-                "pl": "Napraw dla zmiany barwy; Dodano obsługę ściemniania świateł i grup; Dodano obsługę niestandardowych działań;",
-                "zh-cn": "修复色调变化;增加了对调光灯和组的支持;添加了对自定义操作的支持"
-            },
-            "1.0.0": {
-                "en": "skip helper groups; added channels for lights, groups and sensors; skip unusable sensors; turn light/groups on when changing brightness; added objet group for remotes; stop overwrite objects on adapter start; prepared for compact mode;",
-                "de": "Helfergruppen überspringen; hinzugefügte Kanäle für Lichter, Gruppen und Sensoren; überspringen Sie unbrauchbare Sensoren; Licht / Gruppen einschalten, wenn die Helligkeit geändert wird; Objektgruppe für Fernbedienungen hinzugefügt; Stoppen Sie das Überschreiben von Objekten beim Adapterstart. vorbereitet für den Kompaktmodus;",
-                "ru": "пропустить вспомогательные группы; добавлены каналы для освещения, групп и датчиков; пропустить неиспользуемые датчики; включить свет / группы при изменении яркости; добавлена группа объектов для удаленных пользователей; остановить перезапись объектов при запуске адаптера; подготовлен для компактного режима;",
-                "pt": "ignorar grupos auxiliares; adicionou canais para luzes, grupos e sensores; pule sensores inutilizáveis; acende a luz / grupos ao alterar o brilho; adicionado grupo de objetos para controles remotos; Parar sobrescrever objetos no início do adaptador; preparado para modo compacto;",
-                "nl": "helpgroep overslaan; toegevoegde kanalen voor lichten, groepen en sensoren; sla onbruikbare sensoren over; schakel licht / groepen in wanneer u de helderheid wijzigt; toegevoegde objet-groep voor afstandsbedieningen; stop met overschrijven van objecten op adapterstart; voorbereid voor compacte modus;",
-                "fr": "ignorer les groupes d'assistance; canaux ajoutés pour les lumières, les groupes et les capteurs; ignorer les capteurs inutilisables; allumer la lumière / les groupes lorsque vous modifiez la luminosité; ajout d'un groupe d'objets pour les télécommandes; arrêtez d'écraser les objets au démarrage de l'adaptateur; préparé pour le mode compact;",
-                "it": "saltare i gruppi di helper; canali aggiunti per luci, gruppi e sensori; saltare i sensori inutilizzabili; accendere la luce / gruppi quando si cambia la luminosità; aggiunto il gruppo objet per i telecomandi; interrompere la sovrascrittura degli oggetti all'avvio dell'adattatore; preparato per la modalità compatta;",
-                "es": "saltar grupos de ayuda; Canales agregados para luces, grupos y sensores; saltar sensores inutilizables; encienda la luz / grupos cuando cambie el brillo; Grupo de objetos añadidos para mandos a distancia; detener la sobrescritura de objetos en el inicio del adaptador; preparado para el modo compacto;",
-                "pl": "pomiń grupy pomocnicze; dodane kanały dla świateł, grup i czujników; pomiń bezużyteczne czujniki; włącz światło / grupy przy zmianie jasności; dodano grupę objet dla pilotów; zatrzymaj nadpisywanie obiektów na początku adaptera; przygotowany do trybu kompaktowego;",
-                "zh-cn": "跳过辅助组; 增加了灯，组和传感器的通道; 跳过不可用的传感器; 改变亮度时打开灯/组; 为遥控器添加了objet组; 在适配器启动时停止覆盖对象; 准备紧凑模式;"
-            },
-            "1.0.1": {
-                "en": "small fixes\n",
-                "de": "kleine Korrekturen\n",
-                "ru": "небольшие исправления\n",
-                "pt": "pequenas correções\n",
-                "nl": "kleine fixes\n",
-                "fr": "petites corrections\n",
-                "it": "piccole correzioni\n",
-                "es": "pequeñas correcciones\n",
-                "pl": "małe poprawki\n",
-                "zh-cn": "小修正\n"
-            },
-            "1.0.2": {
-                "en": "fix set bri for groups\n",
-                "de": "Fixset bri für Gruppen\n",
-                "ru": "исправить набор bri для групп\n",
-                "pt": "fix set bri para grupos\n",
-                "nl": "fixeer bri voor groepen\n",
-                "fr": "ensemble fixe pour les groupes\n",
-                "it": "fix set bri per gruppi\n",
-                "es": "arreglo conjunto bri para grupos\n",
-                "pl": "popraw zestaw bri dla grup\n",
-                "zh-cn": "修复群组bri\n"
-            },
-            "1.1.0": {
-                "en": "added objects for \"tiltangle\", \"vibration\", \"vibrationstrength\" and \"orientation\" added object \"buttonpressd\" some fixes\n",
-                "de": "hinzugefügte Objekte für \"Tiltangle\", \"Vibration\", \"Vibrationsstärke\" und \"Orientierung\" \n",
-                "ru": "добавлены объекты для «угла наклона», «вибрации», «силы вибрации» и «ориентации» \n",
-                "pt": "objetos adicionados para \"tiltangle\", \"vibração\", \"vibrationstrength\" e \"orientação\" \n",
-                "nl": "toegevoegde objecten voor \"tiltangle\", \"vibration\", \"vibrationstrength\" en \"orientation\" \n",
-                "fr": "objets ajoutés pour \"tiltangle\", \"vibration\", \"vibrationstrength\" et \"orientation\" \n",
-                "it": "aggiunto oggetti per \"tiltangle\", \"vibrazione\", \"vibrationstrength\" e \"orientation\" \n",
-                "es": "objetos añadidos para \"tiltangle\", \"vibration\", \"vibrationstrength\" y \"orientación\" \n",
-                "pl": "dodane obiekty dla „tiltangle”, „vibration”, „vibrationstreth” i „orientation” \n",
-                "zh-cn": "添加了“倾斜角”，“振动”，“振动强度”和“方向”的对象\n"
+            "1.1.3": {
+                "en": "Changed default port to 80",
+                "de": "Der Standardport wurde in 80 geändert",
+                "ru": "Изменен порт по умолчанию на 80",
+                "pt": "Porta padrão alterada para 80",
+                "nl": "Standaardpoort gewijzigd in 80",
+                "fr": "Port par défaut modifié à 80",
+                "it": "Porta predefinita modificata a 80",
+                "es": "Se cambió el puerto predeterminado a 80",
+                "pl": "Zmieniono domyślny port na 80",
+                "zh-cn": "将默认端口更改为80"
             },
             "1.1.2": {
                 "en": "fix button objects changed buttonpressed from boolean to number\n",
@@ -75,17 +27,65 @@
                 "pl": "naprawić obiekty przycisków \nzmieniono naciśnięcie przycisku z boolean na numer\n",
                 "zh-cn": "修复按钮对象\n将按钮从布尔值更改为数字\n"
             },
-            "1.1.3": {
-                "en": "Changed default port to 80",
-                "de": "Der Standardport wurde in 80 geändert",
-                "ru": "Изменен порт по умолчанию на 80",
-                "pt": "Porta padrão alterada para 80",
-                "nl": "Standaardpoort gewijzigd in 80",
-                "fr": "Port par défaut modifié à 80",
-                "it": "Porta predefinita modificata a 80",
-                "es": "Se cambió el puerto predeterminado a 80",
-                "pl": "Zmieniono domyślny port na 80",
-                "zh-cn": "将默认端口更改为80"
+             "1.1.0": {
+                "en": "added objects for \"tiltangle\", \"vibration\", \"vibrationstrength\" and \"orientation\" added object \"buttonpressd\" some fixes\n",
+                "de": "hinzugefügte Objekte für \"Tiltangle\", \"Vibration\", \"Vibrationsstärke\" und \"Orientierung\" \n",
+                "ru": "добавлены объекты для «угла наклона», «вибрации», «силы вибрации» и «ориентации» \n",
+                "pt": "objetos adicionados para \"tiltangle\", \"vibração\", \"vibrationstrength\" e \"orientação\" \n",
+                "nl": "toegevoegde objecten voor \"tiltangle\", \"vibration\", \"vibrationstrength\" en \"orientation\" \n",
+                "fr": "objets ajoutés pour \"tiltangle\", \"vibration\", \"vibrationstrength\" et \"orientation\" \n",
+                "it": "aggiunto oggetti per \"tiltangle\", \"vibrazione\", \"vibrationstrength\" e \"orientation\" \n",
+                "es": "objetos añadidos para \"tiltangle\", \"vibration\", \"vibrationstrength\" y \"orientación\" \n",
+                "pl": "dodane obiekty dla „tiltangle”, „vibration”, „vibrationstreth” i „orientation” \n",
+                "zh-cn": "添加了“倾斜角”，“振动”，“振动强度”和“方向”的对象\n"
+            },
+            "1.0.1": {
+                "en": "small fixes\n",
+                "de": "kleine Korrekturen\n",
+                "ru": "небольшие исправления\n",
+                "pt": "pequenas correções\n",
+                "nl": "kleine fixes\n",
+                "fr": "petites corrections\n",
+                "it": "piccole correzioni\n",
+                "es": "pequeñas correcciones\n",
+                "pl": "małe poprawki\n",
+                "zh-cn": "小修正\n"
+            },
+            "1.0.0": {
+                "en": "skip helper groups; added channels for lights, groups and sensors; skip unusable sensors; turn light/groups on when changing brightness; added objet group for remotes; stop overwrite objects on adapter start; prepared for compact mode;",
+                "de": "Helfergruppen überspringen; hinzugefügte Kanäle für Lichter, Gruppen und Sensoren; überspringen Sie unbrauchbare Sensoren; Licht / Gruppen einschalten, wenn die Helligkeit geändert wird; Objektgruppe für Fernbedienungen hinzugefügt; Stoppen Sie das Überschreiben von Objekten beim Adapterstart. vorbereitet für den Kompaktmodus;",
+                "ru": "пропустить вспомогательные группы; добавлены каналы для освещения, групп и датчиков; пропустить неиспользуемые датчики; включить свет / группы при изменении яркости; добавлена группа объектов для удаленных пользователей; остановить перезапись объектов при запуске адаптера; подготовлен для компактного режима;",
+                "pt": "ignorar grupos auxiliares; adicionou canais para luzes, grupos e sensores; pule sensores inutilizáveis; acende a luz / grupos ao alterar o brilho; adicionado grupo de objetos para controles remotos; Parar sobrescrever objetos no início do adaptador; preparado para modo compacto;",
+                "nl": "helpgroep overslaan; toegevoegde kanalen voor lichten, groepen en sensoren; sla onbruikbare sensoren over; schakel licht / groepen in wanneer u de helderheid wijzigt; toegevoegde objet-groep voor afstandsbedieningen; stop met overschrijven van objecten op adapterstart; voorbereid voor compacte modus;",
+                "fr": "ignorer les groupes d'assistance; canaux ajoutés pour les lumières, les groupes et les capteurs; ignorer les capteurs inutilisables; allumer la lumière / les groupes lorsque vous modifiez la luminosité; ajout d'un groupe d'objets pour les télécommandes; arrêtez d'écraser les objets au démarrage de l'adaptateur; préparé pour le mode compact;",
+                "it": "saltare i gruppi di helper; canali aggiunti per luci, gruppi e sensori; saltare i sensori inutilizzabili; accendere la luce / gruppi quando si cambia la luminosità; aggiunto il gruppo objet per i telecomandi; interrompere la sovrascrittura degli oggetti all'avvio dell'adattatore; preparato per la modalità compatta;",
+                "es": "saltar grupos de ayuda; Canales agregados para luces, grupos y sensores; saltar sensores inutilizables; encienda la luz / grupos cuando cambie el brillo; Grupo de objetos añadidos para mandos a distancia; detener la sobrescritura de objetos en el inicio del adaptador; preparado para el modo compacto;",
+                "pl": "pomiń grupy pomocnicze; dodane kanały dla świateł, grup i czujników; pomiń bezużyteczne czujniki; włącz światło / grupy przy zmianie jasności; dodano grupę objet dla pilotów; zatrzymaj nadpisywanie obiektów na początku adaptera; przygotowany do trybu kompaktowego;",
+                "zh-cn": "跳过辅助组; 增加了灯，组和传感器的通道; 跳过不可用的传感器; 改变亮度时打开灯/组; 为遥控器添加了objet组; 在适配器启动时停止覆盖对象; 准备紧凑模式;"
+            },
+            "1.0.2": {
+                "en": "fix set bri for groups\n",
+                "de": "Fixset bri für Gruppen\n",
+                "ru": "исправить набор bri для групп\n",
+                "pt": "fix set bri para grupos\n",
+                "nl": "fixeer bri voor groepen\n",
+                "fr": "ensemble fixe pour les groupes\n",
+                "it": "fix set bri per gruppi\n",
+                "es": "arreglo conjunto bri para grupos\n",
+                "pl": "popraw zestaw bri dla grup\n",
+                "zh-cn": "修复群组bri\n"
+            },
+            "0.4.0": {
+                "en": "Fix for hue change; Added support for dimming lights and groups; Added support for custom actions;",
+                "de": "Fix für Farbtonänderung; Unterstützung für das Dimmen von Licht und Gruppen hinzugefügt; Unterstützung für benutzerdefinierte Aktionen hinzugefügt;",
+                "ru": "Исправлена ​​смена оттенка; Добавлена ​​поддержка диммирования огней и групп; Добавлена ​​поддержка пользовательских действий;",
+                "pt": "Correção para alteração de matiz; Adicionado suporte para escurecimento de luzes e grupos; Adicionado suporte para ações personalizadas;",
+                "nl": "Oplossing voor tintverandering; Ondersteuning toegevoegd voor het dimmen van lichten en groepen; Ondersteuning voor aangepaste acties toegevoegd;",
+                "fr": "Correction du changement de teinte; Ajout du support pour atténuer les lumières et les groupes; Ajout du support pour les actions personnalisées;",
+                "it": "Correzione per il cambiamento di tonalità; Aggiunto supporto per luci soffuse e gruppi; Aggiunto supporto per azioni personalizzate;",
+                "es": "Corrección para el cambio de tono; Añadido soporte para atenuar luces y grupos; Añadido soporte para acciones personalizadas;",
+                "pl": "Napraw dla zmiany barwy; Dodano obsługę ściemniania świateł i grup; Dodano obsługę niestandardowych działań;",
+                "zh-cn": "修复色调变化;增加了对调光灯和组的支持;添加了对自定义操作的支持"
             }
         },
         "title": "deConz ZigBee",
