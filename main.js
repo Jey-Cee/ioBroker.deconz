@@ -1939,7 +1939,7 @@ function setSensorParameters(parameters, sensorId, stateId, callback){
         adapter.log.debug('STATUS: ' + res.statusCode);
         let response;
         try{response = JSON.parse(body);} catch(err){}
-        adapter.log.info('options: ' + JSON.stringify(options));
+        adapter.log.debug('options: ' + JSON.stringify(options));
         adapter.log.debug('setSensorParameters BODY: ' + JSON.stringify(response));
 
         if(res.statusCode === 200){
@@ -2462,7 +2462,7 @@ function setLightState(parameters, lightId, stateId, callback){
             adapter.log.debug('STATUS: ' + res.statusCode);
             let response;
             try{response = JSON.parse(body);} catch(err){}
-            adapter.log.info('options: ' + JSON.stringify(options));
+            adapter.log.debug('options: ' + JSON.stringify(options));
             adapter.log.debug('setLightState BODY: ' + JSON.stringify(response));
 
             if(res.statusCode === 200){
