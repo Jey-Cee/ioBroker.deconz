@@ -684,14 +684,11 @@ function getConfig(){
     };
 
     request(options, function(error, res, body){
-        let gateway = JSON.parse(body);
-        let response;
-        try{response = JSON.parse(body);} catch(err){}
-        adapter.log.debug('API version: ' + gateway['apiversion']);
-        //adapter.log.info(JSON.stringify(gateway));
-
-        if(res.statusCode === 200) {
-
+        if(error){
+                adapter.log.error(error);
+        }else if(res.statusCode === 200) {
+                let gateway = JSON.parse(body);
+                adapter.log.debug('API version: ' + gateway['apiversion']);
                 adapter.setObject('Gateway_info', {
                     type: 'device',
                     common: {
