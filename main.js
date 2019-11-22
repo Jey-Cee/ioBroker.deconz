@@ -279,7 +279,7 @@ function startAdapter(options) {
                     });
                 }
             });
-        } else if(dp === 'offset' || dp === 'sensitivity' || dp === 'usertest' || dp === 'ledindication' || dp === 'duration' || dp === 'delay') {
+        } else if(dp === 'offset' || dp === 'heatsetpoint' || dp === 'locked' || dp === 'boost' || dp === 'on' || dp === 'off' || dp === 'sensitivity' || dp === 'usertest' || dp === 'ledindication' || dp === 'duration' || dp === 'delay') {
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
                 let controlId = obj.native.id;
                 let parameters = `{ "${dp}": "${state.val}" }`;
