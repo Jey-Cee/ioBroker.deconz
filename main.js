@@ -622,6 +622,21 @@ function getAutoUpdates(){
                                                 case 'offset':
                                                     adapter.setState(`Sensors.${id}` + '.' + obj, {val: config[obj], ack: true});
                                                     break;
+                                                case 'heatsetpoint':
+                                                    adapter.setState(`Sensors.${id}` + '.' + obj, {val: config[obj], ack: true});
+                                                    break;
+                                                case 'locked':
+                                                    adapter.setState(`Sensors.${id}` + '.' + obj, {val: config[obj], ack: true});
+                                                    break;
+                                                case 'boost':
+                                                    adapter.setState(`Sensors.${id}` + '.' + obj, {val: config[obj], ack: true});
+                                                    break;
+                                                case 'on':
+                                                    adapter.setState(`Sensors.${id}` + '.' + obj, {val: config[obj], ack: true});
+                                                    break;
+                                                case 'off':
+                                                    adapter.setState(`Sensors.${id}` + '.' + obj, {val: config[obj], ack: true});
+                                                    break;
                                                 case 'temperature':
                                                     value = config[obj]/100;
                                                     adapter.setState(`Sensors.${id}` + '.' + obj, {val: value, ack: true});
@@ -1567,6 +1582,91 @@ function getAllSensors() {
                                     ack: true
                                 });
                                 break;
+                            case 'heatsetpoint':
+                                adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: list[keyName]['name'] + ' ' + stateName,
+                                        type: 'number',
+                                        role: 'state',
+                                        read: true,
+                                        write: true
+                                    },
+                                    native: {}
+                                });
+                                adapter.setState(`Sensors.${sensorID}` + '.' + stateName, {
+                                    val: list[keyName]['config'][stateName],
+                                    ack: true
+                                });
+                                break;
+                            case 'locked':
+                                adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: list[keyName]['name'] + ' ' + stateName,
+                                        type: 'boolean',
+                                        role: 'state',
+                                        read: true,
+                                        write: true
+                                    },
+                                    native: {}
+                                });
+                                adapter.setState(`Sensors.${sensorID}` + '.' + stateName, {
+                                    val: list[keyName]['config'][stateName],
+                                    ack: true
+                                });
+                                break;
+                            case 'boost':
+                                adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: list[keyName]['name'] + ' ' + stateName,
+                                        type: 'boolean',
+                                        role: 'state',
+                                        read: true,
+                                        write: true
+                                    },
+                                    native: {}
+                                });
+                                adapter.setState(`Sensors.${sensorID}` + '.' + stateName, {
+                                    val: list[keyName]['config'][stateName],
+                                    ack: true
+                                });
+                                break;
+                            case 'on':
+                                adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: list[keyName]['name'] + ' ' + stateName,
+                                        type: 'boolean',
+                                        role: 'state',
+                                        read: true,
+                                        write: true
+                                    },
+                                    native: {}
+                                });
+                                adapter.setState(`Sensors.${sensorID}` + '.' + stateName, {
+                                    val: list[keyName]['config'][stateName],
+                                    ack: true
+                                });
+                                break;
+                            case 'off':
+                                adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: list[keyName]['name'] + ' ' + stateName,
+                                        type: 'boolean',
+                                        role: 'state',
+                                        read: true,
+                                        write: true
+                                    },
+                                    native: {}
+                                });
+                                adapter.setState(`Sensors.${sensorID}` + '.' + stateName, {
+                                    val: list[keyName]['config'][stateName],
+                                    ack: true
+                                });
+                                break;
                             case 'temperature':
                                 adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
                                     type: 'state',
@@ -1887,6 +1987,91 @@ function getSensor(sensorId){
                                     common: {
                                         name: list['name'] + ' ' + stateName,
                                         type: 'number',
+                                        role: 'state',
+                                        read: true,
+                                        write: true
+                                    },
+                                    native: {}
+                                });
+                                adapter.setState(`Sensors.${sensorId}` + '.' + stateName, {
+                                    val: list['config'][stateName],
+                                    ack: true
+                                });
+                                break;
+                            case 'heatsetpoint':
+                                adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: list['name'] + ' ' + stateName,
+                                        type: 'number',
+                                        role: 'state',
+                                        read: true,
+                                        write: true
+                                    },
+                                    native: {}
+                                });
+                                adapter.setState(`Sensors.${sensorId}` + '.' + stateName, {
+                                    val: list['config'][stateName],
+                                    ack: true
+                                });
+                                break;
+                            case 'locked':
+                                adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: list['name'] + ' ' + stateName,
+                                        type: 'boolean',
+                                        role: 'state',
+                                        read: true,
+                                        write: true
+                                    },
+                                    native: {}
+                                });
+                                adapter.setState(`Sensors.${sensorId}` + '.' + stateName, {
+                                    val: list['config'][stateName],
+                                    ack: true
+                                });
+                                break;
+                            case 'boost':
+                                adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: list['name'] + ' ' + stateName,
+                                        type: 'boolean',
+                                        role: 'state',
+                                        read: true,
+                                        write: true
+                                    },
+                                    native: {}
+                                });
+                                adapter.setState(`Sensors.${sensorId}` + '.' + stateName, {
+                                    val: list['config'][stateName],
+                                    ack: true
+                                });
+                                break;
+                            case 'on':
+                                adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: list['name'] + ' ' + stateName,
+                                        type: 'boolean',
+                                        role: 'state',
+                                        read: true,
+                                        write: true
+                                    },
+                                    native: {}
+                                });
+                                adapter.setState(`Sensors.${sensorId}` + '.' + stateName, {
+                                    val: list['config'][stateName],
+                                    ack: true
+                                });
+                                break;
+                            case 'off':
+                                adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
+                                    type: 'state',
+                                    common: {
+                                        name: list['name'] + ' ' + stateName,
+                                        type: 'boolean',
                                         role: 'state',
                                         read: true,
                                         write: true
