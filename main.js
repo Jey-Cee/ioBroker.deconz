@@ -620,20 +620,10 @@ function getAutoUpdates(){
                                                 case 'tholddark':
                                                 case 'tholdoffset':
                                                 case 'offset':
-                                                    adapter.setState(`Sensors.${id}` + '.' + obj, {val: config[obj], ack: true});
-                                                    break;
                                                 case 'heatsetpoint':
-                                                    adapter.setState(`Sensors.${id}` + '.' + obj, {val: config[obj], ack: true});
-                                                    break;
                                                 case 'locked':
-                                                    adapter.setState(`Sensors.${id}` + '.' + obj, {val: config[obj], ack: true});
-                                                    break;
                                                 case 'boost':
-                                                    adapter.setState(`Sensors.${id}` + '.' + obj, {val: config[obj], ack: true});
-                                                    break;
                                                 case 'on':
-                                                    adapter.setState(`Sensors.${id}` + '.' + obj, {val: config[obj], ack: true});
-                                                    break;
                                                 case 'off':
                                                     adapter.setState(`Sensors.${id}` + '.' + obj, {val: config[obj], ack: true});
                                                     break;
