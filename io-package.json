@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "deconz",
-        "version": "1.1.3",
+        "version": "1.2.0",
         "news": {
+            "1.2.0": {
+                "en": "fix adapter crash when deConz is not reachable\nshow connection state as adapter state\nadd auto reconnect to deconz\nadd new objects for thermostat support and others",
+                "de": "Adapterabsturz behoben, wenn deConz nicht erreichbar ist\nVerbindungsstatus als Adapterstatus anzeigen\nAuto Reconnect zu Deconz hinzufügen\nFügen Sie neue Objekte für die Thermostatunterstützung und andere hinzu",
+                "ru": "исправить сбой адаптера, когда deConz недоступен\nпоказать состояние соединения как состояние адаптера\nдобавить автоматическое переподключение к deconz\nдобавить новые объекты для поддержки термостата и другие",
+                "pt": "corrigir falha do adaptador quando o deConz não está acessível\nmostre o estado da conexão como estado do adaptador\nadicione a reconexão automática ao deconz\nadicione novos objetos para suporte ao termostato e outros",
+                "nl": "herstel de crash van de adapter wanneer deConz niet bereikbaar is\nverbindingsstatus weergeven als adapterstatus\nvoeg automatisch opnieuw verbinden toe aan deconz\nvoeg nieuwe objecten toe voor thermostaatondersteuning en andere",
+                "fr": "correction du plantage de l'adaptateur lorsque deConz n'est pas accessible\nafficher l'état de la connexion comme état de l'adaptateur\najouter la reconnexion automatique à deconz\najouter de nouveaux objets pour le support du thermostat et autres",
+                "it": "risolve il crash dell'adattatore quando deConz non è raggiungibile\nmostra lo stato della connessione come stato dell'adattatore\naggiungi la riconnessione automatica a deconz\naggiungere nuovi oggetti per il supporto del termostato e altri",
+                "es": "arregla el bloqueo del adaptador cuando no se puede acceder a deConz\nmuestra el estado de conexión como estado del adaptador\nagregar reconexión automática a deconz\nagregar nuevos objetos para el soporte del termostato y otros",
+                "pl": "napraw awarię adaptera, gdy deConz jest nieosiągalny\npokaż stan połączenia jako stan adaptera\ndodaj automatyczne ponowne połączenie z deconz\ndodaj nowe obiekty do obsługi termostatu i inne",
+                "zh-cn": "修复无法访问deConz时的适配器崩溃\n将连接状态显示为适配器状态\n添加自动重新连接到deconz\n添加新的对象以支持恒温器及其他"
+            },
             "1.1.3": {
                 "en": "Changed default port to 80",
                 "de": "Der Standardport wurde in 80 geändert",
