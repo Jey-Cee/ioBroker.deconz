@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "deconz",
-        "version": "1.2.0",
+        "version": "1.2.1",
         "news": {
+            "1.2.1": {
+                "en": "convert lastupdated time to locale\nobject creation refactored\nfix adapter config update\nadd auto detect deConz\ninclude ssdp discovery to repo",
+                "de": "Konvertieren Sie die zuletzt aktualisierte Zeit in das Gebietsschema\nObjekterstellung überarbeitet\nUpdate der Adapterkonfiguration\nfüge auto detect deConz hinzu\nssdp discovery in repo einbinden",
+                "ru": "конвертировать время последнего обновления в локаль\nрефакторинг создания объекта\nисправить обновление конфигурации адаптера\nдобавить автоопределение deConz\nвключить открытие ssdp для репо",
+                "pt": "converter lastupdated time para localidade\ncriação de objeto refatorada\ncorrigir atualização de configuração do adaptador\nadicionar detecção automática deConz\nincluir descoberta ssdp para repo",
+                "nl": "converteer laatst bijgewerkte tijd naar locale\ncreatie van objecten gewijzigd\nfix adapter configuratie-update\nvoeg automatisch detecteren deConz toe\nssdp-detectie opnemen in repo",
+                "fr": "convertir l'heure mise à jour en paramètres régionaux\ncréation d'objets refactorisée\ncorrection de la mise à jour de la configuration de l'adaptateur\najouter la détection automatique deConz\ninclure la découverte ssdp à repo",
+                "it": "converti il tempo ultimo aggiornamento in locale\ncreazione oggetto refactored\naggiorna l'aggiornamento di configurazione dell'adattatore\naggiungi rilevamento automatico deConz\ninclude il rilevamento ssdp al repository",
+                "es": "convertir la última hora actualizada a la configuración regional\ncreación de objetos refactorizada\narreglar la actualización de la configuración del adaptador\nagregar detección automática deConz\nincluir descubrimiento de ssdp para repositorio",
+                "pl": "konwertuj czas ostatniej aktualizacji do ustawień regionalnych\nrefaktoryzacja tworzenia obiektu\nnapraw aktualizację konfiguracji adaptera\ndodaj automatyczne wykrywanie deConz\ndołącz wykrywanie ssdp do repozytorium",
+                "zh-cn": "将上次更新时间转换为语言环境\n重构对象创建\n修复适配器配置更新\n添加自动检测deConz\n包括ssdp发现以回购"
+            },
             "1.2.0": {
                 "en": "fix adapter crash when deConz is not reachable\nshow connection state as adapter state\nadd auto reconnect to deconz\nadd new objects for thermostat support and others",
                 "de": "Adapterabsturz behoben, wenn deConz nicht erreichbar ist\nVerbindungsstatus als Adapterstatus anzeigen\nAuto Reconnect zu Deconz hinzufügen\nFügen Sie neue Objekte für die Thermostatunterstützung und andere hinzu",

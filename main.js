@@ -2,7 +2,7 @@
 
 const utils = require('@iobroker/adapter-core'); // Get common adapter utils
 const request = require('request');
-let SSDP = require('net-ssdp');
+let SSDP = require('./lib/ssdp.js');
 
 let adapter;
 
@@ -182,7 +182,6 @@ function startAdapter(options) {
                             }
                         })
                 }else {
-                    //adapter.log.info('ID: ' + id + 'Effect: none');
                     let controlId = obj.native.id;
                     let parameters = '{"effect": ' + JSON.stringify(state.val) + '}';
                     if(obj.common.role == 'light') {
@@ -191,6 +190,12 @@ function startAdapter(options) {
                         setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.effect')
                     }
                 }
+            });
+        }else if(dp === 'colormode'){
+            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function (err, obj) {
+                let controlId = obj.native.id;
+                let parameters = `{ "${dp}": "${state.val}" }`;
+                setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.colormode');
             });
         }else if(dp === 'dimup' || dp === 'dimdown'){
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
@@ -299,7 +304,7 @@ function startAdapter(options) {
                 }
             });
         } else if(dp === 'offset' || dp === 'sensitivity' || dp === 'usertest' || dp === 'ledindication' || dp === 'duration' || dp === 'delay' || dp === 'locked' || dp === 'boost' || dp === 'off' || dp === 'on') {
-            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function (err, obj) {
                 let controlId = obj.native.id;
                 let parameters = `{ "${dp}": "${state.val}" }`;
                 setSensorParameters(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.' + dp)
@@ -311,7 +316,7 @@ function startAdapter(options) {
                 let parameters = `{ "${dp}": "${val}" }`;
                 setSensorParameters(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.' + dp)
             });
-        } //on is not working
+        }
     })
 },
 //END on StateChange
@@ -392,13 +397,22 @@ function startAdapter(options) {
 }
 
 
-function main() {
+async function main() {
     adapter.subscribeStates('*');
     autoDiscovery();
     if (!adapter.config.port) {
         adapter.config.port = 80;
+        adapter.extendForeignObject('system.adapter.' + adapter.name + '.' + adapter.instance, {
+            native: {
+                port: 80
+            }
+        });
     } else {
-        adapter.config.port = parseInt(adapter.config.port, 10);
+        adapter.extendForeignObject('system.adapter.' + adapter.name + '.' + adapter.instance, {
+            native: {
+                port: parseInt(adapter.config.port, 10)
+            }
+        });
     }
     if(adapter.config.user === '' || adapter.config.user === null){
         adapter.log.warn('No API Key found');
@@ -408,7 +422,6 @@ function main() {
     setTimeout(function(){
         getAutoUpdates();
     }, 10000);
-
 }
 
 
@@ -418,11 +431,31 @@ let discovery = new SSDP.Discovery();
 function autoDiscovery(){
     adapter.log.info('Auto discovery');
 
-    discovery.on( 'search', (msg, rinfo, iface) => {
+    discovery.on( 'message', (msg, rinfo, iface) => {
         let addr = `${rinfo.address}:${rinfo.port}`;
         if(msg.headers.st === 'urn:schemas-upnp-org:device:basic:1'){
             adapter.log.debug( `M-SEARCH from ${rinfo.address} for "${msg.headers.st}"`);
+            if(msg.headers['gwid.phoscon.de'] !== undefined){
+                let loc = msg.headers.location.replace('/description.xml', '');
+                loc = loc.replace('http://', '');
+                loc = loc.split(':');
+
+                adapter.getForeignObject('system.adapter.' + adapter.name + '.' + adapter.instance, (err, obj)=>{
+                    if(obj.native.bridge === ''){
+                        adapter.extendForeignObject('system.adapter.' + adapter.name + '.' + adapter.instance, {
+                            native: {
+                                bridge: loc[0],
+                                port: loc[1]
+                            }
+                        });
+                    }
+
+                });
+
+            }
+
         }
+
     });
 
     discovery.on( 'notify', ( msg, rinfo, iface ) => {
@@ -440,7 +473,8 @@ function autoDiscovery(){
         if(error){
             adapter.log.error(error);
         }
-        discovery.search({ st: 'urn:schemas-upnp-org:device:basic:1', mx: 1 });
+        //discovery.search({ st: 'urn:schemas-upnp-org:device:basic:1', mx: 1 });
+        discovery.search({ st: 'ssdp:all' });
     });
 
 
@@ -503,7 +537,11 @@ function deleteAPIkey(){
         try{response = JSON.parse(body);} catch(err){}
         if(res.statusCode === 200){
             if(response[0]['success']){
-                adapter.config.user = '';
+                adapter.extendForeignObject('system.adapter.' + adapter.name + '.' + adapter.instance, {
+                    native: {
+                        user: ''
+                    }
+                });
                 adapter.log.info('API key deleted');
             }else if(response[0]['error']){
                 adapter.log.warn(JSON.stringify(response[0]['error']));
@@ -520,7 +558,7 @@ function deleteAPIkey(){
 //Make Abo using websocket
 const WebSocket = require('ws');
 
-function getAutoUpdates() {
+async function getAutoUpdates() {
     let host = adapter.config.bridge;
     let port = adapter.config.websocketport;
 
@@ -537,7 +575,7 @@ function getAutoUpdates() {
                 adapter.setState('info.connection', {val: false, ack: true});
             });
 
-            ws.onmessage = function (msg) {
+            ws.onmessage = async function (msg) {
                 let value;
                 let data = JSON.parse(msg.data);
                 let id = data['id'];
@@ -555,9 +593,9 @@ function getAutoUpdates() {
                         getGroupAttributes(id);
                         break;
                     case 'sensors':
+                        let object = await getObjectByDeviceId(id, 'Sensors');
                         thing = 'Sensor';
-                        adapter.getObject(`Sensors.${id}`, (err, obj) => {
-                            if (err) {
+                            if (object === undefined) {
                                 getSensor(id);
                             } else {
                                 if (typeof state == 'object') {
@@ -579,134 +617,33 @@ function getAutoUpdates() {
 
                                         adapter.getState(`${adapter.name}.${adapter.instance}.Sensors.${id}.lastupdated`, (err, lupdate) => {
                                             if (lupdate === null) {
-                                                switch (obj) {
-                                                    case 'alarm':
-                                                    case 'carbonmonoxide':
-                                                    case 'current':
-                                                    case 'consumption':
-                                                    case 'dark':
-                                                    case 'daylight':
-                                                    case 'fire':
-                                                    case 'flag':
-                                                    case 'group':
-                                                    case 'lastupdated':
-                                                    case 'lightlevel':
-                                                    case 'lowbattery':
-                                                    case 'lux':
-                                                    case 'open':
-                                                    case 'orientation':
-                                                    case 'power':
-                                                    case 'pressure':
-                                                    case 'presence':
-                                                    case 'status':
-                                                    case 'tampered':
-                                                    case 'tiltangle':
-                                                    case 'voltage':
-                                                    case 'vibration':
-                                                    case 'vibrationstrength':
-                                                    case 'water':
-                                                        adapter.setState(`Sensors.${id}` + '.' + obj, {
-                                                            val: state[obj],
-                                                            ack: true
-                                                        });
-                                                        break;
-                                                    case 'lastupdated':
-                                                        adapter.setObjectNotExists(`Sensors.${id}` + '.' + obj, {
-                                                            type: 'state',
-                                                            common: {
-                                                                name: 'Sensor' + id + ' ' + obj,
-                                                                type: 'number',
-                                                                role: 'state',
-                                                                read: true,
-                                                                write: false
-                                                            },
-                                                            native: {}
-                                                        });
-                                                        adapter.setState(`Sensors.${id}` + '.' + obj, {
-                                                            val: state[obj],
-                                                            ack: true
-                                                        });
-                                                        break;
-                                                    case 'heatsetpoint':
-                                                    case 'humidity':
-                                                    case 'on':
-                                                    case 'temperature':
-                                                        value = state[obj] / 100;
-                                                        adapter.setState(`Sensors.${id}` + '.' + obj, {
-                                                            val: value,
-                                                            ack: true
-                                                        });
-                                                        break;
-                                                }
+                                                let newStates = new setObjectAndState(id, object.value.common.name, 'Sensors', obj, state[obj]);
                                             } else if (lupdate.val !== state[obj]) {
-                                                switch (obj) {
-                                                    case 'alarm':
-                                                    case 'carbonmonoxide':
-                                                    case 'current':
-                                                    case 'consumption':
-                                                    case 'dark':
-                                                    case 'daylight':
-                                                    case 'fire':
-                                                    case 'flag':
-                                                    case 'group':
-                                                    case 'lastupdated':
-                                                    case 'lightlevel':
-                                                    case 'lowbattery':
-                                                    case 'lux':
-                                                    case 'open':
-                                                    case 'orientation':
-                                                    case 'power':
-                                                    case 'pressure':
-                                                    case 'presence':
-                                                    case 'status':
-                                                    case 'tampered':
-                                                    case 'tiltangle':
-                                                    case 'voltage':
-                                                    case 'vibration':
-                                                    case 'vibrationstrength':
-                                                    case 'water':
-                                                        adapter.setState(`Sensors.${id}` + '.' + obj, {
-                                                            val: state[obj],
-                                                            ack: true
-                                                        });
-                                                        break;
-                                                    case 'heatsetpoint':
-                                                    case 'humidity':
-                                                    case 'on':
-                                                    case 'temperature':
-                                                        value = state[obj] / 100;
-                                                        adapter.setState(`Sensors.${id}` + '.' + obj, {
-                                                            val: value,
-                                                            ack: true
-                                                        });
-                                                        break;
-                                                    case 'buttonevent':
-                                                        adapter.setState(`Sensors.${id}` + '.' + obj, {
-                                                            val: state[obj],
-                                                            ack: true
-                                                        });
-                                                        adapter.setObjectNotExists(`Sensors.${id}` + '.' + "buttonpressed", {
-                                                            type: 'state',
-                                                            common: {
-                                                                name: 'Sensor' + id + ' ' + 'buttonpressed',
-                                                                type: 'number',
-                                                                role: 'state',
-                                                                read: true,
-                                                                write: false
-                                                            },
-                                                            native: {}
-                                                        });
+                                                if(obj === 'buttonevent'){
+                                                    let newStates = new setObjectAndState(id, object.value.common.name, 'Sensors', obj, state[obj]);
+                                                    adapter.setObjectNotExists(`Sensors.${id}` + '.' + "buttonpressed", {
+                                                        type: 'state',
+                                                        common: {
+                                                            name: 'Sensor' + id + ' ' + 'buttonpressed',
+                                                            type: 'number',
+                                                            role: 'state',
+                                                            read: true,
+                                                            write: false
+                                                        },
+                                                        native: {}
+                                                    });
+                                                    adapter.setState(`Sensors.${id}` + '.' + 'buttonpressed', {
+                                                        val: state[obj],
+                                                        ack: true
+                                                    });
+                                                    setTimeout(function () {
                                                         adapter.setState(`Sensors.${id}` + '.' + 'buttonpressed', {
-                                                            val: state[obj],
+                                                            val: 0,
                                                             ack: true
-                                                        });
-                                                        setTimeout(function () {
-                                                            adapter.setState(`Sensors.${id}` + '.' + 'buttonpressed', {
-                                                                val: 0,
-                                                                ack: true
-                                                            })
-                                                        }, 800);
-                                                        break;
+                                                        })
+                                                    }, 800);
+                                                }else{
+                                                    let newStates = new setObjectAndState(id, object.value.common.name, 'Sensors', obj, state[obj]);
                                                 }
                                             }
 
@@ -715,44 +652,12 @@ function getAutoUpdates() {
                                 }
                                 if (typeof config == 'object') {
                                     for (let obj in config) {
-                                        switch (obj) {
-                                            case 'on':
-                                            case 'ledindication':
-                                            case 'usertest':
-                                            case 'battery':
-                                            case 'delay':
-                                            case 'reachable':
-                                            case 'alert':
-                                            case 'duration':
-                                            case 'pending':
-                                            case 'sensitivity':
-                                            case 'sensitivitymax':
-                                            case 'tholddark':
-                                            case 'tholdoffset':
-                                            case 'offset':
-                                            case 'locked':
-                                            case 'boost':
-                                            case 'off':
-                                            case 'on':
-                                                adapter.setState(`Sensors.${id}` + '.' + obj, {
-                                                    val: config[obj],
-                                                    ack: true
-                                                });
-                                                break;
-                                            case 'heatsetpoint':
-                                            case 'temperature':
-                                                value = config[obj] / 100;
-                                                adapter.setState(`Sensors.${id}` + '.' + obj, {val: value, ack: true});
-                                                break;
-                                            case 'group':
-                                                break;
-                                        }
+                                        let newStates = new setObjectAndState(id, object.value.common.name, 'Sensors', obj, config[obj]);
 
                                     }
                                 }
 
                             }
-                        });
                         break;
                 }
 
@@ -760,7 +665,6 @@ function getAutoUpdates() {
 
     }
 }
-
 
 //START deConz config --------------------------------------------------------------------------------------------------
 function modifyConfig(parameters){
@@ -868,13 +772,18 @@ function getConfig(){
                 },
                 native: {}
             });
-                adapter.config.websocketport = gateway['websocketport'];
+                adapter.extendForeignObject('system.adapter.' + adapter.name + '.' + adapter.instance, {
+                    native: {
+                        websocketport: gateway['websocketport']
+                    }
+                });
                 let updateInfos;
                 if(adapter.config.sw_version !== gateway['swversion'] || adapter.config.api_version !== gateway['apiversion']){
                     adapter.extendForeignObject('system.adapter.' + adapter.name + '.' + adapter.instance, {
                         native: {
                             sw_version: gateway['swversion'],
-                            api_version: gateway['apiversion']
+                            api_version: gateway['apiversion'],
+                            websocketport: gateway['websocketport']
                         }
                     });
                 }
@@ -986,139 +895,18 @@ function getGroupAttributes(groupId) {
                     //create states for light device
                     for (let z = 0; z <= count2; z++) {
                         let stateName = Object.keys(list['action'])[z];
-                        switch (stateName) {
-                            case 'on':
-                                adapter.setObjectNotExists(`Groups.${groupId}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list['name'] + ' ' +stateName,
-                                        type: 'boolean',
-                                        role: 'switch',
-                                        read: true,
-                                        write: true
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Groups.${groupId}` + '.' + stateName, {val: list['action'][stateName], ack: true});
-                                break;
-                            case 'bri':
-                                adapter.setObjectNotExists(`Groups.${groupId}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list['name'] + ' ' +stateName,
-                                        type: 'number',
-                                        role: 'level.dimmer',
-                                        min: 0,
-                                        max: 255,
-                                        read: true,
-                                        write: true
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Groups.${groupId}` + '.' + stateName, {val: list['action'][stateName], ack: true});
-                                break;
-                            case 'hue':
-                                adapter.setObjectNotExists(`Groups.${groupId}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list['name'] + ' ' +stateName,
-                                        type: 'number',
-                                        role: 'level.color.hue',
-                                        min: 0,
-                                        max: 360,
-                                        read: true,
-                                        write: true
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Groups.${groupId}` + '.' + stateName, {val: Math.round(list['action'][stateName] * 100 / hue_factor) / 100, ack: true});
-                                break;
-                            case 'sat':
-                                adapter.setObjectNotExists(`Groups.${groupId}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list['name'] + ' ' +stateName,
-                                        type: 'number',
-                                        role: 'level.color.saturation',
-                                        min: 0,
-                                        max: 255,
-                                        read: true,
-                                        write: true
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Groups.${groupId}` + '.' + stateName, {val: list['action'][stateName], ack: true});
-                                break;
-                            case 'ct':
-                                adapter.setObjectNotExists(`Groups.${groupId}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list['name'] + ' ' +stateName,
-                                        type: 'number',
-                                        role: 'level.color.temperature',
-                                        min: 153,
-                                        max: 500,
-                                        read: true,
-                                        write: true
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Groups.${groupId}` + '.' + stateName, {val: list['action'][stateName], ack: true});
-                                break;
-                            case 'xy':
-                                adapter.setObjectNotExists(`Groups.${groupId}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list['name'] + ' ' +stateName,
-                                        type: 'string',
-                                        role: 'color.CIE',
-                                        read: true,
-                                        write: true
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Groups.${groupId}` + '.' + stateName, {val: list['action'][stateName], ack: true});
-                                break;
-                            case 'effect':
-                                adapter.setObjectNotExists(`Groups.${groupId}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list['name'] + ' ' +stateName,
-                                        type: 'string',
-                                        role: 'action',
-                                        read: true,
-                                        write: true
-                                    },
-                                    native: {}
-                                });
-                                adapter.setObjectNotExists(`Groups.${groupId}` + '.colorloopspeed', {
-                                    type: 'state',
-                                    common: {
-                                        name: list['name'] + ' ' + 'colorloopspeed',
-                                        type: 'number',
-                                        role: 'argument',
-                                        min: 1,
-                                        max: 255,
-                                        read: true,
-                                        write: true
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Groups.${groupId}` + '.' + stateName, {val: list['action'][stateName], ack: true});
-                                break;
-                        }
+                        let newStates = new setObjectAndState(groupId, list['name'], 'Groups', stateName, list['action'][stateName]);
+                        let tt = new setObjectAndState(groupId, list['name'], 'Groups', 'transitiontime', null);
                     }
-                    adapter.setObjectNotExists(`Groups.${groupId}` + '.transitiontime', {
-                        type: 'state',
-                        common: {
-                            name: list['name'] + ' ' + 'transitiontime',
-                            type: 'number',
-                            role: 'argument',
-                            read: true,
-                            write: true
-                        },
-                        native: {}
-                    });
+
+                    let count3 = Object.keys(list['state']).length - 1;
+                    //create states for light device
+                    for (let z = 0; z <= count3; z++) {
+                        let stateName = Object.keys(list['state'])[z];
+                        let newStates = new setObjectAndState(groupId, list['name'], 'Groups', stateName, list['state'][stateName]);
+                        let tt = new setObjectAndState(groupId, list['name'], 'Groups', 'transitiontime', null);
+                    }
+
                     adapter.setObjectNotExists(`Groups.${groupId}.dimspeed`, {
                         type: 'state',
                         common: {
@@ -1426,10 +1214,6 @@ function getAllSensors() {
                 let sensorID = keyName;
                 //create object for sensor device
                 const patt = new RegExp(/\d$/g);
-                /*let match = patt.test(sensorName);
-                if(match === true && list[keyName]['ep'] > 1){
-                    sensorName = sensorName + '_' + keyName;
-                }*/
 
                 let regex = new RegExp("CLIP-Sensor TOOGLE-");
                 if(!regex.test(list[keyName]['name'])) {
@@ -1456,233 +1240,8 @@ function getAllSensors() {
                     //create states for sensor device
                     for (let z = 0; z <= count2; z++) {
                         let stateName = Object.keys(list[keyName]['state'])[z];
-                        switch (stateName) {
-                            case 'lightlevel':
-                            case 'buttonevent':
-                            case 'status':
-                            case 'group':
-                            case 'tiltangle':
-                            case 'vibrationstrength':
-                            case 'locked':
-                            case 'boost':
-                            case 'off':
-                            case 'on':
-                                adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list[keyName]['name'] + ' ' + stateName,
-                                        type: 'number',
-                                        role: 'state',
-                                        read: true,
-                                        write: false
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Sensors.${sensorID}` + '.' + stateName, {
-                                    val: list[keyName]['state'][stateName],
-                                    ack: true
-                                });
-                                break;
-                            case 'voltage':
-                                adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list[keyName]['name'] + ' ' + stateName,
-                                        type: 'number',
-                                        role: 'value.voltage',
-                                        unit: 'V',
-                                        read: true,
-                                        write: false
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Sensors.${sensorID}` + '.' + stateName, {
-                                    val: list[keyName]['state'][stateName],
-                                    ack: true
-                                });
-                                break;
-                            case 'current':
-                                adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list[keyName]['name'] + ' ' + stateName,
-                                        type: 'number',
-                                        role: 'value.current',
-                                        unit: 'mA',
-                                        read: true,
-                                        write: false
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Sensors.${sensorID}` + '.' + stateName, {
-                                    val: list[keyName]['state'][stateName],
-                                    ack: true
-                                });
-                                break;
-                            case 'consumption':
-                                adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list[keyName]['name'] + ' ' + stateName,
-                                        type: 'number',
-                                        role: 'value.consumption',
-                                        unit: 'Wh',
-                                        read: true,
-                                        write: false
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Sensors.${sensorID}` + '.' + stateName, {
-                                    val: list[keyName]['state'][stateName],
-                                    ack: true
-                                });
-                                break;
-                            case 'power':
-                                adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list[keyName]['name'] + ' ' + stateName,
-                                        type: 'number',
-                                        role: 'value.power',
-                                        unit: 'W',
-                                        read: true,
-                                        write: false
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Sensors.${sensorID}` + '.' + stateName, {
-                                    val: list[keyName]['state'][stateName],
-                                    ack: true
-                                });
-                                break;
-                            case 'lux':
-                                adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list[keyName]['name'] + ' ' + stateName,
-                                        type: 'number',
-                                        role: 'value.lux',
-                                        unit: 'LUX',
-                                        read: true,
-                                        write: false
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Sensors.${sensorID}` + '.' + stateName, {
-                                    val: list[keyName]['state'][stateName],
-                                    ack: true
-                                });
-                                break;
-                            case 'pressure':
-                                adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list[keyName]['name'] + ' ' + stateName,
-                                        type: 'number',
-                                        role: 'value.pressure',
-                                        unit: 'hPa',
-                                        read: true,
-                                        write: false
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Sensors.${sensorID}` + '.' + stateName, {
-                                    val: list[keyName]['state'][stateName],
-                                    ack: true
-                                });
-                                break;
-                            case 'temperature':
-                            case 'heatsetpoint':
-                                adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list[keyName]['name'] + ' ' + stateName,
-                                        type: 'number',
-                                        role: 'value.temperature',
-                                        unit: '°C',
-                                        read: true,
-                                        write: false
-                                    },
-                                    native: {}
-                                });
-                                let temp = list[keyName]['state'][stateName] / 100;
-                                adapter.setState(`Sensors.${sensorID}` + '.' + stateName, {val: temp, ack: true});
-                                break;
-                            case 'humidity':
-                                adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list[keyName]['name'] + ' ' + stateName,
-                                        type: 'number',
-                                        role: 'value.humidity',
-                                        unit: '%',
-                                        read: true,
-                                        write: false
-                                    },
-                                    native: {}
-                                });
-                                let humidity = list[keyName]['state'][stateName] / 100;
-                                adapter.setState(`Sensors.${sensorID}` + '.' + stateName, {val: humidity, ack: true});
-                                break;
-                            case 'presence':
-                            case 'dark':
-                            case 'daylight':
-                            case 'open':
-                            case 'flag':
-                            case 'water':
-                            case 'tampered':
-                            case 'fire':
-                            case 'vibration':
-                            adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
-                                type: 'state',
-                                common: {
-                                    name: list[keyName]['name'] + ' ' + stateName,
-                                    type: 'boolean',
-                                    role: 'state',
-                                    read: true,
-                                    write: false
-                                },
-                                native: {}
-                            });
-                            adapter.setState(`Sensors.${sensorID}` + '.' + stateName, {
-                                val: list[keyName]['state'][stateName],
-                                ack: true
-                            });
-                            break;
-                            case 'lowbattery':
-                                adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list[keyName]['name'] + ' ' + stateName,
-                                        type: 'boolean',
-                                        role: 'indicator.battery',
-                                        read: true,
-                                        write: false
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Sensors.${sensorID}` + '.' + stateName, {
-                                    val: list[keyName]['state'][stateName],
-                                    ack: true
-                                });
-                                break;
-                            case 'orientation':
-                                adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list[keyName]['name'] + ' ' + stateName,
-                                        type: 'array',
-                                        read: true,
-                                        write: false
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Sensors.${sensorID}` + '.' + stateName, {
-                                    val: list[keyName]['state'][stateName],
-                                    ack: true
-                                });
-                                break;
-                        }
+                        let newStates = new setObjectAndState(sensorID, list[keyName]['name'], 'Sensors', stateName, list[keyName]['state'][stateName]);
+
                     }
 
 
@@ -1691,155 +1250,7 @@ function getAllSensors() {
                     for (let x = 0; x <= count3; x++) {
                         let stateName = Object.keys(list[keyName]['config'])[x];
                         let value = null;
-                        switch (stateName) {
-                            case 'on':
-                            case 'ledindication':
-                            case 'usertest':
-                            case 'locked':
-                            case 'boost':
-                            case 'off':
-                            case 'on':
-                                adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list[keyName]['name'] + ' ' + stateName,
-                                        type: 'boolean',
-                                        role: 'state',
-                                        read: true,
-                                        write: true
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Sensors.${sensorID}` + '.' + stateName, {
-                                    val: list[keyName]['config'][stateName],
-                                    ack: true
-                                });
-                                break;
-                            case 'alert':
-                                adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list[keyName]['name'] + ' ' + stateName,
-                                        type: 'string',
-                                        role: 'state',
-                                        read: true,
-                                        write: true
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Sensors.${sensorID}` + '.' + stateName, {
-                                    val: list[keyName]['config'][stateName],
-                                    ack: true
-                                });
-                                break;
-                            case 'battery':
-                                adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list[keyName]['name'] + ' ' + stateName,
-                                        type: 'number',
-                                        role: 'indicator.battery',
-                                        read: true,
-                                        write: false
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Sensors.${sensorID}` + '.' + stateName, {
-                                    val: list[keyName]['config'][stateName],
-                                    ack: true
-                                });
-                                break;
-                            case 'delay':
-                            case 'duration':
-                                adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list[keyName]['name'] + ' ' + stateName,
-                                        type: 'number',
-                                        role: 'indicator.duration',
-                                        read: true,
-                                        write: true
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Sensors.${sensorID}` + '.' + stateName, {
-                                    val: list[keyName]['config'][stateName],
-                                    ack: true
-                                });
-                                break;
-                            case 'reachable':
-                                adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list[keyName]['name'] + ' ' + stateName,
-                                        type: 'boolean',
-                                        role: 'indicator.reachable',
-                                        read: true,
-                                        write: false
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Sensors.${sensorID}` + '.' + stateName, {
-                                    val: list[keyName]['config'][stateName],
-                                    ack: true
-                                });
-                                break;
-                            case 'pending':
-                                adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list[keyName]['name'] + ' ' + stateName,
-                                        type: 'mixed',
-                                        role: 'info',
-                                        read: true,
-                                        write: false
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Sensors.${sensorID}` + '.' + stateName, {
-                                    val: list[keyName]['config'][stateName],
-                                    ack: true
-                                });
-                                break;
-                            case 'sensitivity':
-                            case 'sensitivitymax':
-                            case 'tholddark':
-                            case 'tholdoffset':
-                            case 'offset':
-                                adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list[keyName]['name'] + ' ' + stateName,
-                                        type: 'number',
-                                        role: 'state',
-                                        read: true,
-                                        write: true
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Sensors.${sensorID}` + '.' + stateName, {
-                                    val: list[keyName]['config'][stateName],
-                                    ack: true
-                                });
-                                break;
-                            case 'temperature':
-                            case 'heatsetpoint':
-                                adapter.setObjectNotExists(`Sensors.${sensorID}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list[keyName]['name'] + ' ' + stateName,
-                                        type: 'number',
-                                        role: 'state',
-                                        unit: '°C',
-                                        read: true,
-                                        write: false
-                                    },
-                                    native: {}
-                                });
-                                value = list[keyName]['config'][stateName] / 100;
-                                adapter.setState(`Sensors.${sensorID}` + '.' + stateName, {val: value, ack: true});
-                                break;
-                        }
+                        let newStates = new setObjectAndState(sensorID, list[keyName]['name'], 'Sensors', stateName, list[keyName]['config'][stateName]);
                     }
                 }
             }
@@ -1869,11 +1280,6 @@ function getSensor(sensorId){
                 let list = JSON.parse(body);
                 let keyName = Object.keys(list)[0];
                 let sensorName = nameFilter(list['name']);
-                /*const patt = new RegExp(/\d$/g);
-                let match = patt.test(sensorName);
-                if(match === true && list['ep'] > 1){
-                    sensorName = sensorName + '_' + sensorId;
-                }*/
 
                 //create object for sensor
                 adapter.setObjectNotExists(`Sensors.${sensorId}`, {
@@ -1897,386 +1303,35 @@ function getSensor(sensorId){
                 });
                 let count2 = Object.keys(list['state']).length - 1;
                 //create states for sensor device
+
                 for (let z = 0; z <= count2; z++) {
                     let stateName = Object.keys(list['state'])[z];
-                    let value = null;
-                    switch (stateName) {
-                        case 'lightlevel':
-                        case 'daylight':
-                        case 'buttonevent':
-                        case 'status':
-                        case 'group':
-                        case 'tiltangle':
-                        case 'vibrationstrength':
-                        case 'locked':
-                        case 'boost':
-                        case 'off':
-                        case 'on':
-                            adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
-                                type: 'state',
-                                common: {
-                                    name: list['name'] + ' ' + stateName,
-                                    type: 'number',
-                                    role: 'state',
-                                    read: true,
-                                    write: false
-                                },
-                                native: {}
-                            });
-                            if (stateName == 'buttonevent' && list['modelid'] == 'lumi.Sensors.switch.aq2') {
-                                let LastUpdate = Number(new Date(list['state']['lastupdated']));
-                                let Now = Number(new Date().getTime());
-                                let dateoff = new Date();
-                                let TimeOffset = dateoff.getTimezoneOffset() * 60000;
 
-                                if ((Now - LastUpdate + TimeOffset) < 2000) {
-                                    adapter.setState(`Sensors.${sensorId}` + '.' + stateName, {val: list['state'][stateName], ack: true});
-                                    //adapter.log.debug('buttonevent updated, time diff: ' + ((Now - LastUpdate + TimeOffset)/1000) + 'sec update to now');
-                                } else {
-                                    adapter.log.info('buttonevent NOT updated for ' + list['name'] + ', too old: ' + ((Now - LastUpdate + TimeOffset)/1000) + 'sec time difference update to now');
-                                };
-                            } else {
-                                adapter.setState(`Sensors.${sensorId}` + '.' + stateName, {val: list['state'][stateName], ack: true});
-                            }
-                            break;
-                        case 'voltage':
-                            adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
-                                type: 'state',
-                                common: {
-                                    name: list[keyName]['name'] + ' ' + stateName,
-                                    type: 'number',
-                                    role: 'value.voltage',
-                                    unit: 'V',
-                                    read: true,
-                                    write: false
-                                },
-                                native: {}
-                            });
-                            adapter.setState(`Sensors.${sensorId}` + '.' + stateName, {
-                                val: list[keyName]['state'][stateName],
-                                ack: true
-                            });
-                            break;
-                        case 'current':
-                            adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
-                                type: 'state',
-                                common: {
-                                    name: list[keyName]['name'] + ' ' + stateName,
-                                    type: 'number',
-                                    role: 'value.current',
-                                    unit: 'mA',
-                                    read: true,
-                                    write: false
-                                },
-                                native: {}
-                            });
-                            adapter.setState(`Sensors.${sensorId}` + '.' + stateName, {
-                                val: list[keyName]['state'][stateName],
-                                ack: true
-                            });
-                            break;
-                        case 'consumption':
-                            adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
-                                type: 'state',
-                                common: {
-                                    name: list[keyName]['name'] + ' ' + stateName,
-                                    type: 'number',
-                                    role: 'value.consumption',
-                                    unit: 'Wh',
-                                    read: true,
-                                    write: false
-                                },
-                                native: {}
-                            });
-                            adapter.setState(`Sensors.${sensorId}` + '.' + stateName, {
-                                val: list[keyName]['state'][stateName],
-                                ack: true
-                            });
-                            break;
-                        case 'power':
-                            adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
-                                type: 'state',
-                                common: {
-                                    name: list[keyName]['name'] + ' ' + stateName,
-                                    type: 'number',
-                                    role: 'value.power',
-                                    unit: 'W',
-                                    read: true,
-                                    write: false
-                                },
-                                native: {}
-                            });
-                            adapter.setState(`Sensors.${sensorId}` + '.' + stateName, {
-                                val: list[keyName]['state'][stateName],
-                                ack: true
-                            });
-                            break;
-                        case 'lux':
-                            adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
-                                type: 'state',
-                                common: {
-                                    name: list[keyName]['name'] + ' ' + stateName,
-                                    type: 'number',
-                                    role: 'value.lux',
-                                    unit: 'LUX',
-                                    read: true,
-                                    write: false
-                                },
-                                native: {}
-                            });
-                            adapter.setState(`Sensors.${sensorId}` + '.' + stateName, {
-                                val: list[keyName]['state'][stateName],
-                                ack: true
-                            });
-                            break;
-                        case 'pressure':
-                            adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
-                                type: 'state',
-                                common: {
-                                    name: list[keyName]['name'] + ' ' + stateName,
-                                    type: 'number',
-                                    role: 'value.pressure',
-                                    unit: 'hPa',
-                                    read: true,
-                                    write: false
-                                },
-                                native: {}
-                            });
-                            adapter.setState(`Sensors.${sensorId}` + '.' + stateName, {
-                                val: list[keyName]['state'][stateName],
-                                ack: true
-                            });
-                            break;
-                        case 'temperature':
-                        case 'heatsetpoint':
-                            adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
-                                type: 'state',
-                                common: {
-                                    name: list['name'] + ' ' + stateName,
-                                    type: 'number',
-                                    role: 'state',
-                                    unit: '°C',
-                                    read: true,
-                                    write: false
-                                },
-                                native: {}
-                            });
-                            value = list['state'][stateName]/100;
-                            adapter.setState(`Sensors.${sensorId}` + '.' + stateName, {val: value, ack: true});
-                            break;
-                        case 'humidity':
-                            adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
-                                type: 'state',
-                                common: {
-                                    name: list['name'] + ' ' + stateName,
-                                    type: 'number',
-                                    role: 'state',
-                                    unit: '%',
-                                    read: true,
-                                    write: false
-                                },
-                                native: {}
-                            });
-                            value = list['state'][stateName]/100;
-                            adapter.setState(`Sensors.${sensorId}` + '.' + stateName, {val: value, ack: true});
-                            break;
-                        case 'presence':
-                        case 'dark':
-                        case 'open':
-                        case 'flag':
-                        case 'water':
-                        case 'tampered':
-                        case 'fire':
-                        case 'vibration':
-                        case 'locked':
-                        case 'boost':
-                        case 'off':
-                        case 'on':
-                            adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
-                                type: 'state',
-                                common: {
-                                    name: list['name'] + ' ' + stateName,
-                                    type: 'boolean',
-                                    role: 'state',
-                                    read: true,
-                                    write: false
-                                },
-                                native: {}
-                            });
-                            adapter.setState(`Sensors.${sensorId}` + '.' + stateName, {val: list['state'][stateName], ack: true});
-                        break;
-                        case 'lowbattery':
-                            adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
-                                type: 'state',
-                                common: {
-                                    name: list['name'] + ' ' + stateName,
-                                    type: 'boolean',
-                                    role: 'indicator.battery',
-                                    read: true,
-                                    write: false
-                                },
-                                native: {}
-                            });
-                            adapter.setState(`Sensors.${sensorId}` + '.' + stateName, {val: list['state'][stateName], ack: true});
-                            break;
-                }
+                    if (stateName == 'buttonevent' && list['modelid'] == 'lumi.Sensors.switch.aq2') {
+                        let LastUpdate = Number(new Date(list['state']['lastupdated']));
+                        let Now = Number(new Date().getTime());
+                        let dateoff = new Date();
+                        let TimeOffset = dateoff.getTimezoneOffset() * 60000;
+
+                        if ((Now - LastUpdate + TimeOffset) < 2000) {
+                            let newStates = new setObjectAndState(sensorId, list['name'], 'Sensors', stateName, list['state'][stateName]);
+
+                        } else {
+                            adapter.log.info('buttonevent NOT updated for ' + list['name'] + ', too old: ' + ((Now - LastUpdate + TimeOffset)/1000) + 'sec time difference update to now');
+                        }
+                    } else {
+                        let newStates = new setObjectAndState(sensorId, list['name'], 'Sensors', stateName, list['state'][stateName]);
+                    }
+
 
                     let count3 = Object.keys(list['config']).length - 1;
                     //create config for sensor device
                     for (let x = 0; x <= count3; x++) {
                         let stateName = Object.keys(list['config'])[x];
-                        switch (stateName) {
-                            case 'on':
-                            case 'ledindication':
-                            case 'usertest':
-                            case 'locked':
-                            case 'boost':
-                            case 'off':
-                                adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list['name'] + ' ' + stateName,
-                                        type: 'boolean',
-                                        role: 'state',
-                                        read: true,
-                                        write: true
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Sensors.${sensorId}` + '.' + stateName, {
-                                    val: list['config'][stateName],
-                                    ack: true
-                                });
-                                break;
-                            case 'battery':
-                                adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list['name'] + ' ' + stateName,
-                                        type: 'number',
-                                        role: 'indicator.battery',
-                                        read: true,
-                                        write: false
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Sensors.${sensorId}` + '.' + stateName, {
-                                    val: list['config'][stateName],
-                                    ack: true
-                                });
-                                break;
-                            case 'reachable':
-                                adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list['name'] + ' ' + stateName,
-                                        type: 'boolean',
-                                        role: 'indicator.reachable',
-                                        read: true,
-                                        write: false
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Sensors.${sensorId}` + '.' + stateName, {
-                                    val: list['config'][stateName],
-                                    ack: true
-                                });
-                                break;
-                            case 'alert':
-                                adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list['name'] + ' ' + stateName,
-                                        type: 'boolean',
-                                        role: 'indicator.reachable',
-                                        read: true,
-                                        write: false
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Sensors.${sensorId}` + '.' + stateName, {
-                                    val: list['config'][stateName],
-                                    ack: true
-                                });
-                                break;
-                            case 'delay':
-                            case 'duration':
-                                adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list['name'] + ' ' + stateName,
-                                        type: 'number',
-                                        role: 'indicator.duration',
-                                        read: true,
-                                        write: true
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Sensors.${sensorId}` + '.' + stateName, {
-                                    val: list['config'][stateName],
-                                    ack: true
-                                });
-                                break;
-                            case 'pending':
-                                adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list['name'] + ' ' + stateName,
-                                        type: 'mixed',
-                                        role: 'info',
-                                        read: true,
-                                        write: false
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Sensors.${sensorId}` + '.' + stateName, {
-                                    val: list['config'][stateName],
-                                    ack: true
-                                });
-                                break;
-                            case 'sensitivity':
-                            case 'sensitivitymax':
-                            case 'tholddark':
-                            case 'tholdoffset':
-                            case 'offset':
-                                adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list['name'] + ' ' + stateName,
-                                        type: 'number',
-                                        role: 'state',
-                                        read: true,
-                                        write: true
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Sensors.${sensorId}` + '.' + stateName, {
-                                    val: list['config'][stateName],
-                                    ack: true
-                                });
-                                break;
-                            case 'temperature':
-                            case 'heatsetpoint':
-                                adapter.setObjectNotExists(`Sensors.${sensorId}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list['name'] + ' ' + stateName,
-                                        type: 'number',
-                                        role: 'state',
-                                        unit: '°c',
-                                        read: true,
-                                        write: false
-                                    },
-                                    native: {}
-                                });
-                                value = list['config'][stateName]/100;
-                                adapter.setState(`Sensors.${sensorId}` + '.' + stateName, {val: value, ack: true});
-                                break;
-                        }
+                        let newStates = new setObjectAndState(sensorId, list['name'], 'Sensors', stateName, list['config'][stateName]);
+
                     }
                 }
-
-
         }
     })
 } //END getSensor
@@ -2399,157 +1454,9 @@ function getAllLights(){
                         //create states for light device
                         for (let z = 0; z <= count2; z++) {
                             let stateName = Object.keys(list[keyName]['state'])[z];
-                            switch (stateName) {
-                                case 'on':
-                                    adapter.setObjectNotExists(`Lights.${lightID}` + '.' + stateName, {
-                                        type: 'state',
-                                        common: {
-                                            name: list[keyName]['name'] + ' ' + stateName,
-                                            type: 'boolean',
-                                            role: 'switch',
-                                            read: true,
-                                            write: true
-                                        },
-                                        native: {}
-                                    });
-                                    break;
-                                case 'bri':
-                                    adapter.setObjectNotExists(`Lights.${lightID}` + '.' + stateName, {
-                                        type: 'state',
-                                        common: {
-                                            name: list[keyName]['name'] + ' ' + stateName,
-                                            type: 'number',
-                                            role: 'level.dimmer',
-                                            min: 0,
-                                            max: 255,
-                                            read: true,
-                                            write: true
-                                        },
-                                        native: {}
-                                    });
-                                    break;
-                                case 'hue':
-                                    adapter.setObjectNotExists(`Lights.${lightID}` + '.' + stateName, {
-                                        type: 'state',
-                                        common: {
-                                            name: list[keyName]['name'] + ' ' + stateName,
-                                            type: 'number',
-                                            role: 'level.color.hue',
-                                            min: 0,
-                                            max: 360,
-                                            read: true,
-                                            write: true
-                                        },
-                                        native: {}
-                                    });
-                                    break;
-                                case 'sat':
-                                    adapter.setObjectNotExists(`Lights.${lightID}` + '.' + stateName, {
-                                        type: 'state',
-                                        common: {
-                                            name: list[keyName]['name'] + ' ' + stateName,
-                                            type: 'number',
-                                            role: 'level.color.saturation',
-                                            min: 0,
-                                            max: 255,
-                                            read: true,
-                                            write: true
-                                        },
-                                        native: {}
-                                    });
-                                    break;
-                                case 'ct':
-                                    adapter.setObjectNotExists(`Lights.${lightID}` + '.' + stateName, {
-                                        type: 'state',
-                                        common: {
-                                            name: list[keyName]['name'] + ' ' + stateName,
-                                            type: 'number',
-                                            role: 'level.color.temperature',
-                                            min: 153,
-                                            max: 500,
-                                            read: true,
-                                            write: true
-                                        },
-                                        native: {}
-                                    });
-                                    break;
-                                case 'xy':
-                                    adapter.setObjectNotExists(`Lights.${lightID}` + '.' + stateName, {
-                                        type: 'state',
-                                        common: {
-                                            name: list[keyName]['name'] + ' ' + stateName,
-                                            type: 'string',
-                                            role: 'color.CIE',
-                                            read: true,
-                                            write: true
-                                        },
-                                        native: {}
-                                    });
-                                    break;
-                                case 'alert':
-                                    adapter.setObjectNotExists(`Lights.${lightID}` + '.' + stateName, {
-                                        type: 'state',
-                                        common: {
-                                            name: list[keyName]['name'] + ' ' + stateName,
-                                            type: 'string',
-                                            role: 'action',
-                                            read: true,
-                                            write: true
-                                        },
-                                        native: {}
-                                    });
-                                    break;
-                                case 'effect':
-                                    adapter.setObjectNotExists(`Lights.${lightID}` + '.' + stateName, {
-                                        type: 'state',
-                                        common: {
-                                            name: list[keyName]['name'] + ' ' + stateName,
-                                            type: 'string',
-                                            role: 'action',
-                                            read: true,
-                                            write: true
-                                        },
-                                        native: {}
-                                    });
-                                    adapter.setObjectNotExists(`Lights.${lightID}` + '.colorloopspeed', {
-                                        type: 'state',
-                                        common: {
-                                            name: list[keyName]['name'] + ' ' + 'colorloopspeed',
-                                            type: 'number',
-                                            role: 'argument',
-                                            min: 1,
-                                            max: 255,
-                                            read: true,
-                                            write: true
-                                        },
-                                        native: {}
-                                    });
-                                    break;
-                                case 'reachable':
-                                    adapter.setObjectNotExists(`Lights.${lightID}` + '.' + stateName, {
-                                        type: 'state',
-                                        common: {
-                                            name: list[keyName]['name'] + ' ' + stateName,
-                                            type: 'boolean',
-                                            role: 'indicator.reachable',
-                                            read: true,
-                                            write: false
-                                        },
-                                        native: {}
-                                    });
-                                    break;
-                            }
-                            adapter.setObjectNotExists(`Lights.${lightID}` + '.transitiontime', {
-                                type: 'state',
-                                common: {
-                                    name: list[keyName]['name'] + ' ' + 'transitiontime',
-                                    type: 'number',
-                                    role: 'argument',
-                                    read: true,
-                                    write: true
-                                },
-                                native: {}
-                            });
+                            let newStates = new setObjectAndState(lightID, list[keyName]['name'], 'Lights', stateName, list[keyName]['state'][stateName]);
+                            let tt = new setObjectAndState(lightID, list[keyName]['name'], 'Lights', 'transitiontime', null);
+
                             adapter.setObjectNotExists(`Lights.${lightID}.dimspeed`, {
                                 type: 'state',
                                 common: {
@@ -2634,169 +1541,7 @@ function getLightState(lightId){
                     //create states for light device
                     for (let z = 0; z <= count2; z++) {
                         let stateName = Object.keys(list['state'])[z];
-                        switch (stateName) {
-                            case 'on':
-                                adapter.setObjectNotExists(`Lights.${lightId}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list['name'] + ' ' + stateName,
-                                        type: 'boolean',
-                                        role: 'switch',
-                                        read: true,
-                                        write: true
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Lights.${lightId}` + '.' + stateName, {val: list['state'][stateName], ack: true});
-                                break;
-                            case 'bri':
-                                adapter.setObjectNotExists(`Lights.${lightId}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list['name'] + ' ' + stateName,
-                                        type: 'number',
-                                        role: 'level.dimmer',
-                                        min: 0,
-                                        max: 255,
-                                        read: true,
-                                        write: true
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Lights.${lightId}` + '.' + stateName, {val: list['state'][stateName], ack: true});
-                                break;
-                            case 'hue':
-                                adapter.setObjectNotExists(`Lights.${lightId}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list['name'] + ' ' + stateName,
-                                        type: 'number',
-                                        role: 'level.color.hue',
-                                        min: 0,
-                                        max: 360,
-                                        read: true,
-                                        write: true
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Lights.${lightId}` + '.' + stateName, {val: Math.round(list['state'][stateName] * 100 / hue_factor) / 100, ack: true});
-                                break;
-                            case 'sat':
-                                adapter.setObjectNotExists(`Lights.${lightId}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list['name'] + ' ' + stateName,
-                                        type: 'number',
-                                        role: 'level.color.saturation',
-                                        min: 0,
-                                        max: 255,
-                                        read: true,
-                                        write: true
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Lights.${lightId}` + '.' + stateName, {val: list['state'][stateName], ack: true});
-                                break;
-                            case 'ct':
-                                adapter.setObjectNotExists(`Lights.${lightId}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list['name'] + ' ' + stateName,
-                                        type: 'number',
-                                        role: 'level.color.temperature',
-                                        min: 153,
-                                        max: 500,
-                                        read: true,
-                                        write: true
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Lights.${lightId}` + '.' + stateName, {val: list['state'][stateName], ack: true});
-                                break;
-                            case 'xy':
-                                adapter.setObjectNotExists(`Lights.${lightId}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list['name'] + ' ' + stateName,
-                                        type: 'string',
-                                        role: 'color.CIE',
-                                        read: true,
-                                        write: true
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Lights.${lightId}` + '.' + stateName, {val: list['state'][stateName], ack: true});
-                                break;
-                            case 'alert':
-                                adapter.setObjectNotExists(`Lights.${lightId}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list['name'] + ' ' + stateName,
-                                        type: 'string',
-                                        role: 'action',
-                                        read: true,
-                                        write: true
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Lights.${lightId}` + '.' + stateName, {val: list['state'][stateName], ack: true});
-                                break;
-                            case 'effect':
-                                adapter.setObjectNotExists(`Lights.${lightId}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list['name'] + ' ' + stateName,
-                                        type: 'string',
-                                        role: 'action',
-                                        read: true,
-                                        write: true
-                                    },
-                                    native: {}
-                                });
-                                adapter.setObjectNotExists(`Lights.${lightId}` + '.colorloopspeed', {
-                                    type: 'state',
-                                    common: {
-                                        name: list['name'] + ' ' + 'colorloopspeed',
-                                        type: 'number',
-                                        role: 'argument',
-                                        min: 1,
-                                        max: 255,
-                                        read: true,
-                                        write: true
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Lights.${lightId}` + '.' + stateName, {val: list['state'][stateName], ack: true});
-                                break;
-                            case 'transitiontime':
-                                adapter.setObjectNotExists(`Lights.${lightId}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list['name'] + ' ' + stateName,
-                                        type: 'number',
-                                        role: 'argument',
-                                        read: true,
-                                        write: true
-                                    },
-                                    native: {}
-                                });
-                                break;
-                            case 'reachable':
-                                adapter.setObjectNotExists(`Lights.${lightId}` + '.' + stateName, {
-                                    type: 'state',
-                                    common: {
-                                        name: list['name'] + ' ' + stateName,
-                                        type: 'boolean',
-                                        role: 'indicator.reachable',
-                                        read: true,
-                                        write: false
-                                    },
-                                    native: {}
-                                });
-                                adapter.setState(`Lights.${lightId}` + '.' + stateName, {val: list['state'][stateName], ack: true});
-                                break;
-                        }
-
+                        let newStates = new setObjectAndState(lightId, list[keyName]['name'], 'Lights', stateName, list['state'][stateName]);
                     }
             } else{
                 logging(res.statusCode, 'Get light state with ID: ' + lightId);
@@ -2820,7 +1565,7 @@ function setLightState(parameters, lightId, stateId, callback){
             adapter.log.debug('options: ' + JSON.stringify(options));
             adapter.log.debug('setLightState BODY: ' + JSON.stringify(response));
 
-            if(res.statusCode === 200){
+            if(res.statusCode === 200 && (response[0] !== undefined || response[0] !== 'undefined')){
                 if(response[0]['success']){
                     adapter.setState(stateId, {ack: true});
                 }else if(response[0]['error']){
@@ -2928,7 +1673,6 @@ function logging(statusCode, message){
 
 function nameFilter(name){
     let signs = [String.fromCharCode(46), String.fromCharCode(44), String.fromCharCode(92), String.fromCharCode(47), String.fromCharCode(91), String.fromCharCode(93), String.fromCharCode(123), String.fromCharCode(125), String.fromCharCode(32), String.fromCharCode(129), String.fromCharCode(154), String.fromCharCode(132), String.fromCharCode(142), String.fromCharCode(148), String.fromCharCode(153)]; //46=. 44=, 92=\ 47=/ 91=[ 93=] 123={ 125=} 32=Space 129=ü 154=Ü 132=ä 142=Ä 148=ö 153=Ö
-
     signs.forEach(function(item, index){
         let count = name.split(item).length - 1;
 
@@ -2941,12 +1685,428 @@ function nameFilter(name){
             name = name.replace(/_$/, '');
         }
 
-
-
     });
     return name;
 }
 
+function UTCtoLocal(timeString){
+
+    let jsT = Date.parse(timeString + 'Z');
+
+    let d = new Date();
+    let n = d.getTimezoneOffset();
+
+    let local;
+
+    if(Math.sign(n) === -1){
+        n = Math.abs(n);
+        let offset = (n*60)*1000;
+
+        local = jsT + offset;
+    }else{
+        let offset = (n*60)*1000;
+
+        local = jsT - offset;
+    }
+
+    let lTime = (new Date(local)).toISOString();
+    return lTime;
+}
+
+async function getObjectByDeviceId(id, type){
+    /*
+    type = Groups, Lights, Sensors
+     */
+   let obj = await adapter.getObjectListAsync({startkey: 'deconz.' + adapter.instance + '.' + type + '.', endkey: 'deconz.' + adapter.instance + '.' + type + '.\u9999'});
+
+        let rows = obj.rows;
+        let object;
+        for(let o in rows){
+            if(rows[o].value.native !== undefined){
+                if(rows[o].value.native.id === id.toString()){
+                    object = rows[o];
+                    break;
+                }
+            }
+        }
+        return object;
+}
+
+function setObjectAndState(id, name, type, stateName, value){
+    /*
+    type = Sensors, Lights, Groups
+     */
+    let objType = 'mixed';
+    let objRole = 'state';
+    let objStates = null;
+    let objRead = true;
+    let objWrite = true;
+    let objMin = null;
+    let objMax = null;
+    let objUnit = null;
+    let objDefault = null;
+
+    switch(stateName){
+        case 'orientation':
+            objType = 'array';
+            objWrite = false;
+            break;
+        case 'pending':
+            objType = 'array';
+            objWrite = false;
+            break;
+        case 'xy':
+            objType = 'array';
+            objRole = 'color.CIE';
+            objDefault = '0.10000, 0.10000';
+            break;
+        case 'alarm':
+            objType = 'boolean';
+            objRole = 'sensor.alarm';
+            objWrite = false;
+            break;
+        case 'all_on':
+            objType = 'boolean';
+            objRole = 'switch';
+            break;
+        case 'any_on':
+            objType = 'boolean';
+            objRole = 'switch';
+            break;
+        case 'boost':
+            objType = 'boolean';
+            objRole = 'switch';
+            break;
+        case 'carbonmonoxide':
+            objType = 'boolean';
+            objRole = 'sensor.alarm';
+            objWrite = false;
+            break;
+        case 'fire':
+            objType = 'boolean';
+            objRole = 'sensor.alarm.fire';
+            objWrite = false;
+            break;
+        case 'flag':
+            objType = 'boolean';
+            objRole = 'indicator';
+            objWrite = false;
+            break;
+        case 'ledindication':
+            objType = 'boolean';
+            objRole = 'indicator';
+            break;
+        case 'on':
+        case 'off':
+        case 'locked':
+        case 'usertest':
+        case 'toggle':
+            objType = 'boolean';
+            objRole = 'switch';
+            break;
+        case 'lowbattery':
+            objType = 'boolean';
+            objRole = 'indicator.lowbat';
+            objWrite = false;
+            break;
+        case 'open':
+            objType = 'boolean';
+            objRole = 'sensor.open';
+            objWrite = false;
+            break;
+        case 'presence':
+            objType = 'boolean';
+            objRole = 'sensor.motion';
+            objWrite = false;
+            break;
+        case 'reachable':
+            objType = 'boolean';
+            objRole = 'indicator.reachable';
+            objWrite = false;
+            break;
+        case 'vibration':
+            objType = 'boolean';
+            objRole = 'sensor.vibration';
+            break;
+        case 'water':
+            objType = 'boolean';
+            objRole = 'sensor.alarm.flood';
+            objWrite = false;
+            break;
+        case 'scheduleron':
+        case 'tampered':
+        case 'dark':
+        case 'daylight':
+            objType = 'boolean';
+            objRole = 'state';
+            objWrite = false;
+            break;
+        case 'battery':
+            objType = 'number';
+            objRole = 'value.battery';
+            objWrite = false;
+            objMin = 0;
+            objMax = 100;
+            objUnit = '%';
+            objDefault = 0;
+            break;
+        case 'bri':
+            objType = 'number';
+            objRole = 'value.brightness';
+            objMin = 0;
+            objMax = 254;
+            objDefault = 254;
+            break;
+        case 'buttonevent':
+            objType = 'number';
+            objRole = 'state';
+            objWrite = false;
+            break;
+        case 'colorspeed':
+            objType = 'number';
+            objRole = 'state';
+            objMin = 1;
+            objMax = 255;
+            objDefault = 255;
+            break;
+        case 'configid':
+            objType = 'number';
+            objRole = 'state';
+            break;
+        case 'consumption':
+            objType = 'number';
+            objRole = 'value.power.consumption';
+            objWrite = false;
+            objDefault = 0;
+            objUnit = 'Wh';
+            break;
+        case 'ct':
+            objType = 'number';
+            objRole = 'level.color.temperature';
+            objMin =  153;
+            objMax = 500;
+            objDefault = 500;
+            break;
+        case 'current':
+            objType = 'number';
+            objRole = 'value.current';
+            objWrite = false;
+            objDefault = 0;
+            objUnit = 'mA';
+            break;
+        case 'delay':
+            objType = 'number';
+            objRole = 'state';
+            break;
+        case 'duration':
+            objType = 'number';
+            objRole = 'value.power.consumption';
+            objMin = 0;
+            objMax = 600;
+            objDefault = 600;
+            objUnit = 's';
+            break;
+        case 'group':
+            objType = 'number';
+            objRole = 'state';
+            break;
+        case 'heatsetpoint':
+            objType = 'number';
+            objRole = 'level.temperature';
+            objDefault = 20.00;
+            objUnit = '°C';
+            value = value / 100;
+            break;
+        case 'hue':
+            objType = 'number';
+            objRole = 'level.color.hue';
+            objMin = 0;
+            objMax = 360;
+            objDefault = 360;
+            objUnit = '°';
+            value = Math.round(value * 100 / hue_factor) / 100;
+            break;
+        case 'humidity':
+            objType = 'number';
+            objRole = 'value.humidity';
+            objWrite = false;
+            objMin = 0;
+            objMax = 100;
+            objDefault = 0;
+            objUnit = '%';
+            value = value / 100;
+            break;
+        case 'lightlevel':
+            objType = 'number';
+            objRole = 'value';
+            objWrite = false;
+            objDefault = 0;
+            break;
+        case 'lux':
+            objType = 'number';
+            objRole = 'value.brightness';
+            objDefault = 0;
+            objWrite = false;
+            objUnit = 'Lux';
+            break;
+        case 'mode':
+            objType = 'number';
+            objRole = 'state';
+            break;
+        case 'offset':
+            objType = 'number';
+            objRole = 'state';
+            objMin = -500;
+            objMax = 500;
+            objDefault = 0;
+            break;
+        case 'power':
+            objType = 'number';
+            objRole = 'value.power';
+            objWrite = false;
+            objDefault = 0;
+            objUnit = 'W';
+            break;
+        case 'pressure':
+            objType = 'number';
+            objRole = 'value.pressure';
+            objWrite = false;
+            objDefault = 0;
+            objUnit = 'hPa';
+            break;
+        case 'sat':
+            objType = 'number';
+            objRole = 'level.color.saturation';
+            objMin = 0;
+            objMax = 255;
+            objDefault = 255;
+            break;
+        case 'sensitivity':
+            objType = 'number';
+            objRole = 'state';
+            objDefault = 0;
+            break;
+        case 'sensitivitymax':
+            objType = 'number';
+            objRole = 'state';
+            objDefault = 0;
+            break;
+        case 'speed':
+            objType = 'number';
+            objRole = 'state';
+            objDefault = 0;
+            break;
+        case 'status':
+            objType = 'number';
+            objRole = 'state';
+            objWrite = false;
+            objDefault = 0;
+            break;
+        case 'temperature':
+            objType = 'number';
+            objRole = 'value.temperature';
+            objWrite = false;
+            objDefault = 0;
+            objUnit = '°C';
+            value = value / 100;
+            break;
+        case 'tiltangle':
+            objType = 'number';
+            objRole = 'value.tilt';
+            objWrite = false;
+            objDefault = 0;
+            objUnit = '°';
+            break;
+        case 'transitiontime':
+            objType = 'number';
+            objRole = 'state';
+            objDefault = 0;
+            break;
+        case 'vibrationstrength':
+            objType = 'number';
+            objRole = 'value';
+            objWrite = false;
+            objDefault = 0;
+            break;
+        case 'voltage':
+            objType = 'number';
+            objRole = 'value.voltage';
+            objWrite = false;
+            objDefault = 0;
+            objUnit = 'V';
+            break;
+        case 'alert':
+            objType = 'string';
+            objRole = 'state';
+            objDefault = 'none';
+            objStates = {none: 'none', select: 'select', lselect: 'lselect', blink: 'blink'};
+            break;
+        case 'colormode':
+            objType = 'string';
+            objRole = 'state';
+            objStates = {hs: 'hs', xy: 'xy', ct : 'ct'};
+            break;
+        case 'effect':
+            objType = 'string';
+            objRole = 'state';
+            objStates = {none: 'none', colorloop: 'colorloop'};
+            let cs = new setObjectAndState(id, name, type, 'colorspeed', null);
+            break;
+        case 'lastupdated':
+            objType = 'string';
+            objRole = 'value.datetime';
+            objWrite = false;
+            value = UTCtoLocal(value);
+            break;
+        case 'localtime':
+            objType = 'string';
+            objRole = 'value.datetime';
+            objWrite = false;
+            break;
+        case 'scheduler':
+            objType = 'string';
+            objRole = 'state';
+            break;
+    }
+
+    let objCommon = {
+        name: name + ' ' + stateName,
+        type: objType,
+        role: objRole,
+        read: objRead,
+        write: objWrite
+    };
+
+    if(objStates !== null){
+        objCommon.states = objStates;
+    }
+    if(objUnit !== null){
+        objCommon.unit = objUnit;
+    }
+    if(objMin !== null){
+        objCommon.min = objMin;
+    }
+    if(objMin !== null){
+        objCommon.max = objMax;
+    }
+    if(objDefault !== null){
+        objCommon.def = objDefault;
+    }
+
+
+    adapter.setObjectNotExists(`${type}.${id}` + '.' + stateName, {
+        type: 'state',
+        common: objCommon,
+        native: {}
+    });
+    if(value !== null){
+        adapter.setState(`${type}.${id}` + '.' + stateName, {
+            val: value,
+            ack: true
+        });
+    }
+
+}
 
 // If started as allInOne/compact mode => return function to create instance
 if (module && module.parent) {
@@ -2955,5 +2115,3 @@ if (module && module.parent) {
     // or start the instance directly
     startAdapter();
 }
-
-
