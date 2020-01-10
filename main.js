@@ -10,6 +10,7 @@ let started;
 let hue_factor = 182.041666667;
 
 let ws = null;
+let alive_ts = 0;
 
 function startAdapter(options) {
     options = options || {};
@@ -30,9 +31,11 @@ function startAdapter(options) {
                     adapter.setState('info.connected', {val: false, ack: true});
                 }
             }else if(state.val === true){
-                if(ws === null){
+                if(state.lc !== alive_ts){
+                    alive_ts = state.lc;
                     getAutoUpdates();
                 }
+
             }
         }
         return;
@@ -295,6 +298,7 @@ function startAdapter(options) {
                         let controlId = obj.native.id;
                         let parameters = `{ "name": "${state.val}" }`;
                         setGroupScene(parameters, parentId, controlId, '', '', 'PUT');
+
                         adapter.extendObject(adapter.name + '.' + adapter.instance + '.' + id, {
                             common: {
                                 name: state.val
@@ -322,10 +326,10 @@ function startAdapter(options) {
 //END on StateChange
 
 // New message arrived. obj is array with current messages
-        message: function (obj) {
+        message: async function (obj) {
     let wait = false;
     if (obj) {
-        switch (obj.command) {
+       switch (obj.command) {
             case 'browse':
                 browse(obj.message, function (res) {
                     if (obj.callback) adapter.sendTo(obj.from, obj.command, JSON.stringify(res), obj.callback);
@@ -347,7 +351,11 @@ function startAdapter(options) {
                 wait = true;
                 break;
             case 'openNetwork':
-                let opentime = adapter.config.permit;
+                let opentime;
+                await adapter.getObject('Gateway_info')
+                    .then(async results =>{
+                        opentime = results.native.networkopenduration;
+                    });
                 let parameters = `{"permitjoin": ${opentime}}`;
                 modifyConfig(parameters);
                 wait = true;
@@ -376,6 +384,13 @@ function startAdapter(options) {
                 });
                 wait = true;
                 break;
+           case 'saveConfig':
+               adapter.log.info('save Config');
+               adapter.extendObject('Gateway_info', {
+                   native: obj.message
+
+               });
+               break;
             default:
                 adapter.log.warn("Unknown command: " + obj.command);
                 return false;
@@ -399,29 +414,27 @@ function startAdapter(options) {
 
 async function main() {
     adapter.subscribeStates('*');
-    autoDiscovery();
-    if (!adapter.config.port) {
-        adapter.config.port = 80;
-        adapter.extendForeignObject('system.adapter.' + adapter.name + '.' + adapter.instance, {
-            native: {
-                port: 80
+    await adapter.getObjectAsync('Gateway_info')
+        .then(async results=>{
+            if(results.native.ipaddress === undefined){
+                autoDiscovery();
+            }else{
+                adapter.log.info(JSON.stringify(results));
+                if(results.native.user === '' || results.native.user === null){
+                    adapter.log.warn('No API Key found');
+                }else {
+                    getConfig();
+                }
             }
-        });
-    } else {
-        adapter.extendForeignObject('system.adapter.' + adapter.name + '.' + adapter.instance, {
-            native: {
-                port: parseInt(adapter.config.port, 10)
-            }
-        });
-    }
-    if(adapter.config.user === '' || adapter.config.user === null){
-        adapter.log.warn('No API Key found');
-    }else {
-        getConfig();
-    }
+        }), (reject =>{
+        adapter.log.error(JSON.stringify(reject));
+    });
+
     setTimeout(function(){
         getAutoUpdates();
     }, 10000);
+
+
 }
 
 
@@ -429,7 +442,6 @@ async function main() {
 let discovery = new SSDP.Discovery();
 
 function autoDiscovery(){
-    adapter.log.info('Auto discovery');
 
     discovery.on( 'message', (msg, rinfo, iface) => {
         let addr = `${rinfo.address}:${rinfo.port}`;
@@ -440,34 +452,22 @@ function autoDiscovery(){
                 loc = loc.replace('http://', '');
                 loc = loc.split(':');
 
-                adapter.getForeignObject('system.adapter.' + adapter.name + '.' + adapter.instance, (err, obj)=>{
-                    if(obj.native.bridge === ''){
-                        adapter.extendForeignObject('system.adapter.' + adapter.name + '.' + adapter.instance, {
+                adapter.log.debug('autodiscovery: ' + loc);
+
+                        adapter.extendObject('Gateway_info', {
                             native: {
-                                bridge: loc[0],
+                                ipaddress: loc[0],
                                 port: loc[1]
                             }
                         });
-                    }
 
-                });
-
-            }
-
+                        discovery.close();
+                }
         }
 
     });
 
-    discovery.on( 'notify', ( msg, rinfo, iface ) => {
-        if(msg.headers.nt === 'urn:schemas-upnp-org:device:basic:1') {
-            if(msg.headers['gwid.phoscon.de']){
-                let time = parseInt(msg.headers['cache-control'].replace('max-age=', ''));
-                adapter.setState('Gateway_info.alive', {val: true, ack: true, expire: time});
-                adapter.log.debug('NOTIFY ' + JSON.stringify(msg))
-            }
 
-        }
-    });
 
     discovery.listen((error) => {
         if(error){
@@ -478,6 +478,26 @@ function autoDiscovery(){
     });
 
 
+}
+
+function heartbeat(){
+
+    discovery.on( 'notify', ( msg, rinfo, iface ) => {
+        if(msg.headers.nt === 'urn:schemas-upnp-org:device:basic:1') {
+            if(msg.headers['gwid.phoscon.de']){
+                let time = parseInt(msg.headers['cache-control'].replace('max-age=', ''));
+                adapter.setState('Gateway_info.alive', {val: true, ack: true, expire: time + 10000});
+                adapter.log.debug('NOTIFY ' + JSON.stringify(msg))
+            }
+
+        }
+    });
+
+    discovery.listen((error) => {
+        if(error){
+            adapter.log.error(error);
+        }
+    });
 }
 
 function createAPIkey(host, credentials, callback){
@@ -522,10 +542,17 @@ function createAPIkey(host, credentials, callback){
 
 }
 
-function deleteAPIkey(){
+async function deleteAPIkey(){
     adapter.log.info('deleteAPIkey');
+    let ip, port, user;
+    await adapter.getObjectAsync('Gateway_info')
+        .then(async results => {
+            ip = results.native.ipaddress;
+            port = results.native.port;
+            user = results.native.user;
+        });
     let options = {
-        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/config/whitelist/' + adapter.config.user,
+        url: 'http://' + ip + ':' + port + '/api/' + user + '/config/whitelist/' + user,
         method: 'DELETE',
         headers: {
             'Content-Type': 'text/plain;charset=UTF-8'
@@ -537,11 +564,13 @@ function deleteAPIkey(){
         try{response = JSON.parse(body);} catch(err){}
         if(res.statusCode === 200){
             if(response[0]['success']){
-                adapter.extendForeignObject('system.adapter.' + adapter.name + '.' + adapter.instance, {
+
+                adapter.extendObject('Gateway_info', {
                     native: {
                         user: ''
                     }
                 });
+
                 adapter.log.info('API key deleted');
             }else if(response[0]['error']){
                 adapter.log.warn(JSON.stringify(response[0]['error']));
@@ -559,10 +588,17 @@ function deleteAPIkey(){
 const WebSocket = require('ws');
 
 async function getAutoUpdates() {
-    let host = adapter.config.bridge;
-    let port = adapter.config.websocketport;
+    heartbeat();
 
-    if (adapter.config.user) {
+    let host, port, user;
+    await adapter.getObjectAsync('Gateway_info')
+        .then(async results => {
+            host = results.native.ipaddress;
+            port = results.native.websocketport;
+            user = results.native.user;
+        });
+
+    if (user) {
             ws = new WebSocket('ws://' + host + ':' + port);
 
             ws.on('open', () => {
@@ -667,9 +703,18 @@ async function getAutoUpdates() {
 }
 
 //START deConz config --------------------------------------------------------------------------------------------------
-function modifyConfig(parameters){
+async function modifyConfig(parameters){
+    let ip, port, user, ot;
+    await adapter.getObjectAsync('Gateway_info')
+        .then(async results => {
+            ip = results.native.ipaddress;
+            port = results.native.port;
+            user = results.native.user;
+            ot = results.native.networkopenduration;
+        });
+
     let options = {
-        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/config',
+        url: 'http://' + ip + ':' + port + '/api/' + user + '/config',
         method: 'PUT',
         headers: 'Content-Type" : "application/json',
         body: parameters
@@ -682,7 +727,6 @@ function modifyConfig(parameters){
 
         if(res.statusCode === 200){
             if(response[0]['success']){
-                let ot = adapter.config.permit;
                 switch (JSON.stringify(response[0]['success'])) {
                     case  `{"/config/permitjoin":${ot}}`:
                         adapter.log.info(`Network is now open for ${ot} seconds to register new devices.`);
@@ -700,9 +744,17 @@ function modifyConfig(parameters){
     });
 }
 
-function getConfig(){
+async function getConfig(){
+    let ip, port, user;
+    await adapter.getObjectAsync('Gateway_info')
+        .then(async results => {
+            ip = results.native.ipaddress;
+            port = results.native.port;
+            user = results.native.user;
+        });
+
     let options = {
-        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/config',
+        url: 'http://' + ip + ':' + port + '/api/' + user + '/config',
         method: 'GET'
     };
 
@@ -712,7 +764,7 @@ function getConfig(){
         }else if(res.statusCode === 200) {
                 let gateway = JSON.parse(body);
                 adapter.log.debug('API version: ' + gateway['apiversion']);
-                adapter.setObject('Gateway_info', {
+                adapter.extendObject('Gateway_info', {
                     type: 'device',
                     common: {
                         name: gateway['name'],
@@ -748,45 +800,8 @@ function getConfig(){
                         zigbeechannel: gateway['zigbeechannel']
                     }
                 });
-                adapter.setObject('Gateway_info.alive', {
-                   type: 'state',
-                   common: {
-                       name: 'Gateway alive',
-                       type: 'boolean',
-                       role: 'indicator.online',
-                       read: true,
-                       write: false,
-                       def: false
-                   },
-                    native: {}
-                });
-            adapter.setObject('info.connection', {
-                type: 'state',
-                common: {
-                    name: 'Gateway connected',
-                    type: 'boolean',
-                    role: 'indicator.connected',
-                    read: true,
-                    write: false,
-                    def: false
-                },
-                native: {}
-            });
-                adapter.extendForeignObject('system.adapter.' + adapter.name + '.' + adapter.instance, {
-                    native: {
-                        websocketport: gateway['websocketport']
-                    }
-                });
-                let updateInfos;
-                if(adapter.config.sw_version !== gateway['swversion'] || adapter.config.api_version !== gateway['apiversion']){
-                    adapter.extendForeignObject('system.adapter.' + adapter.name + '.' + adapter.instance, {
-                        native: {
-                            sw_version: gateway['swversion'],
-                            api_version: gateway['apiversion'],
-                            websocketport: gateway['websocketport']
-                        }
-                    });
-                }
+
+
 
                 getAllLights();
                 getAllSensors();
@@ -802,11 +817,20 @@ function getConfig(){
 
 
 //START  Group functions -----------------------------------------------------------------------------------------------
-function getAllGroups() {
+async function getAllGroups() {
+    let ip, port, user;
+    await adapter.getObjectAsync('Gateway_info')
+        .then(async results => {
+            ip = results.native.ipaddress;
+            port = results.native.port;
+            user = results.native.user;
+        });
+
     let options = {
-        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/groups',
+        url: 'http://' + ip + ':' + port + '/api/' + user + '/groups',
         method: 'GET'
     };
+
     request(options, function (error, res, body) {
         let list = JSON.parse(body);
         let response;
@@ -852,11 +876,20 @@ function getAllGroups() {
     });
 } //END getAllGroups
 
-function getGroupAttributes(groupId) {
+async function getGroupAttributes(groupId) {
+    let ip, port, user;
+    await adapter.getObjectAsync('Gateway_info')
+        .then(async results => {
+            ip = results.native.ipaddress;
+            port = results.native.port;
+            user = results.native.user;
+        });
+
     let options = {
-        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/groups/' + groupId,
+        url: 'http://' + ip + ':' + port + '/api/' + user + '/groups/' + groupId,
         method: 'GET'
     };
+
     request(options, function (error, res, body) {
         let list = JSON.parse(body);
         let response;
@@ -1060,9 +1093,17 @@ function getGroupScenes(group, sceneList) {
     });
 } //END getGroupScenes
 
-function setGroupState(parameters, groupId, stateId){
+async function setGroupState(parameters, groupId, stateId){
+    let ip, port, user;
+    await adapter.getObjectAsync('Gateway_info')
+        .then(async results => {
+            ip = results.native.ipaddress;
+            port = results.native.port;
+            user = results.native.user;
+        });
+
     let options = {
-        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/groups/' + groupId + '/action',
+        url: 'http://' + ip + ':' + port + '/api/' + user + '/groups/' + groupId + '/action',
         method: 'PUT',
         headers: 'Content-Type : application/json',
         body: parameters
@@ -1087,7 +1128,7 @@ function setGroupState(parameters, groupId, stateId){
     });
 } //END setGroupState
 
-function setGroupScene(parameters, groupId, sceneId, action, stateId, method){
+async function setGroupScene(parameters, groupId, sceneId, action, stateId, method){
     let sceneString = '';
     if(sceneId > 0){
         sceneString = '/' + sceneId;
@@ -1095,8 +1136,17 @@ function setGroupScene(parameters, groupId, sceneId, action, stateId, method){
             sceneString += '/' + action;
         }
     }
+
+    let ip, port, user;
+    await adapter.getObjectAsync('Gateway_info')
+        .then(async results => {
+            ip = results.native.ipaddress;
+            port = results.native.port;
+            user = results.native.user;
+        });
+
     let options = {
-        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/groups/' + groupId + '/scenes' + sceneString,
+        url: 'http://' + ip + ':' + port + '/api/' + user + '/groups/' + groupId + '/scenes' + sceneString,
         method: method,
         headers: 'Content-Type" : "application/json',
         body: parameters
@@ -1121,9 +1171,17 @@ function setGroupScene(parameters, groupId, sceneId, action, stateId, method){
     });
 } //END setGroupScene
 
-function createGroup(name, callback) {
+async function createGroup(name, callback) {
+    let ip, port, user;
+    await adapter.getObjectAsync('Gateway_info')
+        .then(async results => {
+            ip = results.native.ipaddress;
+            port = results.native.port;
+            user = results.native.user;
+        });
+
     let options = {
-        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/groups',
+        url: 'http://' + ip + ':' + port + '/api/' + user + '/groups',
         method: 'POST',
         headers: {
             'Content-Type': 'text/plain;charset=UTF-8',
@@ -1144,9 +1202,18 @@ function createGroup(name, callback) {
     }catch(err){adapter.log.error(err)}
 } //END createGroup
 
-function deleteGroup(groupId){
+async function deleteGroup(groupId){
+
+    let ip, port, user;
+    await adapter.getObjectAsync('Gateway_info')
+        .then(async results => {
+            ip = results.native.ipaddress;
+            port = results.native.port;
+            user = results.native.user;
+        });
+
     let options = {
-        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/groups/' + groupId,
+        url: 'http://' + ip + ':' + port + '/api/' + user + '/groups/' + groupId,
         method: 'DELETE',
         headers: 'Content-Type" : "application/json'
         //body: parameters
@@ -1194,10 +1261,18 @@ function deleteGroup(groupId){
 
 
 //START  Sensor functions ----------------------------------------------------------------------------------------------
-function getAllSensors() {
+async function getAllSensors() {
+
+    let ip, port, user;
+    await adapter.getObjectAsync('Gateway_info')
+        .then(async results => {
+            ip = results.native.ipaddress;
+            port = results.native.port;
+            user = results.native.user;
+        });
 
     let options = {
-        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/sensors',
+        url: 'http://' + ip + ':' + port + '/api/' + user + '/sensors',
         method: 'GET'
     };
     request(options, function (error, res, body) {
@@ -1262,9 +1337,18 @@ function getAllSensors() {
     });
 } //END getAllSensors
 
-function getSensor(sensorId){
+async function getSensor(sensorId){
+
+    let ip, port, user;
+    await adapter.getObjectAsync('Gateway_info')
+        .then(async results => {
+            ip = results.native.ipaddress;
+            port = results.native.port;
+            user = results.native.user;
+        });
+
     let options = {
-        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/sensors/' + sensorId,
+        url: 'http://' + ip + ':' + port + '/api/' + user + '/sensors/' + sensorId,
         method: 'GET'
     };
     request(options, function (error, res, body) {
@@ -1336,10 +1420,19 @@ function getSensor(sensorId){
     })
 } //END getSensor
 
-function setSensorParameters(parameters, sensorId, stateId, callback){
+async function setSensorParameters(parameters, sensorId, stateId, callback){
+
+    let ip, port, user;
+    await adapter.getObjectAsync('Gateway_info')
+        .then(async results => {
+            ip = results.native.ipaddress;
+            port = results.native.port;
+            user = results.native.user;
+        });
+
     adapter.log.info('setSensorParameters: ' + parameters + ' ' + sensorId + ' ' + stateId);
     let options = {
-        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/sensors/' + sensorId + '/config',
+        url: 'http://' + ip + ':' + port + '/api/' + user + '/sensors/' + sensorId + '/config',
         method: 'PUT',
         headers: 'Content-Type" : "application/json',
         body: parameters
@@ -1368,9 +1461,18 @@ function setSensorParameters(parameters, sensorId, stateId, callback){
     });
 } //END setSensorParameters
 
-function deleteSensor(sensorId){
+async function deleteSensor(sensorId){
+
+    let ip, port, user;
+    await adapter.getObjectAsync('Gateway_info')
+        .then(async results => {
+            ip = results.native.ipaddress;
+            port = results.native.port;
+            user = results.native.user;
+        });
+
     let options = {
-        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/sensors/' + sensorId,
+        url: 'http://' + ip + ':' + port + '/api/' + user + '/sensors/' + sensorId,
         method: 'DELETE',
         headers: 'Content-Type" : "application/json',
         //body: parameters
@@ -1414,9 +1516,18 @@ function deleteSensor(sensorId){
 
 
 //START  Light functions -----------------------------------------------------------------------------------------------
-function getAllLights(){
+async function getAllLights(){
+
+    let ip, port, user;
+    await adapter.getObjectAsync('Gateway_info')
+        .then(async results => {
+            ip = results.native.ipaddress;
+            port = results.native.port;
+            user = results.native.user;
+        });
+
     let options = {
-        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/lights',
+        url: 'http://' + ip + ':' + port + '/api/' + user + '/lights',
         method: 'GET'
     };
         request(options, function (error, res, body) {
@@ -1502,9 +1613,18 @@ function getAllLights(){
         })
 } //END getAllLights
 
-function getLightState(lightId){
+async function getLightState(lightId){
+
+    let ip, port, user;
+    await adapter.getObjectAsync('Gateway_info')
+        .then(async results => {
+            ip = results.native.ipaddress;
+            port = results.native.port;
+            user = results.native.user;
+        });
+
     let options = {
-        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/lights/' + lightId,
+        url: 'http://' + ip + ':' + port + '/api/' + user + '/lights/' + lightId,
         method: 'GET'
     };
     request(options, function (error, res, body) {
@@ -1549,10 +1669,19 @@ function getLightState(lightId){
     })
 } //END getLightState
 
-function setLightState(parameters, lightId, stateId, callback){
+async function setLightState(parameters, lightId, stateId, callback){
         adapter.log.info('setLightState: ' + parameters + ' ' + lightId + ' ' + stateId);
+
+        let ip, port, user;
+        await adapter.getObjectAsync('Gateway_info')
+            .then(async results => {
+                ip = results.native.ipaddress;
+                port = results.native.port;
+                user = results.native.user;
+            });
+
         let options = {
-            url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/lights/' + lightId + '/state',
+            url: 'http://' + ip + ':' + port + '/api/' + user + '/lights/' + lightId + '/state',
             method: 'PUT',
             headers: 'Content-Type" : "application/json',
             body: parameters
@@ -1581,9 +1710,18 @@ function setLightState(parameters, lightId, stateId, callback){
         });
 } //END setLightState
 
-function deleteLight(lightId){
+async function deleteLight(lightId){
+
+    let ip, port, user;
+    await adapter.getObjectAsync('Gateway_info')
+        .then(async results => {
+            ip = results.native.ipaddress;
+            port = results.native.port;
+            user = results.native.user;
+        });
+
     let options = {
-        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/lights/' + lightId,
+        url: 'http://' + ip + ':' + port + '/api/' + user + '/lights/' + lightId,
         method: 'DELETE',
         headers: 'Content-Type" : "application/json',
         //body: parameters
@@ -1608,9 +1746,18 @@ function deleteLight(lightId){
     });
 }
 
-function removeFromGroups(lightId){
+async function removeFromGroups(lightId){
+
+    let ip, port, user;
+    await adapter.getObjectAsync('Gateway_info')
+        .then(async results => {
+            ip = results.native.ipaddress;
+            port = results.native.port;
+            user = results.native.user;
+        });
+
     let options = {
-        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/lights/' + lightId + '/groups',
+        url: 'http://' + ip + ':' + port + '/api/' + user + '/lights/' + lightId + '/groups',
         method: 'DELETE',
         headers: 'Content-Type" : "application/json'
     };
@@ -1636,9 +1783,18 @@ function removeFromGroups(lightId){
 //END  Light functions -------------------------------------------------------------------------------------------------
 
 //START Devices functions ----------------------------------------------------------------------------------------------
-function getDevices(){
+async function getDevices(){
+
+    let ip, port, user;
+    await adapter.getObjectAsync('Gateway_info')
+        .then(async results => {
+            ip = results.native.ipaddress;
+            port = results.native.port;
+            user = results.native.user;
+        });
+
     let options = {
-        url: 'http://' + adapter.config.bridge + ':' + adapter.config.port + '/api/' + adapter.config.user + '/devices',
+        url: 'http://' + ip + ':' + port + '/api/' + user + '/devices',
         method: 'GET'
     };
 
@@ -1690,7 +1846,7 @@ function nameFilter(name){
 }
 
 function UTCtoLocal(timeString){
-
+    adapter.log.debug(timeString);
     let jsT = Date.parse(timeString + 'Z');
 
     let d = new Date();

@@ -30,6 +30,9 @@ Required node.js >= 8.x.x
 
 ## Changelog
 
+### 1.2.2
+* adapter configuration handling rewritten
+
 ### 1.2.1
 * convert lastupdated time to locale
 * object creation refactored

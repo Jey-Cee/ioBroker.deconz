@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "deconz",
-        "version": "1.2.1",
+        "version": "1.2.2",
         "news": {
+            "1.2.1": {
+                "en": "adapter configuration handling rewritten",
+                "de": "Adapterkonfigurationsbehandlung umgeschrieben",
+                "ru": "переписана обработка конфигурации адаптера",
+                "pt": "manipulação de configuração do adaptador reescrita",
+                "nl": "adapterconfiguratie herschreven",
+                "fr": "gestion de la configuration de l'adaptateur réécrite",
+                "it": "gestione della configurazione dell'adattatore riscritta",
+                "es": "manejo de la configuración del adaptador reescrito",
+                "pl": "przepisana obsługa konfiguracji adaptera",
+                "zh-cn": "适配器配置处理被重写"
+            },
             "1.2.1": {
                 "en": "convert lastupdated time to locale\nobject creation refactored\nfix adapter config update\nadd auto detect deConz\ninclude ssdp discovery to repo",
                 "de": "Konvertieren Sie die zuletzt aktualisierte Zeit in das Gebietsschema\nObjekterstellung überarbeitet\nUpdate der Adapterkonfiguration\nfüge auto detect deConz hinzu\nssdp discovery in repo einbinden",
@@ -164,17 +176,6 @@
         "type": "hardware"
     },
     "native": {
-        "bridge": "0.0.0.0",
-        "port": 80,
-        "user": "",
-        "polling": true,
-        "pollingInterval": 30,
-        "openNetwork": false,
-        "websocketport": 443,
-        "sw_version": "",
-        "channel": "",
-        "api_version": "",
-        "permit": "60"
     },
     "instanceObjects": [
         {
@@ -198,6 +199,57 @@
             "type": "channel",
             "common": {
                 "name": "Information"
+            },
+            "native": {}
+        },
+        {
+            "_id": "info",
+            "type": "device",
+            "common": {
+                "name": "Information for adapter"
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.connection",
+            "type": "state",
+            "common": {
+                "name": "Connection to deConz",
+                "def": false
+            },
+            "native": {}
+        },
+        {
+            "_id": "Gateway_info",
+            "type": "device",
+            "common": {
+                "name": "Information about the Gateway"
+            },
+            "native": {}
+        },
+        {
+            "_id": "Gateway_info.network_open",
+            "type": "state",
+            "common": {
+                "name": "Open Network for new Zigbee devices",
+                "type": "boolean",
+                "role": "indicator",
+                "read": true,
+                "write": true,
+                "def": false
+            },
+            "native": {}
+        },
+        {
+            "_id": "Gateway_info.alive",
+            "type": "state",
+            "common": {
+                "name": "Gateway alive",
+                "type": "boolean",
+                "role": "indicator.online",
+                "read": true,
+                "write": false,
+                "def": false
             },
             "native": {}
         }

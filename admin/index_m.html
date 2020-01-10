@@ -149,10 +149,36 @@
         });
     }
 
+    /*
+    async function getGatewayInfo(){
+        let info = await getObject('deconz.' + instance + '.Gateway_info', (err, obj)=>{
+            console.log(err + ' ' + JSON.stringify(obj));
+            return obj.native;
+        });
+        return info;
+    }
+     */
+    async function getGatewayInfo(){
+        return new Promise(function(resolve, reject) {
+            let info;
+            getObject('deconz.' + instance + '.Gateway_info', (err, obj)=>{
+                info = obj.native;
+                resolve(obj.native);
+            });
+
+            //resolve(info);
+        });
+    }
 
     // the function loadSettings has to exist ...
-    function load(settings, onChange) {
-        if (settings.port === undefined) settings.port = 8080;
+    async function load(settings, onChange) {
+        //if (settings.port === undefined) settings.port = 8080;
+
+        let info;
+        await getGatewayInfo()
+        .then(async results => {
+            info = results;
+        });
 
 
         if (!settings) return;
@@ -173,6 +199,7 @@
                 });
             }
         });
+
 
         $('#dialog-bridges').modal({
             autoOpen: false,
@@ -282,7 +309,7 @@
             });
         });
 
-        if (settings.user) {
+        if (info.user) {
             $('#create').addClass('disabled');
         } else {
             $('#deleteAPIkey').addClass('disabled');
@@ -315,12 +342,17 @@
         $('#bridge').focusout(function(){$('.btn-save').trigger('click')});
         $('#port').focusout(function(){$('.btn-save').trigger('click')});
 
+
+        $('#sw_version').text('deConz Version: ' + info.swversion);
+        $('#api_version').text('API Version: ' + info.apiversion);
+        $('#bridge').val(info.ipaddress);
+        $('#port').val(info.port);
+        $('#user').val(info.user);
+        $('#permit').val(info.networkopenduration);
+        counter = info.networkopenduration;
+
         onChange(false);
         M.updateTextFields();
-
-        $('#sw_version').text('deConz Version: ' + settings.sw_version);
-        $('#api_version').text('API Version: ' + settings.api_version);
-        counter = settings.permit;
     }
 
     function countdown(){
@@ -340,6 +372,7 @@
     }
 
     function save(callback) {
+        sendTo('deconz.' + instance, 'saveConfig', {'ipaddress': $('#bridge').val(), 'port': $('#port').val(), 'networkopenduration': $('#permit').val(), 'user': $('#user').val()}, (result) => {});
         var obj = {};
         $('.value').each(function () {
             var $this = $(this);
@@ -350,6 +383,8 @@
             }
         });
         callback(obj);
+
+
     }
 
 
