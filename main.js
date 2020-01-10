@@ -419,7 +419,6 @@ async function main() {
             if(results.native.ipaddress === undefined){
                 autoDiscovery();
             }else{
-                adapter.log.info(JSON.stringify(results));
                 if(results.native.user === '' || results.native.user === null){
                     adapter.log.warn('No API Key found');
                 }else {
@@ -1846,27 +1845,30 @@ function nameFilter(name){
 }
 
 function UTCtoLocal(timeString){
-    adapter.log.debug(timeString);
-    let jsT = Date.parse(timeString + 'Z');
+    if(timeString !== 'none' && timeString !== null && timeString !== undefined) {
+        let jsT = Date.parse(timeString + 'Z');
 
-    let d = new Date();
-    let n = d.getTimezoneOffset();
+        let d = new Date();
+        let n = d.getTimezoneOffset();
 
-    let local;
+        let local;
 
-    if(Math.sign(n) === -1){
-        n = Math.abs(n);
-        let offset = (n*60)*1000;
+        if (Math.sign(n) === -1) {
+            n = Math.abs(n);
+            let offset = (n * 60) * 1000;
 
-        local = jsT + offset;
+            local = jsT + offset;
+        } else {
+            let offset = (n * 60) * 1000;
+
+            local = jsT - offset;
+        }
+
+        let lTime = (new Date(local)).toISOString();
+        return lTime;
     }else{
-        let offset = (n*60)*1000;
-
-        local = jsT - offset;
+        return timeString;
     }
-
-    let lTime = (new Date(local)).toISOString();
-    return lTime;
 }
 
 async function getObjectByDeviceId(id, type){

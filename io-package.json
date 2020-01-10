@@ -3,17 +3,17 @@
         "name": "deconz",
         "version": "1.2.2",
         "news": {
-            "1.2.1": {
-                "en": "adapter configuration handling rewritten",
-                "de": "Adapterkonfigurationsbehandlung umgeschrieben",
-                "ru": "переписана обработка конфигурации адаптера",
-                "pt": "manipulação de configuração do adaptador reescrita",
-                "nl": "adapterconfiguratie herschreven",
-                "fr": "gestion de la configuration de l'adaptateur réécrite",
-                "it": "gestione della configurazione dell'adattatore riscritta",
-                "es": "manejo de la configuración del adaptador reescrito",
-                "pl": "przepisana obsługa konfiguracji adaptera",
-                "zh-cn": "适配器配置处理被重写"
+            "1.2.2": {
+                "en": "adapter configuration handling rewritten\nfix lastupdated UTC to locale time",
+                "de": "Adapterkonfigurationsbehandlung umgeschrieben\nKorrigiert die zuletzt aktualisierte UTC auf die Ortszeit",
+                "ru": "переписана обработка конфигурации адаптера\nисправить последнее обновление UTC по местному времени",
+                "pt": "manipulação de configuração do adaptador reescrita\ncorrigir lastupdated UTC para a hora local",
+                "nl": "adapterconfiguratie herschreven\nlaatste bijgewerkte UTC naar locale tijd repareren",
+                "fr": "gestion de la configuration de l'adaptateur réécrite\ncorrection de la dernière mise à jour UTC à l'heure locale",
+                "it": "gestione della configurazione dell'adattatore riscritta\ncorreggi l'ultimo UTC aggiornato all'ora della locale",
+                "es": "manejo de la configuración del adaptador reescrito\narreglar el último UTC actualizado a la hora local",
+                "pl": "przepisana obsługa konfiguracji adaptera\nnapraw ostatnią aktualizację UTC do czasu lokalnego",
+                "zh-cn": "适配器配置处理被重写\n将最近更新的UTC修复为语言环境时间"
             },
             "1.2.1": {
                 "en": "convert lastupdated time to locale\nobject creation refactored\nfix adapter config update\nadd auto detect deConz\ninclude ssdp discovery to repo",

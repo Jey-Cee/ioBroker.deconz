@@ -32,6 +32,7 @@ Required node.js >= 8.x.x
 
 ### 1.2.2
 * adapter configuration handling rewritten
+* fix lastupdated UTC to locale time
 
 ### 1.2.1
 * convert lastupdated time to locale
