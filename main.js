@@ -307,7 +307,7 @@ function startAdapter(options) {
                     });
                 }
             });
-        } else if(dp === 'offset' || dp === 'sensitivity' || dp === 'usertest' || dp === 'ledindication' || dp === 'duration' || dp === 'delay' || dp === 'locked' || dp === 'boost' || dp === 'off' || dp === 'on' || === 'mode') {
+        } else if(dp === 'offset' || dp === 'sensitivity' || dp === 'usertest' || dp === 'ledindication' || dp === 'duration' || dp === 'delay' || dp === 'locked' || dp === 'boost' || dp === 'off' || dp === 'on' || dp === 'mode') {
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function (err, obj) {
                 let controlId = obj.native.id;
                 let parameters = `{ "${dp}": "${state.val}" }`;
