@@ -307,7 +307,7 @@ function startAdapter(options) {
                     });
                 }
             });
-        } else if(dp === 'offset' || dp === 'sensitivity' || dp === 'usertest' || dp === 'ledindication' || dp === 'duration' || dp === 'delay' || dp === 'locked' || dp === 'boost' || dp === 'off' || dp === 'on') {
+        } else if(dp === 'offset' || dp === 'sensitivity' || dp === 'usertest' || dp === 'ledindication' || dp === 'duration' || dp === 'delay' || dp === 'locked' || dp === 'boost' || dp === 'off' || dp === 'on' || === 'mode') {
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function (err, obj) {
                 let controlId = obj.native.id;
                 let parameters = `{ "${dp}": "${state.val}" }`;
@@ -316,7 +316,14 @@ function startAdapter(options) {
         }else if(dp === 'heatsetpoint'){
             adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
                 let controlId = obj.native.id;
-                let val = state.val/100;
+                let val = Math.floor(state.val * 100);
+                let parameters = `{ "${dp}": "${val}" }`;
+                setSensorParameters(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.' + dp)
+            });
+        }else if(dp === 'temperature'){
+            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+                let controlId = obj.native.id;
+                let val = Math.floor(state.val * 100);
                 let parameters = `{ "${dp}": "${val}" }`;
                 setSensorParameters(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.' + dp)
             });
@@ -1940,6 +1947,11 @@ function setObjectAndState(id, name, type, stateName, value){
             objRole = 'sensor.alarm';
             objWrite = false;
             break;
+        case 'displayflipped':
+            objType = 'boolean';
+            objRole = 'indicator';
+            objWrite = false;
+            break;
         case 'fire':
             objType = 'boolean';
             objRole = 'sensor.alarm.fire';
@@ -2107,10 +2119,6 @@ function setObjectAndState(id, name, type, stateName, value){
             objWrite = false;
             objUnit = 'Lux';
             break;
-        case 'mode':
-            objType = 'number';
-            objRole = 'state';
-            break;
         case 'offset':
             objType = 'number';
             objRole = 'state';
@@ -2186,6 +2194,12 @@ function setObjectAndState(id, name, type, stateName, value){
             objWrite = false;
             objDefault = 0;
             break;
+        case 'valve':
+            objType = 'number';
+            objRole = 'value.valve';
+            objWrite = false;
+            objDefault = 0;
+            break;
         case 'voltage':
             objType = 'number';
             objRole = 'value.voltage';
@@ -2220,6 +2234,10 @@ function setObjectAndState(id, name, type, stateName, value){
             objType = 'string';
             objRole = 'value.datetime';
             objWrite = false;
+            break;
+        case 'mode':
+            objType = 'string';
+            objRole = 'state';
             break;
         case 'scheduler':
             objType = 'string';
