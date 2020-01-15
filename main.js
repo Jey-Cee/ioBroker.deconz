@@ -12,7 +12,7 @@ let hue_factor = 182.041666667;
 let ws = null;
 let alive_ts = 0;
 
-function startAdapter(options) {
+async function startAdapter(options) {
     options = options || {};
     Object.assign(options, {
         name: 'deconz',
@@ -23,12 +23,13 @@ function startAdapter(options) {
 
     if (!id || !state || state.ack) {
         if(dp === 'alive'){
-
             if(state === null){
+                adapter.log.info('alive state null');
                 adapter.setState(id, {val: false, ack: true});
                 if(ws !== null){
+                    adapter.log.info('ws nicht null');
                     ws.terminate();
-                    adapter.setState('info.connected', {val: false, ack: true});
+                    adapter.setState('info.connection', {val: false, ack: true});
                 }
             }else if(state.val === true){
                 if(state.lc !== alive_ts){
@@ -46,7 +47,7 @@ function startAdapter(options) {
 
     adapter.log.debug('dp: ' + dp + '; id:' + id);
 
-    adapter.getState(adapter.name + '.' + adapter.instance + '.' + id + '.transitiontime', function (err, ttime){
+    adapter.getState(adapter.name + '.' + adapter.instance + '.' + id + '.transitiontime', async function (err, ttime){
         if(err){
             ttime = 'none';
         }else if(ttime === null) {
@@ -327,6 +328,16 @@ function startAdapter(options) {
                 let parameters = `{ "${dp}": "${val}" }`;
                 setSensorParameters(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.' + dp)
             });
+        }else if(dp === 'network_open'){
+            let opentime;
+            await adapter.getObjectAsync('Gateway_info')
+                .then(async results =>{
+                    opentime = results.native.networkopenduration;
+                }, reject=>{
+                    adapter.log.error(JSON.stringify(reject));
+                });
+            let parameters = `{"permitjoin": ${opentime}}`;
+            await modifyConfig(parameters);
         }
     })
 },
@@ -359,9 +370,11 @@ function startAdapter(options) {
                 break;
             case 'openNetwork':
                 let opentime;
-                await adapter.getObject('Gateway_info')
+                await adapter.getObjectAsync('Gateway_info')
                     .then(async results =>{
                         opentime = results.native.networkopenduration;
+                    }, reject=>{
+                        adapter.log.error(JSON.stringify(reject));
                     });
                 let parameters = `{"permitjoin": ${opentime}}`;
                 modifyConfig(parameters);
@@ -392,10 +405,8 @@ function startAdapter(options) {
                 wait = true;
                 break;
            case 'saveConfig':
-               adapter.log.info('save Config');
                adapter.extendObject('Gateway_info', {
                    native: obj.message
-
                });
                break;
             default:
@@ -421,6 +432,7 @@ function startAdapter(options) {
 
 async function main() {
     adapter.subscribeStates('*');
+    heartbeat();
     await adapter.getObjectAsync('Gateway_info')
         .then(async results=>{
             if(results.native.ipaddress === undefined){
@@ -435,6 +447,8 @@ async function main() {
         }), (reject =>{
         adapter.log.error(JSON.stringify(reject));
     });
+
+
 
     setTimeout(function(){
         getAutoUpdates();
@@ -492,7 +506,7 @@ function heartbeat(){
         if(msg.headers.nt === 'urn:schemas-upnp-org:device:basic:1') {
             if(msg.headers['gwid.phoscon.de']){
                 let time = parseInt(msg.headers['cache-control'].replace('max-age=', ''));
-                adapter.setState('Gateway_info.alive', {val: true, ack: true, expire: time + 10000});
+                adapter.setState('Gateway_info.alive', {val: true, ack: true, expire: time});
                 adapter.log.debug('NOTIFY ' + JSON.stringify(msg))
             }
 
@@ -594,7 +608,6 @@ async function deleteAPIkey(){
 const WebSocket = require('ws');
 
 async function getAutoUpdates() {
-    heartbeat();
 
     let host, port, user;
     await adapter.getObjectAsync('Gateway_info')
@@ -736,6 +749,7 @@ async function modifyConfig(parameters){
                 switch (JSON.stringify(response[0]['success'])) {
                     case  `{"/config/permitjoin":${ot}}`:
                         adapter.log.info(`Network is now open for ${ot} seconds to register new devices.`);
+                        adapter.setState('Gateway_info.network_open', {ack: true, expire: ot});
                         break;
                 }
             }else if(response[0]['error']){

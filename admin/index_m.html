@@ -39,7 +39,7 @@
 
     function showDevice(obj, isFirst) {
         var text = '';
-        if(obj.common.role != 'gateway' && obj.common.role != 'group') {
+        if(obj.common.role != 'gateway' && obj.common.role != 'group' && obj.common.role !== undefined && obj.common.role !== 'scene') {
             text += '<td>' + obj.common.name + '</td>';
             text += '<td>' + obj.native.id + '</td>';
             text += '<td>' + obj.native.manufacturername + '</td>';
@@ -58,29 +58,34 @@
             /*$('#' + obj.native.id + obj.common.role).change({id : obj.native.id}, onSelect);
         $('#' + obj.native.id + obj.common.role).select();*/
             $('#' + obj.native.id + obj.common.role).click(function(){
-                if(obj.common.role === 'sensor') {
-                    sendTo('deconz.' + instance, 'deleteSensor', obj.native.id);
-                    //$('#user.value').val('').trigger('change');
-                }else if(obj.common.role === 'light'){
-                    sendTo('deconz.' + instance, 'deleteLight', obj.native.id);
-                }
 
-                $("#devices > tr").remove();
+                    if (obj.common.role === 'sensor') {
+                        sendTo('deconz.' + instance, 'deleteSensor', obj.native.id);
+                        //$('#user.value').val('').trigger('change');
+                    } else if (obj.common.role === 'light') {
+                        sendTo('deconz.' + instance, 'deleteLight', obj.native.id);
+                    }
+
+                    $("#devices > tr").remove();
                     // populate the list of known devices
-                setTimeout(function(){
-                    socket.emit('getObjectView', 'system', 'device', { startkey: 'deconz.' + instance + '.', endkey: 'deconz.' + instance + '.\u9999', include_docs: true }, function (err, _devices) {
-                        socket.emit('getStates', function (err, _values) {
-                            var namespace = 'deconz.' + instance + '.';
-                            var len = namespace.length;
-                            if (_devices && _devices.rows && _devices.rows.length) {
-                                for (var j = 0; j < _devices.rows.length; j++) {
-                                    devices[_devices.rows[j].value._id] = _devices.rows[j].value;
-                                    showDevice(_devices.rows[j].value, true);
+                    setTimeout(function () {
+                        socket.emit('getObjectView', 'system', 'device', {
+                            startkey: 'deconz.' + instance + '.',
+                            endkey: 'deconz.' + instance + '.\u9999',
+                            include_docs: true
+                        }, function (err, _devices) {
+                            socket.emit('getStates', function (err, _values) {
+                                var namespace = 'deconz.' + instance + '.';
+                                var len = namespace.length;
+                                if (_devices && _devices.rows && _devices.rows.length) {
+                                    for (var j = 0; j < _devices.rows.length; j++) {
+                                        devices[_devices.rows[j].value._id] = _devices.rows[j].value;
+                                        showDevice(_devices.rows[j].value, true);
+                                    }
                                 }
-                            }
+                            });
                         });
-                    });
-                }, 1000);
+                    }, 1000);
             });
         }
     }
@@ -363,7 +368,7 @@
                 countdown();
             }, 1000);
             $('#opennetwork').html(_('Open for %s seconds', counter));
-        }else if(i === 0){
+        }else if(counter === 0){
             $('#opennetwork').html('Open Network');
             $('#opennetwork').removeClass('disabled');
             counter = $('permit').val();
@@ -500,10 +505,12 @@
                             <span class="translate tooltiped" data-position="bottom" data-delay="50" data-tooltip="I am a tooltip" data-lang="Open Network">Open Network</span>
                         </a>
                     </div>
+                    <!--
                     <div class="input-field col s1 m1">
                         <input class="value number" id="permit" size="10" maxlength="10" type="number">
                         <label class="translate active" for="permit" data-lang="Duration">Duration</label>
                     </div>
+                    -->
                 </div>
 
             <div class="table-values-div">

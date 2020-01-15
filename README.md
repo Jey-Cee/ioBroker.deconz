@@ -30,6 +30,12 @@ Required node.js >= 8.x.x
 
 ## Changelog
 
+### 1.2.3
+* fix expire time for alive 
+* add object for open zigbee network to add new devices without admin config
+* removed input for opne network time
+* fix device list in admin config
+
 ### 1.2.2
 * adapter configuration handling rewritten
 * fix lastupdated UTC to locale time

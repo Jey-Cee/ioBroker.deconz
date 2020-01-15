@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "deconz",
-        "version": "1.2.2",
+        "version": "1.2.3",
         "news": {
+            "1.2.3": {
+                "en": "fix expire time for alive \nadd object for open zigbee network to add new devices without admin config\nremoved input for opne network time\nfix device list in admin config",
+                "de": "Verfallszeit für lebendig festlegen\nObjekt für offenes ZigBee-Netzwerk hinzufügen, um neue Geräte ohne Admin-Konfiguration hinzuzufügen\nDie Eingabe für die Netzwerkzeit wurde entfernt\nGeräteliste in Admin-Konfiguration korrigieren",
+                "ru": "исправить время истечения для живых\nдобавить объект для открытой сети zigbee, чтобы добавить новые устройства без конфигурации администратора\nудален вход для времени сети opne\nисправить список устройств в конфигурации администратора",
+                "pt": "corrigir expirar tempo para vivo\nadicionar objeto para a rede zigbee aberta para adicionar novos dispositivos sem a configuração de administrador\nentrada removida por um tempo de rede opcional\ncorrigir lista de dispositivos na configuração do administrador",
+                "nl": "fix verlopen tijd voor levend\nobject toevoegen voor open zigbee-netwerk om nieuwe apparaten toe te voegen zonder admin-configuratie\ninvoer verwijderd voor opne-netwerktijd\nlijst met apparaten in admin config repareren",
+                "fr": "fixer le temps d'expiration pour vivant\najouter un objet pour un réseau zigbee ouvert pour ajouter de nouveaux appareils sans configuration administrateur\nentrée supprimée pour le temps de réseau opne\ncorrection de la liste des périphériques dans la configuration d'administration",
+                "it": "correggere il tempo di scadenza per vivo\naggiungi oggetto per rete a zigbee aperta per aggiungere nuovi dispositivi senza la configurazione dell'amministratore\ninput rimosso per tempo di rete opne\nrisolve l'elenco dei dispositivi nella configurazione dell'amministratore",
+                "es": "fijar el tiempo de caducidad para vivo\nAgregar objeto para abrir la red zigbee para agregar nuevos dispositivos sin configuración de administrador\nentrada eliminada para el tiempo de red opne\narreglar la lista de dispositivos en la configuración de administración",
+                "pl": "napraw czas wygaśnięcia żywych\ndodaj obiekt do otwartej sieci Zigbee, aby dodać nowe urządzenia bez konfiguracji administratora\nusunięto dane wejściowe dla czasu pracy sieci\nnapraw listę urządzeń w konfiguracji administratora",
+                "zh-cn": "修复生存时间\n为开放的zigbee网络添加对象，无需管理员配置即可添加新设备\n删除了用于网络时间的输入\n修复管理员配置中的设备列表"
+            },
             "1.2.2": {
                 "en": "adapter configuration handling rewritten\nfix lastupdated UTC to locale time",
                 "de": "Adapterkonfigurationsbehandlung umgeschrieben\nKorrigiert die zuletzt aktualisierte UTC auf die Ortszeit",
@@ -14,30 +26,6 @@
                 "es": "manejo de la configuración del adaptador reescrito\narreglar el último UTC actualizado a la hora local",
                 "pl": "przepisana obsługa konfiguracji adaptera\nnapraw ostatnią aktualizację UTC do czasu lokalnego",
                 "zh-cn": "适配器配置处理被重写\n将最近更新的UTC修复为语言环境时间"
-            },
-            "1.2.1": {
-                "en": "convert lastupdated time to locale\nobject creation refactored\nfix adapter config update\nadd auto detect deConz\ninclude ssdp discovery to repo",
-                "de": "Konvertieren Sie die zuletzt aktualisierte Zeit in das Gebietsschema\nObjekterstellung überarbeitet\nUpdate der Adapterkonfiguration\nfüge auto detect deConz hinzu\nssdp discovery in repo einbinden",
-                "ru": "конвертировать время последнего обновления в локаль\nрефакторинг создания объекта\nисправить обновление конфигурации адаптера\nдобавить автоопределение deConz\nвключить открытие ssdp для репо",
-                "pt": "converter lastupdated time para localidade\ncriação de objeto refatorada\ncorrigir atualização de configuração do adaptador\nadicionar detecção automática deConz\nincluir descoberta ssdp para repo",
-                "nl": "converteer laatst bijgewerkte tijd naar locale\ncreatie van objecten gewijzigd\nfix adapter configuratie-update\nvoeg automatisch detecteren deConz toe\nssdp-detectie opnemen in repo",
-                "fr": "convertir l'heure mise à jour en paramètres régionaux\ncréation d'objets refactorisée\ncorrection de la mise à jour de la configuration de l'adaptateur\najouter la détection automatique deConz\ninclure la découverte ssdp à repo",
-                "it": "converti il tempo ultimo aggiornamento in locale\ncreazione oggetto refactored\naggiorna l'aggiornamento di configurazione dell'adattatore\naggiungi rilevamento automatico deConz\ninclude il rilevamento ssdp al repository",
-                "es": "convertir la última hora actualizada a la configuración regional\ncreación de objetos refactorizada\narreglar la actualización de la configuración del adaptador\nagregar detección automática deConz\nincluir descubrimiento de ssdp para repositorio",
-                "pl": "konwertuj czas ostatniej aktualizacji do ustawień regionalnych\nrefaktoryzacja tworzenia obiektu\nnapraw aktualizację konfiguracji adaptera\ndodaj automatyczne wykrywanie deConz\ndołącz wykrywanie ssdp do repozytorium",
-                "zh-cn": "将上次更新时间转换为语言环境\n重构对象创建\n修复适配器配置更新\n添加自动检测deConz\n包括ssdp发现以回购"
-            },
-            "1.2.0": {
-                "en": "fix adapter crash when deConz is not reachable\nshow connection state as adapter state\nadd auto reconnect to deconz\nadd new objects for thermostat support and others",
-                "de": "Adapterabsturz behoben, wenn deConz nicht erreichbar ist\nVerbindungsstatus als Adapterstatus anzeigen\nAuto Reconnect zu Deconz hinzufügen\nFügen Sie neue Objekte für die Thermostatunterstützung und andere hinzu",
-                "ru": "исправить сбой адаптера, когда deConz недоступен\nпоказать состояние соединения как состояние адаптера\nдобавить автоматическое переподключение к deconz\nдобавить новые объекты для поддержки термостата и другие",
-                "pt": "corrigir falha do adaptador quando o deConz não está acessível\nmostre o estado da conexão como estado do adaptador\nadicione a reconexão automática ao deconz\nadicione novos objetos para suporte ao termostato e outros",
-                "nl": "herstel de crash van de adapter wanneer deConz niet bereikbaar is\nverbindingsstatus weergeven als adapterstatus\nvoeg automatisch opnieuw verbinden toe aan deconz\nvoeg nieuwe objecten toe voor thermostaatondersteuning en andere",
-                "fr": "correction du plantage de l'adaptateur lorsque deConz n'est pas accessible\nafficher l'état de la connexion comme état de l'adaptateur\najouter la reconnexion automatique à deconz\najouter de nouveaux objets pour le support du thermostat et autres",
-                "it": "risolve il crash dell'adattatore quando deConz non è raggiungibile\nmostra lo stato della connessione come stato dell'adattatore\naggiungi la riconnessione automatica a deconz\naggiungere nuovi oggetti per il supporto del termostato e altri",
-                "es": "arregla el bloqueo del adaptador cuando no se puede acceder a deConz\nmuestra el estado de conexión como estado del adaptador\nagregar reconexión automática a deconz\nagregar nuevos objetos para el soporte del termostato y otros",
-                "pl": "napraw awarię adaptera, gdy deConz jest nieosiągalny\npokaż stan połączenia jako stan adaptera\ndodaj automatyczne ponowne połączenie z deconz\ndodaj nowe obiekty do obsługi termostatu i inne",
-                "zh-cn": "修复无法访问deConz时的适配器崩溃\n将连接状态显示为适配器状态\n添加自动重新连接到deconz\n添加新的对象以支持恒温器及其他"
             },
             "1.1.3": {
                 "en": "Changed default port to 80",
@@ -110,18 +98,6 @@
                 "es": "arreglo conjunto bri para grupos\n",
                 "pl": "popraw zestaw bri dla grup\n",
                 "zh-cn": "修复群组bri\n"
-            },
-            "0.4.0": {
-                "en": "Fix for hue change; Added support for dimming lights and groups; Added support for custom actions;",
-                "de": "Fix für Farbtonänderung; Unterstützung für das Dimmen von Licht und Gruppen hinzugefügt; Unterstützung für benutzerdefinierte Aktionen hinzugefügt;",
-                "ru": "Исправлена ​​смена оттенка; Добавлена ​​поддержка диммирования огней и групп; Добавлена ​​поддержка пользовательских действий;",
-                "pt": "Correção para alteração de matiz; Adicionado suporte para escurecimento de luzes e grupos; Adicionado suporte para ações personalizadas;",
-                "nl": "Oplossing voor tintverandering; Ondersteuning toegevoegd voor het dimmen van lichten en groepen; Ondersteuning voor aangepaste acties toegevoegd;",
-                "fr": "Correction du changement de teinte; Ajout du support pour atténuer les lumières et les groupes; Ajout du support pour les actions personnalisées;",
-                "it": "Correzione per il cambiamento di tonalità; Aggiunto supporto per luci soffuse e gruppi; Aggiunto supporto per azioni personalizzate;",
-                "es": "Corrección para el cambio de tono; Añadido soporte para atenuar luces y grupos; Añadido soporte para acciones personalizadas;",
-                "pl": "Napraw dla zmiany barwy; Dodano obsługę ściemniania świateł i grup; Dodano obsługę niestandardowych działań;",
-                "zh-cn": "修复色调变化;增加了对调光灯和组的支持;添加了对自定义操作的支持"
             }
         },
         "title": "deConz ZigBee",
