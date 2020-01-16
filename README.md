@@ -26,7 +26,9 @@ You must first link to deConz.
 
 ### No Support for Beta Versions of deConz
 
-Required node.js >= 8.x.x
+### Required js-controller version >2.x.x
+
+Required node.js >= 10.x.x
 
 ## Changelog
 

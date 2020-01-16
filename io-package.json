@@ -132,6 +132,11 @@
         "compact": true,
         "messagebox": true,
         "enabled": true,
+        "dependencies": [
+            {
+                "js-controller": ">=2.0.0"
+            }
+        ],
         "readme": "https://github.com/iobroker-community-adapters/ioBroker.deconz/blob/master/README.md",
         "loglevel": "info",
         "keywords": [
