@@ -30,6 +30,8 @@ You must first link to deConz.
 
 Required node.js >= 10.x.x
 
+## [Sponsors](https://github.com/iobroker-community-adapters/ioBroker.deconz/blob/master/SPONSORS.MD)
+
 ## Changelog
 
 ### 1.2.3
