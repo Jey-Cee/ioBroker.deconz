@@ -211,7 +211,7 @@ async function startAdapter(options) {
                     }
                     let speed = dp === 'dimup' ? dimspeed.val : dimspeed.val * -1;
                     let controlId = obj.native.id;
-                    let parameters = `{ "bri_inc": ${speed} }`;
+                    let parameters = '{ "transitiontime": ' + JSON.stringify(ttime) + `, "bri_inc": ${speed} }`;
                     switch(obj.common.role){
                         case 'group':
                             setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri');
