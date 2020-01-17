@@ -1,7 +1,8 @@
 # Sponsors
 
-This list contains persons who support this adapter.
-Thank you
+This list contains persons who support this adapter. If you want to support also you can send a donation via PayPal to jey-ce@live.com.
+
+Thank you to ...
 
 ### 2020
 
