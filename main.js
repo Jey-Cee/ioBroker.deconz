@@ -798,7 +798,6 @@ async function getConfig(){
                         dhcp: gateway['dhcp'],
                         factorynew: gateway['factorynew'],
                         gateway: gateway['gateway'],
-                        ipaddress: gateway['ipaddress'],
                         linkbutton: gateway['linkbutton'],
                         mac: gateway['mac'],
                         modelid: gateway['modelid'],
