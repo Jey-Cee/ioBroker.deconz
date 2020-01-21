@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "deconz",
-        "version": "1.2.3",
+        "version": "1.2.4",
         "news": {
+            "1.2.4": {
+                "en": "dynamicly add boolean states for button events\nadded new object definitions\nremove ip overwrite\nadd transitiontime for bri_inc (dim step)",
+                "de": "Fügen Sie dynamisch Boolesche Zustände für Schaltflächenereignisse hinzu\nneue Objektdefinitionen hinzugefügt\nIP-Überschreibung entfernen\nÜbergangszeit für bri_inc hinzufügen (dim step)",
+                "ru": "динамически добавлять логические состояния для событий кнопок\nдобавлены новые определения объектов\nудалить перезапись ip\nдобавить время перехода для bri_inc (тусклый шаг)",
+                "pt": "adicionar dinamicamente estados booleanos para eventos de botão\nadicionadas novas definições de objetos\nremover a substituição do ip\nadicionar tempo de transição para bri_inc (dim step)",
+                "nl": "voeg dynamisch booleaanse statussen toe voor knopgebeurtenissen\nnieuwe objectdefinities toegevoegd\nverwijder ip overschrijven\novergangstijd toevoegen voor bri_inc (dimstap)",
+                "fr": "ajouter dynamiquement des états booléens pour les événements de bouton\najout de nouvelles définitions d'objets\nsupprimer l'IP écraser\najouter un temps de transition pour bri_inc (dim dim)",
+                "it": "aggiungere dinamicamente stati booleani per eventi pulsante\naggiunte nuove definizioni di oggetti\nrimuovere la sovrascrittura ip\naggiungi tempo di transizione per bri_inc (dim step)",
+                "es": "Agregue dinámicamente estados booleanos para eventos de botón\nse agregaron nuevas definiciones de objeto\neliminar ip sobrescribir\nagregar tiempo de transición para bri_inc (paso tenue)",
+                "pl": "dynamicznie dodawaj stany logiczne dla zdarzeń przycisków\ndodano nowe definicje obiektów\nusuń ip overwrite\ndodaj czas przejścia dla bri_inc (dim step)",
+                "zh-cn": "为按钮事件动态添加布尔状态\n添加了新的对象定义\n删除ip覆盖\n为bri_inc添加过渡时间（暗淡步骤）"
+            },
             "1.2.3": {
                 "en": "fix expire time for alive \nadd object for open zigbee network to add new devices without admin config\nremoved input for opne network time\nfix device list in admin config",
                 "de": "Verfallszeit für lebendig festlegen\nObjekt für offenes ZigBee-Netzwerk hinzufügen, um neue Geräte ohne Admin-Konfiguration hinzuzufügen\nDie Eingabe für die Netzwerkzeit wurde entfernt\nGeräteliste in Admin-Konfiguration korrigieren",

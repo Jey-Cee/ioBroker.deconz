@@ -32,6 +32,13 @@ Required node.js >= 10.x.x
 
 ## Changelog
 
+### 1.2.4
+* dynamicly add boolean states for button events
+* added new object definitions
+* (mobilutz) remove ip overwrite
+* (njeisecke) add transitiontime for bri_inc (dim step)
+
+
 ### 1.2.3
 * fix expire time for alive 
 * add object for open zigbee network to add new devices without admin config

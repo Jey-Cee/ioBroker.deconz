@@ -24,10 +24,8 @@ async function startAdapter(options) {
     if (!id || !state || state.ack) {
         if(dp === 'alive'){
             if(state === null){
-                adapter.log.info('alive state null');
                 adapter.setState(id, {val: false, ack: true});
                 if(ws !== null){
-                    adapter.log.info('ws nicht null');
                     ws.terminate();
                     adapter.setState('info.connection', {val: false, ack: true});
                 }
@@ -211,7 +209,12 @@ async function startAdapter(options) {
                     }
                     let speed = dp === 'dimup' ? dimspeed.val : dimspeed.val * -1;
                     let controlId = obj.native.id;
-                    let parameters = `{ "bri_inc": ${speed} }`;
+                    let parameters;
+                    if(ttime !== 'none'){
+                        parameters = `{ "transitiontime": ${JSON.stringify(ttime)} , "bri_inc": ${speed} }`;
+                    } else {
+                        parameters = `{ "bri_inc": ${speed} }`;
+                    }
                     switch(obj.common.role){
                         case 'group':
                             setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri');
@@ -540,7 +543,7 @@ function createAPIkey(host, credentials, callback){
             'Content-Length': Buffer.byteLength('{"devicetype": "ioBroker"}')
         }
     };
-    adapter.log.info(host + ' auth: ' + auth);
+    adapter.log.debug(host + ' auth: ' + auth);
     try{
         let req = request(options, function (error, res, body){
             if(!error){
@@ -783,7 +786,7 @@ async function getConfig(){
                 adapter.log.error('Could not connect to deConz/Phoscon. ' + error);
         }else if(res.statusCode === 200) {
                 let gateway = JSON.parse(body);
-                adapter.log.debug('API version: ' + gateway['apiversion']);
+                adapter.log.info('deConz Version: ' + gateway['swversion'] + '; API version: ' + gateway['apiversion']);
                 adapter.extendObject('Gateway_info', {
                     type: 'device',
                     common: {
@@ -798,7 +801,7 @@ async function getConfig(){
                         dhcp: gateway['dhcp'],
                         factorynew: gateway['factorynew'],
                         gateway: gateway['gateway'],
-                        ipaddress: gateway['ipaddress'],
+                        //ipaddress: gateway['ipaddress'],
                         linkbutton: gateway['linkbutton'],
                         mac: gateway['mac'],
                         modelid: gateway['modelid'],
@@ -953,6 +956,7 @@ async function getGroupAttributes(groupId) {
                     }
 
                     let count3 = Object.keys(list['state']).length - 1;
+
                     //create states for light device
                     for (let z = 0; z <= count3; z++) {
                         let stateName = Object.keys(list['state'])[z];
@@ -1260,7 +1264,10 @@ async function deleteGroup(groupId){
                         let name = enums[keyName]._id;
 
                         adapter.deleteDevice(name, function(err){
-                            adapter.log.info(err);
+                            if(err){
+                                adapter.log.warn(err);
+                            }
+
                         });
                     }
 
@@ -1516,7 +1523,10 @@ async function deleteSensor(sensorId){
                             let name = enums[keyName]._id;
 
                             adapter.deleteDevice(name, function(err){
-                                adapter.log.info(err);
+                                if(err){
+                                    adapter.log.warn(err);
+                                }
+
                             });
                         }
 
@@ -1892,6 +1902,84 @@ function UTCtoLocal(timeString){
     }
 }
 
+async function buttonevents(id, event){
+    let button = event.toString().substr(0, 1);
+    let type = event.toString().substr(1, 3);
+    await adapter.setObjectNotExistsAsync(`${id}.${button}`, {
+        type: 'channel',
+        common: {
+            name: 'Button ' + button
+        },
+        native: {}
+    });
+
+    let common = {
+        type: 'boolean',
+        role: 'button',
+        read: true,
+        write: false,
+        def: false
+    };
+    let state;
+    switch(type){
+        case '000':
+            common.name = 'Press';
+            state = 'press';
+            break;
+        case '001':
+            common.name = 'Hold';
+            state = 'hold';
+            break;
+        case '002':
+            common.name = 'Release after press';
+            state = 'release_press';
+            break;
+        case '003':
+            common.name = 'Release after hold';
+            state = 'release_hold';
+            break;
+        case '004':
+            common.name = 'Double press';
+            state = 'double_press';
+            break;
+        case '005':
+            common.name = 'Triple press';
+            state = 'triple_press';
+            break;
+        case '006':
+            common.name = 'Quadruple press';
+            state = 'quadruple_press';
+            break;
+        case '007':
+            common.name = 'Shake';
+            state = 'shake';
+            break;
+        case '008':
+            common.name = 'Drop';
+            state = 'drop';
+            break;
+        case '009':
+            common.name = 'Tilt';
+            state = 'tilt';
+            break;
+        case '010':
+            common.name = 'Many press';
+            state = 'many_press';
+            break;
+    }
+    await adapter.setObjectNotExistsAsync(`${id}.${button}.${state}`, {
+        type: 'state',
+        common: common,
+        native: {}
+    });
+
+    adapter.setState(`${id}.${button}.${state}`, {
+        val: true,
+        ack: true
+    });
+
+}
+
 async function getObjectByDeviceId(id, type){
     /*
     type = Groups, Lights, Sensors
@@ -1924,6 +2012,7 @@ function setObjectAndState(id, name, type, stateName, value){
     let objMax = null;
     let objUnit = null;
     let objDefault = null;
+
 
     switch(stateName){
         case 'orientation':
@@ -1959,6 +2048,11 @@ function setObjectAndState(id, name, type, stateName, value){
         case 'carbonmonoxide':
             objType = 'boolean';
             objRole = 'sensor.alarm';
+            objWrite = false;
+            break;
+        case 'configured':
+            objType = 'boolean';
+            objRole = 'indicator';
             objWrite = false;
             break;
         case 'displayflipped':
@@ -2045,6 +2139,7 @@ function setObjectAndState(id, name, type, stateName, value){
             objType = 'number';
             objRole = 'state';
             objWrite = false;
+            buttonevents(`${type}.${id}.buttonevent`, value);
             break;
         case 'colorspeed':
             objType = 'number';
@@ -2182,6 +2277,14 @@ function setObjectAndState(id, name, type, stateName, value){
             objWrite = false;
             objDefault = 0;
             break;
+        case 'sunriseoffset':
+            objType = 'number';
+            objRole = 'state';
+            break;
+        case 'sunsetoffset':
+            objType = 'number';
+            objRole = 'state';
+            break;
         case 'temperature':
             objType = 'number';
             objRole = 'value.temperature';
@@ -2190,6 +2293,17 @@ function setObjectAndState(id, name, type, stateName, value){
             objUnit = '°C';
             value = value / 100;
             break;
+        case 'tholddark':
+            objType = 'number';
+            objRole = 'value';
+            objDefault = 0;
+            objWrite = false;
+            break;
+        case 'tholdoffset':
+            objType = 'number';
+            objRole = 'value';
+            objDefault = 0;
+            break
         case 'tiltangle':
             objType = 'number';
             objRole = 'value.tilt';
@@ -2256,6 +2370,16 @@ function setObjectAndState(id, name, type, stateName, value){
         case 'scheduler':
             objType = 'string';
             objRole = 'state';
+            break;
+        case 'sunrise':
+            objType = 'string';
+            objRole = 'date.sunrise';
+            objWrite = false;
+            break;
+        case 'sunset':
+            objType = 'string';
+            objRole = 'date.sunset';
+            objWrite = false;
             break;
     }
 
