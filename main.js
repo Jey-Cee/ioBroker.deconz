@@ -20,410 +20,410 @@ async function startAdapter(options) {
             let tmp = id.split('.');
             let dp = tmp.pop();
             id = tmp.slice(2).join('.');
+			
+			if (!id || !state || state.ack) {
+				if(dp === 'alive'){
+					if(state === null){
+						adapter.setState(id, {val: false, ack: true});
+						if(ws !== null){
+							ws.terminate();
+							adapter.setState('info.connection', {val: false, ack: true});
+						}
+					}else if(state.val === true){
+						if(state.lc !== alive_ts){
+							alive_ts = state.lc;
+							getAutoUpdates();
+						}
 
-    if (!id || !state || state.ack) {
-        if(dp === 'alive'){
-            if(state === null){
-                adapter.setState(id, {val: false, ack: true});
-                if(ws !== null){
-                    ws.terminate();
-                    adapter.setState('info.connection', {val: false, ack: true});
-                }
-            }else if(state.val === true){
-                if(state.lc !== alive_ts){
-                    alive_ts = state.lc;
-                    getAutoUpdates();
-                }
-
-            }
-        }
-        return;
-    }
+					}
+				}
+				return;
+			}
 
 
-    adapter.log.debug('stateChange ' + id + ' ' + JSON.stringify(state));
+			adapter.log.debug('stateChange ' + id + ' ' + JSON.stringify(state));
 
-    adapter.log.debug('dp: ' + dp + '; id:' + id);
+			adapter.log.debug('dp: ' + dp + '; id:' + id);
 
-    adapter.getState(adapter.name + '.' + adapter.instance + '.' + id + '.transitiontime', async function (err, ttime){
-        if(err){
-            ttime = 'none';
-        }else if(ttime === null) {
-            ttime = 'none';
-        }else{
-                ttime = ttime.val;
-            }
+			adapter.getState(adapter.name + '.' + adapter.instance + '.' + id + '.transitiontime', async function (err, ttime){
+				if(err){
+					ttime = 'none';
+				}else if(ttime === null) {
+					ttime = 'none';
+				}else{
+						ttime = ttime.val;
+					}
 
-        if(dp === 'bri'){
-            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
-                let controlId = obj.native.id;
-                let parameters;
-                if(state.val >0 && ttime === 'none'){
-                    parameters = '{"bri": ' + JSON.stringify(state.val) + ', "on": true}';
-                }else if(state.val >0){
-                    parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "bri": ' + JSON.stringify(state.val) + ', "on": true}';
-                }else{
-                    parameters = '{"bri": ' + JSON.stringify(state.val) + ', "on": false}';
-                }
-                
+				if(dp === 'bri'){
+					adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+						let controlId = obj.native.id;
+						let parameters;
+						if(state.val >0 && ttime === 'none'){
+							parameters = '{"bri": ' + JSON.stringify(state.val) + ', "on": true}';
+						}else if(state.val >0){
+							parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "bri": ' + JSON.stringify(state.val) + ', "on": true}';
+						}else{
+							parameters = '{"bri": ' + JSON.stringify(state.val) + ', "on": false}';
+						}
+						
 
-                if(obj.common.role == 'light'){
-                    setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri');
-                }else if(obj.common.role == 'group'){
-                    setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri');
-                }
+						if(obj.common.role == 'light'){
+							setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri');
+						}else if(obj.common.role == 'group'){
+							setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri');
+						}
 
-            });
-        }else if(dp === 'on'){
-            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
-                let controlId = obj.native.id;
-                let parameters;
-                if(ttime === 'none'){
-                    parameters = '{"on": ' + JSON.stringify(state.val) + '}';
-                }else{
-                    parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "on": ' + JSON.stringify(state.val) + '}';
-                }
-                //adapter.log.info('type: ' + obj.common.role);
-                if(obj.common.role == 'light') {
-                    setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on')
-                }else if(obj.common.role == 'group'){
-                    setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on')
-                }
-            });
-        }else if(dp === 'hue'){
-            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
-                let controlId = obj.native.id;
-                let parameters;
-                //let hue_factor = 182.041666667;
-                if(ttime === 'none'){
-                    parameters = '{"hue": ' + Math.round(parseInt(JSON.stringify(state.val)) * hue_factor) + '}';
-                }else{
-                    parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "hue": ' + Math.round(parseInt(JSON.stringify(state.val)) * hue_factor) + '}';
-                }
+					});
+				}else if(dp === 'on'){
+					adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+						let controlId = obj.native.id;
+						let parameters;
+						if(ttime === 'none'){
+							parameters = '{"on": ' + JSON.stringify(state.val) + '}';
+						}else{
+							parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "on": ' + JSON.stringify(state.val) + '}';
+						}
+						//adapter.log.info('type: ' + obj.common.role);
+						if(obj.common.role == 'light') {
+							setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on')
+						}else if(obj.common.role == 'group'){
+							setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.on')
+						}
+					});
+				}else if(dp === 'hue'){
+					adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+						let controlId = obj.native.id;
+						let parameters;
+						//let hue_factor = 182.041666667;
+						if(ttime === 'none'){
+							parameters = '{"hue": ' + Math.round(parseInt(JSON.stringify(state.val)) * hue_factor) + '}';
+						}else{
+							parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "hue": ' + Math.round(parseInt(JSON.stringify(state.val)) * hue_factor) + '}';
+						}
 
-                if(obj.common.role == 'light') {
-                    setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.hue')
-                }else if(obj.common.role == 'group'){
-                    setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.hue')
-                }
-            });
-        }else if(dp === 'sat'){
-            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
-                let controlId = obj.native.id;
-                let parameters;
-                if(ttime === 'none'){
-                    parameters = '{"sat": ' + JSON.stringify(state.val) + '}';
-                }else{
-                    parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "sat": ' + JSON.stringify(state.val) + '}';
-                }
-                if(obj.common.role == 'light') {
-                    setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.sat')
-                }else if(obj.common.role == 'group'){
-                    setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.sat')
-                }
-            });
-        }else if(dp === 'ct'){
-            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
-                let controlId = obj.native.id;
-                let parameters;
-                if(ttime === 'none'){
-                    parameters = '{"ct": ' + JSON.stringify(state.val) + '}';
-                }else{
-                    parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "ct": ' + JSON.stringify(state.val) + '}';
-                }
-                if(obj.common.role == 'light') {
-                    setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.ct')
-                }else if(obj.common.role == 'group'){
-                    setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.ct')
-                }
-            });
-        }else if(dp === 'xy'){
-            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
-                let controlId = obj.native.id;
-                let parameters;
-                if(ttime === 'none'){
-                    parameters = '{"xy": [' + state.val + ']}';
-                }else{
-                    parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "xy": [' + state.val + ']}';
-                }
-                if(obj.common.role == 'light') {
-                    setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.xy')
-                }else if(obj.common.role == 'group'){
-                    setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.xy')
-                }
-            });
-        }else if(dp === 'alert'){
-            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
-                let controlId = obj.native.id;
-                let parameters;
-                if(ttime === 'none'){
-                    parameters = '{"alert": ' + JSON.stringify(state.val) + '}';
-                }else{
-                    parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "alert": ' + JSON.stringify(state.val) + '}';
-                }
-                setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.alert')
-            });
-        }else if(dp === 'effect'){
-            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
-                let parameters;
-                if(state.val === 'colorloop'){
-                    //adapter.log.info(id + ' Effect: colorloop');
-                    adapter.getState(adapter.name + '.' + adapter.instance + '.' + id + '.colorloopspeed', function(error, colorloopspeed){
-                            let controlId = obj.native.id;
-                            let speed;
-                            try{speed = colorloopspeed.val;} catch(err){}
-                            if (speed === null || speed === undefined) {
-                                speed = 1;
-                            }
-                            parameters = '{"colorloopspeed": ' + JSON.stringify(speed) + ', "effect": ' + JSON.stringify(state.val) + '}';
-                            //adapter.log.info('parameters: ' + parameters);
-                            if (obj.common.role == 'light') {
-                                setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.effect')
-                            } else if (obj.common.role == 'group') {
-                                setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.effect')
-                            }
-                        })
-                }else {
-                    let controlId = obj.native.id;
-                    let parameters = '{"effect": ' + JSON.stringify(state.val) + '}';
-                    if(obj.common.role == 'light') {
-                        setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.effect')
-                    }else if(obj.common.role == 'group'){
-                        setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.effect')
-                    }
-                }
-            });
-        }else if(dp === 'colormode'){
-            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function (err, obj) {
-                let controlId = obj.native.id;
-                let parameters = `{ "${dp}": "${state.val}" }`;
-                setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.colormode');
-            });
-        }else if(dp === 'dimup' || dp === 'dimdown'){
-            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
-                adapter.getState(adapter.name + '.' + adapter.instance + '.' + id + '.dimspeed', function(error, dimspeed){
-                    if (dimspeed === null || dimspeed === undefined || dimspeed == 0) 
-                    {
-                        dimspeed = 10;
-                        adapter.setState(adapter.name + '.' + adapter.instance + '.' + id + '.dimspeed', 10, true);
-                    }
-                    let speed = dp === 'dimup' ? dimspeed.val : dimspeed.val * -1;
-                    let controlId = obj.native.id;
-                    let parameters;
-                    if(ttime !== 'none'){
-                        parameters = `{ "transitiontime": ${JSON.stringify(ttime)} , "bri_inc": ${speed} }`;
-                    } else {
-                        parameters = `{ "bri_inc": ${speed} }`;
-                    }
-                    switch(obj.common.role){
-                        case 'group':
-                            setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri');
-                            break;
-                        case 'light':
-                            setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri');
-                            break;
-                    }
-                });
-            });
-        }else if(dp === 'dimspeed'){
-            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
-                adapter.setState(adapter.name + '.' + adapter.instance + '.' + id + '.dimspeed', {ack: true});
-            });
-        }else if(dp === 'action'){
-            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
-                let action = state.val;
-                if (action === null || action === undefined || action == 0) 
-                {
-                    return;
-                }
-                let controlId = obj.native.id;
-                let parameters = `{ ${action} }`;
-                switch(obj.common.role){
-                    case 'group':
-                        setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.action');
-                        break;
-                    case 'light':
-                        setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.action');
-                        break;
-                }
-            });
-        }else if(dp === 'createscene'){
-            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
-                if(obj.common.role == 'group'){
-                    let controlId = obj.native.id;
-                    let parameters = `{ "name": "${state.ts}" }`;
-                    setGroupScene(parameters, controlId, 0, '', '', 'POST');
-                    getAllGroups();
-                }
-            });
-        }else if(dp === 'delete'){
-            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
-                if(obj.common.role == 'scene'){
-                    let parentDevicelId = id.split(".")[1];
-                    adapter.getObject(adapter.name + '.' + adapter.instance + '.Groups.' + parentDevicelId, function(err, objParent) {
-                        let parentId = objParent.native.id;
-                        let controlId = obj.native.id;
-                        let parameters = '';
-                        setGroupScene(parameters, parentId, controlId, '', '', 'DELETE');
-                    });
-                    adapter.delObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {});
-                }
-            });
-        }else if(dp === 'store'){
-            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
-                if(obj.common.role == 'scene'){
-                    let parentDevicelId = id.split(".")[1];
-                    adapter.getObject(adapter.name + '.' + adapter.instance + '.Groups.' + parentDevicelId, function(err, objParent) {
-                        let parentId = objParent.native.id;
-                        let controlId = obj.native.id;
-                        let parameters = '';
-                        setGroupScene(parameters, parentId, controlId, 'store', '', 'PUT');
-                    });
-                }
-            });
-        }else if(dp === 'recall'){
-            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
-                if(obj.common.role == 'scene'){
-                    let parentDeviceId = id.split(".")[1];
-                    adapter.getObject(adapter.name + '.' + adapter.instance + '.Groups.' + parentDeviceId, function(err, objParent) {
-                        let parentId = objParent.native.id;
-                        let controlId = obj.native.id;
-                        let parameters = '';
-                        setGroupScene(parameters, parentId, controlId, 'recall', '', 'PUT');
-                    });
-                }
-            });
-        }else if(dp === 'name'){
-            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
-                if(obj.common.role == 'scene'){
-                    let parentDevicelId = id.split(".")[0];
-                    adapter.getObject(adapter.name + '.' + adapter.instance + '.Groups.' + parentDevicelId, function(err, objParent) {
-                        let parentId = objParent.native.id;
-                        let controlId = obj.native.id;
-                        let parameters = `{ "name": "${state.val}" }`;
-                        setGroupScene(parameters, parentId, controlId, '', '', 'PUT');
+						if(obj.common.role == 'light') {
+							setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.hue')
+						}else if(obj.common.role == 'group'){
+							setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.hue')
+						}
+					});
+				}else if(dp === 'sat'){
+					adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+						let controlId = obj.native.id;
+						let parameters;
+						if(ttime === 'none'){
+							parameters = '{"sat": ' + JSON.stringify(state.val) + '}';
+						}else{
+							parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "sat": ' + JSON.stringify(state.val) + '}';
+						}
+						if(obj.common.role == 'light') {
+							setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.sat')
+						}else if(obj.common.role == 'group'){
+							setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.sat')
+						}
+					});
+				}else if(dp === 'ct'){
+					adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+						let controlId = obj.native.id;
+						let parameters;
+						if(ttime === 'none'){
+							parameters = '{"ct": ' + JSON.stringify(state.val) + '}';
+						}else{
+							parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "ct": ' + JSON.stringify(state.val) + '}';
+						}
+						if(obj.common.role == 'light') {
+							setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.ct')
+						}else if(obj.common.role == 'group'){
+							setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.ct')
+						}
+					});
+				}else if(dp === 'xy'){
+					adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+						let controlId = obj.native.id;
+						let parameters;
+						if(ttime === 'none'){
+							parameters = '{"xy": [' + state.val + ']}';
+						}else{
+							parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "xy": [' + state.val + ']}';
+						}
+						if(obj.common.role == 'light') {
+							setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.xy')
+						}else if(obj.common.role == 'group'){
+							setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.xy')
+						}
+					});
+				}else if(dp === 'alert'){
+					adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+						let controlId = obj.native.id;
+						let parameters;
+						if(ttime === 'none'){
+							parameters = '{"alert": ' + JSON.stringify(state.val) + '}';
+						}else{
+							parameters = '{"transitiontime": ' + JSON.stringify(ttime) + ', "alert": ' + JSON.stringify(state.val) + '}';
+						}
+						setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.alert')
+					});
+				}else if(dp === 'effect'){
+					adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+						let parameters;
+						if(state.val === 'colorloop'){
+							//adapter.log.info(id + ' Effect: colorloop');
+							adapter.getState(adapter.name + '.' + adapter.instance + '.' + id + '.colorloopspeed', function(error, colorloopspeed){
+									let controlId = obj.native.id;
+									let speed;
+									try{speed = colorloopspeed.val;} catch(err){}
+									if (speed === null || speed === undefined) {
+										speed = 1;
+									}
+									parameters = '{"colorloopspeed": ' + JSON.stringify(speed) + ', "effect": ' + JSON.stringify(state.val) + '}';
+									//adapter.log.info('parameters: ' + parameters);
+									if (obj.common.role == 'light') {
+										setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.effect')
+									} else if (obj.common.role == 'group') {
+										setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.effect')
+									}
+								})
+						}else {
+							let controlId = obj.native.id;
+							let parameters = '{"effect": ' + JSON.stringify(state.val) + '}';
+							if(obj.common.role == 'light') {
+								setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.effect')
+							}else if(obj.common.role == 'group'){
+								setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.effect')
+							}
+						}
+					});
+				}else if(dp === 'colormode'){
+					adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function (err, obj) {
+						let controlId = obj.native.id;
+						let parameters = `{ "${dp}": "${state.val}" }`;
+						setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.colormode');
+					});
+				}else if(dp === 'dimup' || dp === 'dimdown'){
+					adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+						adapter.getState(adapter.name + '.' + adapter.instance + '.' + id + '.dimspeed', function(error, dimspeed){
+							if (dimspeed === null || dimspeed === undefined || dimspeed == 0) 
+							{
+								dimspeed = 10;
+								adapter.setState(adapter.name + '.' + adapter.instance + '.' + id + '.dimspeed', 10, true);
+							}
+							let speed = dp === 'dimup' ? dimspeed.val : dimspeed.val * -1;
+							let controlId = obj.native.id;
+							let parameters;
+							if(ttime !== 'none'){
+								parameters = `{ "transitiontime": ${JSON.stringify(ttime)} , "bri_inc": ${speed} }`;
+							} else {
+								parameters = `{ "bri_inc": ${speed} }`;
+							}
+							switch(obj.common.role){
+								case 'group':
+									setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri');
+									break;
+								case 'light':
+									setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.bri');
+									break;
+							}
+						});
+					});
+				}else if(dp === 'dimspeed'){
+					adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+						adapter.setState(adapter.name + '.' + adapter.instance + '.' + id + '.dimspeed', {ack: true});
+					});
+				}else if(dp === 'action'){
+					adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+						let action = state.val;
+						if (action === null || action === undefined || action == 0) 
+						{
+							return;
+						}
+						let controlId = obj.native.id;
+						let parameters = `{ ${action} }`;
+						switch(obj.common.role){
+							case 'group':
+								setGroupState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.action');
+								break;
+							case 'light':
+								setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.action');
+								break;
+						}
+					});
+				}else if(dp === 'createscene'){
+					adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+						if(obj.common.role == 'group'){
+							let controlId = obj.native.id;
+							let parameters = `{ "name": "${state.ts}" }`;
+							setGroupScene(parameters, controlId, 0, '', '', 'POST');
+							getAllGroups();
+						}
+					});
+				}else if(dp === 'delete'){
+					adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+						if(obj.common.role == 'scene'){
+							let parentDevicelId = id.split(".")[1];
+							adapter.getObject(adapter.name + '.' + adapter.instance + '.Groups.' + parentDevicelId, function(err, objParent) {
+								let parentId = objParent.native.id;
+								let controlId = obj.native.id;
+								let parameters = '';
+								setGroupScene(parameters, parentId, controlId, '', '', 'DELETE');
+							});
+							adapter.delObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {});
+						}
+					});
+				}else if(dp === 'store'){
+					adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+						if(obj.common.role == 'scene'){
+							let parentDevicelId = id.split(".")[1];
+							adapter.getObject(adapter.name + '.' + adapter.instance + '.Groups.' + parentDevicelId, function(err, objParent) {
+								let parentId = objParent.native.id;
+								let controlId = obj.native.id;
+								let parameters = '';
+								setGroupScene(parameters, parentId, controlId, 'store', '', 'PUT');
+							});
+						}
+					});
+				}else if(dp === 'recall'){
+					adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+						if(obj.common.role == 'scene'){
+							let parentDeviceId = id.split(".")[1];
+							adapter.getObject(adapter.name + '.' + adapter.instance + '.Groups.' + parentDeviceId, function(err, objParent) {
+								let parentId = objParent.native.id;
+								let controlId = obj.native.id;
+								let parameters = '';
+								setGroupScene(parameters, parentId, controlId, 'recall', '', 'PUT');
+							});
+						}
+					});
+				}else if(dp === 'name'){
+					adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+						if(obj.common.role == 'scene'){
+							let parentDevicelId = id.split(".")[0];
+							adapter.getObject(adapter.name + '.' + adapter.instance + '.Groups.' + parentDevicelId, function(err, objParent) {
+								let parentId = objParent.native.id;
+								let controlId = obj.native.id;
+								let parameters = `{ "name": "${state.val}" }`;
+								setGroupScene(parameters, parentId, controlId, '', '', 'PUT');
 
-                        adapter.extendObject(adapter.name + '.' + adapter.instance + '.' + id, {
-                            common: {
-                                name: state.val
-                            }
-                        });
-                    });
-                }
-            });
-        } else if(dp === 'offset' || dp === 'sensitivity' || dp === 'usertest' || dp === 'ledindication' || dp === 'duration' || dp === 'delay' || dp === 'locked' || dp === 'boost' || dp === 'off' || dp === 'on' || dp === 'mode') {
-            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function (err, obj) {
-                let controlId = obj.native.id;
-                let parameters = `{ "${dp}": "${state.val}" }`;
-                setSensorParameters(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.' + dp)
-            });
-        }else if(dp === 'heatsetpoint'){
-            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
-                let controlId = obj.native.id;
-                let val = Math.floor(state.val * 100);
-                let parameters = `{ "${dp}": "${val}" }`;
-                setSensorParameters(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.' + dp)
-            });
-        }else if(dp === 'temperature'){
-            adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
-                let controlId = obj.native.id;
-                let val = Math.floor(state.val * 100);
-                let parameters = `{ "${dp}": "${val}" }`;
-                setSensorParameters(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.' + dp)
-            });
-        }else if(dp === 'network_open'){
-            let opentime;
-            await adapter.getObjectAsync('Gateway_info')
-                .then(async results =>{
-                    opentime = results.native.networkopenduration;
-                }, reject=>{
-                    adapter.log.error(JSON.stringify(reject));
-                });
-            let parameters = `{"permitjoin": ${opentime}}`;
-            await modifyConfig(parameters);
-        }
-    })
-},
-//END on StateChange
+								adapter.extendObject(adapter.name + '.' + adapter.instance + '.' + id, {
+									common: {
+										name: state.val
+									}
+								});
+							});
+						}
+					});
+				} else if(dp === 'offset' || dp === 'sensitivity' || dp === 'usertest' || dp === 'ledindication' || dp === 'duration' || dp === 'delay' || dp === 'locked' || dp === 'boost' || dp === 'off' || dp === 'on' || dp === 'mode') {
+					adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function (err, obj) {
+						let controlId = obj.native.id;
+						let parameters = `{ "${dp}": "${state.val}" }`;
+						setSensorParameters(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.' + dp)
+					});
+				}else if(dp === 'heatsetpoint'){
+					adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+						let controlId = obj.native.id;
+						let val = Math.floor(state.val * 100);
+						let parameters = `{ "${dp}": "${val}" }`;
+						setSensorParameters(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.' + dp)
+					});
+				}else if(dp === 'temperature'){
+					adapter.getObject(adapter.name + '.' + adapter.instance + '.' + id, function(err, obj) {
+						let controlId = obj.native.id;
+						let val = Math.floor(state.val * 100);
+						let parameters = `{ "${dp}": "${val}" }`;
+						setSensorParameters(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.' + dp)
+					});
+				}else if(dp === 'network_open'){
+					let opentime;
+					await adapter.getObjectAsync('Gateway_info')
+						.then(async results =>{
+							opentime = results.native.networkopenduration;
+						}, reject=>{
+							adapter.log.error(JSON.stringify(reject));
+						});
+					let parameters = `{"permitjoin": ${opentime}}`;
+					await modifyConfig(parameters);
+				}
+			})
+		},
+		//END on StateChange
 
-// New message arrived. obj is array with current messages
+		// New message arrived. obj is array with current messages
         message: async function (obj) {
-    let wait = false;
-    if (obj) {
-       switch (obj.command) {
-            case 'browse':
-                browse(obj.message, function (res) {
-                    if (obj.callback) adapter.sendTo(obj.from, obj.command, JSON.stringify(res), obj.callback);
-                });
-                wait = true;
-                break;
-            case 'createAPIkey':
-                createAPIkey(obj.message.host, obj.message.credentials, function (res) {
-                    if (obj.callback) adapter.sendTo(obj.from, obj.command, JSON.stringify(res), obj.callback);
-                });
-                wait = true;
-                break;
-            case 'deleteAPIkey':
-                deleteAPIkey();
-                wait = true;
-                break;
-            case 'getConfig':
-                getConfig();
-                wait = true;
-                break;
-            case 'openNetwork':
-                let opentime;
-                await adapter.getObjectAsync('Gateway_info')
-                    .then(async results =>{
-                        opentime = results.native.networkopenduration;
-                    }, reject=>{
-                        adapter.log.error(JSON.stringify(reject));
-                    });
-                let parameters = `{"permitjoin": ${opentime}}`;
-                modifyConfig(parameters);
-                wait = true;
-                break;
-            case 'deleteLight':
-                deleteLight(obj.message, function (res) {
-                    if (obj.callback) adapter.sendTo(obj.from, obj.command, JSON.stringify(res), obj.callback);
-                });
-                wait = true;
-                break;
-            case 'deleteSensor':
-                deleteSensor(obj.message, function (res) {
-                    if (obj.callback) adapter.sendTo(obj.from, obj.command, JSON.stringify(res), obj.callback);
-                });
-                wait = true;
-                break;
-            case 'createGroup':
-                createGroup(obj.message, function (res) {
-                    if (obj.callback) adapter.sendTo(obj.from, obj.command, JSON.stringify(res), obj.callback);
-                });
-                wait = true;
-                break;
-            case 'deleteGroup':
-                deleteGroup(obj.message, function (res) {
-                    if (obj.callback) adapter.sendTo(obj.from, obj.command, JSON.stringify(res), obj.callback);
-                });
-                wait = true;
-                break;
-           case 'saveConfig':
-               adapter.extendObject('Gateway_info', {
-                   native: obj.message
-               });
-               break;
-            default:
-                adapter.log.warn("Unknown command: " + obj.command);
-                return false;
-                break;
-        }
-    }
-    if (!wait && obj.callback) {
-        adapter.sendTo(obj.from, obj.command, obj.message, obj.callback);
-    }
-    return true;
-},
-
+			let wait = false;
+			if (obj) {
+			   switch (obj.command) {
+					case 'browse':
+						browse(obj.message, function (res) {
+							if (obj.callback) adapter.sendTo(obj.from, obj.command, JSON.stringify(res), obj.callback);
+						});
+						wait = true;
+						break;
+					case 'createAPIkey':
+						createAPIkey(obj.message.host, obj.message.credentials, function (res) {
+							if (obj.callback) adapter.sendTo(obj.from, obj.command, JSON.stringify(res), obj.callback);
+						});
+						wait = true;
+						break;
+					case 'deleteAPIkey':
+						deleteAPIkey();
+						wait = true;
+						break;
+					case 'getConfig':
+						getConfig();
+						wait = true;
+						break;
+					case 'openNetwork':
+						let opentime;
+						await adapter.getObjectAsync('Gateway_info')
+							.then(async results =>{
+								opentime = results.native.networkopenduration;
+							}, reject=>{
+								adapter.log.error(JSON.stringify(reject));
+							});
+						let parameters = `{"permitjoin": ${opentime}}`;
+						modifyConfig(parameters);
+						wait = true;
+						break;
+					case 'deleteLight':
+						deleteLight(obj.message, function (res) {
+							if (obj.callback) adapter.sendTo(obj.from, obj.command, JSON.stringify(res), obj.callback);
+						});
+						wait = true;
+						break;
+					case 'deleteSensor':
+						deleteSensor(obj.message, function (res) {
+							if (obj.callback) adapter.sendTo(obj.from, obj.command, JSON.stringify(res), obj.callback);
+						});
+						wait = true;
+						break;
+					case 'createGroup':
+						createGroup(obj.message, function (res) {
+							if (obj.callback) adapter.sendTo(obj.from, obj.command, JSON.stringify(res), obj.callback);
+						});
+						wait = true;
+						break;
+					case 'deleteGroup':
+						deleteGroup(obj.message, function (res) {
+							if (obj.callback) adapter.sendTo(obj.from, obj.command, JSON.stringify(res), obj.callback);
+						});
+						wait = true;
+						break;
+				   case 'saveConfig':
+					   adapter.extendObject('Gateway_info', {
+						   native: obj.message
+					   });
+					   break;
+					default:
+						adapter.log.warn("Unknown command: " + obj.command);
+						return false;
+						break;
+				}
+			}
+			if (!wait && obj.callback) {
+				adapter.sendTo(obj.from, obj.command, obj.message, obj.callback);
+			}
+			return true;
+		},
+		
         ready: main,
 
     });
@@ -450,14 +450,6 @@ async function main() {
         }), (reject =>{
         adapter.log.error(JSON.stringify(reject));
     });
-
-
-
-    setTimeout(function(){
-        getAutoUpdates();
-    }, 10000);
-
-
 }
 
 
@@ -611,7 +603,7 @@ async function deleteAPIkey(){
 const WebSocket = require('ws');
 
 async function getAutoUpdates() {
-
+	
     let host, port, user;
     await adapter.getObjectAsync('Gateway_info')
         .then(async results => {
@@ -621,6 +613,7 @@ async function getAutoUpdates() {
         });
 
     if (user) {
+			adapter.log.info('Subscribed to updates...');
             ws = new WebSocket('ws://' + host + ':' + port);
 
             ws.on('open', () => {
@@ -922,88 +915,86 @@ async function getGroupAttributes(groupId) {
         adapter.log.debug('getGroupAttributes: ' + JSON.stringify(response));
 
         if(res.statusCode === 200){
-            for (let i = 0; i <= count; i++) {
-                let keyName = Object.keys(list)[i];
-                //create object for group with attributes
-                let groupID = list[keyName]['id'];
+			
+			//create object for group with attributes
+			//let groupId = list[keyName]['id'];
 
-                //Changed check if helper, if skip it (cause it also dont exists)
-                let regex = new RegExp("helper[0-9]+ for group [0-9]+");
-                if(!regex.test(list['name'])) {
+			//Changed check if helper, if skip it (cause it also dont exists)
+			let regex = new RegExp("helper[0-9]+ for group [0-9]+");
+			if(!regex.test(list['name'])) {
 
-                    adapter.setObjectNotExists(`Groups.${groupId}`, {
-                        type: 'device',
-                        common: {
-                            name: list['name'],
-                            role: 'group'
-                        },
-                        native: {
-                            devicemembership: list['devicemembership'],
-                            etag: list['etag'],
-                            hidden: list['hidden'],
-                            id: groupId,
-                            lights: list['lights'],
-                            lightsequence: list['lightsequence'],
-                            multideviceids: list['multideviceids']
-                        }
-                    });
-                    let count2 = Object.keys(list['action']).length - 1;
-                    //create states for light device
-                    for (let z = 0; z <= count2; z++) {
-                        let stateName = Object.keys(list['action'])[z];
-                        let newStates = new setObjectAndState(groupId, list['name'], 'Groups', stateName, list['action'][stateName]);
-                        let tt = new setObjectAndState(groupId, list['name'], 'Groups', 'transitiontime', null);
-                    }
+				adapter.setObjectNotExists(`Groups.${groupId}`, {
+					type: 'device',
+					common: {
+						name: list['name'],
+						role: 'group'
+					},
+					native: {
+						devicemembership: list['devicemembership'],
+						etag: list['etag'],
+						hidden: list['hidden'],
+						id: groupId,
+						lights: list['lights'],
+						lightsequence: list['lightsequence'],
+						multideviceids: list['multideviceids']
+					}
+				});
+				let count2 = Object.keys(list['action']).length - 1;
+				//create states for light device
+				for (let z = 0; z <= count2; z++) {
+					let stateName = Object.keys(list['action'])[z];
+					let newStates = new setObjectAndState(groupId, list['name'], 'Groups', stateName, list['action'][stateName]);
+					let tt = new setObjectAndState(groupId, list['name'], 'Groups', 'transitiontime', null);
+				}
 
-                    let count3 = Object.keys(list['state']).length - 1;
+				let count3 = Object.keys(list['state']).length - 1;
 
-                    //create states for light device
-                    for (let z = 0; z <= count3; z++) {
-                        let stateName = Object.keys(list['state'])[z];
-                        let newStates = new setObjectAndState(groupId, list['name'], 'Groups', stateName, list['state'][stateName]);
-                        let tt = new setObjectAndState(groupId, list['name'], 'Groups', 'transitiontime', null);
-                    }
+				//create states for light device
+				for (let z = 0; z <= count3; z++) {
+					let stateName = Object.keys(list['state'])[z];
+					let newStates = new setObjectAndState(groupId, list['name'], 'Groups', stateName, list['state'][stateName]);
+					let tt = new setObjectAndState(groupId, list['name'], 'Groups', 'transitiontime', null);
+				}
 
-                    adapter.setObjectNotExists(`Groups.${groupId}.dimspeed`, {
-                        type: 'state',
-                        common: {
-                            name: list['name'] + ' ' + 'dimspeed',
-                            type: 'number',
-                            role: 'level.dimspeed',
-                            min: 0,
-                            max: 254,
-                            read: false,
-                            write: true
-                        },
-                        native: {}
-                    });
-                    adapter.setObjectNotExists(`Groups.${groupId}.dimup`, {
-                        type: 'state',
-                            common: {
-                                name: list['name'] + ' ' + 'dimup',
-                                role: 'button'
-                            }
-                    });
-                    adapter.setObjectNotExists(`Groups.${groupId}.dimdown`, {
-                        type: 'state',
-                            common: {
-                                name: list['name'] + ' ' + 'dimdown',
-                                role: 'button'
-                            }
-                    });
-                    adapter.setObjectNotExists(`Groups.${groupId}.action`, {
-                        type: 'state',
-                            common: {
-                                name: list['name'] + ' ' + 'action',
-                                role: 'argument',
-                                type: 'string',
-                                read: false,
-                                write: true    
-                            }
-                    });
-                }
-                getGroupScenes(`Groups.${groupID}`, list[keyName]['scenes']);
-            }
+				adapter.setObjectNotExists(`Groups.${groupId}.dimspeed`, {
+					type: 'state',
+					common: {
+						name: list['name'] + ' ' + 'dimspeed',
+						type: 'number',
+						role: 'level.dimspeed',
+						min: 0,
+						max: 254,
+						read: false,
+						write: true
+					},
+					native: {}
+				});
+				adapter.setObjectNotExists(`Groups.${groupId}.dimup`, {
+					type: 'state',
+						common: {
+							name: list['name'] + ' ' + 'dimup',
+							role: 'button'
+						}
+				});
+				adapter.setObjectNotExists(`Groups.${groupId}.dimdown`, {
+					type: 'state',
+						common: {
+							name: list['name'] + ' ' + 'dimdown',
+							role: 'button'
+						}
+				});
+				adapter.setObjectNotExists(`Groups.${groupId}.action`, {
+					type: 'state',
+						common: {
+							name: list['name'] + ' ' + 'action',
+							role: 'argument',
+							type: 'string',
+							read: false,
+							write: true    
+						}
+				});
+			}
+			getGroupScenes(`Groups.${groupId}`, list['scenes'] || []);
 
         }else{
             logging(res.statusCode, 'Get group attributes: ' + groupId);
