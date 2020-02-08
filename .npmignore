@@ -7,5 +7,6 @@ node_modules
 .DS_Store
 test
 .travis.yml
+tsconfig.json
 appveyor.yml
 SPONSORS.MD

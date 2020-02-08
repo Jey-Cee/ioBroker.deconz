@@ -1,4 +1,4 @@
-<html>
+<html lang="en">
 <head>
     <link rel="stylesheet" type="text/css" href="../../css/adapter.css"/>
     <link rel="stylesheet" type="text/css" href="../../lib/css/materialize.css">
@@ -14,14 +14,14 @@
 
     <script type="text/javascript">
 
-    var namespace = 'deconz.' + instance;
-    var active   = false;
-    var devices = {};
-    var counter;
+    let namespace = 'deconz.' + instance;
+    let active   = false;
+    let devices = {};
+    let counter;
 
 
-    function setValue(id, value, onChange) {
-        var $value = $('#' + id + '.value');
+    /*function setValue(id, value, onChange) {
+        let $value = $('#' + id + '.value');
         if ($value.attr('type') === 'checkbox') {
             $value.prop('checked', value).change(function() {
                 onChange();
@@ -33,13 +33,13 @@
                 $(this).trigger('change');
             });
         }
-    }
+    }*/
 
 
 
-    function showDevice(obj, isFirst) {
-        var text = '';
-        if(obj.common.role != 'gateway' && obj.common.role != 'group' && obj.common.role !== undefined && obj.common.role !== 'scene') {
+    function showDevice(obj) {
+        let text = '';
+        if(obj.common.role !== 'gateway' && obj.common.role !== 'group' && obj.common.role !== undefined && obj.common.role !== 'scene') {
             text += '<td>' + obj.common.name + '</td>';
             text += '<td>' + obj.native.id + '</td>';
             text += '<td>' + obj.native.manufacturername + '</td>';
@@ -54,14 +54,10 @@
             text = '<tr data-id="' + obj.native.id + '">' + text + '</tr>';
             $('#devices').append(text);
 
-
-            /*$('#' + obj.native.id + obj.common.role).change({id : obj.native.id}, onSelect);
-        $('#' + obj.native.id + obj.common.role).select();*/
             $('#' + obj.native.id + obj.common.role).click(function(){
 
                     if (obj.common.role === 'sensor') {
                         sendTo('deconz.' + instance, 'deleteSensor', obj.native.id);
-                        //$('#user.value').val('').trigger('change');
                     } else if (obj.common.role === 'light') {
                         sendTo('deconz.' + instance, 'deleteLight', obj.native.id);
                     }
@@ -75,8 +71,6 @@
                             include_docs: true
                         }, function (err, _devices) {
                             socket.emit('getStates', function (err, _values) {
-                                var namespace = 'deconz.' + instance + '.';
-                                var len = namespace.length;
                                 if (_devices && _devices.rows && _devices.rows.length) {
                                     for (var j = 0; j < _devices.rows.length; j++) {
                                         devices[_devices.rows[j].value._id] = _devices.rows[j].value;
@@ -90,9 +84,9 @@
         }
     }
 
-    function showGroups(obj, isFirst) {
-        var text = '';
-        if(obj.common.role == 'group') {
+    function showGroups(obj) {
+        let text = '';
+        if(obj.common.role === 'group') {
             text += '<td>' + obj.common.name + '</td>';
             text += '<td>' + obj.native.id + '</td>';
             text += '<td>' + obj.native.devicemembership + '</td>';
@@ -106,15 +100,10 @@
             text = '<tr data-id="' + obj.native.id + '">' + text + '</tr>';
             $('#groups').append(text);
 
-
-            /*$('#' + obj.native.id + obj.common.role).change({id : obj.native.id}, onSelect);
-        $('#' + obj.native.id + obj.common.role).select();*/
             $('#' + obj.native.id + obj.common.role).click(function(){
                 if(obj.common.role === 'group') {
                     sendTo('deconz.' + instance, 'deleteGroup', obj.native.id);
-                    //$('#user.value').val('').trigger('change');
                 }
-                //document.getElementById("devices").remove();
                 $("#groups > tr").remove();
                 // populate the list of known devices
                 setTimeout(function(){
@@ -127,10 +116,8 @@
     function emitDevices(){
         socket.emit('getObjectView', 'system', 'device', { startkey: 'deconz.' + instance + '.', endkey: 'deconz.' + instance + '.\u9999', include_docs: true }, function (err, _devices) {
             socket.emit('getStates', function (err, _values) {
-                var namespace = 'deconz.' + instance + '.';
-                var len = namespace.length;
                 if (_devices && _devices.rows && _devices.rows.length) {
-                    for (var j = 0; j < _devices.rows.length; j++) {
+                    for (let j = 0; j < _devices.rows.length; j++) {
                         devices[_devices.rows[j].value._id] = _devices.rows[j].value;
                         showDevice(_devices.rows[j].value, true);
                     }
@@ -142,10 +129,8 @@
     function emitGroups(){
         socket.emit('getObjectView', 'system', 'device', { startkey: 'deconz.' + instance + '.', endkey: 'deconz.' + instance + '.\u9999', include_docs: true }, function (err, _groups) {
             socket.emit('getStates', function (err, _values) {
-                var namespace = 'deconz.' + instance + '.';
-                var len = namespace.length;
                 if (_groups && _groups.rows && _groups.rows.length) {
-                    for (var j = 0; j < _groups.rows.length; j++) {
+                    for (let j = 0; j < _groups.rows.length; j++) {
                         groups[_groups.rows[j].value._id] = _groups.rows[j].value;
                         showGroups(_groups.rows[j].value, true);
                     }
@@ -154,15 +139,7 @@
         });
     }
 
-    /*
-    async function getGatewayInfo(){
-        let info = await getObject('deconz.' + instance + '.Gateway_info', (err, obj)=>{
-            console.log(err + ' ' + JSON.stringify(obj));
-            return obj.native;
-        });
-        return info;
-    }
-     */
+
     async function getGatewayInfo(){
         return new Promise(function(resolve, reject) {
             let info;
@@ -171,31 +148,27 @@
                 resolve(obj.native);
             });
 
-            //resolve(info);
         });
     }
 
     // the function loadSettings has to exist ...
     async function load(settings, onChange) {
-        //if (settings.port === undefined) settings.port = 8080;
-
         let info;
         await getGatewayInfo()
         .then(async results => {
             info = results;
         });
 
-
         if (!settings) return;
         $('.value').each(function () {
-            var $key = $(this);
-            var id = $key.attr('id');
+            let $key = $(this);
+            let id = $key.attr('id');
             if ($key.attr('type') === 'checkbox') {
                 // do not call onChange direct, because onChange could expect some arguments
                 $key.prop('checked', settings[id]).change(function() {
                     onChange();
                 });
-            } else {
+            } else if( $key.attr('id') !== 'bridge' && $key.attr('id') !== 'port'){
                 // do not call onChange direct, because onChange could expect some arguments
                 $key.val(settings[id]).change(function() {
                     onChange();
@@ -215,10 +188,6 @@
             }
         });
 
-        /*for (var key in settings) {
-            if (settings.hasOwnProperty(key)) setValue(key, settings[key], onChange);
-        }*/
-
         // read if instance is active or enabled
         getIsAdapterAlive(function (isAlive) {
             if (isAlive || common.enabled) {
@@ -226,7 +195,6 @@
             }
         });
 
-        //$('#tabs').tabs();
         $('#create').click(function () {
             if (!active) {
                 showMessage(_('Enable adapter first'), 'Warning', 'info');
@@ -245,7 +213,7 @@
                     if(result.error === 0) {
                         $('#user.value').val(result.message).trigger('change');
                         count = 10;
-                        showMessage(_('Done'), _('Error'), 'info');
+                        showMessage(_('API Key created.'), _('Success'), 'info');
                         manDone = true;
                         return;
                     }else{
@@ -330,10 +298,6 @@
             $(this).trigger('change');
         });
 
-        /*$('#mtabdeconz').click(function(){
-            $('#swversion.value').val(settings.sw_version).trigger('change');
-        });*/
-
         // subscribe to changes
         socket.emit('subscribeStates', namespace + '.info.*');
         socket.emit('subscribeObjects', namespace + '.*'); // seems, this doesn't work
@@ -347,6 +311,9 @@
         $('#bridge').focusout(function(){$('.btn-save').trigger('click')});
         $('#port').focusout(function(){$('.btn-save').trigger('click')});
 
+        //$('#bridge').focusout(function(){ save() });
+        //$('#port').focusout(function(){ save() });
+
 
         $('#sw_version').text('deConz Version: ' + info.swversion);
         $('#api_version').text('API Version: ' + info.apiversion);
@@ -358,6 +325,7 @@
 
         onChange(false);
         M.updateTextFields();
+        console.log('loaded');
     }
 
     function countdown(){
@@ -378,7 +346,7 @@
 
     function save(callback) {
         sendTo('deconz.' + instance, 'saveConfig', {'ipaddress': $('#bridge').val(), 'port': $('#port').val(), 'networkopenduration': $('#permit').val(), 'user': $('#user').val()}, (result) => {});
-        var obj = {};
+        let obj = {};
         $('.value').each(function () {
             var $this = $(this);
             if ($this.attr('type') === 'checkbox') {
@@ -388,8 +356,6 @@
             }
         });
         callback(obj);
-
-
     }
 
 
@@ -404,10 +370,9 @@
     #deleteAPIkey, #create, #opennetwork {
         font-size: 14px;
     }
-    #manage_deconz {
 
-    }
 </style>
+    <title>deConz</title>
 </head>
 <body>
 <!-- you have to put your config page in a div with id adapter-container -->
@@ -443,14 +408,13 @@
 
             <div class="row">
                 <div class="input-field col s12 m4 15">
-                    <input class="value text" id="bridge" for="bridge" size="15" maxlength="15" type="text">
-                    <label class="translate active" id="deconz-address" data-lang="deConz Addresse:">deConz IP Adresse</label>
+                    <input class="value text" id="bridge" size="15" maxlength="15" type="text">
+                    <label class="translate active" for="bridge" data-lang="deConz Addresse:">deConz IP Adresse</label>
                 </div>
                 <div class="input-field col s12 m8 l3">
                     <input class="value number" id="port" size="5" maxlength="5" type="number">
                     <label class="translate active" for="port" data-lang="Bridge Port">Port</label>
                 </div>
-
             </div>
             <div class="row">
                 <div class="input-field col s12 m2 14">
@@ -536,7 +500,7 @@
                 <div class="row">
                     <div class="input-field col s2">
                         <input class="value text" id="group_name"  size="15" maxlength="15" type="text">
-                        <label class="translate active" data-lang="Name of the new group:">Name of the new group</label>
+                        <label class="translate active" for="group_name" data-lang="Name of the new group:">Name of the new group</label>
                     </div>
                     <div class="input-field col s2">
                         <a class="waves-effect waves-light btn" id="create_group">
@@ -568,6 +532,5 @@
 
 
     </div>
-</div>
 </body>
 </html>

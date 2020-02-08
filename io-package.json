@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "deconz",
-        "version": "1.2.4",
+        "version": "1.2.5",
         "news": {
+            "1.2.5": {
+                "en": "code cleanup\n(Zefau) fixed duplicated subscription\n(Zefau) useless loop within getGroupAttributes()\nrefactor logging\nrefactor state change\nfix API Key Dialog\nWebsocket reconnect after 60 Seconds if no message is received",
+                "de": "Code-Bereinigung\n(Zefau) doppeltes Abonnement behoben\n(Zefau) nutzlose Schleife in getGroupAttributes ()\nRefactor-Protokollierung\nRefactor-Statusänderung\nAPI Key Dialog korrigieren\nDie Verbindung zum Websocket wird nach 60 Sekunden wiederhergestellt, wenn keine Nachricht empfangen wird",
+                "ru": "очистка кода\n(Zefau) исправлена дублированная подписка\n(Zefau) бесполезный цикл в getGroupAttributes ()\nрегистрация рефактора\nизменение состояния рефактора\nисправить диалог API Key\nWebsocket переподключается через 60 секунд, если сообщение не получено",
+                "pt": "limpeza de código\n(Zefau) assinatura duplicada fixa\n(Zefau) loop inútil dentro de getGroupAttributes ()\nrefatoração de log\nrefatorar alteração de estado\ncorrigir diálogo de chave da API\nWebsocket reconectar após 60 segundos se nenhuma mensagem for recebida",
+                "nl": "code opruimen\n(Zefau) vast gedupliceerd abonnement\n(Zefau) nutteloze lus binnen getGroupAttributes ()\nlogboekregistratie van refactoren\nrefactor toestand verandering\nfix API Key Dialog\nWebsocket maakt opnieuw verbinding na 60 seconden als er geen bericht wordt ontvangen",
+                "fr": "nettoyage de code\n(Zefau) abonnement dupliqué fixe\n(Zefau) boucle inutile dans getGroupAttributes ()\njournalisation du refactor\nchangement d'état du refactor\ncorriger la boîte de dialogue de clé API\nReconnexion Websocket après 60 secondes si aucun message n'est reçu",
+                "it": "pulizia del codice\n(Zefau) fisso abbonamento duplicato\n(Zefau) loop inutile all'interno di getGroupAttributes ()\nregistrazione del refactor\ncambiamento di stato del refactor\ncorrezione finestra di dialogo chiave API\nWebsocket riconnettersi dopo 60 secondi se non viene ricevuto alcun messaggio",
+                "es": "limpieza de código\n(Zefau) fijo suscripción duplicada\n(Zefau) bucle inútil dentro de getGroupAttributes ()\nregistro de refactorización\ncambio de estado refactorizado\nFix API Key Dialog\nWebsocket se vuelve a conectar después de 60 segundos si no se recibe ningún mensaje",
+                "pl": "czyszczenie kodu\n(Zefau) naprawiono zduplikowaną subskrypcję\n(Zefau) bezużyteczna pętla w getGroupAttributes ()\nrejestrowanie refaktorów\nzmiana stanu refaktora\nNapraw okno dialogowe klucza API\nWebsocket połączy się ponownie po 60 sekundach, jeśli nie zostanie odebrany żaden komunikat",
+                "zh-cn": "代码清理\n（Zefau）固定重复订阅\n（Zefau）getGroupAttributes（）中的无用循环\n重构日志\n重构状态变化\n修复API密钥对话框\n如果没有收到消息，Websocket将在60秒后重新连接"
+            },
             "1.2.4": {
                 "en": "dynamicly add boolean states for button events\nadded new object definitions\nremove ip overwrite\nadd transitiontime for bri_inc (dim step)",
                 "de": "Fügen Sie dynamisch Boolesche Zustände für Schaltflächenereignisse hinzu\nneue Objektdefinitionen hinzugefügt\nIP-Überschreibung entfernen\nÜbergangszeit für bri_inc hinzufügen (dim step)",
