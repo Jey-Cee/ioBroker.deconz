@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "deconz",
-        "version": "1.2.5",
+        "version": "1.2.6",
         "news": {
+            "1.2.6": {
+                "en": "fix crash by executing commands without parameters",
+                "de": "Beheben Sie den Absturz, indem Sie Befehle ohne Parameter ausführen",
+                "ru": "исправить сбой, выполнив команды без параметров",
+                "pt": "corrigir falha executando comandos sem parâmetros",
+                "nl": "crash oplossen door opdrachten zonder parameters uit te voeren",
+                "fr": "correction d'un crash en exécutant des commandes sans paramètres",
+                "it": "risolve il crash eseguendo comandi senza parametri",
+                "es": "arregla el bloqueo ejecutando comandos sin parámetros",
+                "pl": "napraw awarię, wykonując polecenia bez parametrów",
+                "zh-cn": "通过执行不带参数的命令来修复崩溃"
+            },
             "1.2.5": {
                 "en": "code cleanup\n(Zefau) fixed duplicated subscription\n(Zefau) useless loop within getGroupAttributes()\nrefactor logging\nrefactor state change\nfix API Key Dialog\nWebsocket reconnect after 60 Seconds if no message is received",
                 "de": "Code-Bereinigung\n(Zefau) doppeltes Abonnement behoben\n(Zefau) nutzlose Schleife in getGroupAttributes ()\nRefactor-Protokollierung\nRefactor-Statusänderung\nAPI Key Dialog korrigieren\nDie Verbindung zum Websocket wird nach 60 Sekunden wiederhergestellt, wenn keine Nachricht empfangen wird",

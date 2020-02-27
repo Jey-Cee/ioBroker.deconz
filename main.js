@@ -158,7 +158,7 @@ async function startAdapter(options) {
                     case 'createscene':
                         if (obj.common.role === 'group') {
                             let controlId = obj.native.id;
-                            let parameters = `{ "name": "${state.ts}" }`;
+                            let parameters = `{ "name": "${state.val}" }`;
                             setGroupScene(parameters, controlId, 0, '', '', 'POST');
                             getAllGroups();
                         }
@@ -219,6 +219,9 @@ async function startAdapter(options) {
                 }
 
                 if(action !== 'none'){
+                    if(typeof parameters === 'object'){
+                        parameters = JSON.stringify(parameters);
+                    }
                     switch (obj.common.role) {
                         case 'light':
                             setLightState(parameters, controlId, adapter.name + '.' + adapter.instance + '.' + id + '.' + dp);
@@ -233,8 +236,8 @@ async function startAdapter(options) {
                             break;
                         case 'scene':
                             let parentDeviceId = id.split(".")[1];
-                            let parent = await adapter.getObjectAsync(adapter.name + '.' + adapter.instance + '.Groups.' + parentDeviceId);
-                            setGroupScene(parameters, parent.val, controlId, action, stateId, method);
+                            //let parent = await adapter.getObjectAsync(adapter.name + '.' + adapter.instance + '.Groups.' + parentDeviceId);
+                            setGroupScene(parameters, parentDeviceId, controlId, action, stateId, method);
                             break;
                     }
                 }
