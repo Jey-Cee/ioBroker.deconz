@@ -2002,7 +2002,7 @@ function SetObjectAndState(id, name, type, stateName, value) {
             break;
         case 'bri':
             objType = 'number';
-            objRole = 'value.brightness';
+            objRole = 'level.brightness';
             objMin = 0;
             objMax = 254;
             objDefault = 254;
