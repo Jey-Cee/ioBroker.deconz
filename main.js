@@ -517,6 +517,8 @@ async function getAutoUpdates() {
             host = results.native.ipaddress;
             port = results.native.websocketport;
             user = results.native.user;
+        }, reject => {
+            adapter.log.warn('Object Gateway_info access error: ' + JSON.stringify(reject))
         });
 
     if (user) {
