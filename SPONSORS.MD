@@ -8,3 +8,4 @@ Thank you to ...
 
 * Marco Laser
 * Nils J.
+* Wildbill
