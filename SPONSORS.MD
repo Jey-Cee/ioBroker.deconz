@@ -1,6 +1,6 @@
 # Sponsors
 
-This list contains persons who support this adapter. If you want to support also you can send a donation via PayPal to jey-ce@live.com.
+This list contains persons who support this adapter. If you want to support also you can send a donation via PayPal to jey-cee@live.com.
 
 Thank you to ...
 
