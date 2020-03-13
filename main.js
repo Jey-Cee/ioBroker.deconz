@@ -354,8 +354,10 @@ async function main() {
 
 //search for Gateway
 let discovery = new SSDP.Discovery();
+let found_deconz = false;
 
 function autoDiscovery() {
+    let wait;
 
     discovery.on('message', (msg, rinfo, iface) => {
         if (msg.headers.st === 'urn:schemas-upnp-org:device:basic:1') {
@@ -373,7 +375,8 @@ function autoDiscovery() {
                         port: loc[1]
                     }
                 });
-
+                found_deconz = true;
+                clearTimeout(wait);
                 discovery.close();
             }
         }
@@ -386,6 +389,10 @@ function autoDiscovery() {
             adapter.log.error(error);
         }
         discovery.search({st: 'ssdp:all'});
+        wait = setTimeout( () => {
+            adapter.log.warn('Could not found deConz by broadcast, establishing Websocket without monitoring the connection state. This is happen if you are using VLAN or installed deConz in an container.')
+            getAutoUpdates();
+        }, 10 * 1000)
     });
 
 
