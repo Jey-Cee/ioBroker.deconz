@@ -2053,7 +2053,7 @@ function SetObjectAndState(id, name, type, stateName, value) {
             break;
         case 'duration':
             objType = 'number';
-            objRole = 'value.power.consumption';
+            objRole = 'value';
             objMin = 0;
             objMax = 600;
             objDefault = 600;

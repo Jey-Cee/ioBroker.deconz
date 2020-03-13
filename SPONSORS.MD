@@ -10,3 +10,4 @@ Thank you to ...
 * Nils J.
 * Wildbill
 * Dennis H.
+* Siegfried B.
