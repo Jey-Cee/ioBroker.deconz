@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "deconz",
-        "version": "1.2.6",
+        "version": "1.3.0",
         "news": {
+            "1.3.0": {
+                "en": "fix websocket connection if there are no upnp broadcast answer from deconz\ncorrected duration role\nadded level to lights and groups",
+                "de": "Korrigieren Sie die Websocket-Verbindung, wenn keine UTP-Broadcast-Antwort von deconz vorliegt\nkorrigierte Dauer Rolle\nLichter und Gruppen hinzugefügt",
+                "ru": "исправить соединение через websocket, если нет ответа от deconz\nисправлена продолжительность роли\nдобавлен уровень для источников света и групп",
+                "pt": "corrigir conexão websocket se não houver resposta de transmissão upnp da deconz\nfunção de duração corrigida\nnível adicionado a luzes e grupos",
+                "nl": "repareer websocket-verbinding als er geen upnp-uitzendantwoord is van deconz\ngecorrigeerde duurrol\nniveau toegevoegd aan lichten en groepen",
+                "fr": "correction de la connexion websocket s'il n'y a pas de réponse de diffusion upnp de deconz\nrôle de durée corrigé\najout de niveau aux lumières et aux groupes",
+                "it": "correggi la connessione websocket se non ci sono risposte upnp broadcast da deconz\nruolo di durata corretta\naggiunto livello a luci e gruppi",
+                "es": "arregle la conexión websocket si no hay respuesta de difusión upnp de deconz\nrol de duración corregida\nnivel agregado a luces y grupos",
+                "pl": "napraw połączenie websocket, jeśli nie ma odpowiedzi rozgłaszania upnp z deconz\npoprawiona rola czasu trwania\ndodano poziom do świateł i grup",
+                "zh-cn": "如果没有来自deconz的upnp广播答案，请修复websocket连接\n更正的持续时间作用\n为灯光和组添加级别"
+            },
             "1.2.6": {
                 "en": "fix crash by executing commands without parameters",
                 "de": "Beheben Sie den Absturz, indem Sie Befehle ohne Parameter ausführen",
@@ -15,66 +27,6 @@
                 "pl": "napraw awarię, wykonując polecenia bez parametrów",
                 "zh-cn": "通过执行不带参数的命令来修复崩溃"
             },
-            "1.2.5": {
-                "en": "code cleanup\n(Zefau) fixed duplicated subscription\n(Zefau) useless loop within getGroupAttributes()\nrefactor logging\nrefactor state change\nfix API Key Dialog\nWebsocket reconnect after 60 Seconds if no message is received",
-                "de": "Code-Bereinigung\n(Zefau) doppeltes Abonnement behoben\n(Zefau) nutzlose Schleife in getGroupAttributes ()\nRefactor-Protokollierung\nRefactor-Statusänderung\nAPI Key Dialog korrigieren\nDie Verbindung zum Websocket wird nach 60 Sekunden wiederhergestellt, wenn keine Nachricht empfangen wird",
-                "ru": "очистка кода\n(Zefau) исправлена дублированная подписка\n(Zefau) бесполезный цикл в getGroupAttributes ()\nрегистрация рефактора\nизменение состояния рефактора\nисправить диалог API Key\nWebsocket переподключается через 60 секунд, если сообщение не получено",
-                "pt": "limpeza de código\n(Zefau) assinatura duplicada fixa\n(Zefau) loop inútil dentro de getGroupAttributes ()\nrefatoração de log\nrefatorar alteração de estado\ncorrigir diálogo de chave da API\nWebsocket reconectar após 60 segundos se nenhuma mensagem for recebida",
-                "nl": "code opruimen\n(Zefau) vast gedupliceerd abonnement\n(Zefau) nutteloze lus binnen getGroupAttributes ()\nlogboekregistratie van refactoren\nrefactor toestand verandering\nfix API Key Dialog\nWebsocket maakt opnieuw verbinding na 60 seconden als er geen bericht wordt ontvangen",
-                "fr": "nettoyage de code\n(Zefau) abonnement dupliqué fixe\n(Zefau) boucle inutile dans getGroupAttributes ()\njournalisation du refactor\nchangement d'état du refactor\ncorriger la boîte de dialogue de clé API\nReconnexion Websocket après 60 secondes si aucun message n'est reçu",
-                "it": "pulizia del codice\n(Zefau) fisso abbonamento duplicato\n(Zefau) loop inutile all'interno di getGroupAttributes ()\nregistrazione del refactor\ncambiamento di stato del refactor\ncorrezione finestra di dialogo chiave API\nWebsocket riconnettersi dopo 60 secondi se non viene ricevuto alcun messaggio",
-                "es": "limpieza de código\n(Zefau) fijo suscripción duplicada\n(Zefau) bucle inútil dentro de getGroupAttributes ()\nregistro de refactorización\ncambio de estado refactorizado\nFix API Key Dialog\nWebsocket se vuelve a conectar después de 60 segundos si no se recibe ningún mensaje",
-                "pl": "czyszczenie kodu\n(Zefau) naprawiono zduplikowaną subskrypcję\n(Zefau) bezużyteczna pętla w getGroupAttributes ()\nrejestrowanie refaktorów\nzmiana stanu refaktora\nNapraw okno dialogowe klucza API\nWebsocket połączy się ponownie po 60 sekundach, jeśli nie zostanie odebrany żaden komunikat",
-                "zh-cn": "代码清理\n（Zefau）固定重复订阅\n（Zefau）getGroupAttributes（）中的无用循环\n重构日志\n重构状态变化\n修复API密钥对话框\n如果没有收到消息，Websocket将在60秒后重新连接"
-            },
-            "1.2.4": {
-                "en": "dynamicly add boolean states for button events\nadded new object definitions\nremove ip overwrite\nadd transitiontime for bri_inc (dim step)",
-                "de": "Fügen Sie dynamisch Boolesche Zustände für Schaltflächenereignisse hinzu\nneue Objektdefinitionen hinzugefügt\nIP-Überschreibung entfernen\nÜbergangszeit für bri_inc hinzufügen (dim step)",
-                "ru": "динамически добавлять логические состояния для событий кнопок\nдобавлены новые определения объектов\nудалить перезапись ip\nдобавить время перехода для bri_inc (тусклый шаг)",
-                "pt": "adicionar dinamicamente estados booleanos para eventos de botão\nadicionadas novas definições de objetos\nremover a substituição do ip\nadicionar tempo de transição para bri_inc (dim step)",
-                "nl": "voeg dynamisch booleaanse statussen toe voor knopgebeurtenissen\nnieuwe objectdefinities toegevoegd\nverwijder ip overschrijven\novergangstijd toevoegen voor bri_inc (dimstap)",
-                "fr": "ajouter dynamiquement des états booléens pour les événements de bouton\najout de nouvelles définitions d'objets\nsupprimer l'IP écraser\najouter un temps de transition pour bri_inc (dim dim)",
-                "it": "aggiungere dinamicamente stati booleani per eventi pulsante\naggiunte nuove definizioni di oggetti\nrimuovere la sovrascrittura ip\naggiungi tempo di transizione per bri_inc (dim step)",
-                "es": "Agregue dinámicamente estados booleanos para eventos de botón\nse agregaron nuevas definiciones de objeto\neliminar ip sobrescribir\nagregar tiempo de transición para bri_inc (paso tenue)",
-                "pl": "dynamicznie dodawaj stany logiczne dla zdarzeń przycisków\ndodano nowe definicje obiektów\nusuń ip overwrite\ndodaj czas przejścia dla bri_inc (dim step)",
-                "zh-cn": "为按钮事件动态添加布尔状态\n添加了新的对象定义\n删除ip覆盖\n为bri_inc添加过渡时间（暗淡步骤）"
-            },
-            "1.2.3": {
-                "en": "fix expire time for alive \nadd object for open zigbee network to add new devices without admin config\nremoved input for opne network time\nfix device list in admin config",
-                "de": "Verfallszeit für lebendig festlegen\nObjekt für offenes ZigBee-Netzwerk hinzufügen, um neue Geräte ohne Admin-Konfiguration hinzuzufügen\nDie Eingabe für die Netzwerkzeit wurde entfernt\nGeräteliste in Admin-Konfiguration korrigieren",
-                "ru": "исправить время истечения для живых\nдобавить объект для открытой сети zigbee, чтобы добавить новые устройства без конфигурации администратора\nудален вход для времени сети opne\nисправить список устройств в конфигурации администратора",
-                "pt": "corrigir expirar tempo para vivo\nadicionar objeto para a rede zigbee aberta para adicionar novos dispositivos sem a configuração de administrador\nentrada removida por um tempo de rede opcional\ncorrigir lista de dispositivos na configuração do administrador",
-                "nl": "fix verlopen tijd voor levend\nobject toevoegen voor open zigbee-netwerk om nieuwe apparaten toe te voegen zonder admin-configuratie\ninvoer verwijderd voor opne-netwerktijd\nlijst met apparaten in admin config repareren",
-                "fr": "fixer le temps d'expiration pour vivant\najouter un objet pour un réseau zigbee ouvert pour ajouter de nouveaux appareils sans configuration administrateur\nentrée supprimée pour le temps de réseau opne\ncorrection de la liste des périphériques dans la configuration d'administration",
-                "it": "correggere il tempo di scadenza per vivo\naggiungi oggetto per rete a zigbee aperta per aggiungere nuovi dispositivi senza la configurazione dell'amministratore\ninput rimosso per tempo di rete opne\nrisolve l'elenco dei dispositivi nella configurazione dell'amministratore",
-                "es": "fijar el tiempo de caducidad para vivo\nAgregar objeto para abrir la red zigbee para agregar nuevos dispositivos sin configuración de administrador\nentrada eliminada para el tiempo de red opne\narreglar la lista de dispositivos en la configuración de administración",
-                "pl": "napraw czas wygaśnięcia żywych\ndodaj obiekt do otwartej sieci Zigbee, aby dodać nowe urządzenia bez konfiguracji administratora\nusunięto dane wejściowe dla czasu pracy sieci\nnapraw listę urządzeń w konfiguracji administratora",
-                "zh-cn": "修复生存时间\n为开放的zigbee网络添加对象，无需管理员配置即可添加新设备\n删除了用于网络时间的输入\n修复管理员配置中的设备列表"
-            },
-            "1.2.2": {
-                "en": "adapter configuration handling rewritten\nfix lastupdated UTC to locale time",
-                "de": "Adapterkonfigurationsbehandlung umgeschrieben\nKorrigiert die zuletzt aktualisierte UTC auf die Ortszeit",
-                "ru": "переписана обработка конфигурации адаптера\nисправить последнее обновление UTC по местному времени",
-                "pt": "manipulação de configuração do adaptador reescrita\ncorrigir lastupdated UTC para a hora local",
-                "nl": "adapterconfiguratie herschreven\nlaatste bijgewerkte UTC naar locale tijd repareren",
-                "fr": "gestion de la configuration de l'adaptateur réécrite\ncorrection de la dernière mise à jour UTC à l'heure locale",
-                "it": "gestione della configurazione dell'adattatore riscritta\ncorreggi l'ultimo UTC aggiornato all'ora della locale",
-                "es": "manejo de la configuración del adaptador reescrito\narreglar el último UTC actualizado a la hora local",
-                "pl": "przepisana obsługa konfiguracji adaptera\nnapraw ostatnią aktualizację UTC do czasu lokalnego",
-                "zh-cn": "适配器配置处理被重写\n将最近更新的UTC修复为语言环境时间"
-            },
-            "1.1.3": {
-                "en": "Changed default port to 80",
-                "de": "Der Standardport wurde in 80 geändert",
-                "ru": "Изменен порт по умолчанию на 80",
-                "pt": "Porta padrão alterada para 80",
-                "nl": "Standaardpoort gewijzigd in 80",
-                "fr": "Port par défaut modifié à 80",
-                "it": "Porta predefinita modificata a 80",
-                "es": "Se cambió el puerto predeterminado a 80",
-                "pl": "Zmieniono domyślny port na 80",
-                "zh-cn": "将默认端口更改为80"
-            },
             "1.1.2": {
                 "en": "fix button objects changed buttonpressed from boolean to number\n",
                 "de": "Knopfobjekte reparieren \nKnopfdruck von Boolean in Zahl geändert\n",
@@ -86,54 +38,6 @@
                 "es": "arreglar objetos de botón \nbotón pulsado cambiado de booleano a número\n",
                 "pl": "naprawić obiekty przycisków \nzmieniono naciśnięcie przycisku z boolean na numer\n",
                 "zh-cn": "修复按钮对象\n将按钮从布尔值更改为数字\n"
-            },
-             "1.1.0": {
-                "en": "added objects for \"tiltangle\", \"vibration\", \"vibrationstrength\" and \"orientation\" added object \"buttonpressd\" some fixes\n",
-                "de": "hinzugefügte Objekte für \"Tiltangle\", \"Vibration\", \"Vibrationsstärke\" und \"Orientierung\" \n",
-                "ru": "добавлены объекты для «угла наклона», «вибрации», «силы вибрации» и «ориентации» \n",
-                "pt": "objetos adicionados para \"tiltangle\", \"vibração\", \"vibrationstrength\" e \"orientação\" \n",
-                "nl": "toegevoegde objecten voor \"tiltangle\", \"vibration\", \"vibrationstrength\" en \"orientation\" \n",
-                "fr": "objets ajoutés pour \"tiltangle\", \"vibration\", \"vibrationstrength\" et \"orientation\" \n",
-                "it": "aggiunto oggetti per \"tiltangle\", \"vibrazione\", \"vibrationstrength\" e \"orientation\" \n",
-                "es": "objetos añadidos para \"tiltangle\", \"vibration\", \"vibrationstrength\" y \"orientación\" \n",
-                "pl": "dodane obiekty dla „tiltangle”, „vibration”, „vibrationstreth” i „orientation” \n",
-                "zh-cn": "添加了“倾斜角”，“振动”，“振动强度”和“方向”的对象\n"
-            },
-            "1.0.1": {
-                "en": "small fixes\n",
-                "de": "kleine Korrekturen\n",
-                "ru": "небольшие исправления\n",
-                "pt": "pequenas correções\n",
-                "nl": "kleine fixes\n",
-                "fr": "petites corrections\n",
-                "it": "piccole correzioni\n",
-                "es": "pequeñas correcciones\n",
-                "pl": "małe poprawki\n",
-                "zh-cn": "小修正\n"
-            },
-            "1.0.0": {
-                "en": "skip helper groups; added channels for lights, groups and sensors; skip unusable sensors; turn light/groups on when changing brightness; added objet group for remotes; stop overwrite objects on adapter start; prepared for compact mode;",
-                "de": "Helfergruppen überspringen; hinzugefügte Kanäle für Lichter, Gruppen und Sensoren; überspringen Sie unbrauchbare Sensoren; Licht / Gruppen einschalten, wenn die Helligkeit geändert wird; Objektgruppe für Fernbedienungen hinzugefügt; Stoppen Sie das Überschreiben von Objekten beim Adapterstart. vorbereitet für den Kompaktmodus;",
-                "ru": "пропустить вспомогательные группы; добавлены каналы для освещения, групп и датчиков; пропустить неиспользуемые датчики; включить свет / группы при изменении яркости; добавлена группа объектов для удаленных пользователей; остановить перезапись объектов при запуске адаптера; подготовлен для компактного режима;",
-                "pt": "ignorar grupos auxiliares; adicionou canais para luzes, grupos e sensores; pule sensores inutilizáveis; acende a luz / grupos ao alterar o brilho; adicionado grupo de objetos para controles remotos; Parar sobrescrever objetos no início do adaptador; preparado para modo compacto;",
-                "nl": "helpgroep overslaan; toegevoegde kanalen voor lichten, groepen en sensoren; sla onbruikbare sensoren over; schakel licht / groepen in wanneer u de helderheid wijzigt; toegevoegde objet-groep voor afstandsbedieningen; stop met overschrijven van objecten op adapterstart; voorbereid voor compacte modus;",
-                "fr": "ignorer les groupes d'assistance; canaux ajoutés pour les lumières, les groupes et les capteurs; ignorer les capteurs inutilisables; allumer la lumière / les groupes lorsque vous modifiez la luminosité; ajout d'un groupe d'objets pour les télécommandes; arrêtez d'écraser les objets au démarrage de l'adaptateur; préparé pour le mode compact;",
-                "it": "saltare i gruppi di helper; canali aggiunti per luci, gruppi e sensori; saltare i sensori inutilizzabili; accendere la luce / gruppi quando si cambia la luminosità; aggiunto il gruppo objet per i telecomandi; interrompere la sovrascrittura degli oggetti all'avvio dell'adattatore; preparato per la modalità compatta;",
-                "es": "saltar grupos de ayuda; Canales agregados para luces, grupos y sensores; saltar sensores inutilizables; encienda la luz / grupos cuando cambie el brillo; Grupo de objetos añadidos para mandos a distancia; detener la sobrescritura de objetos en el inicio del adaptador; preparado para el modo compacto;",
-                "pl": "pomiń grupy pomocnicze; dodane kanały dla świateł, grup i czujników; pomiń bezużyteczne czujniki; włącz światło / grupy przy zmianie jasności; dodano grupę objet dla pilotów; zatrzymaj nadpisywanie obiektów na początku adaptera; przygotowany do trybu kompaktowego;",
-                "zh-cn": "跳过辅助组; 增加了灯，组和传感器的通道; 跳过不可用的传感器; 改变亮度时打开灯/组; 为遥控器添加了objet组; 在适配器启动时停止覆盖对象; 准备紧凑模式;"
-            },
-            "1.0.2": {
-                "en": "fix set bri for groups\n",
-                "de": "Fixset bri für Gruppen\n",
-                "ru": "исправить набор bri для групп\n",
-                "pt": "fix set bri para grupos\n",
-                "nl": "fixeer bri voor groepen\n",
-                "fr": "ensemble fixe pour les groupes\n",
-                "it": "fix set bri per gruppi\n",
-                "es": "arreglo conjunto bri para grupos\n",
-                "pl": "popraw zestaw bri dla grup\n",
-                "zh-cn": "修复群组bri\n"
             }
         },
         "title": "deConz ZigBee",

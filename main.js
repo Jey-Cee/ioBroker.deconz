@@ -41,7 +41,7 @@ async function startAdapter(options) {
 
             adapter.log.debug('stateChange ' + id + ' ' + JSON.stringify(state));
 
-            adapter.log.debug('dp: ' + dp + '; id:' + id);
+            adapter.log.debug('dp: ' + dp + '; id:' + id + ' tmp: ' + tmp);
 
             /**
              * @param {any} err
@@ -72,6 +72,16 @@ async function startAdapter(options) {
                             parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "bri": ' + JSON.stringify(state.val) + ', "on": true}';
                         } else {
                             parameters = '{"bri": ' + JSON.stringify(state.val) + ', "on": false}';
+                        }
+                        new SetObjectAndState(tmp[3], '', tmp[2], 'level', Math.floor((100/255) * state.val));
+                        break;
+                    case 'level':
+                        if (state.val > 0 && transitionTime === 'none') {
+                            parameters = '{"bri": ' + Math.floor((255/100) * state.val) + ', "on": true}';
+                        } else if (state.val > 0) {
+                            parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "bri": ' + Math.floor((255/100) * state.val) + ', "on": true}';
+                        } else {
+                            parameters = '{"bri": ' + Math.floor((255/100) * state.val) + ', "on": false}';
                         }
                         break;
                     case 'on':
@@ -862,6 +872,7 @@ async function getGroupAttributes(groupId) {
                     new SetObjectAndState(groupId, list['name'], 'Groups', stateName, list['state'][stateName]);
                     new SetObjectAndState(groupId, list['name'], 'Groups', 'transitiontime', null);
                 }
+                new SetObjectAndState(groupId, list['name'], 'Groups', 'level', null);
                 adapter.setObjectNotExists(`Groups.${groupId}.dimspeed`, {
                     type: 'state',
                     common: {
@@ -1447,6 +1458,7 @@ async function getAllLights() {
                     let stateName = Object.keys(list[keyName]['state'])[z];
                     new SetObjectAndState(lightID, list[keyName]['name'], 'Lights', stateName, list[keyName]['state'][stateName]);
                     new SetObjectAndState(lightID, list[keyName]['name'], 'Lights', 'transitiontime', null);
+                    new SetObjectAndState(lightID, list[keyName]['name'], 'Lights', 'level', null);
                     adapter.setObjectNotExists(`Lights.${lightID}.dimspeed`, {
                         type: 'state',
                         common: {
@@ -1873,10 +1885,17 @@ async function getObjectByDeviceId(id, type) {
     return object;
 }
 
+/**
+ *
+ * @param {string} id - of the device or group
+ * @param {string} name - only for creating object
+ * @param {string} type - Sensors, Lights, Groups
+ * @param {string} stateName
+ * @param value
+ * @constructor
+ */
 function SetObjectAndState(id, name, type, stateName, value) {
-    /*
-    type = Sensors, Lights, Groups
-     */
+
     let objType = 'mixed';
     let objRole = 'state';
     let objStates = null;
@@ -2095,6 +2114,14 @@ function SetObjectAndState(id, name, type, stateName, value) {
             objDefault = 0;
             objUnit = '%';
             value = value / 100;
+            break;
+        case 'level':
+            objType = 'number';
+            objRole = 'level.brightness';
+            objMin = 0;
+            objMax = 100;
+            objDefault = 100;
+            objUnit = '%';
             break;
         case 'lightlevel':
             objType = 'number';
