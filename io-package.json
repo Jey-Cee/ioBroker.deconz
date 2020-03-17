@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "deconz",
-        "version": "1.3.0",
+        "version": "1.3.1",
         "news": {
+            "1.3.1": {
+                "en": "fix set dimspeed\nconnect to Websocket in any case",
+                "de": "Fix Set Dimspeed\nStellen Sie auf jeden Fall eine Verbindung zu Websocket her",
+                "ru": "исправить набор Dimspeed\nподключиться к Websocket в любом случае",
+                "pt": "fix set dimspeed\nconecte-se ao Websocket em qualquer caso",
+                "nl": "stel dimspeed in\nmaak in ieder geval verbinding met Websocket",
+                "fr": "fix set dimspeed\nse connecter à Websocket dans tous les cas",
+                "it": "fix set dimspeed\nconnettersi a Websocket in ogni caso",
+                "es": "Fix set dimspeed\nconectarse a Websocket en cualquier caso",
+                "pl": "naprawić ustawiony dimspeed\nw każdym przypadku połącz się z Websocket",
+                "zh-cn": "修复设置dimspeed\n在任何情况下都连接到Websocket"
+            },
             "1.3.0": {
                 "en": "fix websocket connection if there are no upnp broadcast answer from deconz\ncorrected duration role\nadded level to lights and groups",
                 "de": "Korrigieren Sie die Websocket-Verbindung, wenn keine UTP-Broadcast-Antwort von deconz vorliegt\nkorrigierte Dauer Rolle\nLichter und Gruppen hinzugefügt",

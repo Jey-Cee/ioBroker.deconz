@@ -36,6 +36,7 @@ Required node.js >= 10.x.x
 
 ### 1.3.1
 * fix set dimspeed
+* connect to Websocket in any case
 
 ### 1.3.0
 * fix websocket connection if there are no upnp broadcast answer from deconz
