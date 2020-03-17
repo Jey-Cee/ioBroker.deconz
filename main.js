@@ -10,6 +10,7 @@ let hue_factor = 182.041666667;
 
 let ws = null;
 let alive_ts = 0;
+let reconnect = null;
 
 async function startAdapter(options) {
     options = options || {};
@@ -31,6 +32,9 @@ async function startAdapter(options) {
                     } else if (state.val === true) {
                         if (state.lc !== alive_ts) {
                             alive_ts = state.lc;
+                            if(reconnect !== null){
+                                clearTimeout(reconnect);
+                            }
                             getAutoUpdates();
                         }
 
@@ -155,9 +159,6 @@ async function startAdapter(options) {
                         } else {
                             parameters = `{ "bri_inc": ${speed} }`;
                         }
-                        break;
-                    case 'dimspeed':
-                        adapter.setState(adapter.name + '.' + adapter.instance + '.' + id + '.dimspeed', {ack: true});
                         break;
                     case 'action':
                         if (state.val === null || state.val === undefined || state.val === 0) {
@@ -347,13 +348,14 @@ async function main() {
     heartbeat();
     await adapter.getObjectAsync('Gateway_info')
         .then(async results => {
-            if (results.native.ipaddress === undefined) {
+            if (results.native.ipaddress === undefined) {  //only on first start
                 autoDiscovery();
             } else {
                 if (results.native.user === '' || results.native.user === null) {
                     adapter.log.warn('No API Key found');
                 } else {
                     getConfig();
+                    getAutoUpdates();
                 }
             }
         }), (reject => {
@@ -365,9 +367,10 @@ async function main() {
 //search for Gateway
 let discovery = new SSDP.Discovery();
 let found_deconz = false;
+let wait;
 
 function autoDiscovery() {
-    let wait;
+    adapter.log.info('auto discovery');
 
     discovery.on('message', (msg, rinfo, iface) => {
         if (msg.headers.st === 'urn:schemas-upnp-org:device:basic:1') {
@@ -394,7 +397,7 @@ function autoDiscovery() {
     });
 
 
-    discovery.listen((error) => {
+    discovery.listen('',(error) => {
         if (error) {
             adapter.log.error(error);
         }
@@ -517,7 +520,7 @@ async function deleteAPIkey() {
 
 //Make Abo using websocket
 const WebSocket = require('ws');
-let reconnect = null;
+
 
 function autoReconnect(host, port){
     reconnect = setTimeout(() => {
