@@ -138,9 +138,9 @@ async function startAdapter(options) {
                             let speed = await adapter.getStateAsync(adapter.name + '.' + adapter.instance + '.' + id + '.colorspeed');
                             adapter.log.info(JSON.stringify(speed));
                             if (speed.val === null || speed.val === undefined) {
-                                speed = 1;
+                                speed.val = 1;
                             }
-                            parameters = '{"colorspeed": ' + JSON.stringify(speed) + ', "effect": ' + JSON.stringify(state.val) + '}';
+                            parameters = '{"colorspeed": ' + speed.val + ', "effect": ' + JSON.stringify(state.val) + '}';
                         } else {
                             parameters = '{"effect": ' + JSON.stringify(state.val) + '}';
                         }
@@ -2229,6 +2229,7 @@ function SetObjectAndState(id, name, type, stateName, value) {
         case 'transitiontime':
             objType = 'number';
             objRole = 'state';
+            objUnit = 's';
             objDefault = 0;
             break;
         case 'vibrationstrength':
