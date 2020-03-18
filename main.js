@@ -59,10 +59,13 @@ async function startAdapter(options) {
 
                 if (err) {
                     transitionTime = 'none';
+                    adapter.log.debug('no transitiontime');
                 } else if (transitionTime === null) {
                     transitionTime = 'none';
+                    adapter.log.debug('no transitiontime');
                 } else {
-                    transitionTime = transitionTime.val;
+                    transitionTime = transitionTime.val * 10;
+                    adapter.log.debug('transitiontime: ' + transitionTime);
                 }
 
                 let obj = await adapter.getObjectAsync(adapter.name + '.' + adapter.instance + '.' + id);
