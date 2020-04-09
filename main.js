@@ -1781,6 +1781,7 @@ function UTCtoLocal(timeString) {
 }
 
 async function buttonEvents(id, event) {
+    if(event !== null && event !== undefined){
     let button = event.toString().substr(0, 1);
     let type = event.toString().substr(1, 3);
     await adapter.setObjectNotExistsAsync(`${id}.${button}`, {
@@ -1863,7 +1864,7 @@ async function buttonEvents(id, event) {
         }, 100);
     });
 
-
+    }
 }
 
 async function getObjectByDeviceId(id, type) {
