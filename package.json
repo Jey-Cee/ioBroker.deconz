@@ -31,7 +31,8 @@
     "dependencies": {
         "@iobroker/adapter-core": "^2.0.0",
         "request": "^2.83.0",
-        "ws": "^7.2.1"
+        "ws": "^7.2.1",
+        "@sentry/node": "^5.15.4"
     },
     "devDependencies": {
         "gulp": "^4.0.1",

@@ -109,6 +109,7 @@
         "type": "hardware"
     },
     "native": {
+        "sentry": true
     },
     "instanceObjects": [
         {
