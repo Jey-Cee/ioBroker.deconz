@@ -191,31 +191,22 @@ class deconz extends utils.Adapter{
 
         /**
          * @param {any} err
-         * @param {string | null} transitionTime
+         * @param {object|null} tTime - object for state transitiontime
          */
-        this.getState(this.name + '.' + this.instance + '.' + id + '.transitiontime', async (err, transitionTime) => {
+        this.getState(this.name + '.' + this.instance + '.' + id + '.transitiontime', async (err, tTime) => {
             let parameters = {};
             let action = '';
             let stateId = '';
             let method = '';
+            let transitionTime = err ? 'none' : (tTime.val * 10);
 
-            if (err) {
-                transitionTime = 'none';
-                this.log.debug('no transitiontime');
-            } else if (transitionTime === null) {
-                transitionTime = 'none';
-                this.log.debug('no transitiontime');
-            } else {
-                transitionTime = transitionTime.val * 10;
-                this.log.debug('transitiontime: ' + transitionTime);
-            }
 
             let obj = await this.getObjectAsync(this.name + '.' + this.instance + '.' + id);
             let controlId = obj.native.id;
 
             switch (dp) {
                 case 'bri':
-                    if (state.val > 0 && transitionTime === 'none') {
+                    if (state.val > 0 && (transitionTime === 'none' || transitionTime === 0)) {
                         parameters = '{"bri": ' + JSON.stringify(state.val) + ', "on": true}';
                     } else if (state.val > 0) {
                         parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "bri": ' + JSON.stringify(state.val) + ', "on": true}';
@@ -225,7 +216,7 @@ class deconz extends utils.Adapter{
                     new SetObjectAndState(tmp[3], '', tmp[2], 'level', Math.floor((100/255) * state.val));
                     break;
                 case 'level':
-                    if (state.val > 0 && transitionTime === 'none') {
+                    if (state.val > 0 && (transitionTime === 'none' || transitionTime === 0)) {
                         parameters = '{"bri": ' + Math.floor((255/100) * state.val) + ', "on": true}';
                     } else if (state.val > 0) {
                         parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "bri": ' + Math.floor((255/100) * state.val) + ', "on": true}';
@@ -234,42 +225,42 @@ class deconz extends utils.Adapter{
                     }
                     break;
                 case 'on':
-                    if (transitionTime === 'none') {
+                    if (transitionTime === 'none' || transitionTime === 0) {
                         parameters = '{"on": ' + JSON.stringify(state.val) + '}';
                     } else {
                         parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "on": ' + JSON.stringify(state.val) + '}';
                     }
                     break;
                 case 'hue':
-                    if (transitionTime === 'none') {
+                    if (transitionTime === 'none' || transitionTime === 0) {
                         parameters = '{"hue": ' + Math.round(parseInt(JSON.stringify(state.val)) * hue_factor) + '}';
                     } else {
                         parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "hue": ' + Math.round(parseInt(JSON.stringify(state.val)) * hue_factor) + '}';
                     }
                     break;
                 case 'sat':
-                    if (transitionTime === 'none') {
+                    if (transitionTime === 'none' || transitionTime === 0) {
                         parameters = '{"sat": ' + JSON.stringify(state.val) + '}';
                     } else {
                         parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "sat": ' + JSON.stringify(state.val) + '}';
                     }
                     break;
                 case 'ct':
-                    if (transitionTime === 'none') {
+                    if (transitionTime === 'none' || transitionTime === 0) {
                         parameters = '{"ct": ' + JSON.stringify(state.val) + '}';
                     } else {
                         parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "ct": ' + JSON.stringify(state.val) + '}';
                     }
                     break;
                 case 'xy':
-                    if (transitionTime === 'none') {
+                    if (transitionTime === 'none' || transitionTime === 0) {
                         parameters = '{"xy": [' + state.val + ']}';
                     } else {
                         parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "xy": [' + state.val + ']}';
                     }
                     break;
                 case 'alert':
-                    if (transitionTime === 'none') {
+                    if (transitionTime === 'none' || transitionTime === 0) {
                         parameters = '{"alert": ' + JSON.stringify(state.val) + '}';
                     } else {
                         parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "alert": ' + JSON.stringify(state.val) + '}';
@@ -548,7 +539,6 @@ function heartbeat() {
                 adapter.setState('Gateway_info.alive', {val: true, ack: true, expire: time});
                 //adapter.log.debug('NOTIFY ' + JSON.stringify(msg))
             }
-
         }
     });
 
@@ -645,10 +635,8 @@ async function deleteAPIkey() {
     });
 }
 
-
 //Make Abo using websocket
 const WebSocket = require('ws');
-
 
 function autoReconnect(host, port){
     reconnect = setTimeout(() => {
