@@ -198,7 +198,7 @@ class deconz extends utils.Adapter{
             let action = '';
             let stateId = '';
             let method = '';
-            let transitionTime = err ? 'none' : (tTime.val * 10);
+            let transitionTime = (err === null && tTime !== null) ? (tTime.val * 10) : 'none';
 
 
             let obj = await this.getObjectAsync(this.name + '.' + this.instance + '.' + id);
@@ -464,6 +464,7 @@ class deconz extends utils.Adapter{
 
 async function main() {
     adapter.subscribeStates('*');
+
     heartbeat();
     await adapter.getObjectAsync('Gateway_info')
         .then(async results => {
@@ -789,6 +790,7 @@ async function modifyConfig(parameters) {
 
     request(options, async (error, res, body) => {
         let response;
+        if(error) adapter.log.warn(error);
         try {
             response = JSON.parse(body);
         } catch (err) {
@@ -1271,20 +1273,15 @@ async function deleteGroup(groupId) {
         if ( await logging(res, body, 'delete group ' + groupId) ) {
             if (response[0]['success']) {
                 adapter.log.info('The group with id ' + groupId + ' was removed.');
-                adapter.getForeignObjects(adapter.name + '.' + adapter.instance + '*', 'device', (err, enums) => {                    //alle Objekte des Adapters suchen
+                adapter.getForeignObjects(adapter.name + '.' + adapter.instance + '*', 'device', async (err, enums) => {                    //alle Objekte des Adapters suchen
                     let count = Object.keys(enums).length - 1;                                      //Anzahl der Objekte
-                    for (let i = 0; i <= count; i++) {                                              //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ sensor handelt
+                    for (let i = 0; i <= count; i++) {                                              //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ group handelt
                         let keyName = Object.keys(enums)[i];
                         if (enums[keyName].common.role === 'group' && enums[keyName].native.id === groupId) {
                             adapter.log.info('Delete device Object: ' + enums[keyName].id);
                             let name = enums[keyName]._id;
 
-                            adapter.deleteDevice(name, (err) => {
-                                if (err) {
-                                    adapter.log.warn(err);
-                                }
-
-                            });
+                           await deleteDevice(name);
                         }
                     }
                 });
@@ -1501,7 +1498,7 @@ async function deleteSensor(sensorId) {
         if ( await logging(res, body, 'delete sensor ' +  sensorId) ) {
             if (response[0]['success']) {
                 adapter.log.info('The sensor with id ' + sensorId + ' was removed.');
-                adapter.getForeignObjects(adapter.name + '.' + adapter.instance + '*', 'device', (err, enums) => {                    //alle Objekte des Adapters suchen
+                adapter.getForeignObjects(adapter.name + '.' + adapter.instance + '*', 'device', async (err, enums) => {                    //alle Objekte des Adapters suchen
                     let count = Object.keys(enums).length - 1;                                      //Anzahl der Objekte
                     for (let i = 0; i <= count; i++) {                                              //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ sensor handelt
                         let keyName = Object.keys(enums)[i];
@@ -1509,12 +1506,7 @@ async function deleteSensor(sensorId) {
                             adapter.log.info('delete device Object: ' + enums[keyName]._id);
                             let name = enums[keyName]._id;
 
-                            adapter.deleteDevice(name, (err) => {
-                                if (err) {
-                                    adapter.log.warn(err);
-                                }
-
-                            });
+                            await deleteDevice(name);
                         }
 
                     }
@@ -1729,6 +1721,19 @@ async function deleteLight(lightId) {
         if ( await logging(res, body, 'delete light ' + lightId) ) {
             if (response[0]['success']) {
                 adapter.log.info('The light with id ' + lightId + ' was removed.')
+                adapter.getForeignObjects(adapter.name + '.' + adapter.instance + '.Lights.*', 'device', async (err, enums) => {                    //alle Objekte des Adapters suchen
+                    let count = Object.keys(enums).length - 1;                                      //Anzahl der Objekte
+                    for (let i = 0; i <= count; i++) {                                              //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ sensor handelt
+                        let keyName = Object.keys(enums)[i];
+                        if (enums[keyName].common.role === 'light' && enums[keyName].native.id === lightId) {
+                            adapter.log.info('delete device Object: ' + enums[keyName]._id);
+                            let name = enums[keyName]._id;
+
+                            await deleteDevice(name);
+                        }
+
+                    }
+                });
             } else if (response[0]['error']) {
                 adapter.log.warn(JSON.stringify(response[0]['error']));
             }
@@ -1881,6 +1886,24 @@ function nameFilter(name) {
 
     });
     return name;
+}
+
+async function deleteDevice(deviceId) {
+    await adapter.getObjectListAsync( {startkey: deviceId, endkey: deviceId + '.\u9999'})
+        .then(async result => {
+            for(let r in result.rows){
+                await adapter.delObjectAsync(result.rows[r].id)
+                    .then(result => {
+                        console.log(result);
+                    }, reject => {
+                        console.log(reject);
+                    });
+            }
+        }, reject => {
+            console.log(reject);
+        })
+
+
 }
 
 /**
