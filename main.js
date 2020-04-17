@@ -5,14 +5,118 @@ const request = require('request');
 let SSDP = require('./lib/ssdp.js');
 
 let adapter;
-let Sentry;
-let SentryIntegrations;
 
 let hue_factor = 182.041666667;
 
 let ws = null;
 let alive_ts = 0;
 let reconnect = null;
+
+//Sentry for error reporting
+let Sentry;
+let SentryIntegrations;
+function initSentry(callback) {
+    if (!adapter.ioPack.common || !adapter.ioPack.common.plugins || !adapter.ioPack.common.plugins.sentry) {
+        return callback && callback();
+    }
+    const sentryConfig = adapter.ioPack.common.plugins.sentry;
+    if (!sentryConfig.dsn) {
+        adapter.log.warn('Invalid Sentry definition, no dsn provided. Disable error reporting');
+        return callback && callback();
+    }
+    // Require needed tooling
+    Sentry = require('@sentry/node');
+    SentryIntegrations = require('@sentry/integrations');
+    // By installing source map support, we get the original source
+    // locations in error messages
+    require('source-map-support').install();
+
+    let sentryPathWhitelist = [];
+    if (sentryConfig.pathWhitelist && Array.isArray(sentryConfig.pathWhitelist)) {
+        sentryPathWhitelist = sentryConfig.pathWhitelist;
+    }
+    if (adapter.pack.name && !sentryPathWhitelist.includes(adapter.pack.name)) {
+        sentryPathWhitelist.push(adapter.pack.name);
+    }
+    let sentryErrorBlacklist = [];
+    if (sentryConfig.errorBlacklist && Array.isArray(sentryConfig.errorBlacklist)) {
+        sentryErrorBlacklist = sentryConfig.errorBlacklist;
+    }
+    if (!sentryErrorBlacklist.includes('SyntaxError')) {
+        sentryErrorBlacklist.push('SyntaxError');
+    }
+
+    Sentry.init({
+        release: adapter.pack.name + '@' + adapter.pack.version,
+        dsn: sentryConfig.dsn,
+        integrations: [
+            new SentryIntegrations.Dedupe()
+        ]
+    });
+    Sentry.configureScope(scope => {
+        scope.setTag('version', adapter.common.installedVersion || adapter.common.version);
+        if (adapter.common.installedFrom) {
+            scope.setTag('installedFrom', adapter.common.installedFrom);
+        }
+        else {
+            scope.setTag('installedFrom', adapter.common.installedVersion || adapter.common.version);
+        }
+        scope.addEventProcessor(function(event, hint) {
+            // Try to filter out some events
+            if (event.exception && event.exception.values && event.exception.values[0]) {
+                const eventData = event.exception.values[0];
+                // if error type is one from blacklist we ignore this error
+                if (eventData.type && sentryErrorBlacklist.includes(eventData.type)) {
+                    return null;
+                }
+                if (eventData.stacktrace && eventData.stacktrace.frames && Array.isArray(eventData.stacktrace.frames) && eventData.stacktrace.frames.length) {
+                    // if last exception frame is from an nodejs internal method we ignore this error
+                    if (eventData.stacktrace.frames[eventData.stacktrace.frames.length - 1].filename && (eventData.stacktrace.frames[eventData.stacktrace.frames.length - 1].filename.startsWith('internal/') || eventData.stacktrace.frames[eventData.stacktrace.frames.length - 1].filename.startsWith('Module.'))) {
+                        return null;
+                    }
+                    // Check if any entry is whitelisted from pathWhitelist
+                    const whitelisted = eventData.stacktrace.frames.find(frame => {
+                        if (frame.function && frame.function.startsWith('Module.')) {
+                            return false;
+                        }
+                        if (frame.filename && frame.filename.startsWith('internal/')) {
+                            return false;
+                        }
+                        if (frame.filename && !sentryPathWhitelist.find(path => path && path.length && frame.filename.includes(path))) {
+                            return false;
+                        }
+                        return true;
+                    });
+                    if (!whitelisted) {
+                        return null;
+                    }
+                }
+            }
+
+            return event;
+        });
+
+
+        adapter.getForeignObject('system.config', (err, obj) => {
+            if (obj && obj.common && obj.common.diag) {
+                adapter.getForeignObject('system.meta.uuid', (err, obj) => {
+                    // create uuid
+                    if (!err  && obj) {
+                        Sentry.configureScope(scope => {
+                            scope.setUser({
+                                id: obj.native.uuid
+                            });
+                        });
+                    }
+                    callback && callback();
+                });
+            }
+            else {
+                callback && callback();
+            }
+        });
+    });
+}
 
 class deconz extends utils.Adapter{
     /**
@@ -32,10 +136,20 @@ class deconz extends utils.Adapter{
 
     async onReady() {
         adapter = this;
-        await main();
+
+        if (adapter.supportsFeature && adapter.supportsFeature('PLUGINS')) {
+            await main();
+        }
+        else {
+            initSentry(main);
+        }
     }
 
     async onUnload(callback) {
+        ws.terminate();
+        this.setState('info.connection', {val: false, ack: true});
+        this.setState('Gateway_info.alive', {val: false, ack: true});
+
         try {
             this.log.info('cleaned everything up...');
             callback();
@@ -355,13 +469,6 @@ class deconz extends utils.Adapter{
         }
         return true;
     }
-}
-
-
-async function stop() {
-    ws.terminate();
-    adapter.setState('info.connection', {val: false, ack: true});
-    adapter.setState('Gateway_info.alive', {val: false, ack: true});
 }
 
 async function main() {
@@ -1731,7 +1838,9 @@ async function logging(res, message, action) {
             check = false;
             break;
         case 400:
-            adapter.log.warn(`Code 400: Bad request ${action}: ${message}`);
+            let msg = `Code 400: Bad request ${action}: ${message}`;
+            sentryMsg(msg);
+            adapter.log.warn(msg);
             check = false;
             break;
         case 401:
@@ -1752,6 +1861,20 @@ async function logging(res, message, action) {
             break;
     }
     return check;
+}
+
+function sentryMsg(msg) {
+    if (adapter.supportsFeature && adapter.supportsFeature('PLUGINS')) {
+        const sentryInstance = adapter.getPluginInstance('sentry');
+        if (sentryInstance) {
+            const Sentry = sentryInstance.getSentryObject();
+            Sentry && Sentry.withScope(scope => {
+                scope.setLevel('info');
+                scope.setExtra('key', 'value');
+                Sentry.captureMessage(msg, 'info'); // Level "info"
+            });
+        }
+    }
 }
 
 function nameFilter(name) {
@@ -2356,9 +2479,10 @@ function SetObjectAndState(id, name, type, stateName, value) {
 
 }
 
-// If started as allInOne/compact mode => return function to create instance
-if (module && module.parent) {
-    module.exports = startAdapter;
+
+// @ts-ignore parent is a valid property on module
+if (module.parent) {
+    module.exports = (options) => new deconz(options);
 } else {
     // or start the instance directly
     new deconz();
