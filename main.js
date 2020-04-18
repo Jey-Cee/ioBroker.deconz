@@ -146,7 +146,7 @@ class deconz extends utils.Adapter{
     }
 
     async onUnload(callback) {
-        ws.terminate();
+        if(ws !== null) ws.terminate();
         this.setState('info.connection', {val: false, ack: true});
         this.setState('Gateway_info.alive', {val: false, ack: true});
 
