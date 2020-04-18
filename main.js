@@ -619,24 +619,27 @@ async function deleteAPIkey() {
             response = JSON.parse(body);
         } catch (err) {
         }
-        if ( await logging(res, body, 'delete API key') ) {
-            if (response[0]['success']) {
+        if(res !== undefined){
+            if ( await logging(res, body, 'delete API key') ) {
+                if (response[0]['success']) {
 
-                adapter.extendObject('Gateway_info', {
-                    native: {
-                        user: ''
-                    }
-                });
+                    adapter.extendObject('Gateway_info', {
+                        native: {
+                            user: ''
+                        }
+                    });
 
-                adapter.log.info('API key deleted');
-            } else if (response[0]['error']) {
-                adapter.log.warn(JSON.stringify(response[0]['error']));
+                    adapter.log.info('API key deleted');
+                } else if (response[0]['error']) {
+                    adapter.log.warn(JSON.stringify(response[0]['error']));
+                }
+            } else if (res.statusCode === 403) {
+                adapter.log.warn('You do not have the permission to do this! ');
+            } else if (res.statusCode === 404) {
+                adapter.log.warn('Error 404 Not Found ')
             }
-        } else if (res.statusCode === 403) {
-            adapter.log.warn('You do not have the permission to do this! ');
-        } else if (res.statusCode === 404) {
-            adapter.log.warn('Error 404 Not Found ')
         }
+
     });
 }
 
