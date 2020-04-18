@@ -34,6 +34,12 @@ Required node.js >= 10.x.x
 
 ## Changelog
 
+### 1.3.3
+* fix catch response of setLightState is undefined
+* fix ws.terminate at unload
+* catch ip/port undefined at auto updates
+* catch res is undefined at deleteApiKey
+
 ### 1.3.2
 * transitiontime now in seconds instead 1/10 seconds
 * fix colorspeed

@@ -693,7 +693,7 @@ async function getAutoUpdates() {
             clearTimeout(reconnect);
             autoReconnect(host, port);
             let data = JSON.parse(msg.data);
-            let id = data['id'];
+            let id = data['id'] ? data['id'] : data['gid'];
             let type = data['r'];
             let state = data['state'];
             let config = data['config'];
@@ -706,6 +706,7 @@ async function getAutoUpdates() {
                     await getLightState(id);
                     break;
                 case 'groups':
+                case 'scenes':
                     await getGroupAttributes(id);
                     break;
                 case 'sensors':
