@@ -34,6 +34,16 @@ Required node.js >= 10.x.x
 
 ## Changelog
 
+### 1.3.2
+* transitiontime now in seconds instead 1/10 seconds
+* fix colorspeed
+* use new class style
+* add sentry for error collection
+* fix transition time if set to 0
+* objects will be now deleted if the device is removed by adapter
+* fix multiple websocket connections
+* try to fix #120 reconnect after 60 seconds
+
 ### 1.3.1
 * fix set dimspeed
 * connect to Websocket in any case

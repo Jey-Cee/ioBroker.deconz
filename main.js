@@ -681,6 +681,7 @@ async function getAutoUpdates() {
             setTimeout(async () => {
                 await getAutoUpdates();
             }, 60 * 1000)
+
         });
 
 
