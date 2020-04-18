@@ -175,6 +175,9 @@ class deconz extends utils.Adapter{
                     if (state.lc !== alive_ts) {
                         alive_ts = state.lc;
                         if(reconnect !== null){
+                            if(ws !== null){
+                                ws.terminate();
+                            }
                             clearTimeout(reconnect);
                         }
                         await getAutoUpdates();
@@ -1291,8 +1294,6 @@ async function deleteGroup(groupId) {
         }  
     });
 }
-
-
 //END  Group functions -------------------------------------------------------------------------------------------------
 
 
