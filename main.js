@@ -1687,7 +1687,7 @@ async function setLightState(parameters, lightId, stateId, callback) {
         } catch (err) {
         }
 
-        if ( await logging(res, body, 'set light state ' + lightId)  && (response[0] !== undefined || response[0] !== 'undefined')) {
+        if ( await logging(res, body, 'set light state ' + lightId)  && (response !== undefined || response !== 'undefined')) {
             if (response[0]['success']) {
                 adapter.setState(stateId, {ack: true});
             } else if (response[0]['error']) {
