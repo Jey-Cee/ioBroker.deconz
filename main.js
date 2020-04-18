@@ -203,9 +203,10 @@ class deconz extends utils.Adapter{
             let method = '';
             let transitionTime = (err === null && tTime !== null) ? (tTime.val * 10) : 'none';
 
-
             let obj = await this.getObjectAsync(this.name + '.' + this.instance + '.' + id);
-            let controlId = obj.native.id;
+
+            let controlId = obj !== null ? obj.native.id : '';
+
 
             switch (dp) {
                 case 'bri':
@@ -600,9 +601,9 @@ async function deleteAPIkey() {
     let ip, port, user;
     await adapter.getObjectAsync('Gateway_info')
         .then(async results => {
-            ip = results.native.ipaddress;
-            port = results.native.port;
-            user = results.native.user;
+            ip = results !== null ? results.native.ipaddress : null;
+            port = results !== null ? results.native.port : null;
+            user = results !== null ? results.native.user : null;
         });
     let options = {
         url: 'http://' + ip + ':' + port + '/api/' + user + '/config/whitelist/' + user,
@@ -654,14 +655,14 @@ async function getAutoUpdates() {
     let host, port, user;
     await adapter.getObjectAsync('Gateway_info')
         .then(async results => {
-            host = results.native.ipaddress;
-            port = results.native.websocketport;
-            user = results.native.user;
+            host = results !== null ? results.native.ipaddress : null;
+            port = results !== null ? results.native.websocketport : null;
+            user = results !== null ? results.native.user : null;
         }, reject => {
             adapter.log.warn('Object Gateway_info access error: ' + JSON.stringify(reject))
         });
 
-    if (user) {
+    if (user !== null && host !== null && port !== null) {
         ws = new WebSocket('ws://' + host + ':' + port);
 
         ws.on('open', () => {
