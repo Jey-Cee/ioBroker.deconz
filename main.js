@@ -1177,11 +1177,7 @@ async function setGroupState(parameters, groupId, stateId) {
         }
 
         if ( await logging(res, body, 'set group state ' + groupId) ) {
-            if (response[0]['success']) {
-                adapter.setState(stateId, {ack: true});
-            } else if (response[0]['error']) {
-                adapter.log.warn(JSON.stringify(response[0]['error']));
-            }
+            await ackStateVal(stateId, response);
         }  
     });
 } //END setGroupState
@@ -1218,11 +1214,7 @@ async function setGroupScene(parameters, groupId, sceneId, action, stateId, meth
         }
 
         if ( await logging(res, body, 'set group scene ' + groupId) ) {
-            if (response[0]['success']) {
-                adapter.setState(stateId, {ack: true});
-            } else if (response[0]['error']) {
-                adapter.log.warn(JSON.stringify(response[0]['error']));
-            }
+            await ackStateVal(stateId, response);
         }  
     });
 } //END setGroupScene
@@ -1469,11 +1461,7 @@ async function setSensorParameters(parameters, sensorId, stateId, callback) {
         }
 
         if ( await logging(res, body, 'set sensor parameters') ) {
-            if (response[0]['success']) {
-                adapter.setState(stateId, {ack: true});
-            } else if (response[0]['error']) {
-                adapter.log.warn(JSON.stringify(response[0]['error']));
-            }
+            await ackStateVal(stateId, response);
         }  
 
         if (callback)
@@ -1693,11 +1681,7 @@ async function setLightState(parameters, lightId, stateId, callback) {
         }
 
         if ( await logging(res, body, 'set light state ' + lightId)  && (response !== undefined || response !== 'undefined')) {
-            if (response[0]['success']) {
-                adapter.setState(stateId, {ack: true});
-            } else if (response[0]['error']) {
-                adapter.log.warn(JSON.stringify(response[0]['error']));
-            }
+            await ackStateVal(stateId, response);
         }
 
         if (callback)
@@ -1914,6 +1898,23 @@ async function deleteDevice(deviceId) {
         })
 
 
+}
+
+/**
+ * Set ACK Flag for state value
+ * @param {string} stateId
+ * @param {object} response
+ * @returns {Promise<any>}
+ */
+async function ackStateVal(stateId, response){
+    if (response[0]['success']) {
+        await adapter.getState(stateId)
+            .then(results => {
+                adapter.setState(stateId, {val: results.val, ack: true});
+            });
+    } else if (response[0]['error']) {
+        adapter.log.warn(JSON.stringify(response[0]['error']));
+    }
 }
 
 /**
