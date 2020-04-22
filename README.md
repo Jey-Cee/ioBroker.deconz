@@ -34,6 +34,9 @@ Required node.js >= 10.x.x
 
 ## Changelog
 
+### 1.3.4
+* fix message "State value to set is invalid"
+
 ### 1.3.3
 * fix catch response of setLightState is undefined
 * fix ws.terminate at unload

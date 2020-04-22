@@ -681,6 +681,7 @@ async function getAutoUpdates() {
 
         ws.on('error', async (err) => {
             adapter.log.warn('Could not connect to websocket instance of deConz/Phoscon. ' + err);
+            if(ws !== null) ws.terminate();
             adapter.setState('info.connection', {val: false, ack: true});
             setTimeout(async () => {
                 await getAutoUpdates();
