@@ -159,6 +159,7 @@ class deconz extends utils.Adapter{
     }
 
     async onStateChange(id, state){
+        let oid = id;
         let tmp = id.split('.');
         let dp = tmp.pop();
         id = tmp.slice(2).join('.');
@@ -192,208 +193,212 @@ class deconz extends utils.Adapter{
 
         this.log.debug('dp: ' + dp + '; id:' + id + ' tmp: ' + tmp);
 
-        /**
-         * @param {any} err
-         * @param {object|null} tTime - object for state transitiontime
-         */
-        this.getState(this.name + '.' + this.instance + '.' + id + '.transitiontime', async (err, tTime) => {
-            let parameters = {};
-            let action = '';
-            let stateId = '';
-            let method = '';
-            let transitionTime = (err === null && tTime !== null) ? (tTime.val * 10) : 'none';
+        let stateObj = await this.getObjectAsync(oid);
 
-            let obj = await this.getObjectAsync(this.name + '.' + this.instance + '.' + id);
-            if(obj === null) return false;
+        if(typeof state.val === stateObj.common.type) {
+            /**
+             * @param {any} err
+             * @param {object|null} tTime - object for state transitiontime
+             */
+            this.getState(this.name + '.' + this.instance + '.' + id + '.transitiontime', async (err, tTime) => {
+                let parameters = {};
+                let action = '';
+                let stateId = '';
+                let method = '';
+                let transitionTime = (err === null && tTime !== null) ? (tTime.val * 10) : 'none';
 
-            let controlId = obj !== null ? obj.native.id : '';
+                let obj = await this.getObjectAsync(this.name + '.' + this.instance + '.' + id);
+                if (obj === null) return false;
+
+                let controlId = obj !== null ? obj.native.id : '';
 
 
-            switch (dp) {
-                case 'bri':
-                    if (state.val > 0 && (transitionTime === 'none' || transitionTime === 0)) {
-                        parameters = '{"bri": ' + JSON.stringify(state.val) + ', "on": true}';
-                    } else if (state.val > 0) {
-                        parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "bri": ' + JSON.stringify(state.val) + ', "on": true}';
-                    } else {
-                        parameters = '{"bri": ' + JSON.stringify(state.val) + ', "on": false}';
-                    }
-                    new SetObjectAndState(tmp[3], '', tmp[2], 'level', Math.floor((100/255) * state.val));
-                    break;
-                case 'level':
-                    if (state.val > 0 && (transitionTime === 'none' || transitionTime === 0)) {
-                        parameters = '{"bri": ' + Math.floor((255/100) * state.val) + ', "on": true}';
-                    } else if (state.val > 0) {
-                        parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "bri": ' + Math.floor((255/100) * state.val) + ', "on": true}';
-                    } else {
-                        parameters = '{"bri": ' + Math.floor((255/100) * state.val) + ', "on": false}';
-                    }
-                    break;
-                case 'on':
-                    if (transitionTime === 'none' || transitionTime === 0) {
-                        parameters = '{"on": ' + JSON.stringify(state.val) + '}';
-                    } else {
-                        parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "on": ' + JSON.stringify(state.val) + '}';
-                    }
-                    break;
-                case 'hue':
-                    if (transitionTime === 'none' || transitionTime === 0) {
-                        parameters = '{"hue": ' + Math.round(parseInt(JSON.stringify(state.val)) * hue_factor) + '}';
-                    } else {
-                        parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "hue": ' + Math.round(parseInt(JSON.stringify(state.val)) * hue_factor) + '}';
-                    }
-                    break;
-                case 'sat':
-                    if (transitionTime === 'none' || transitionTime === 0) {
-                        parameters = '{"sat": ' + JSON.stringify(state.val) + '}';
-                    } else {
-                        parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "sat": ' + JSON.stringify(state.val) + '}';
-                    }
-                    break;
-                case 'ct':
-                    if (transitionTime === 'none' || transitionTime === 0) {
-                        parameters = '{"ct": ' + JSON.stringify(state.val) + '}';
-                    } else {
-                        parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "ct": ' + JSON.stringify(state.val) + '}';
-                    }
-                    break;
-                case 'xy':
-                    if (transitionTime === 'none' || transitionTime === 0) {
-                        parameters = '{"xy": [' + state.val + ']}';
-                    } else {
-                        parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "xy": [' + state.val + ']}';
-                    }
-                    break;
-                case 'alert':
-                    if (transitionTime === 'none' || transitionTime === 0) {
-                        parameters = '{"alert": ' + JSON.stringify(state.val) + '}';
-                    } else {
-                        parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "alert": ' + JSON.stringify(state.val) + '}';
-                    }
-                    break;
-                case 'effect':
-                    if (state.val === 'colorloop') {
-                        let speed = await this.getStateAsync(this.name + '.' + this.instance + '.' + id + '.colorspeed');
-                        this.log.info(JSON.stringify(speed));
-                        if (speed.val === null || speed.val === undefined) {
-                            speed.val = 1;
+                switch (dp) {
+                    case 'bri':
+                        if (state.val > 0 && (transitionTime === 'none' || transitionTime === 0)) {
+                            parameters = '{"bri": ' + JSON.stringify(state.val) + ', "on": true}';
+                        } else if (state.val > 0) {
+                            parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "bri": ' + JSON.stringify(state.val) + ', "on": true}';
+                        } else {
+                            parameters = '{"bri": ' + JSON.stringify(state.val) + ', "on": false}';
                         }
-                        parameters = '{"colorspeed": ' + speed.val + ', "effect": ' + JSON.stringify(state.val) + '}';
-                    } else {
-                        parameters = '{"effect": ' + JSON.stringify(state.val) + '}';
-                    }
-                    break;
-                case 'colormode':
-                    parameters = `{ "${dp}": "${state.val}" }`;
-                    break;
-                case 'dimup':
-                case 'dimdown':
-                    let dimspeed = await this.getStateAsync(this.name + '.' + this.instance + '.' + id + '.dimspeed');
-
-                    if (dimspeed === null || dimspeed === undefined || dimspeed.val === 0) {
-                        dimspeed = 10;
-                        this.setState(this.name + '.' + this.instance + '.' + id + '.dimspeed', 10, true);
-                    }
-                    let speed = dp === 'dimup' ? dimspeed.val : dimspeed.val * -1;
-                    if (transitionTime !== 'none') {
-                        parameters = `{ "transitiontime": ${JSON.stringify(transitionTime)} , "bri_inc": ${speed} }`;
-                    } else {
-                        parameters = `{ "bri_inc": ${speed} }`;
-                    }
-                    break;
-                case 'action':
-                    if (state.val === null || state.val === undefined || state.val === 0) {
-                        return;
-                    }
-                    parameters = `{ ${state.val} }`;
-                    break;
-                case 'createscene':
-                    if (obj.common.role === 'group') {
-                        let controlId = obj.native.id;
-                        let parameters = `{ "name": "${state.val}" }`;
-                        setGroupScene(parameters, controlId, 0, '', '', 'POST');
-                        getAllGroups();
-                    }
-                    break;
-                case 'delete':
-                    method = 'DELETE';
-                    await this.delObjectAsync(this.name + '.' + this.instance + '.' + id);
-                    break;
-                case 'store':
-                    action = 'store';
-                    method = 'PUT';
-                    break;
-                case 'recall':
-                    action = 'recall';
-                    method = 'PUT';
-                    break;
-                case 'name':
-                    parameters = `{ "name": "${state.val}" }`;
-                    method = 'PUT';
-
-                    this.extendObject(this.name + '.' + this.instance + '.' + id, {
-                        common: {
-                            name: state.val
+                        new SetObjectAndState(tmp[3], '', tmp[2], 'level', Math.floor((100 / 255) * state.val));
+                        break;
+                    case 'level':
+                        if (state.val > 0 && (transitionTime === 'none' || transitionTime === 0)) {
+                            parameters = '{"bri": ' + Math.floor((255 / 100) * state.val) + ', "on": true}';
+                        } else if (state.val > 0) {
+                            parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "bri": ' + Math.floor((255 / 100) * state.val) + ', "on": true}';
+                        } else {
+                            parameters = '{"bri": ' + Math.floor((255 / 100) * state.val) + ', "on": false}';
                         }
-                    });
-                    break;
-                case 'offset':
-                case 'sensitivity':
-                case 'usertest':
-                case 'ledindication':
-                case 'duration':
-                case 'delay':
-                case 'locked':
-                case 'boost':
-                case 'off':
-                case 'mode':
-                    parameters = `{ "${dp}": "${state.val}" }`;
-                    break;
-                case 'heatsetpoint':
-                case 'temperature':
-                    let val = Math.floor(state.val * 100);
-                    parameters = `{ "${dp}": "${val}" }`;
-                    break;
-                case 'network_open':
-                    let opentime;
-                    await this.getObjectAsync('Gateway_info')
-                        .then(async results => {
-                            opentime = results.native.networkopenduration;
-                        }, reject => {
-                            this.log.error(JSON.stringify(reject));
+                        break;
+                    case 'on':
+                        if (transitionTime === 'none' || transitionTime === 0) {
+                            parameters = '{"on": ' + JSON.stringify(state.val) + '}';
+                        } else {
+                            parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "on": ' + JSON.stringify(state.val) + '}';
+                        }
+                        break;
+                    case 'hue':
+                        if (transitionTime === 'none' || transitionTime === 0) {
+                            parameters = '{"hue": ' + Math.round(parseInt(JSON.stringify(state.val)) * hue_factor) + '}';
+                        } else {
+                            parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "hue": ' + Math.round(parseInt(JSON.stringify(state.val)) * hue_factor) + '}';
+                        }
+                        break;
+                    case 'sat':
+                        if (transitionTime === 'none' || transitionTime === 0) {
+                            parameters = '{"sat": ' + JSON.stringify(state.val) + '}';
+                        } else {
+                            parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "sat": ' + JSON.stringify(state.val) + '}';
+                        }
+                        break;
+                    case 'ct':
+                        if (transitionTime === 'none' || transitionTime === 0) {
+                            parameters = '{"ct": ' + JSON.stringify(state.val) + '}';
+                        } else {
+                            parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "ct": ' + JSON.stringify(state.val) + '}';
+                        }
+                        break;
+                    case 'xy':
+                        if (transitionTime === 'none' || transitionTime === 0) {
+                            parameters = '{"xy": [' + state.val + ']}';
+                        } else {
+                            parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "xy": [' + state.val + ']}';
+                        }
+                        break;
+                    case 'alert':
+                        if (transitionTime === 'none' || transitionTime === 0) {
+                            parameters = '{"alert": ' + JSON.stringify(state.val) + '}';
+                        } else {
+                            parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "alert": ' + JSON.stringify(state.val) + '}';
+                        }
+                        break;
+                    case 'effect':
+                        if (state.val === 'colorloop') {
+                            let speed = await this.getStateAsync(this.name + '.' + this.instance + '.' + id + '.colorspeed');
+                            this.log.info(JSON.stringify(speed));
+                            if (speed.val === null || speed.val === undefined) {
+                                speed.val = 1;
+                            }
+                            parameters = '{"colorspeed": ' + speed.val + ', "effect": ' + JSON.stringify(state.val) + '}';
+                        } else {
+                            parameters = '{"effect": ' + JSON.stringify(state.val) + '}';
+                        }
+                        break;
+                    case 'colormode':
+                        parameters = `{ "${dp}": "${state.val}" }`;
+                        break;
+                    case 'dimup':
+                    case 'dimdown':
+                        let dimspeed = await this.getStateAsync(this.name + '.' + this.instance + '.' + id + '.dimspeed');
+
+                        if (dimspeed === null || dimspeed === undefined || dimspeed.val === 0) {
+                            dimspeed = 10;
+                            this.setState(this.name + '.' + this.instance + '.' + id + '.dimspeed', 10, true);
+                        }
+                        let speed = dp === 'dimup' ? dimspeed.val : dimspeed.val * -1;
+                        if (transitionTime !== 'none') {
+                            parameters = `{ "transitiontime": ${JSON.stringify(transitionTime)} , "bri_inc": ${speed} }`;
+                        } else {
+                            parameters = `{ "bri_inc": ${speed} }`;
+                        }
+                        break;
+                    case 'action':
+                        if (state.val === null || state.val === undefined || state.val === 0) {
+                            return;
+                        }
+                        parameters = `{ ${state.val} }`;
+                        break;
+                    case 'createscene':
+                        if (obj.common.role === 'group') {
+                            let controlId = obj.native.id;
+                            let parameters = `{ "name": "${state.val}" }`;
+                            setGroupScene(parameters, controlId, 0, '', '', 'POST');
+                            getAllGroups();
+                        }
+                        break;
+                    case 'delete':
+                        method = 'DELETE';
+                        await this.delObjectAsync(this.name + '.' + this.instance + '.' + id);
+                        break;
+                    case 'store':
+                        action = 'store';
+                        method = 'PUT';
+                        break;
+                    case 'recall':
+                        action = 'recall';
+                        method = 'PUT';
+                        break;
+                    case 'name':
+                        parameters = `{ "name": "${state.val}" }`;
+                        method = 'PUT';
+
+                        this.extendObject(this.name + '.' + this.instance + '.' + id, {
+                            common: {
+                                name: state.val
+                            }
                         });
-                    parameters = `{"permitjoin": ${opentime}}`;
-                    await modifyConfig(parameters);
-                    break;
-                default:
-                    action = 'none';
-                    break;
-            }
+                        break;
+                    case 'offset':
+                    case 'sensitivity':
+                    case 'usertest':
+                    case 'ledindication':
+                    case 'duration':
+                    case 'delay':
+                    case 'locked':
+                    case 'boost':
+                    case 'off':
+                    case 'mode':
+                        parameters = `{ "${dp}": "${state.val}" }`;
+                        break;
+                    case 'heatsetpoint':
+                    case 'temperature':
+                        let val = Math.floor(state.val * 100);
+                        parameters = `{ "${dp}": "${val}" }`;
+                        break;
+                    case 'network_open':
+                        let opentime;
+                        await this.getObjectAsync('Gateway_info')
+                            .then(async results => {
+                                opentime = results.native.networkopenduration;
+                            }, reject => {
+                                this.log.error(JSON.stringify(reject));
+                            });
+                        parameters = `{"permitjoin": ${opentime}}`;
+                        await modifyConfig(parameters);
+                        break;
+                    default:
+                        action = 'none';
+                        break;
+                }
 
-            if(action !== 'none'){
-                if(typeof parameters === 'object'){
-                    parameters = JSON.stringify(parameters);
+                if (action !== 'none') {
+                    if (typeof parameters === 'object') {
+                        parameters = JSON.stringify(parameters);
+                    }
+                    switch (obj.common.role) {
+                        case 'light':
+                            await setLightState(parameters, controlId, this.name + '.' + this.instance + '.' + id + '.' + dp);
+                            break;
+                        case 'group':
+                            if (dp !== 'createscene') {
+                                await setGroupState(parameters, controlId, this.name + '.' + this.instance + '.' + id + '.' + dp);
+                            }
+                            break;
+                        case 'sensor':
+                            await setSensorParameters(parameters, controlId, this.name + '.' + this.instance + '.' + id + '.' + dp);
+                            break;
+                        case 'scene':
+                            let parentDeviceId = id.split(".")[1];
+                            //let parent = await adapter.getObjectAsync(adapter.name + '.' + adapter.instance + '.Groups.' + parentDeviceId);
+                            await setGroupScene(parameters, parentDeviceId, controlId, action, stateId, method);
+                            break;
+                    }
                 }
-                switch (obj.common.role) {
-                    case 'light':
-                        await setLightState(parameters, controlId, this.name + '.' + this.instance + '.' + id + '.' + dp);
-                        break;
-                    case 'group':
-                        if (dp !== 'createscene') {
-                            await setGroupState(parameters, controlId, this.name + '.' + this.instance + '.' + id + '.' + dp);
-                        }
-                        break;
-                    case 'sensor':
-                        await setSensorParameters(parameters, controlId, this.name + '.' + this.instance + '.' + id + '.' + dp);
-                        break;
-                    case 'scene':
-                        let parentDeviceId = id.split(".")[1];
-                        //let parent = await adapter.getObjectAsync(adapter.name + '.' + adapter.instance + '.Groups.' + parentDeviceId);
-                        await setGroupScene(parameters, parentDeviceId, controlId, action, stateId, method);
-                        break;
-                }
-            }
-        });
+            });
+        }
     }
 
     async onMessage(obj) {
@@ -1895,7 +1900,6 @@ async function logging(res, message, action) {
             break;
         case 400:
             let msg = `Code 400: Bad request ${action}: ${message}`;
-            sentryMsg(msg);
             adapter.log.warn(msg);
             check = false;
             break;

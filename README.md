@@ -38,6 +38,7 @@ Required node.js >= 10.x.x
 * fix message "State value to set is invalid"
 * terminate websocket connection on error to make sure the session is closed
 * check response is not undefined
+* catch request errors and send to sentry
 
 ### 1.3.3
 * fix catch response of setLightState is undefined
