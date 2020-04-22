@@ -30,7 +30,7 @@
         "request": "^2.83.0",
         "ws": "^7.2.1",
         "@sentry/node": "^5.15.4",
-        "@sentry/integrations": "^5.15.4",
+        "@sentry/integrations": "^5.15.5",
         "source-map-support": "^0.5.18"
     },
     "devDependencies": {
