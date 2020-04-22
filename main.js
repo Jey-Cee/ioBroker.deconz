@@ -1907,9 +1907,9 @@ async function deleteDevice(deviceId) {
  */
 function ackStateVal(stateId, response){
     if (response[0]['success']) {
-        adapter.getState(stateId)
+        adapter.getStateAsync(stateId)
             .then(results => {
-                adapter.setState(stateId, {val: results.val, ack: true});
+                adapter.setStateAsync(stateId, {val: results.val, ack: true});
             });
     } else if (response[0]['error']) {
         adapter.log.warn(JSON.stringify(response[0]['error']));
