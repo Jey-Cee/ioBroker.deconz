@@ -809,7 +809,7 @@ async function modifyConfig(parameters) {
         } catch (err) {
         }
 
-        if ( await logging(res, body, 'modify config') ) {
+        if ( await logging(res, body, 'modify config') && response !== undefined && response !== 'undefined' ) {
             if (response[0]['success']) {
                 switch (JSON.stringify(response[0]['success'])) {
                     case  `{"/config/permitjoin":${ot}}`:
@@ -1177,7 +1177,7 @@ async function setGroupState(parameters, groupId, stateId) {
         } catch (err) {
         }
 
-        if ( await logging(res, body, 'set group state ' + groupId) ) {
+        if ( await logging(res, body, 'set group state ' + groupId) && response !== undefined && response !== 'undefined') {
             new ackStateVal(stateId, response);
         }  
     });
@@ -1214,7 +1214,7 @@ async function setGroupScene(parameters, groupId, sceneId, action, stateId, meth
         } catch (err) {
         }
 
-        if ( await logging(res, body, 'set group scene ' + groupId) ) {
+        if ( await logging(res, body, 'set group scene ' + groupId) && response !== undefined && response !== 'undefined') {
             new ackStateVal(stateId, response);
         }  
     });
@@ -1275,7 +1275,7 @@ async function deleteGroup(groupId) {
         } catch (err) {
         }
 
-        if ( await logging(res, body, 'delete group ' + groupId) ) {
+        if ( await logging(res, body, 'delete group ' + groupId) && response !== undefined && response !== 'undefined') {
             if (response[0]['success']) {
                 adapter.log.info('The group with id ' + groupId + ' was removed.');
                 adapter.getForeignObjects(adapter.name + '.' + adapter.instance + '*', 'device', async (err, enums) => {                    //alle Objekte des Adapters suchen
@@ -1461,7 +1461,7 @@ async function setSensorParameters(parameters, sensorId, stateId, callback) {
         } catch (err) {
         }
 
-        if ( await logging(res, body, 'set sensor parameters') ) {
+        if ( await logging(res, body, 'set sensor parameters') && response !== undefined && response !== 'undefined') {
             new ackStateVal(stateId, response);
         }  
 
@@ -1494,7 +1494,7 @@ async function deleteSensor(sensorId) {
         } catch (err) {
         }
 
-        if ( await logging(res, body, 'delete sensor ' +  sensorId) ) {
+        if ( await logging(res, body, 'delete sensor ' +  sensorId) && response !== undefined && response !== 'undefined') {
             if (response[0]['success']) {
                 adapter.log.info('The sensor with id ' + sensorId + ' was removed.');
                 adapter.getForeignObjects(adapter.name + '.' + adapter.instance + '*', 'device', async (err, enums) => {                    //alle Objekte des Adapters suchen
@@ -1681,7 +1681,7 @@ async function setLightState(parameters, lightId, stateId, callback) {
         } catch (err) {
         }
 
-        if ( await logging(res, body, 'set light state ' + lightId)  && (response !== undefined && response !== 'undefined')) {
+        if ( await logging(res, body, 'set light state ' + lightId)  && response !== undefined && response !== 'undefined') {
             new ackStateVal(stateId, response);
         }
 
@@ -1713,7 +1713,7 @@ async function deleteLight(lightId) {
         } catch (err) {
         }
 
-        if ( await logging(res, body, 'delete light ' + lightId) ) {
+        if ( await logging(res, body, 'delete light ' + lightId) && response !== undefined && response !== 'undefined') {
             if (response[0]['success']) {
                 adapter.log.info('The light with id ' + lightId + ' was removed.')
                 adapter.getForeignObjects(adapter.name + '.' + adapter.instance + '.Lights.*', 'device', async (err, enums) => {                    //alle Objekte des Adapters suchen
@@ -1759,7 +1759,7 @@ async function removeFromGroups(lightId) {
         } catch (err) {
         }
 
-        if ( await logging(res, body, 'remove light from groups ' + lightId) ) {
+        if ( await logging(res, body, 'remove light from groups ' + lightId) && response !== undefined && response !== 'undefined') {
             if (response[0]['success']) {
                 adapter.log.info('The light with id ' + lightId + ' was removed from all groups.')
             } else if (response[0]['error']) {

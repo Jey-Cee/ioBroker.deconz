@@ -36,6 +36,7 @@ Required node.js >= 10.x.x
 
 ### 1.3.4
 * fix message "State value to set is invalid"
+* terminate websocket connection on error to make sure the session is closed
 
 ### 1.3.3
 * fix catch response of setLightState is undefined
