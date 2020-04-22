@@ -204,6 +204,7 @@ class deconz extends utils.Adapter{
             let transitionTime = (err === null && tTime !== null) ? (tTime.val * 10) : 'none';
 
             let obj = await this.getObjectAsync(this.name + '.' + this.instance + '.' + id);
+            if(obj === null) return false;
 
             let controlId = obj !== null ? obj.native.id : '';
 
@@ -523,7 +524,7 @@ function autoDiscovery() {
 
     discovery.listen('',(error) => {
         if (error) {
-            adapter.log.error(error);
+            sentryMsg(error);
         }
         discovery.search({st: 'ssdp:all'});
         wait = setTimeout( () => {
@@ -549,7 +550,7 @@ function heartbeat() {
 
     discovery.listen((error) => {
         if (error) {
-            adapter.log.error(error);
+            sentryMsg(error);
         }
     });
 }
@@ -614,32 +615,35 @@ async function deleteAPIkey() {
     };
 
     request(options, async (error, res, body) => {
-        let response;
-        try {
-            response = JSON.parse(body);
-        } catch (err) {
-        }
-        if(res !== undefined){
-            if ( await logging(res, body, 'delete API key') ) {
-                if (response[0]['success']) {
+        if(error){
+            sentryMsg(error);
+        }else {
+            let response;
+            try {
+                response = JSON.parse(body);
+            } catch (err) {
+            }
+            if (res !== undefined) {
+                if (await logging(res, body, 'delete API key')) {
+                    if (response[0]['success']) {
 
-                    adapter.extendObject('Gateway_info', {
-                        native: {
-                            user: ''
-                        }
-                    });
+                        adapter.extendObject('Gateway_info', {
+                            native: {
+                                user: ''
+                            }
+                        });
 
-                    adapter.log.info('API key deleted');
-                } else if (response[0]['error']) {
-                    adapter.log.warn(JSON.stringify(response[0]['error']));
+                        adapter.log.info('API key deleted');
+                    } else if (response[0]['error']) {
+                        adapter.log.warn(JSON.stringify(response[0]['error']));
+                    }
+                } else if (res.statusCode === 403) {
+                    adapter.log.warn('You do not have the permission to do this! ');
+                } else if (res.statusCode === 404) {
+                    adapter.log.warn('Error 404 Not Found ')
                 }
-            } else if (res.statusCode === 403) {
-                adapter.log.warn('You do not have the permission to do this! ');
-            } else if (res.statusCode === 404) {
-                adapter.log.warn('Error 404 Not Found ')
             }
         }
-
     });
 }
 
@@ -802,28 +806,32 @@ async function modifyConfig(parameters) {
     };
 
     request(options, async (error, res, body) => {
-        let response;
-        if(error) adapter.log.warn(error);
-        try {
-            response = JSON.parse(body);
-        } catch (err) {
-        }
-
-        if ( await logging(res, body, 'modify config') && response !== undefined && response !== 'undefined' ) {
-            if (response[0]['success']) {
-                switch (JSON.stringify(response[0]['success'])) {
-                    case  `{"/config/permitjoin":${ot}}`:
-                        adapter.log.info(`Network is now open for ${ot} seconds to register new devices.`);
-                        adapter.setState('Gateway_info.network_open', {ack: true, expire: ot});
-                        break;
-                }
-            } else if (response[0]['error']) {
-                adapter.log.warn(JSON.stringify(response[0]['error']));
+        if(error){
+            sentryMsg(error);
+        }else {
+            let response;
+            if (error) adapter.log.warn(error);
+            try {
+                response = JSON.parse(body);
+            } catch (err) {
             }
-        } else if (res.statusCode === 403) {
-            adapter.log.warn('You do not have the permission to do this! ' + parameters);
-        } else if (res.statusCode === 400) {
-            adapter.log.warn('Error 404 Not Found ' + parameters)
+
+            if (await logging(res, body, 'modify config') && response !== undefined && response !== 'undefined') {
+                if (response[0]['success']) {
+                    switch (JSON.stringify(response[0]['success'])) {
+                        case  `{"/config/permitjoin":${ot}}`:
+                            adapter.log.info(`Network is now open for ${ot} seconds to register new devices.`);
+                            adapter.setState('Gateway_info.network_open', {ack: true, expire: ot});
+                            break;
+                    }
+                } else if (response[0]['error']) {
+                    adapter.log.warn(JSON.stringify(response[0]['error']));
+                }
+            } else if (res.statusCode === 403) {
+                adapter.log.warn('You do not have the permission to do this! ' + parameters);
+            } else if (res.statusCode === 400) {
+                adapter.log.warn('Error 404 Not Found ' + parameters)
+            }
         }
     });
 }
@@ -914,42 +922,46 @@ async function getAllGroups() {
     };
 
     request(options, async (error, res, body) => {
-        let list = JSON.parse(body);
-        let count = Object.keys(list).length - 1;
+        if(error){
+            sentryMsg(error);
+        }else {
+            let list = JSON.parse(body);
+            let count = Object.keys(list).length - 1;
 
-        if ( await logging(res, body, 'get all groups')  && body !== '{}') {
-            for (let i = 0; i <= count; i++) {
-                let keyName = Object.keys(list)[i];
-                //create object for group
-                let objectName = list[keyName]['name'];
-                let groupID = list[keyName]['id'];
+            if (await logging(res, body, 'get all groups') && body !== '{}') {
+                for (let i = 0; i <= count; i++) {
+                    let keyName = Object.keys(list)[i];
+                    //create object for group
+                    let objectName = list[keyName]['name'];
+                    let groupID = list[keyName]['id'];
 
-                //Changed check if is helper group, if skip it
-                let regex = new RegExp("helper[0-9]+ for group [0-9]+");
-                if (!regex.test(objectName)) {
+                    //Changed check if is helper group, if skip it
+                    let regex = new RegExp("helper[0-9]+ for group [0-9]+");
+                    if (!regex.test(objectName)) {
 
 
-                    adapter.setObjectNotExists(`Groups.${groupID}`, {
-                        type: 'device',
-                        common: {
-                            name: list[keyName]['name'],
-                            role: 'group'
-                        },
-                        native: {
-                            devicemembership: list[keyName]['devicemembership'],
-                            etag: list[keyName]['etag'],
-                            id: list[keyName]['id'],
-                            hidden: list[keyName]['hidden'],
-                            type: 'group'
-                        }
-                    }, () => {
-                        getGroupAttributes(list[keyName]['id']);
-                        getGroupScenes(`Groups.${groupID}`, list[keyName]['scenes']);
-                    });
+                        adapter.setObjectNotExists(`Groups.${groupID}`, {
+                            type: 'device',
+                            common: {
+                                name: list[keyName]['name'],
+                                role: 'group'
+                            },
+                            native: {
+                                devicemembership: list[keyName]['devicemembership'],
+                                etag: list[keyName]['etag'],
+                                id: list[keyName]['id'],
+                                hidden: list[keyName]['hidden'],
+                                type: 'group'
+                            }
+                        }, () => {
+                            getGroupAttributes(list[keyName]['id']);
+                            getGroupScenes(`Groups.${groupID}`, list[keyName]['scenes']);
+                        });
 
+                    }
                 }
             }
-        }  
+        }
     });
 } //END getAllGroups
 
@@ -968,85 +980,89 @@ async function getGroupAttributes(groupId) {
     };
 
     request(options, async (error, res, body) => {
-        let list = JSON.parse(body);
+        if(error){
+            sentryMsg(error);
+        }else {
+            let list = JSON.parse(body);
 
-        if ( await logging(res, body, 'get group attributes ' + groupId) ) {
-            //create object for group with attributes
-            let groupID = list['id'];
-            //Changed check if helper, if skip it (cause it also dont exists)
-            let regex = new RegExp("helper[0-9]+ for group [0-9]+");
-            if (!regex.test(list['name'])) {
-                adapter.setObjectNotExists(`Groups.${groupId}`, {
-                    type: 'device',
-                    common: {
-                        name: list['name'],
-                        role: 'group'
-                    },
-                    native: {
-                        devicemembership: list['devicemembership'],
-                        etag: list['etag'],
-                        hidden: list['hidden'],
-                        id: groupId,
-                        lights: list['lights'],
-                        lightsequence: list['lightsequence'],
-                        multideviceids: list['multideviceids']
+            if (await logging(res, body, 'get group attributes ' + groupId)) {
+                //create object for group with attributes
+                let groupID = list['id'];
+                //Changed check if helper, if skip it (cause it also dont exists)
+                let regex = new RegExp("helper[0-9]+ for group [0-9]+");
+                if (!regex.test(list['name'])) {
+                    adapter.setObjectNotExists(`Groups.${groupId}`, {
+                        type: 'device',
+                        common: {
+                            name: list['name'],
+                            role: 'group'
+                        },
+                        native: {
+                            devicemembership: list['devicemembership'],
+                            etag: list['etag'],
+                            hidden: list['hidden'],
+                            id: groupId,
+                            lights: list['lights'],
+                            lightsequence: list['lightsequence'],
+                            multideviceids: list['multideviceids']
+                        }
+                    });
+                    let count2 = Object.keys(list['action']).length - 1;
+                    //create states for light device
+                    for (let z = 0; z <= count2; z++) {
+                        let stateName = Object.keys(list['action'])[z];
+                        new SetObjectAndState(groupId, list['name'], 'Groups', stateName, list['action'][stateName]);
+                        new SetObjectAndState(groupId, list['name'], 'Groups', 'transitiontime', null);
                     }
-                });
-                let count2 = Object.keys(list['action']).length - 1;
-                //create states for light device
-                for (let z = 0; z <= count2; z++) {
-                    let stateName = Object.keys(list['action'])[z];
-                    new SetObjectAndState(groupId, list['name'], 'Groups', stateName, list['action'][stateName]);
-                    new SetObjectAndState(groupId, list['name'], 'Groups', 'transitiontime', null);
+                    let count3 = Object.keys(list['state']).length - 1;
+                    //create states for light device
+                    for (let z = 0; z <= count3; z++) {
+                        let stateName = Object.keys(list['state'])[z];
+                        new SetObjectAndState(groupId, list['name'], 'Groups', stateName, list['state'][stateName]);
+                        new SetObjectAndState(groupId, list['name'], 'Groups', 'transitiontime', null);
+                    }
+                    new SetObjectAndState(groupId, list['name'], 'Groups', 'level', null);
+                    adapter.setObjectNotExists(`Groups.${groupId}.dimspeed`, {
+                        type: 'state',
+                        common: {
+                            name: list['name'] + ' ' + 'dimspeed',
+                            type: 'number',
+                            role: 'level.dimspeed',
+                            min: 0,
+                            max: 254,
+                            read: false,
+                            write: true
+                        },
+                        native: {}
+                    });
+                    adapter.setObjectNotExists(`Groups.${groupId}.dimup`, {
+                        type: 'state',
+                        common: {
+                            name: list['name'] + ' ' + 'dimup',
+                            role: 'button'
+                        }
+                    });
+                    adapter.setObjectNotExists(`Groups.${groupId}.dimdown`, {
+                        type: 'state',
+                        common: {
+                            name: list['name'] + ' ' + 'dimdown',
+                            role: 'button'
+                        }
+                    });
+                    adapter.setObjectNotExists(`Groups.${groupId}.action`, {
+                        type: 'state',
+                        common: {
+                            name: list['name'] + ' ' + 'action',
+                            role: 'argument',
+                            type: 'string',
+                            read: false,
+                            write: true
+                        }
+                    });
                 }
-                let count3 = Object.keys(list['state']).length - 1;
-                //create states for light device
-                for (let z = 0; z <= count3; z++) {
-                    let stateName = Object.keys(list['state'])[z];
-                    new SetObjectAndState(groupId, list['name'], 'Groups', stateName, list['state'][stateName]);
-                    new SetObjectAndState(groupId, list['name'], 'Groups', 'transitiontime', null);
-                }
-                new SetObjectAndState(groupId, list['name'], 'Groups', 'level', null);
-                adapter.setObjectNotExists(`Groups.${groupId}.dimspeed`, {
-                    type: 'state',
-                    common: {
-                        name: list['name'] + ' ' + 'dimspeed',
-                        type: 'number',
-                        role: 'level.dimspeed',
-                        min: 0,
-                        max: 254,
-                        read: false,
-                        write: true
-                    },
-                    native: {}
-                });
-                adapter.setObjectNotExists(`Groups.${groupId}.dimup`, {
-                    type: 'state',
-                    common: {
-                        name: list['name'] + ' ' + 'dimup',
-                        role: 'button'
-                    }
-                });
-                adapter.setObjectNotExists(`Groups.${groupId}.dimdown`, {
-                    type: 'state',
-                    common: {
-                        name: list['name'] + ' ' + 'dimdown',
-                        role: 'button'
-                    }
-                });
-                adapter.setObjectNotExists(`Groups.${groupId}.action`, {
-                    type: 'state',
-                    common: {
-                        name: list['name'] + ' ' + 'action',
-                        role: 'argument',
-                        type: 'string',
-                        read: false,
-                        write: true
-                    }
-                });
+                getGroupScenes(`Groups.${groupID}`, list['scenes']);
             }
-            getGroupScenes(`Groups.${groupID}`, list['scenes']);
-        }  
+        }
     })
 } //END getGroupAttributes
 
@@ -1171,15 +1187,19 @@ async function setGroupState(parameters, groupId, stateId) {
     };
 
     request(options, async (error, res, body) => {
-        let response;
-        try {
-            response = JSON.parse(body);
-        } catch (err) {
-        }
+        if(error){
+            sentryMsg(error);
+        }else {
+            let response;
+            try {
+                response = JSON.parse(body);
+            } catch (err) {
+            }
 
-        if ( await logging(res, body, 'set group state ' + groupId) && response !== undefined && response !== 'undefined') {
-            new ackStateVal(stateId, response);
-        }  
+            if (await logging(res, body, 'set group state ' + groupId) && response !== undefined && response !== 'undefined') {
+                new ackStateVal(stateId, response);
+            }
+        }
     });
 } //END setGroupState
 
@@ -1208,15 +1228,20 @@ async function setGroupScene(parameters, groupId, sceneId, action, stateId, meth
     };
 
     request(options, async (error, res, body) => {
-        let response;
-        try {
-            response = JSON.parse(body);
-        } catch (err) {
-        }
+        if(error){
+            sentryMsg(error);
+            sentryMsg(error);
+        }else {
+            let response;
+            try {
+                response = JSON.parse(body);
+            } catch (err) {
+            }
 
-        if ( await logging(res, body, 'set group scene ' + groupId) && response !== undefined && response !== 'undefined') {
-            new ackStateVal(stateId, response);
-        }  
+            if (await logging(res, body, 'set group scene ' + groupId) && response !== undefined && response !== 'undefined') {
+                new ackStateVal(stateId, response);
+            }
+        }
     });
 } //END setGroupScene
 
@@ -1269,31 +1294,35 @@ async function deleteGroup(groupId) {
     };
 
     request(options,  async (error, res, body) => {
-        let response;
-        try {
-            response = JSON.parse(body);
-        } catch (err) {
-        }
-
-        if ( await logging(res, body, 'delete group ' + groupId) && response !== undefined && response !== 'undefined') {
-            if (response[0]['success']) {
-                adapter.log.info('The group with id ' + groupId + ' was removed.');
-                adapter.getForeignObjects(adapter.name + '.' + adapter.instance + '*', 'device', async (err, enums) => {                    //alle Objekte des Adapters suchen
-                    let count = Object.keys(enums).length - 1;                                      //Anzahl der Objekte
-                    for (let i = 0; i <= count; i++) {                                              //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ group handelt
-                        let keyName = Object.keys(enums)[i];
-                        if (enums[keyName].common.role === 'group' && enums[keyName].native.id === groupId) {
-                            adapter.log.info('Delete device Object: ' + enums[keyName].id);
-                            let name = enums[keyName]._id;
-
-                           await deleteDevice(name);
-                        }
-                    }
-                });
-            } else if (response[0]['error']) {
-                adapter.log.warn(JSON.stringify(response[0]['error']));
+        if(error){
+            sentryMsg(error);
+        }else {
+            let response;
+            try {
+                response = JSON.parse(body);
+            } catch (err) {
             }
-        }  
+
+            if (await logging(res, body, 'delete group ' + groupId) && response !== undefined && response !== 'undefined') {
+                if (response[0]['success']) {
+                    adapter.log.info('The group with id ' + groupId + ' was removed.');
+                    adapter.getForeignObjects(adapter.name + '.' + adapter.instance + '*', 'device', async (err, enums) => {                    //alle Objekte des Adapters suchen
+                        let count = Object.keys(enums).length - 1;                                      //Anzahl der Objekte
+                        for (let i = 0; i <= count; i++) {                                              //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ group handelt
+                            let keyName = Object.keys(enums)[i];
+                            if (enums[keyName].common.role === 'group' && enums[keyName].native.id === groupId) {
+                                adapter.log.info('Delete device Object: ' + enums[keyName].id);
+                                let name = enums[keyName]._id;
+
+                                await deleteDevice(name);
+                            }
+                        }
+                    });
+                } else if (response[0]['error']) {
+                    adapter.log.warn(JSON.stringify(response[0]['error']));
+                }
+            }
+        }
     });
 }
 //END  Group functions -------------------------------------------------------------------------------------------------
@@ -1315,54 +1344,57 @@ async function getAllSensors() {
         method: 'GET'
     };
     request(options,  async (error, res, body) => {
-        let list = JSON.parse(body);
-        let count = Object.keys(list).length - 1;
+        if(error){
+            sentryMsg(error);
+        }else {
+            let list = JSON.parse(body);
+            let count = Object.keys(list).length - 1;
 
 
-        if ( await logging(res, body, 'get all sensors')  && body !== '{}') {
-            for (let i = 0; i <= count; i++) {              //Get each Sensor
-                let keyName = Object.keys(list)[i];
-                let sensorID = keyName;
-                //create object for sensor device
-                let regex = new RegExp("CLIP-Sensor TOOGLE-");
-                if (!regex.test(list[keyName]['name'])) {
-                    adapter.setObjectNotExists(`Sensors.${sensorID}`, {
-                        type: 'device',
-                        common: {
-                            name: list[keyName]['name'],
-                            role: 'sensor'
-                        },
-                        native: {
-                            ep: list[keyName]['ep'],
-                            etag: list[keyName]['etag'],
-                            id: keyName,
-                            group: list[keyName]['config']['group'],
-                            manufacturername: list[keyName]['manufacturername'],
-                            modelid: list[keyName]['modelid'],
-                            swversion: list[keyName]['swversion'],
-                            type: list[keyName]['type'],
-                            uniqueid: list[keyName]['uniqueid']
+            if (await logging(res, body, 'get all sensors') && body !== '{}') {
+                for (let i = 0; i <= count; i++) {              //Get each Sensor
+                    let keyName = Object.keys(list)[i];
+                    let sensorID = keyName;
+                    //create object for sensor device
+                    let regex = new RegExp("CLIP-Sensor TOOGLE-");
+                    if (!regex.test(list[keyName]['name'])) {
+                        adapter.setObjectNotExists(`Sensors.${sensorID}`, {
+                            type: 'device',
+                            common: {
+                                name: list[keyName]['name'],
+                                role: 'sensor'
+                            },
+                            native: {
+                                ep: list[keyName]['ep'],
+                                etag: list[keyName]['etag'],
+                                id: keyName,
+                                group: list[keyName]['config']['group'],
+                                manufacturername: list[keyName]['manufacturername'],
+                                modelid: list[keyName]['modelid'],
+                                swversion: list[keyName]['swversion'],
+                                type: list[keyName]['type'],
+                                uniqueid: list[keyName]['uniqueid']
+                            }
+                        });
+
+                        let count2 = Object.keys(list[keyName]['state']).length - 1;
+                        //create states for sensor device
+                        for (let z = 0; z <= count2; z++) {
+                            let stateName = Object.keys(list[keyName]['state'])[z];
+                            new SetObjectAndState(sensorID, list[keyName]['name'], 'Sensors', stateName, list[keyName]['state'][stateName]);
                         }
-                    });
-
-                    let count2 = Object.keys(list[keyName]['state']).length - 1;
-                    //create states for sensor device
-                    for (let z = 0; z <= count2; z++) {
-                        let stateName = Object.keys(list[keyName]['state'])[z];
-                        new SetObjectAndState(sensorID, list[keyName]['name'], 'Sensors', stateName, list[keyName]['state'][stateName]);
-                    }
 
 
-                    let count3 = Object.keys(list[keyName]['config']).length - 1;
-                    //create config states for sensor device
-                    for (let x = 0; x <= count3; x++) {
-                        let stateName = Object.keys(list[keyName]['config'])[x];
-                        new SetObjectAndState(sensorID, list[keyName]['name'], 'Sensors', stateName, list[keyName]['config'][stateName]);
+                        let count3 = Object.keys(list[keyName]['config']).length - 1;
+                        //create config states for sensor device
+                        for (let x = 0; x <= count3; x++) {
+                            let stateName = Object.keys(list[keyName]['config'])[x];
+                            new SetObjectAndState(sensorID, list[keyName]['name'], 'Sensors', stateName, list[keyName]['config'][stateName]);
+                        }
                     }
                 }
             }
-        }  
-
+        }
     });
 } //END getAllSensors
 
@@ -1381,56 +1413,60 @@ async function getSensor(sensorId) {
         method: 'GET'
     };
     request(options,  async (error, res, body) => {
-        if ( await logging(res, body, 'get sensor ' + sensorId) ) {
-            let list = JSON.parse(body);
+        if(error){
+            sentryMsg(error);
+        }else {
+            if (await logging(res, body, 'get sensor ' + sensorId)) {
+                let list = JSON.parse(body);
 
-            //create object for sensor
-            adapter.setObjectNotExists(`Sensors.${sensorId}`, {
-                type: 'device',
-                common: {
-                    name: list['name'],
-                    role: 'sensor'
-                },
-                native: {
-                    ep: list['ep'],
-                    etag: list['etag'],
-                    id: sensorId,
-                    group: list['config']['group'],
-                    manufacturername: list['manufacturername'],
-                    mode: list['mode'],
-                    modelid: list['modelid'],
-                    swversion: list['swversion'],
-                    type: list['type'],
-                    uniqueid: list['uniqueid']
-                }
-            });
-            let count2 = Object.keys(list['state']).length - 1;
-            //create states for sensor device
-
-            for (let z = 0; z <= count2; z++) {
-                let stateName = Object.keys(list['state'])[z];
-
-                if (stateName === 'buttonevent' && list['modelid'] === 'lumi.Sensors.switch.aq2') {
-                    let LastUpdate = Number(new Date(list['state']['lastupdated']));
-                    let Now = Number(new Date().getTime());
-                    let dateOff = new Date();
-                    let TimeOffset = dateOff.getTimezoneOffset() * 60000;
-
-                    if ((Now - LastUpdate + TimeOffset) < 2000) {
-                        new SetObjectAndState(sensorId, list['name'], 'Sensors', stateName, list['state'][stateName]);
-                    } else {
-                        adapter.log.info('buttonevent NOT updated for ' + list['name'] + ', too old: ' + ((Now - LastUpdate + TimeOffset) / 1000) + 'sec time difference update to now');
+                //create object for sensor
+                adapter.setObjectNotExists(`Sensors.${sensorId}`, {
+                    type: 'device',
+                    common: {
+                        name: list['name'],
+                        role: 'sensor'
+                    },
+                    native: {
+                        ep: list['ep'],
+                        etag: list['etag'],
+                        id: sensorId,
+                        group: list['config']['group'],
+                        manufacturername: list['manufacturername'],
+                        mode: list['mode'],
+                        modelid: list['modelid'],
+                        swversion: list['swversion'],
+                        type: list['type'],
+                        uniqueid: list['uniqueid']
                     }
-                } else {
-                    new SetObjectAndState(sensorId, list['name'], 'Sensors', stateName, list['state'][stateName]);
-                }
+                });
+                let count2 = Object.keys(list['state']).length - 1;
+                //create states for sensor device
+
+                for (let z = 0; z <= count2; z++) {
+                    let stateName = Object.keys(list['state'])[z];
+
+                    if (stateName === 'buttonevent' && list['modelid'] === 'lumi.Sensors.switch.aq2') {
+                        let LastUpdate = Number(new Date(list['state']['lastupdated']));
+                        let Now = Number(new Date().getTime());
+                        let dateOff = new Date();
+                        let TimeOffset = dateOff.getTimezoneOffset() * 60000;
+
+                        if ((Now - LastUpdate + TimeOffset) < 2000) {
+                            new SetObjectAndState(sensorId, list['name'], 'Sensors', stateName, list['state'][stateName]);
+                        } else {
+                            adapter.log.info('buttonevent NOT updated for ' + list['name'] + ', too old: ' + ((Now - LastUpdate + TimeOffset) / 1000) + 'sec time difference update to now');
+                        }
+                    } else {
+                        new SetObjectAndState(sensorId, list['name'], 'Sensors', stateName, list['state'][stateName]);
+                    }
 
 
-                let count3 = Object.keys(list['config']).length - 1;
-                //create config for sensor device
-                for (let x = 0; x <= count3; x++) {
-                    let stateName = Object.keys(list['config'])[x];
-                    new SetObjectAndState(sensorId, list['name'], 'Sensors', stateName, list['config'][stateName]);
+                    let count3 = Object.keys(list['config']).length - 1;
+                    //create config for sensor device
+                    for (let x = 0; x <= count3; x++) {
+                        let stateName = Object.keys(list['config'])[x];
+                        new SetObjectAndState(sensorId, list['name'], 'Sensors', stateName, list['config'][stateName]);
+                    }
                 }
             }
         }
@@ -1455,18 +1491,22 @@ async function setSensorParameters(parameters, sensorId, stateId, callback) {
     };
 
     request(options,  async (error, res, body) => {
-        let response;
-        try {
-            response = JSON.parse(body);
-        } catch (err) {
+        if(error){
+            sentryMsg(error);
+        }else {
+            let response;
+            try {
+                response = JSON.parse(body);
+            } catch (err) {
+            }
+
+            if (await logging(res, body, 'set sensor parameters') && response !== undefined && response !== 'undefined') {
+                new ackStateVal(stateId, response);
+            }
+
+            if (callback)
+                callback();
         }
-
-        if ( await logging(res, body, 'set sensor parameters') && response !== undefined && response !== 'undefined') {
-            new ackStateVal(stateId, response);
-        }  
-
-        if (callback)
-            callback();
     });
 } //END setSensorParameters
 
@@ -1487,33 +1527,37 @@ async function deleteSensor(sensorId) {
     };
 
     request(options, async (error, res, body) => {
-        adapter.log.debug('deleteSensor STATUS: ' + res.statusCode);
-        let response;
-        try {
-            response = JSON.parse(body);
-        } catch (err) {
-        }
-
-        if ( await logging(res, body, 'delete sensor ' +  sensorId) && response !== undefined && response !== 'undefined') {
-            if (response[0]['success']) {
-                adapter.log.info('The sensor with id ' + sensorId + ' was removed.');
-                adapter.getForeignObjects(adapter.name + '.' + adapter.instance + '*', 'device', async (err, enums) => {                    //alle Objekte des Adapters suchen
-                    let count = Object.keys(enums).length - 1;                                      //Anzahl der Objekte
-                    for (let i = 0; i <= count; i++) {                                              //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ sensor handelt
-                        let keyName = Object.keys(enums)[i];
-                        if (enums[keyName].common.role === 'sensor' && enums[keyName].native.id === sensorId) {
-                            adapter.log.info('delete device Object: ' + enums[keyName]._id);
-                            let name = enums[keyName]._id;
-
-                            await deleteDevice(name);
-                        }
-
-                    }
-                });
-            } else if (response[0]['error']) {
-                adapter.log.warn(JSON.stringify(response[0]['error']));
+        if(error){
+            sentryMsg(error);
+        }else {
+            adapter.log.debug('deleteSensor STATUS: ' + res.statusCode);
+            let response;
+            try {
+                response = JSON.parse(body);
+            } catch (err) {
             }
-        }  
+
+            if (await logging(res, body, 'delete sensor ' + sensorId) && response !== undefined && response !== 'undefined') {
+                if (response[0]['success']) {
+                    adapter.log.info('The sensor with id ' + sensorId + ' was removed.');
+                    adapter.getForeignObjects(adapter.name + '.' + adapter.instance + '*', 'device', async (err, enums) => {                    //alle Objekte des Adapters suchen
+                        let count = Object.keys(enums).length - 1;                                      //Anzahl der Objekte
+                        for (let i = 0; i <= count; i++) {                                              //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ sensor handelt
+                            let keyName = Object.keys(enums)[i];
+                            if (enums[keyName].common.role === 'sensor' && enums[keyName].native.id === sensorId) {
+                                adapter.log.info('delete device Object: ' + enums[keyName]._id);
+                                let name = enums[keyName]._id;
+
+                                await deleteDevice(name);
+                            }
+
+                        }
+                    });
+                } else if (response[0]['error']) {
+                    adapter.log.warn(JSON.stringify(response[0]['error']));
+                }
+            }
+        }
     });
 }
 
@@ -1536,76 +1580,80 @@ async function getAllLights() {
         method: 'GET'
     };
     request(options, async (error, res, body) => {
-        let list = JSON.parse(body);
-        let count = Object.keys(list).length - 1;
+        if(error){
+            sentryMsg(error);
+        }else {
+            let list = JSON.parse(body);
+            let count = Object.keys(list).length - 1;
 
-        if ( await logging(res, body, 'get all lights') && body !== '{}') {
-            for (let i = 0; i <= count; i++) {
-                let keyName = Object.keys(list)[i];
-                let lightID = Object.keys(list)[i];
+            if (await logging(res, body, 'get all lights') && body !== '{}') {
+                for (let i = 0; i <= count; i++) {
+                    let keyName = Object.keys(list)[i];
+                    let lightID = Object.keys(list)[i];
 
-                //create object for light device
-                adapter.setObjectNotExists(`Lights.${lightID}`, {
-                    type: 'device',
-                    common: {
-                        name: list[keyName]['name'],
-                        role: 'light'
-                    },
-                    native: {
-                        etag: list[keyName]['etag'],
-                        hascolor: list[keyName]['hascolor'],
-                        id: Object.keys(list)[i],
-                        manufacturername: list[keyName]['manufacturername'],
-                        modelid: list[keyName]['modelid'],
-                        swversion: list[keyName]['swversion'],
-                        type: list[keyName]['type'],
-                        uniqueid: list[keyName]['uniqueid']
-                    }
-                });
-                let count2 = Object.keys(list[keyName]['state']).length - 1;
-                //create states for light device
-                for (let z = 0; z <= count2; z++) {
-                    let stateName = Object.keys(list[keyName]['state'])[z];
-                    new SetObjectAndState(lightID, list[keyName]['name'], 'Lights', stateName, list[keyName]['state'][stateName]);
-                    new SetObjectAndState(lightID, list[keyName]['name'], 'Lights', 'transitiontime', null);
-                    new SetObjectAndState(lightID, list[keyName]['name'], 'Lights', 'level', null);
-                    adapter.setObjectNotExists(`Lights.${lightID}.dimspeed`, {
-                        type: 'state',
+                    //create object for light device
+                    adapter.setObjectNotExists(`Lights.${lightID}`, {
+                        type: 'device',
                         common: {
-                            name: list[keyName]['name'] + ' ' + 'dimspeed',
-                            type: 'number',
-                            role: 'level.dimspeed',
-                            min: 0,
-                            max: 254,
-                            read: false,
-                            write: true
+                            name: list[keyName]['name'],
+                            role: 'light'
                         },
-                        native: {}
-                    });
-                    adapter.setObjectNotExists(`Lights.${lightID}.dimup`, {
-                        type: 'state',
-                        common: {
-                            name: list[keyName]['name'] + ' ' + 'dimup',
-                            role: 'button'
+                        native: {
+                            etag: list[keyName]['etag'],
+                            hascolor: list[keyName]['hascolor'],
+                            id: Object.keys(list)[i],
+                            manufacturername: list[keyName]['manufacturername'],
+                            modelid: list[keyName]['modelid'],
+                            swversion: list[keyName]['swversion'],
+                            type: list[keyName]['type'],
+                            uniqueid: list[keyName]['uniqueid']
                         }
                     });
-                    adapter.setObjectNotExists(`Lights.${lightID}.dimdown`, {
-                        type: 'state',
-                        common: {
-                            name: list[keyName]['name'] + ' ' + 'dimdown',
-                            role: 'button'
-                        }
-                    });
-                    adapter.setObjectNotExists(`Lights.${lightID}.action`, {
-                        type: 'state',
-                        common: {
-                            name: list[keyName]['name'] + ' ' + 'action',
-                            role: 'argument',
-                            type: 'string',
-                            read: false,
-                            write: true
-                        }
-                    });
+                    let count2 = Object.keys(list[keyName]['state']).length - 1;
+                    //create states for light device
+                    for (let z = 0; z <= count2; z++) {
+                        let stateName = Object.keys(list[keyName]['state'])[z];
+                        new SetObjectAndState(lightID, list[keyName]['name'], 'Lights', stateName, list[keyName]['state'][stateName]);
+                        new SetObjectAndState(lightID, list[keyName]['name'], 'Lights', 'transitiontime', null);
+                        new SetObjectAndState(lightID, list[keyName]['name'], 'Lights', 'level', null);
+                        adapter.setObjectNotExists(`Lights.${lightID}.dimspeed`, {
+                            type: 'state',
+                            common: {
+                                name: list[keyName]['name'] + ' ' + 'dimspeed',
+                                type: 'number',
+                                role: 'level.dimspeed',
+                                min: 0,
+                                max: 254,
+                                read: false,
+                                write: true
+                            },
+                            native: {}
+                        });
+                        adapter.setObjectNotExists(`Lights.${lightID}.dimup`, {
+                            type: 'state',
+                            common: {
+                                name: list[keyName]['name'] + ' ' + 'dimup',
+                                role: 'button'
+                            }
+                        });
+                        adapter.setObjectNotExists(`Lights.${lightID}.dimdown`, {
+                            type: 'state',
+                            common: {
+                                name: list[keyName]['name'] + ' ' + 'dimdown',
+                                role: 'button'
+                            }
+                        });
+                        adapter.setObjectNotExists(`Lights.${lightID}.action`, {
+                            type: 'state',
+                            common: {
+                                name: list[keyName]['name'] + ' ' + 'action',
+                                role: 'argument',
+                                type: 'string',
+                                read: false,
+                                write: true
+                            }
+                        });
+                    }
                 }
             }
         }
@@ -1627,32 +1675,36 @@ async function getLightState(lightId) {
         method: 'GET'
     };
     request(options, async (error, res, body) => {
-        if ( await logging(res, body, 'get light state ' + lightId) ) {
-            let list = JSON.parse(body);
-            let keyName = Object.keys(list)[0];
-            //create object for light device
-            adapter.setObject(`Lights.${lightId}`, {
-                type: 'device',
-                common: {
-                    name: list['name'],
-                    role: 'light'
-                },
-                native: {
-                    etag: list['etag'],
-                    hascolor: list['hascolor'],
-                    id: lightId,
-                    manufacturername: list['manufacturername'],
-                    modelid: list['modelid'],
-                    swversion: list['swversion'],
-                    type: list['type'],
-                    uniqueid: list['uniqueid']
+        if(error){
+            sentryMsg(error);
+        }else {
+            if (await logging(res, body, 'get light state ' + lightId)) {
+                let list = JSON.parse(body);
+                let keyName = Object.keys(list)[0];
+                //create object for light device
+                adapter.setObject(`Lights.${lightId}`, {
+                    type: 'device',
+                    common: {
+                        name: list['name'],
+                        role: 'light'
+                    },
+                    native: {
+                        etag: list['etag'],
+                        hascolor: list['hascolor'],
+                        id: lightId,
+                        manufacturername: list['manufacturername'],
+                        modelid: list['modelid'],
+                        swversion: list['swversion'],
+                        type: list['type'],
+                        uniqueid: list['uniqueid']
+                    }
+                });
+                let count2 = Object.keys(list['state']).length - 1;
+                //create states for light device
+                for (let z = 0; z <= count2; z++) {
+                    let stateName = Object.keys(list['state'])[z];
+                    new SetObjectAndState(lightId, list[keyName]['name'], 'Lights', stateName, list['state'][stateName]);
                 }
-            });
-            let count2 = Object.keys(list['state']).length - 1;
-            //create states for light device
-            for (let z = 0; z <= count2; z++) {
-                let stateName = Object.keys(list['state'])[z];
-                new SetObjectAndState(lightId, list[keyName]['name'], 'Lights', stateName, list['state'][stateName]);
             }
         }
     })
@@ -1675,18 +1727,22 @@ async function setLightState(parameters, lightId, stateId, callback) {
     };
 
     request(options, async (error, res, body) => {
-        let response;
-        try {
-            response = JSON.parse(body);
-        } catch (err) {
-        }
+        if(error){
+            sentryMsg(error);
+        }else {
+            let response;
+            try {
+                response = JSON.parse(body);
+            } catch (err) {
+            }
 
-        if ( await logging(res, body, 'set light state ' + lightId)  && response !== undefined && response !== 'undefined') {
-            new ackStateVal(stateId, response);
-        }
+            if (await logging(res, body, 'set light state ' + lightId) && response !== undefined && response !== 'undefined') {
+                new ackStateVal(stateId, response);
+            }
 
-        if (callback)
-            callback();
+            if (callback)
+                callback();
+        }
     });
 } //END setLightState
 
@@ -1707,30 +1763,34 @@ async function deleteLight(lightId) {
     };
 
     request(options, async (error, res, body) => {
-        let response;
-        try {
-            response = JSON.parse(body);
-        } catch (err) {
-        }
+        if(error){
+            sentryMsg(error);
+        }else {
+            let response;
+            try {
+                response = JSON.parse(body);
+            } catch (err) {
+            }
 
-        if ( await logging(res, body, 'delete light ' + lightId) && response !== undefined && response !== 'undefined') {
-            if (response[0]['success']) {
-                adapter.log.info('The light with id ' + lightId + ' was removed.')
-                adapter.getForeignObjects(adapter.name + '.' + adapter.instance + '.Lights.*', 'device', async (err, enums) => {                    //alle Objekte des Adapters suchen
-                    let count = Object.keys(enums).length - 1;                                      //Anzahl der Objekte
-                    for (let i = 0; i <= count; i++) {                                              //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ sensor handelt
-                        let keyName = Object.keys(enums)[i];
-                        if (enums[keyName].common.role === 'light' && enums[keyName].native.id === lightId) {
-                            adapter.log.info('delete device Object: ' + enums[keyName]._id);
-                            let name = enums[keyName]._id;
+            if (await logging(res, body, 'delete light ' + lightId) && response !== undefined && response !== 'undefined') {
+                if (response[0]['success']) {
+                    adapter.log.info('The light with id ' + lightId + ' was removed.')
+                    adapter.getForeignObjects(adapter.name + '.' + adapter.instance + '.Lights.*', 'device', async (err, enums) => {                    //alle Objekte des Adapters suchen
+                        let count = Object.keys(enums).length - 1;                                      //Anzahl der Objekte
+                        for (let i = 0; i <= count; i++) {                                              //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ sensor handelt
+                            let keyName = Object.keys(enums)[i];
+                            if (enums[keyName].common.role === 'light' && enums[keyName].native.id === lightId) {
+                                adapter.log.info('delete device Object: ' + enums[keyName]._id);
+                                let name = enums[keyName]._id;
 
-                            await deleteDevice(name);
+                                await deleteDevice(name);
+                            }
+
                         }
-
-                    }
-                });
-            } else if (response[0]['error']) {
-                adapter.log.warn(JSON.stringify(response[0]['error']));
+                    });
+                } else if (response[0]['error']) {
+                    adapter.log.warn(JSON.stringify(response[0]['error']));
+                }
             }
         }
     });
@@ -1753,17 +1813,21 @@ async function removeFromGroups(lightId) {
     };
 
     request(options, async (error, res, body) => {
-        let response;
-        try {
-            response = JSON.parse(body);
-        } catch (err) {
-        }
+        if(error){
+            sentryMsg(error);
+        }else {
+            let response;
+            try {
+                response = JSON.parse(body);
+            } catch (err) {
+            }
 
-        if ( await logging(res, body, 'remove light from groups ' + lightId) && response !== undefined && response !== 'undefined') {
-            if (response[0]['success']) {
-                adapter.log.info('The light with id ' + lightId + ' was removed from all groups.')
-            } else if (response[0]['error']) {
-                adapter.log.warn(JSON.stringify(response[0]['error']));
+            if (await logging(res, body, 'remove light from groups ' + lightId) && response !== undefined && response !== 'undefined') {
+                if (response[0]['success']) {
+                    adapter.log.info('The light with id ' + lightId + ' was removed from all groups.')
+                } else if (response[0]['error']) {
+                    adapter.log.warn(JSON.stringify(response[0]['error']));
+                }
             }
         }
     });
@@ -1788,8 +1852,12 @@ async function getDevices() {
     };
 
     request(options,async (error, res, body) => {
-        if( await logging(res, body, 'get devices')) {
-            adapter.log.debug('getDevices: ' + JSON.stringify(res) + ' ' + body);
+        if(error){
+            sentryMsg(error);
+        }else {
+            if (await logging(res, body, 'get devices')) {
+                adapter.log.debug('getDevices: ' + JSON.stringify(res) + ' ' + body);
+            }
         }
     });
 }
