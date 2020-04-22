@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "deconz",
-        "version": "1.3.3",
+        "version": "1.3.4",
         "news": {
+            "1.3.4":{
+                "en": "fix message \"State value to set is invalid\"\nterminate websocket connection on error to make sure the session is closed\ncheck response is not undefined\ncatch request errors and send to sentry\nprevent sending message with wrong value type",
+                "de": "Fix meldung \"State value to set is invalid\"\nBeenden der Websocket-Verbindung bei einem Fehler, um sicherzustellen, dass die Sitzung geschlossen ist\nPrüfung das response nicht undefined ist\nAnforderungsfehler abfangen und an Sentry senden\nVerhindern Sie das Senden von Nachrichten mit falschem Werttyp",
+                "ru": "исправить сообщение «Неверное значение состояния»\nпрервите соединение websocket в случае ошибки, чтобы убедиться, что сессия закрыта\nпроверить ответ не является неопределенным\nпоймать ошибки запроса и отправить в часовой\nзапретить отправку сообщения с неправильным типом значения",
+                "pt": "mensagem de correção \"O valor do estado a ser definido é inválido\"\nencerre a conexão do websocket com erro para garantir que a sessão seja fechada\nresposta de verificação não é indefinida\npegar erros de solicitação e enviar para sentinela\nimpedir o envio de mensagem com o tipo de valor errado",
+                "nl": "bericht repareren \"In te stellen statuswaarde is ongeldig\"\nde websocket-verbinding beëindigen bij een fout om er zeker van te zijn dat de sessie wordt afgesloten\ncheck reactie is niet ongedefinieerd\nvang verzoekfouten en verzend naar schildwacht\nvoorkomen dat een bericht met een verkeerd waardetype wordt verzonden",
+                "fr": "message de correction \"La valeur d'état à définir n'est pas valide\"\nmettre fin à la connexion websocket en cas d'erreur pour vous assurer que la session est fermée\nla réponse de vérification n'est pas indéfinie\nintercepter les erreurs de demande et envoyer à la sentinelle\nempêcher l'envoi de message avec un type de valeur incorrect",
+                "it": "correzione messaggio \"Il valore di stato da impostare non è valido\"\nterminare la connessione websocket in caso di errore per assicurarsi che la sessione sia chiusa\nverifica che la risposta non sia indefinita\ncattura errori di richiesta e invia a sentinella\nimpedire l'invio di messaggi con un tipo di valore errato",
+                "es": "mensaje fijo \"El valor de estado para establecer no es válido\"\nterminar la conexión websocket en caso de error para asegurarse de que la sesión esté cerrada\nla respuesta de verificación no está indefinida\natrapar errores de solicitud y enviar a centinela\nevitar enviar mensajes con un tipo de valor incorrecto",
+                "pl": "napraw komunikat „Niepoprawna wartość stanu”\npo błędzie zakończ połączenie WebSocket, aby upewnić się, że sesja jest zamknięta\nodpowiedź odpowiedzi nie jest niezdefiniowana\nbłędy żądania połowu i wysłać do wartownika\nzapobiec wysyłaniu wiadomości o niewłaściwym typie wartości",
+                "zh-cn": "修复消息“要设置的状态值无效”\n发生错误时终止websocket连接以确保会话已关闭\n检查响应不是不确定的\n捕获请求错误并发送给哨兵\n防止发送错误值类型的消息"
+            },
             "1.3.3": {
                 "en": "fix catch response of setLightState is undefined\nfix ws.terminate at unload\ncatch ip/port undefined at auto updates\ncatch res is undefined at deleteApiKey",
                 "de": "Die Fix-Catch-Antwort von setLightState ist undefiniert\nFix ws.terminate beim Entladen\nFang IP / Port undefiniert bei automatischen Updates\ncatch res ist bei deleteApiKey undefiniert",
