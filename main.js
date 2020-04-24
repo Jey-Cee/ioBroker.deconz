@@ -1080,7 +1080,10 @@ function getGroupScenes(group, sceneList) {
                 type: 'state',
                 common: {
                     name: "createscene",
-                    role: 'button'
+                    role: "state",
+                    type: "string",
+                    read: false,
+                    write: true
                 }
             });
             if (sceneList.length === 0) {
