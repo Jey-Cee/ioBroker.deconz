@@ -203,7 +203,6 @@ class deconz extends utils.Adapter{
             this.getState(this.name + '.' + this.instance + '.' + id + '.transitiontime', async (err, tTime) => {
                 let parameters = {};
                 let action = '';
-                let stateId = '';
                 let method = '';
                 let transitionTime = (err === null && tTime !== null) ? (tTime.val * 10) : 'none';
 
@@ -312,7 +311,7 @@ class deconz extends utils.Adapter{
                         if (obj.common.role === 'group') {
                             let controlId = obj.native.id;
                             let parameters = `{ "name": "${state.val}" }`;
-                            setGroupScene(parameters, controlId, 0, '', '', 'POST');
+                            setGroupScene(parameters, controlId, 0, '', oid, 'POST');
                             getAllGroups();
                         }
                         break;
@@ -393,7 +392,7 @@ class deconz extends utils.Adapter{
                         case 'scene':
                             let parentDeviceId = id.split(".")[1];
                             //let parent = await adapter.getObjectAsync(adapter.name + '.' + adapter.instance + '.Groups.' + parentDeviceId);
-                            await setGroupScene(parameters, parentDeviceId, controlId, action, stateId, method);
+                            await setGroupScene(parameters, parentDeviceId, controlId, action, oid, method);
                             break;
                     }
                 }
@@ -1982,7 +1981,6 @@ async function deleteDevice(deviceId) {
  * @param {object} response
  */
 function ackStateVal(stateId, response){
-    try {
         if (response[0]['success']) {
             adapter.getStateAsync(stateId)
                 .then(results => {
@@ -1991,9 +1989,6 @@ function ackStateVal(stateId, response){
         } else if (response[0]['error']) {
             adapter.log.warn(JSON.stringify(response[0]['error']));
         }
-    } catch (error) {
-        adapter.log.warn(error);
-    }
 }
 
 /**
