@@ -2282,6 +2282,7 @@ function SetObjectAndState(id, name, type, stateName, value) {
             objMin = 0;
             objMax = 254;
             objDefault = 254;
+            let bri = new SetObjectAndState(id, name, type, 'level',  Math.floor((100 / 254) * value));
             break;
         case 'buttonevent':
             objType = 'number';
