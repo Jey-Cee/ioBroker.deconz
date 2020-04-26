@@ -670,9 +670,9 @@ async function getAutoUpdates() {
     let host, port, user;
     await adapter.getObjectAsync('Gateway_info')
         .then(async results => {
-            host = (results !== null || results !== undefined) ? results.native.ipaddress : null;
-            port = (results !== null || results !== undefined) ? results.native.websocketport : null;
-            user = (results !== null || results !== undefined) ? results.native.user : null;
+            host = (results !== null || results.native.ipaddress !== undefined) ? results.native.ipaddress : null;
+            port = (results !== null || results.native.websocketport !== undefined) ? results.native.websocketport : null;
+            user = (results !== null || results.native.user !== undefined) ? results.native.user : null;
         }, reject => {
             adapter.log.warn('Object Gateway_info access error: ' + JSON.stringify(reject))
         });
