@@ -210,9 +210,6 @@ class deconz extends utils.Adapter{
                 let obj = await this.getObjectAsync(this.name + '.' + this.instance + '.' + id);
                 if (obj === null) return false;
 
-                let controlId = obj !== null ? obj.native.id : '';
-
-
                 switch (dp) {
                     case 'bri':
                         if (state.val > 0 && (transitionTime === 'none' || transitionTime === 0)) {
@@ -378,6 +375,9 @@ class deconz extends utils.Adapter{
                     if (typeof parameters === 'object') {
                         parameters = JSON.stringify(parameters);
                     }
+
+                    let controlId = (obj !== null || obj !== undefined)? obj.native.id : '';
+
                     switch (obj.common.role) {
                         case 'light':
                             await setLightState(parameters, controlId, this.name + '.' + this.instance + '.' + id + '.' + dp);
