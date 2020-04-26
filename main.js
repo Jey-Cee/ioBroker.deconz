@@ -360,12 +360,10 @@ class deconz extends utils.Adapter{
                         break;
                     case 'network_open':
                         let opentime;
-                        await this.getObjectAsync('Gateway_info')
-                            .then(async results => {
+                        const results = await this.getObjectAsync('Gateway_info')
+                            if(results){
                                 opentime = results.native.networkopenduration;
-                            }, reject => {
-                                this.log.error(JSON.stringify(reject));
-                            });
+                            }
                         parameters = `{"permitjoin": ${opentime}}`;
                         await modifyConfig(parameters);
                         break;
@@ -424,12 +422,10 @@ class deconz extends utils.Adapter{
                     break;
                 case 'openNetwork':
                     let openTime;
-                    await this.getObjectAsync('Gateway_info')
-                        .then(async results => {
-                            openTime = results.native.networkopenduration;
-                        }, reject => {
-                            this.log.error(JSON.stringify(reject));
-                        });
+                    const results = await this.getObjectAsync('Gateway_info')
+                    if (results) {
+                        openTime = results.native.networkopenduration;
+                    }
                     let parameters = `{"permitjoin": ${openTime}}`;
                     await modifyConfig(parameters);
                     wait = true;
@@ -479,21 +475,19 @@ async function main() {
     adapter.subscribeStates('*');
 
     heartbeat();
-    await adapter.getObjectAsync('Gateway_info')
-        .then(async results => {
+    const results = await adapter.getObjectAsync('Gateway_info');
+        if(results){
             if (results.native.ipaddress === undefined) {  //only on first start
                 autoDiscovery();
             } else {
                 if (results.native.user === '' || results.native.user === null) {
                     adapter.log.warn('No API Key found');
                 } else {
-                    getConfig();
-                    getAutoUpdates();
+                   await getConfig();
+                   await getAutoUpdates();
                 }
             }
-        }), (reject => {
-        adapter.log.error(JSON.stringify(reject));
-    });
+        }
 }
 
 
@@ -607,13 +601,8 @@ function createAPIkey(host, credentials, callback) {
 
 async function deleteAPIkey() {
     adapter.log.info('deleteAPIkey');
-    let ip, port, user;
-    await adapter.getObjectAsync('Gateway_info')
-        .then(async results => {
-            ip = results !== null ? results.native.ipaddress : null;
-            port = results !== null ? results.native.port : null;
-            user = results !== null ? results.native.user : null;
-        });
+    const {ip, port, user} = await getGatewayParam();
+
     let options = {
         url: 'http://' + ip + ':' + port + '/api/' + user + '/config/whitelist/' + user,
         method: 'DELETE',
@@ -668,14 +657,13 @@ function autoReconnect(host, port){
 async function getAutoUpdates() {
 
     let host, port, user;
-    await adapter.getObjectAsync('Gateway_info')
-        .then(async results => {
-            host = (results !== null || results.native.ipaddress !== undefined) ? results.native.ipaddress : null;
-            port = (results !== null || results.native.websocketport !== undefined) ? results.native.websocketport : null;
-            user = (results !== null || results.native.user !== undefined) ? results.native.user : null;
-        }, reject => {
-            adapter.log.warn('Object Gateway_info access error: ' + JSON.stringify(reject))
-        });
+   const results =  await adapter.getObjectAsync('Gateway_info');
+
+   if(results){
+       host = (results !== null && results.native.ipaddress !== undefined) ? results.native.ipaddress : null;
+       port = (results !== null && results.native.websocketport !== undefined) ? results.native.websocketport : null;
+       user = (results !== null && results.native.user !== undefined) ? results.native.user : null;
+   }
 
     if (user !== null && host !== null && port !== null) {
         ws = new WebSocket('ws://' + host + ':' + port);
@@ -798,13 +786,13 @@ async function getAutoUpdates() {
 //START deConz config --------------------------------------------------------------------------------------------------
 async function modifyConfig(parameters) {
     let ip, port, user, ot;
-    await adapter.getObjectAsync('Gateway_info')
-        .then(async results => {
-            ip = results.native.ipaddress;
-            port = results.native.port;
-            user = results.native.user;
-            ot = results.native.networkopenduration;
-        });
+    const results = await adapter.getObjectAsync('Gateway_info');
+    if(results){
+        ip = results.native.ipaddress;
+        port = results.native.port;
+        user = results.native.user;
+        ot = results.native.networkopenduration;
+    }
 
     let options = {
         url: 'http://' + ip + ':' + port + '/api/' + user + '/config',
@@ -846,13 +834,7 @@ async function modifyConfig(parameters) {
 
 
 async function getConfig() {
-    let ip, port, user;
-    await adapter.getObjectAsync('Gateway_info')
-        .then(async results => {
-            ip = results.native.ipaddress;
-            port = results.native.port;
-            user = results.native.user;
-        });
+    const {ip, port, user} = await getGatewayParam();
 
     let options = {
         url: 'http://' + ip + ':' + port + '/api/' + user + '/config',
@@ -916,13 +898,7 @@ async function getConfig() {
 
 //START  Group functions -----------------------------------------------------------------------------------------------
 async function getAllGroups() {
-    let ip, port, user;
-    await adapter.getObjectAsync('Gateway_info')
-        .then(async results => {
-            ip = results.native.ipaddress;
-            port = results.native.port;
-            user = results.native.user;
-        });
+    const {ip, port, user} = await getGatewayParam();
 
     let options = {
         url: 'http://' + ip + ':' + port + '/api/' + user + '/groups',
@@ -974,13 +950,7 @@ async function getAllGroups() {
 } //END getAllGroups
 
 async function getGroupAttributes(groupId) {
-    let ip, port, user;
-    await adapter.getObjectAsync('Gateway_info')
-        .then(async results => {
-            ip = results.native.ipaddress;
-            port = results.native.port;
-            user = results.native.user;
-        });
+    const {ip, port, user} = await getGatewayParam();
 
     let options = {
         url: 'http://' + ip + ':' + port + '/api/' + user + '/groups/' + groupId,
@@ -1182,13 +1152,8 @@ function getGroupScenes(group, sceneList) {
 } //END getGroupScenes
 
 async function setGroupState(parameters, groupId, stateId) {
-    let ip, port, user;
-    await adapter.getObjectAsync('Gateway_info')
-        .then(async results => {
-            ip = results.native.ipaddress;
-            port = results.native.port;
-            user = results.native.user;
-        });
+    const {ip, port, user} = await getGatewayParam();
+
 
     let options = {
         url: 'http://' + ip + ':' + port + '/api/' + user + '/groups/' + groupId + '/action',
@@ -1223,13 +1188,7 @@ async function setGroupScene(parameters, groupId, sceneId, action, stateId, meth
         }
     }
 
-    let ip, port, user;
-    await adapter.getObjectAsync('Gateway_info')
-        .then(async results => {
-            ip = results.native.ipaddress;
-            port = results.native.port;
-            user = results.native.user;
-        });
+    const {ip, port, user} = await getGatewayParam();
 
     let options = {
         url: 'http://' + ip + ':' + port + '/api/' + user + '/groups/' + groupId + '/scenes' + sceneString,
@@ -1257,13 +1216,7 @@ async function setGroupScene(parameters, groupId, sceneId, action, stateId, meth
 } //END setGroupScene
 
 async function createGroup(name, callback) {
-    let ip, port, user;
-    await adapter.getObjectAsync('Gateway_info')
-        .then(async results => {
-            ip = results.native.ipaddress;
-            port = results.native.port;
-            user = results.native.user;
-        });
+    const {ip, port, user} = await getGatewayParam();
 
     let options = {
         url: 'http://' + ip + ':' + port + '/api/' + user + '/groups',
@@ -1290,13 +1243,7 @@ async function createGroup(name, callback) {
 
 async function deleteGroup(groupId) {
 
-    let ip, port, user;
-    await adapter.getObjectAsync('Gateway_info')
-        .then(async results => {
-            ip = results.native.ipaddress;
-            port = results.native.port;
-            user = results.native.user;
-        });
+    const {ip, port, user} = await getGatewayParam();
 
     let options = {
         url: 'http://' + ip + ':' + port + '/api/' + user + '/groups/' + groupId,
@@ -1341,14 +1288,7 @@ async function deleteGroup(groupId) {
 
 //START  Sensor functions ----------------------------------------------------------------------------------------------
 async function getAllSensors() {
-
-    let ip, port, user;
-    await adapter.getObjectAsync('Gateway_info')
-        .then(async results => {
-            ip = results.native.ipaddress;
-            port = results.native.port;
-            user = results.native.user;
-        });
+    const {ip, port, user} = await getGatewayParam();
 
     let options = {
         url: 'http://' + ip + ':' + port + '/api/' + user + '/sensors',
@@ -1411,13 +1351,7 @@ async function getAllSensors() {
 
 async function getSensor(sensorId) {
 
-    let ip, port, user;
-    await adapter.getObjectAsync('Gateway_info')
-        .then(async results => {
-            ip = results.native.ipaddress;
-            port = results.native.port;
-            user = results.native.user;
-        });
+    const {ip, port, user} = await getGatewayParam();
 
     let options = {
         url: 'http://' + ip + ':' + port + '/api/' + user + '/sensors/' + sensorId,
@@ -1486,13 +1420,7 @@ async function getSensor(sensorId) {
 
 async function setSensorParameters(parameters, sensorId, stateId, callback) {
 
-    let ip, port, user;
-    await adapter.getObjectAsync('Gateway_info')
-        .then(async results => {
-            ip = results.native.ipaddress;
-            port = results.native.port;
-            user = results.native.user;
-        });
+    const {ip, port, user} = await getGatewayParam();
 
     let options = {
         url: 'http://' + ip + ':' + port + '/api/' + user + '/sensors/' + sensorId + '/config',
@@ -1523,13 +1451,7 @@ async function setSensorParameters(parameters, sensorId, stateId, callback) {
 
 async function deleteSensor(sensorId) {
 
-    let ip, port, user;
-    await adapter.getObjectAsync('Gateway_info')
-        .then(async results => {
-            ip = results.native.ipaddress;
-            port = results.native.port;
-            user = results.native.user;
-        });
+    const {ip, port, user} = await getGatewayParam();
 
     let options = {
         url: 'http://' + ip + ':' + port + '/api/' + user + '/sensors/' + sensorId,
@@ -1578,13 +1500,7 @@ async function deleteSensor(sensorId) {
 //START  Light functions -----------------------------------------------------------------------------------------------
 async function getAllLights() {
 
-    let ip, port, user;
-    await adapter.getObjectAsync('Gateway_info')
-        .then(async results => {
-            ip = results.native.ipaddress;
-            port = results.native.port;
-            user = results.native.user;
-        });
+    const {ip, port, user} = await getGatewayParam();
 
     let options = {
         url: 'http://' + ip + ':' + port + '/api/' + user + '/lights',
@@ -1673,13 +1589,7 @@ async function getAllLights() {
 
 async function getLightState(lightId) {
 
-    let ip, port, user;
-    await adapter.getObjectAsync('Gateway_info')
-        .then(async results => {
-            ip = results.native.ipaddress;
-            port = results.native.port;
-            user = results.native.user;
-        });
+    const {ip, port, user} = await getGatewayParam();
 
     let options = {
         url: 'http://' + ip + ':' + port + '/api/' + user + '/lights/' + lightId,
@@ -1722,13 +1632,7 @@ async function getLightState(lightId) {
 } //END getLightState
 
 async function setLightState(parameters, lightId, stateId, callback) {
-    let ip, port, user;
-    await adapter.getObjectAsync('Gateway_info')
-        .then(async results => {
-            ip = results.native.ipaddress;
-            port = results.native.port;
-            user = results.native.user;
-        });
+    const {ip, port, user} = await getGatewayParam();
 
     let options = {
         url: 'http://' + ip + ':' + port + '/api/' + user + '/lights/' + lightId + '/state',
@@ -1758,14 +1662,7 @@ async function setLightState(parameters, lightId, stateId, callback) {
 } //END setLightState
 
 async function deleteLight(lightId) {
-
-    let ip, port, user;
-    await adapter.getObjectAsync('Gateway_info')
-        .then(async results => {
-            ip = results.native.ipaddress;
-            port = results.native.port;
-            user = results.native.user;
-        });
+    const {ip, port, user} = await getGatewayParam();
 
     let options = {
         url: 'http://' + ip + ':' + port + '/api/' + user + '/lights/' + lightId,
@@ -1809,13 +1706,7 @@ async function deleteLight(lightId) {
 
 async function removeFromGroups(lightId) {
 
-    let ip, port, user;
-    await adapter.getObjectAsync('Gateway_info')
-        .then(async results => {
-            ip = results.native.ipaddress;
-            port = results.native.port;
-            user = results.native.user;
-        });
+    const {ip, port, user} = await getGatewayParam();
 
     let options = {
         url: 'http://' + ip + ':' + port + '/api/' + user + '/lights/' + lightId + '/groups',
@@ -1848,14 +1739,7 @@ async function removeFromGroups(lightId) {
 
 //START Devices functions ----------------------------------------------------------------------------------------------
 async function getDevices() {
-
-    let ip, port, user;
-    await adapter.getObjectAsync('Gateway_info')
-        .then(async results => {
-            ip = results.native.ipaddress;
-            port = results.native.port;
-            user = results.native.user;
-        });
+    const {ip, port, user} = await getGatewayParam();
 
     let options = {
         url: 'http://' + ip + ':' + port + '/api/' + user + '/devices',
@@ -1959,6 +1843,13 @@ function nameFilter(name) {
 
     });
     return name;
+}
+
+async function getGatewayParam(){
+    const results = await adapter.getObjectAsync('Gateway_info');
+    if(results){
+        return {ip: results.native.ipaddress, port: results.native.port, user: results.native.user};
+    }
 }
 
 async function deleteDevice(deviceId) {
