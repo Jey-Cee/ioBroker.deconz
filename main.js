@@ -1045,7 +1045,7 @@ async function getGroupAttributes(groupId) {
 } //END getGroupAttributes
 
 function getGroupScenes(group, sceneList) {
-
+    //TODO: rewrite, function should only be called on startup or if websocket message says there was a scene added
     //Changed check if group exists, if not skip it
     adapter.getObject(adapter.name + '.' + adapter.instance + '.' + group, (err, obj) => {
         if (obj !== undefined) {
@@ -1065,8 +1065,8 @@ function getGroupScenes(group, sceneList) {
 
             sceneList.forEach((scene) => {
                 if (scene.lightcount > 0) {
-                    adapter.setObjectNotExists(`${group}.Scene_${scene.id}`, {
-                        type: 'device',
+                    adapter.setObject(`${group}.Scene_${scene.id}`, {
+                        type: 'channel',
                         common: {
                             name: scene.name,
                             role: 'scene'
@@ -1116,8 +1116,8 @@ function getGroupScenes(group, sceneList) {
                             read: true,
                             write: false
                         }
-                    });
-                    adapter.setState(`${group}.Scene_${scene.id}.lightcount`, scene.lightcount, true);
+                    }, () => { adapter.setState(`${group}.Scene_${scene.id}.lightcount`, scene.lightcount, true); });
+
                     adapter.setObjectNotExists(`${group}.Scene_${scene.id}.transitiontime`, {
                         type: 'state',
                         common: {
@@ -1127,8 +1127,7 @@ function getGroupScenes(group, sceneList) {
                             read: true,
                             write: false
                         }
-                    });
-                    adapter.setState(`${group}.Scene_${scene.id}.transitiontime`, scene.transitiontime, true);
+                    }, () => { adapter.setState(`${group}.Scene_${scene.id}.transitiontime`, scene.transitiontime, true); });
                     adapter.setObjectNotExists(`${group}.Scene_${scene.id}.name`, {
                         type: 'state',
                         common: {
@@ -1138,13 +1137,7 @@ function getGroupScenes(group, sceneList) {
                             read: true,
                             write: true
                         }
-                    });
-                    adapter.setState(`${group}.Scene_${scene.id}.name`, scene.name, true);
-                    adapter.extendObject(`${group}.Scene_${scene.id}`, {
-                        common: {
-                            name: scene.name
-                        }
-                    });
+                    }, () => { adapter.setState(`${group}.Scene_${scene.id}.name`, scene.name, true); });
                 }
             });
         }
