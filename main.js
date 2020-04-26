@@ -1247,7 +1247,7 @@ async function setGroupScene(parameters, groupId, sceneId, action, stateId, meth
             }
 
             if (await logging(res, body, 'set group scene ' + groupId) && response !== undefined && response !== 'undefined') {
-                new ackStateVal(stateId, response);
+                    new ackStateVal(stateId, response);
             }
         }
     });
@@ -1982,13 +1982,17 @@ async function deleteDevice(deviceId) {
  * @param {object} response
  */
 function ackStateVal(stateId, response){
-    if (response[0]['success']) {
-        adapter.getStateAsync(stateId)
-            .then(results => {
-                adapter.setStateAsync(stateId, {val: results.val, ack: true});
-            });
-    } else if (response[0]['error']) {
-        adapter.log.warn(JSON.stringify(response[0]['error']));
+    try {
+        if (response[0]['success']) {
+            adapter.getStateAsync(stateId)
+                .then(results => {
+                    adapter.setStateAsync(stateId, {val: results.val, ack: true});
+                });
+        } else if (response[0]['error']) {
+            adapter.log.warn(JSON.stringify(response[0]['error']));
+        }
+    } catch (error) {
+        adapter.log.warn(error);
     }
 }
 
