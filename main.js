@@ -195,7 +195,11 @@ class deconz extends utils.Adapter{
 
         let stateObj = await this.getObjectAsync(oid);
 
-        if(typeof state.val === stateObj.common.type) {
+        if(stateObj === null){
+            sentryMsg('onStateChange getObjectAsync ' + oid);
+        }
+
+        if((stateObj !== null && stateObj !== undefined) && typeof state.val === stateObj.common.type) {
             /**
              * @param {any} err
              * @param {object|null} tTime - object for state transitiontime
@@ -287,7 +291,7 @@ class deconz extends utils.Adapter{
                         parameters = `{ "${dp}": "${state.val}" }`;
                         break;
                     case 'dimup':
-                    case 'dimdown':
+                    case 'dimdown':oid
                         let dimspeed = await this.getStateAsync(this.name + '.' + this.instance + '.' + id + '.dimspeed');
 
                         if (dimspeed === null || dimspeed === undefined || dimspeed.val === 0) {
