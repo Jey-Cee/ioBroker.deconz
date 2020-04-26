@@ -34,6 +34,16 @@ Required node.js >= 10.x.x
 
 ## Changelog
 
+###1.3.5
+* disable node v8 tests
+* fix createscene object definition
+* prevent websocket to connect if port, api key or ip is missing
+* catch errors on ackStateVal
+* fix "Cannot read property 'id' of undefined" for controlId
+* fix crash on scene actions with js-controller 3
+* catch onStateChange stateObj is null
+* fix level update when bri was set by other deConz instance
+
 ### 1.3.4
 * fix message "State value to set is invalid"
 * terminate websocket connection on error to make sure the session is closed
