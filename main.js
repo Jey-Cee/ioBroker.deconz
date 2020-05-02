@@ -1017,14 +1017,20 @@ async function getGroupAttributes(groupId) {
                         type: 'state',
                         common: {
                             name: list['name'] + ' ' + 'dimup',
-                            role: 'button'
+                            role: 'button',
+                            type: 'boolean',
+                            read: false,
+                            write: true
                         }
                     });
                     adapter.setObjectNotExists(`Groups.${groupId}.dimdown`, {
                         type: 'state',
                         common: {
                             name: list['name'] + ' ' + 'dimdown',
-                            role: 'button'
+                            role: 'button',
+                            type: 'boolean',
+                            read: false,
+                            write: true
                         }
                     });
                     adapter.setObjectNotExists(`Groups.${groupId}.action`, {
@@ -1553,14 +1559,20 @@ async function getAllLights() {
                             type: 'state',
                             common: {
                                 name: list[keyName]['name'] + ' ' + 'dimup',
-                                role: 'button'
+                                role: 'button',
+                                type: 'boolean',
+                                read: false,
+                                write: true
                             }
                         });
                         adapter.setObjectNotExists(`Lights.${lightID}.dimdown`, {
                             type: 'state',
                             common: {
                                 name: list[keyName]['name'] + ' ' + 'dimdown',
-                                role: 'button'
+                                role: 'button',
+                                type: 'boolean',
+                                read: false,
+                                write: true
                             }
                         });
                         adapter.setObjectNotExists(`Lights.${lightID}.action`, {
