@@ -1515,7 +1515,9 @@ async function getAllLights() {
             if (await logging(res, body, 'get all lights') && body !== '{}') {
                 for (let i = 0; i <= count; i++) {
                     let keyName = Object.keys(list)[i];
-                    let lightID = Object.keys(list)[i];
+                    let mac = list[keyName]['uniqueid'];
+                    mac = mac.match(/..:..:..:..:..:..:..:../g).toString();
+                    let lightID = mac.replace(/:/g, '');
 
                     //create object for light device
                     adapter.setObjectNotExists(`Lights.${lightID}`, {
@@ -1848,6 +1850,15 @@ function nameFilter(name) {
 
     });
     return name;
+}
+
+/**
+ *
+ * @param {number} deviceID
+ * @param {string} type - first letter has to be upper case. Possible: Lights, Sensors
+ */
+async function getDeviceByID(deviceID, type){
+
 }
 
 async function getGatewayParam(){

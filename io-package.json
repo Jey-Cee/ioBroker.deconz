@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "deconz",
-        "version": "1.3.5",
+        "version": "1.3.6",
         "news": {
+            "1.3.6": {
+                "en": "fix object definition dimup and dimdown",
+                "de": "Korrigieren Sie das Dimup und Dimdown der Objektdefinition",
+                "ru": "исправить определение объекта dimup и dimdown",
+                "pt": "corrigir definição de objeto dimup e dimdown",
+                "nl": "objectdefinitie dimup en dimdown repareren",
+                "fr": "corriger la définition d'objet dimup et dimdown",
+                "it": "risolve dimup e dimdown della definizione dell'oggetto",
+                "es": "fijar la definición del objeto atenuar y atenuar",
+                "pl": "napraw dimup i dimdown definicji obiektu",
+                "zh-cn": "修复对象定义dimup和dimdown"
+            },
             "1.3.5": {
                 "en": "disable node v8 tests\nfix createscene object definition\nprevent websocket to connect if port, api key or ip is missing\ncatch errors on ackStateVal\nfix \"Cannot read property 'id' of undefined\" for controlId\nfix crash on scene actions with js-controller 3\ncatch onStateChange stateObj is null\nfix level update when bri was set by other deConz instance",
                 "de": "Deaktivieren Sie Node v8-Tests\nFix erstellt eine Objektdefinition\nVerhindern Sie, dass ein Websocket eine Verbindung herstellt, wenn Port, API-Schlüssel oder IP fehlen\nFehler auf ackStateVal abfangen\nFix \"Eigenschaft 'id' von undefined kann nicht gelesen werden\" für controlId\nBehebung eines Absturzes bei Szenenaktionen mit js-controller 3\ncatch onStateChange stateObj ist null\nUpdate auf Fixebene, wenn bri von einer anderen deConz-Instanz festgelegt wurde",
