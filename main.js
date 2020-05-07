@@ -1515,9 +1515,10 @@ async function getAllLights() {
             if (await logging(res, body, 'get all lights') && body !== '{}') {
                 for (let i = 0; i <= count; i++) {
                     let keyName = Object.keys(list)[i];
-                    let mac = list[keyName]['uniqueid'];
-                    mac = mac.match(/..:..:..:..:..:..:..:../g).toString();
-                    let lightID = mac.replace(/:/g, '');
+                    let lightID = Object.keys(list)[i];
+                    //let mac = list[keyName]['uniqueid'];
+                    //mac = mac.match(/..:..:..:..:..:..:..:../g).toString();
+                    //let lightID = mac.replace(/:/g, '');
 
                     //create object for light device
                     adapter.setObjectNotExists(`Lights.${lightID}`, {

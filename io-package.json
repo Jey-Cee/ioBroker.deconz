@@ -1,9 +1,9 @@
 {
     "common": {
         "name": "deconz",
-        "version": "1.3.6",
+        "version": "1.3.7",
         "news": {
-            "1.3.6": {
+            "1.3.7": {
                 "en": "fix object definition dimup and dimdown",
                 "de": "Korrigieren Sie das Dimup und Dimdown der Objektdefinition",
                 "ru": "исправить определение объекта dimup и dimdown",
