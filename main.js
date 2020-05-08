@@ -275,14 +275,19 @@ class deconz extends utils.Adapter{
                             parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "alert": ' + JSON.stringify(state.val) + '}';
                         }
                         break;
+                    case 'colorspeed':
+                        let effect = await this.getStateAsync(this.name + '.' + this.instance + '.' + id + '.effect');
+                        if(effect && effect.val === 'colorloop'){
+                            parameters = '{"colorloopspeed": ' + state.val + ', "effect": "colorloop"}';
+                        }
+                        break;
                     case 'effect':
                         if (state.val === 'colorloop') {
                             let speed = await this.getStateAsync(this.name + '.' + this.instance + '.' + id + '.colorspeed');
-                            this.log.info(JSON.stringify(speed));
                             if (speed.val === null || speed.val === undefined) {
                                 speed.val = 1;
                             }
-                            parameters = '{"colorspeed": ' + speed.val + ', "effect": ' + JSON.stringify(state.val) + '}';
+                            parameters = '{"colorloopspeed": ' + speed.val + ', "effect": ' + JSON.stringify(state.val) + '}';
                         } else {
                             parameters = '{"effect": ' + JSON.stringify(state.val) + '}';
                         }
