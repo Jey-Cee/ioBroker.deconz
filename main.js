@@ -195,9 +195,7 @@ class deconz extends utils.Adapter{
 
         let stateObj = await this.getObjectAsync(oid);
 
-        if(stateObj === null){
-            sentryMsg('onStateChange getObjectAsync ' + oid);
-        }
+        this.log.info(typeof state.val);
 
         if((stateObj !== null && stateObj !== undefined) && typeof state.val === stateObj.common.type) {
             /**
@@ -2075,7 +2073,7 @@ function SetObjectAndState(id, name, type, stateName, value) {
             objWrite = false;
             break;
         case 'xy':
-            objType = 'array';
+            objType = 'string';
             objRole = 'color.CIE';
             objDefault = '0.10000, 0.10000';
             break;
