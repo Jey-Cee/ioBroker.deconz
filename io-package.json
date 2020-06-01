@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "deconz",
-        "version": "1.3.7",
+        "version": "1.3.8",
         "news": {
+            "1.3.8": {
+                "en": "fix colorloopspeed is not working\nfix set xy has no effect \nsome small fixes",
+                "de": "Fix Colorloopspeed funktioniert nicht\nFix Set xy hat keine Auswirkung\neinige kleine Korrekturen",
+                "ru": "исправить colorloopspeed не работает\nфиксированный набор xy не имеет никакого эффекта\nнекоторые небольшие исправления",
+                "pt": "corrigir colorloopspeed não está funcionando\no conjunto de correções xy não tem efeito\nalgumas pequenas correções",
+                "nl": "fix colorloopspeed werkt niet\nfix set xy heeft geen effect\nenkele kleine oplossingen",
+                "fr": "correction colorloopspeed ne fonctionne pas\nfix set xy n'a aucun effet\nquelques petites corrections",
+                "it": "correzione colorloopspeed non funziona\nfix set xy non ha alcun effetto\nalcune piccole correzioni",
+                "es": "arreglar colorloopspeed no funciona\nFix set xy no tiene efecto\nalgunas pequeñas correcciones",
+                "pl": "fix colorloopspeed nie działa\nzestaw poprawek xy nie ma wpływu\nkilka drobnych poprawek",
+                "zh-cn": "修复colorloopspeed不起作用\n修复程序集xy无效\n一些小修正"
+            },
             "1.3.7": {
                 "en": "fix object definition dimup and dimdown",
                 "de": "Korrigieren Sie das Dimup und Dimdown der Objektdefinition",
