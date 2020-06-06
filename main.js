@@ -481,6 +481,13 @@ async function main() {
             if (results.native.ipaddress === undefined) {  //only on first start
                 autoDiscovery();
             } else {
+                if(results.native.port === '' || results.native.port === null){
+                    await adapter.extendObjectAsync('Gateway_info', {
+                        native: {
+                            port: 80
+                        }
+                    })
+                }
                 if (results.native.user === '' || results.native.user === null) {
                     adapter.log.warn('No API Key found');
                 } else {
