@@ -34,6 +34,9 @@ Required node.js >= 10.x.x
 
 ## Changelog
 
+### 1.3.9
+* set port 80 if not defined
+
 ### 1.3.8
 * fix colorloopspeed is not working
 * fix set xy has no effect 

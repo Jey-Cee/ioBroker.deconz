@@ -475,6 +475,8 @@ class deconz extends utils.Adapter{
 async function main() {
     adapter.subscribeStates('*');
 
+    adapter.log.info('Version 2');
+
     heartbeat();
     const results = await adapter.getObjectAsync('Gateway_info');
         if(results){
