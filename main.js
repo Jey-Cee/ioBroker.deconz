@@ -711,8 +711,7 @@ async function getAutoUpdates() {
             let state = data['state'];
             let config = data['config'];
             adapter.log.debug('Websocket message: ' + JSON.stringify(data));
-
-            let thing;
+            
             let object;
             switch (type) {
                 case 'lights':
@@ -724,15 +723,15 @@ async function getAutoUpdates() {
                     break;
                 case 'sensors':
                     object = await getObjectByDeviceId(id, 'Sensors');
-                    thing = 'Sensor';
                     if (object === undefined) {
                        await getSensor(id);
                     } else {
+                        id = object.id.replace(/^(\w*\.){3}/g, '');
                         if (typeof state == 'object') {
                             for (let obj in state) {
 
                                 if (obj === 'lastupdated') {
-                                    adapter.setObjectNotExists(`Sensors.${id}` + '.lastupdated', {
+                                    adapter.setObjectNotExists(`${object.id}` + '.lastupdated', {
                                         type: 'state',
                                         common: {
                                             name: 'lastupdated',
@@ -745,13 +744,13 @@ async function getAutoUpdates() {
                                     });
                                 }
 
-                                adapter.getState(`${adapter.name}.${adapter.instance}.Sensors.${id}.lastupdated`, (err, lupdate) => {
+                                adapter.getState(`${object.id}.lastupdated`, (err, lupdate) => {
                                     if (lupdate === null) {
                                         new SetObjectAndState(id, object.value.common.name, 'Sensors', obj, state[obj]);
                                     } else if (lupdate.val !== state[obj]) {
                                         if (obj === 'buttonevent') {
                                             new SetObjectAndState(id, object.value.common.name, 'Sensors', obj, state[obj]);
-                                            adapter.setObjectNotExists(`Sensors.${id}` + '.' + "buttonpressed", {
+                                            adapter.setObjectNotExists(`${object.id}` + '.' + "buttonpressed", {
                                                 type: 'state',
                                                 common: {
                                                     name: 'Sensor' + id + ' ' + 'buttonpressed',
@@ -762,12 +761,12 @@ async function getAutoUpdates() {
                                                 },
                                                 native: {}
                                             });
-                                            adapter.setState(`Sensors.${id}` + '.' + 'buttonpressed', {
+                                            adapter.setState(`${object.id}` + '.' + 'buttonpressed', {
                                                 val: state[obj],
                                                 ack: true
                                             });
                                             setTimeout(() => {
-                                                adapter.setState(`Sensors.${id}` + '.' + 'buttonpressed', {
+                                                adapter.setState(`${object.id}` + '.' + 'buttonpressed', {
                                                     val: 0,
                                                     ack: true
                                                 })
@@ -1330,28 +1329,54 @@ async function getAllSensors() {
                 if (await logging(res, body, 'get all sensors') && body !== '{}') {
                     for (let i = 0; i <= count; i++) {              //Get each Sensor
                         let keyName = Object.keys(list)[i];
-                        let sensorID = keyName;
+                        //let sensorID = keyName;
+                        let mac = list[keyName]['uniqueid'];
+                        mac = mac.match(/..:..:..:..:..:..:..:../g).toString();
+                        let sensorID = mac.replace(/:/g, '');
+
                         //create object for sensor device
                         let regex = new RegExp("CLIP-Sensor TOOGLE-");
                         if (!regex.test(list[keyName]['name'])) {
-                            adapter.setObjectNotExists(`Sensors.${sensorID}`, {
-                                type: 'device',
-                                common: {
-                                    name: list[keyName]['name'],
-                                    role: 'sensor'
-                                },
-                                native: {
-                                    ep: list[keyName]['ep'],
-                                    etag: list[keyName]['etag'],
-                                    id: keyName,
-                                    group: (list[keyName]['config'] !== undefined) ? list[keyName]['config']['group'] : '',
-                                    manufacturername: list[keyName]['manufacturername'],
-                                    modelid: list[keyName]['modelid'],
-                                    swversion: list[keyName]['swversion'],
-                                    type: list[keyName]['type'],
-                                    uniqueid: list[keyName]['uniqueid']
+                            let exists = await adapter.getObjectAsync('Sensors.' + sensorID);
+                            if(exists === null) {
+                                await adapter.setObjectNotExistsAsync(`Sensors.${sensorID}`, {
+                                    type: 'device',
+                                    common: {
+                                        name: list[keyName]['name'],
+                                        role: 'sensor'
+                                    },
+                                    native: {
+                                        ep: list[keyName]['ep'],
+                                        etag: list[keyName]['etag'],
+                                        id: keyName,
+                                        group: (list[keyName]['config'] !== undefined) ? list[keyName]['config']['group'] : '',
+                                        manufacturername: list[keyName]['manufacturername'],
+                                        modelid: list[keyName]['modelid'],
+                                        swversion: list[keyName]['swversion'],
+                                        type: list[keyName]['type'],
+                                        uniqueid: list[keyName]['uniqueid']
+                                    }
+                                });
+                            }else{
+                                let ids = exists.native.id;
+                                if(typeof ids === 'string' && ids !== keyName){
+                                    ids = [ids, keyName];
+                                }else{
+                                    let check = true;
+                                    for(let i in ids){
+                                        if(ids[i] === keyName){
+                                            check = false;
+                                        }
+                                    }
+                                    if(check === true) ids.push(keyName);
                                 }
-                            });
+
+                                await adapter.extendObjectAsync(`Sensors.${sensorID}`, {
+                                    native: {
+                                        id: ids
+                                    }
+                                })
+                            }
 
                             let count2 = Object.keys(list[keyName]['state']).length - 1;
                             //create states for sensor device
@@ -1375,42 +1400,67 @@ async function getAllSensors() {
     }
 } //END getAllSensors
 
-async function getSensor(sensorId) {
+async function getSensor(Id) {
 
     const {ip, port, user} = await getGatewayParam();
 
     if(ip !== 'none' && port !== 'none' && user !== 'none') {
         let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/sensors/' + sensorId,
+            url: 'http://' + ip + ':' + port + '/api/' + user + '/sensors/' + Id,
             method: 'GET'
         };
         request(options, async (error, res, body) => {
             if (error) {
                 sentryMsg(error);
             } else {
-                if (await logging(res, body, 'get sensor ' + sensorId)) {
+                if (await logging(res, body, 'get sensor ' + Id)) {
                     let list = JSON.parse(body);
+                    let mac = list['uniqueid'];
+                    mac = mac.match(/..:..:..:..:..:..:..:../g).toString();
+                    let sensorId = mac.replace(/:/g, '');
 
-                    //create object for sensor
-                    adapter.setObjectNotExists(`Sensors.${sensorId}`, {
-                        type: 'device',
-                        common: {
-                            name: list['name'],
-                            role: 'sensor'
-                        },
-                        native: {
-                            ep: list['ep'],
-                            etag: list['etag'],
-                            id: sensorId,
-                            group: list['config']['group'],
-                            manufacturername: list['manufacturername'],
-                            mode: list['mode'],
-                            modelid: list['modelid'],
-                            swversion: list['swversion'],
-                            type: list['type'],
-                            uniqueid: list['uniqueid']
+                    let exists = await adapter.getObjectAsync('Sensors.' + sensorId);
+                    if(exists === null) {
+                        //create object for sensor
+                        await adapter.setObjectNotExistsAsync(`Sensors.${sensorId}`, {
+                            type: 'device',
+                            common: {
+                                name: list['name'],
+                                role: 'sensor'
+                            },
+                            native: {
+                                ep: list['ep'],
+                                etag: list['etag'],
+                                id: Id,
+                                group: list['config']['group'],
+                                manufacturername: list['manufacturername'],
+                                mode: list['mode'],
+                                modelid: list['modelid'],
+                                swversion: list['swversion'],
+                                type: list['type'],
+                                uniqueid: list['uniqueid']
+                            }
+                        });
+                    }else{
+                        let ids = exists.native.id;
+                        if(typeof ids === 'string' && ids !== Id){
+                            ids = [ids, Id];
+                        }else{
+                            let check = true;
+                            for(let i in ids){
+                                if(ids[i] === Id){
+                                    check = false;
+                                }
+                            }
+                            if(check === true) ids.push(Id);
                         }
-                    });
+
+                        await adapter.extendObjectAsync(`Sensors.${sensorId}`, {
+                            native: {
+                                id: ids
+                            }
+                        })
+                    }
                     let count2 = Object.keys(list['state']).length - 1;
                     //create states for sensor device
 
@@ -1429,7 +1479,7 @@ async function getSensor(sensorId) {
                                 adapter.log.info('buttonevent NOT updated for ' + list['name'] + ', too old: ' + ((Now - LastUpdate + TimeOffset) / 1000) + 'sec time difference update to now');
                             }
                         } else {
-                            new SetObjectAndState(sensorId, list['name'], 'Sensors', stateName, list['state'][stateName]);
+                            new SetObjectAndState(Id, list['name'], 'Sensors', stateName, list['state'][stateName]);
                         }
 
 
@@ -1437,7 +1487,7 @@ async function getSensor(sensorId) {
                         //create config for sensor device
                         for (let x = 0; x <= count3; x++) {
                             let stateName = Object.keys(list['config'])[x];
-                            new SetObjectAndState(sensorId, list['name'], 'Sensors', stateName, list['config'][stateName]);
+                            new SetObjectAndState(Id, list['name'], 'Sensors', stateName, list['config'][stateName]);
                         }
                     }
                 }
@@ -1549,10 +1599,10 @@ async function getAllLights() {
                 if (await logging(res, body, 'get all lights') && body !== '{}') {
                     for (let i = 0; i <= count; i++) {
                         let keyName = Object.keys(list)[i];
-                        let lightID = Object.keys(list)[i];
-                        //let mac = list[keyName]['uniqueid'];
-                        //mac = mac.match(/..:..:..:..:..:..:..:../g).toString();
-                        //let lightID = mac.replace(/:/g, '');
+                        //let lightID = Object.keys(list)[i];
+                        let mac = list[keyName]['uniqueid'];
+                        mac = mac.match(/..:..:..:..:..:..:..:../g).toString();
+                        let lightID = mac.replace(/:/g, '');
 
                         //create object for light device
                         adapter.setObjectNotExists(`Lights.${lightID}`, {
@@ -1632,22 +1682,26 @@ async function getAllLights() {
     }
 } //END getAllLights
 
-async function getLightState(lightId) {
+async function getLightState(Id) {
 
     const {ip, port, user} = await getGatewayParam();
 
     if(ip !== 'none' && port !== 'none' && user !== 'none') {
         let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/lights/' + lightId,
+            url: 'http://' + ip + ':' + port + '/api/' + user + '/lights/' + Id,
             method: 'GET'
         };
         request(options, async (error, res, body) => {
             if (error) {
                 sentryMsg(error);
             } else {
-                if (await logging(res, body, 'get light state ' + lightId)) {
+                if (await logging(res, body, 'get light state ' + Id)) {
                     let list = JSON.parse(body);
                     let keyName = Object.keys(list)[0];
+
+                    let mac = list['uniqueid'];
+                    mac = mac.match(/..:..:..:..:..:..:..:../g).toString();
+                    let lightId = mac.replace(/:/g, '');
                     //create object for light device
                     adapter.setObject(`Lights.${lightId}`, {
                         type: 'device',
@@ -1658,7 +1712,7 @@ async function getLightState(lightId) {
                         native: {
                             etag: list['etag'],
                             hascolor: list['hascolor'],
-                            id: lightId,
+                            id: Id,
                             manufacturername: list['manufacturername'],
                             modelid: list['modelid'],
                             swversion: list['swversion'],
@@ -1900,15 +1954,6 @@ function nameFilter(name) {
     return name;
 }
 
-/**
- *
- * @param {number} deviceID
- * @param {string} type - first letter has to be upper case. Possible: Lights, Sensors
- */
-async function getDeviceByID(deviceID, type){
-
-}
-
 async function getGatewayParam(){
     const results = await adapter.getObjectAsync('Gateway_info');
     if(results){
@@ -2063,6 +2108,11 @@ async function buttonEvents(id, event) {
     }
 }
 
+/**
+ *
+ * @param {number} id
+ * @param {string} type - first letter has to be upper case. Possible: Groups, Lights, Sensors
+ */
 async function getObjectByDeviceId(id, type) {
     /*
     type = Groups, Lights, Sensors
@@ -2075,13 +2125,22 @@ async function getObjectByDeviceId(id, type) {
     let rows = obj.rows;
     let object;
     for (let o in rows) {
-        if (rows[o].value.native !== undefined) {
+        if (rows[o].value.native !== undefined && typeof rows[o].value.native.id  === 'string') {
             if (rows[o].value.native.id === id.toString()) {
                 object = rows[o];
                 break;
             }
+        }else{
+            for(let i in rows[o].value.native.id){
+                if(rows[o].value.native.id[i] === id.toString()){
+                    object = rows[o];
+                    break;
+                }
+            }
+            break;
         }
     }
+
     return object;
 }
 
