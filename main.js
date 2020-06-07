@@ -128,7 +128,7 @@ class deconz extends utils.Adapter{
             name: 'deconz',
         });
         this.on('ready', this.onReady.bind(this));
-        //this.on('objectChange', this.onObjectChange.bind(this));
+        this.on('objectChange', this.onObjectChange.bind(this));
         this.on('stateChange', this.onStateChange.bind(this));
         this.on('message', this.onMessage.bind(this));
         this.on('unload', this.onUnload.bind(this));
@@ -156,6 +156,26 @@ class deconz extends utils.Adapter{
         } catch (e) {
             callback();
         }
+    }
+
+    async onObjectChange(id, obj){
+        if(obj.type === 'device') {
+            console.log(id + ' ' + JSON.stringify(obj));
+            switch(obj.common.role){
+                case 'group':
+                    await setGroupAttributes(`{"name": "${obj.common.name}"}`, obj.native.id);
+                    break;
+                case 'light':
+                    await setLightAttributes(`{"name": "${obj.common.name}"}`, obj.native.id)
+                    break;
+                case 'sensor':
+                    for(let i in obj.native.id){
+                        await updateSensor(`{"name": "${obj.common.name}"}`, obj.native.id[i]);
+                    }
+                    break;
+            }
+        }
+
     }
 
     async onStateChange(id, state){
@@ -474,6 +494,9 @@ class deconz extends utils.Adapter{
 
 async function main() {
     adapter.subscribeStates('*');
+    adapter.subscribeObjects('Lights.*');
+    adapter.subscribeObjects('Groups.*');
+    adapter.subscribeObjects('Sensors.*');
 
     adapter.log.info('Version 2');
 
@@ -711,11 +734,20 @@ async function getAutoUpdates() {
             let state = data['state'];
             let config = data['config'];
             adapter.log.debug('Websocket message: ' + JSON.stringify(data));
-            
+
             let object;
             switch (type) {
                 case 'lights':
-                    await getLightState(id);
+                    object = await getObjectByDeviceId(id, 'Lights');
+                    if (object === undefined) {
+                        await getLightState(id);
+                    }else if(data.e === 'changed' && data.name) {
+                        adapter.extendObject(object.id, {
+                            common: {
+                                name: data.name
+                            }
+                        })
+                    }
                     break;
                 case 'groups':
                 case 'scenes':
@@ -725,7 +757,13 @@ async function getAutoUpdates() {
                     object = await getObjectByDeviceId(id, 'Sensors');
                     if (object === undefined) {
                        await getSensor(id);
-                    } else {
+                    }else if(data.e === 'changed' && data.name) {
+                        adapter.extendObject(object.id, {
+                            common: {
+                                name: data.name
+                            }
+                        })
+                    }else {
                         id = object.id.replace(/^(\w*\.){3}/g, '');
                         if (typeof state == 'object') {
                             for (let obj in state) {
@@ -784,8 +822,7 @@ async function getAutoUpdates() {
                                 new SetObjectAndState(id, object.value.common.name, 'Sensors', obj, config[obj]);
                             }
                         }
-
-                    }
+                }
                     break;
             }
 
@@ -1167,6 +1204,29 @@ function getGroupScenes(group, sceneList) {
     });
 } //END getGroupScenes
 
+async function setGroupAttributes(parameters, groupId) {
+    const {ip, port, user} = await getGatewayParam();
+
+    if(ip !== 'none' && port !== 'none' && user !== 'none') {
+        let options = {
+            url: 'http://' + ip + ':' + port + '/api/' + user + '/groups/' + groupId,
+            method: 'PUT',
+            headers: {
+                'Content-Type' : 'application/json'
+            },
+            body: parameters
+        };
+
+        request(options, async (error, res, body) => {
+            if (error) {
+                sentryMsg(error);
+            } else {
+                await logging(res, body, 'set group attribute ' + groupId);
+            }
+        });
+    }
+} //END setGroupAttributes
+
 async function setGroupState(parameters, groupId, stateId) {
     const {ip, port, user} = await getGatewayParam();
 
@@ -1479,7 +1539,7 @@ async function getSensor(Id) {
                                 adapter.log.info('buttonevent NOT updated for ' + list['name'] + ', too old: ' + ((Now - LastUpdate + TimeOffset) / 1000) + 'sec time difference update to now');
                             }
                         } else {
-                            new SetObjectAndState(Id, list['name'], 'Sensors', stateName, list['state'][stateName]);
+                            new SetObjectAndState(sensorId, list['name'], 'Sensors', stateName, list['state'][stateName]);
                         }
 
 
@@ -1487,7 +1547,7 @@ async function getSensor(Id) {
                         //create config for sensor device
                         for (let x = 0; x <= count3; x++) {
                             let stateName = Object.keys(list['config'])[x];
-                            new SetObjectAndState(Id, list['name'], 'Sensors', stateName, list['config'][stateName]);
+                            new SetObjectAndState(sensorId, list['name'], 'Sensors', stateName, list['config'][stateName]);
                         }
                     }
                 }
@@ -1495,6 +1555,28 @@ async function getSensor(Id) {
         })
     }
 } //END getSensor
+
+async function updateSensor(parameters, sensorId) {
+
+    const {ip, port, user} = await getGatewayParam();
+
+    if(ip !== 'none' && port !== 'none' && user !== 'none') {
+        let options = {
+            url: 'http://' + ip + ':' + port + '/api/' + user + '/sensors/' + sensorId,
+            method: 'PUT',
+            headers: 'Content-Type" : "application/json',
+            body: parameters
+        };
+
+        request(options, async (error, res, body) => {
+            if (error) {
+                sentryMsg(error);
+            } else {
+                await logging(res, body, 'set sensor parameters');
+            }
+        });
+    }
+} //END updateSensor
 
 async function setSensorParameters(parameters, sensorId, stateId, callback) {
 
@@ -1518,7 +1600,7 @@ async function setSensorParameters(parameters, sensorId, stateId, callback) {
                 } catch (err) {
                 }
 
-                if (await logging(res, body, 'set sensor parameters') && response !== undefined && response !== 'undefined') {
+                if (stateId && await logging(res, body, 'set sensor parameters') && response !== undefined && response !== 'undefined') {
                     new ackStateVal(stateId, response);
                 }
 
@@ -1763,6 +1845,27 @@ async function setLightState(parameters, lightId, stateId, callback) {
         });
     }
 } //END setLightState
+
+async function setLightAttributes(parameters, lightId) {
+    const {ip, port, user} = await getGatewayParam();
+
+    if(ip !== 'none' && port !== 'none' && user !== 'none') {
+        let options = {
+            url: 'http://' + ip + ':' + port + '/api/' + user + '/lights/' + lightId,
+            method: 'PUT',
+            headers: 'Content-Type" : "application/json',
+            body: parameters
+        };
+
+        request(options, async (error, res, body) => {
+            if (error) {
+                sentryMsg(error);
+            } else {
+                await logging(res, body, 'set light state ' + lightId);
+            }
+        });
+    }
+} //END setLightAttributes
 
 async function deleteLight(lightId) {
     const {ip, port, user} = await getGatewayParam();
@@ -2130,7 +2233,7 @@ async function getObjectByDeviceId(id, type) {
                 object = rows[o];
                 break;
             }
-        }else{
+        }else if(rows[o].value.native !== undefined){
             for(let i in rows[o].value.native.id){
                 if(rows[o].value.native.id[i] === id.toString()){
                     object = rows[o];
