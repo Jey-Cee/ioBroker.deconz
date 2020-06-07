@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "deconz",
-        "version": "1.3.8",
+        "version": "2.0.0",
         "news": {
+            "2.0.0": {
+                "en": "changed id naming from id to mac (uniqueid)\npossibility to rename devices",
+                "de": "ID-Benennung von ID in Mac geändert (uniqueid)\nMöglichkeit, Geräte umzubenennen",
+                "ru": "изменил имя идентификатора с id на mac (uniqueid)\nвозможность переименовать устройства",
+                "pt": "nomeação de ID alterada de id para mac (uniqueid)\npossibilidade de renomear dispositivos",
+                "nl": "veranderde naamgeving van id van id naar mac (uniqueid)\nmogelijkheid om apparaten te hernoemen",
+                "fr": "changement de nom de l'id de l'id en mac (uniqueid)\npossibilité de renommer les appareils",
+                "it": "ha cambiato il nome id da id a mac (uniqueid)\npossibilità di rinominare i dispositivi",
+                "es": "cambio de nombre de id de id a mac (uniqueid)\nposibilidad de renombrar dispositivos",
+                "pl": "zmieniono nazewnictwo id z id na mac (uniqueid)\nmożliwość zmiany nazwy urządzeń",
+                "zh-cn": "将id命名从id更改为mac（唯一）\n重命名设备的可能性"
+            },
             "1.3.8": {
                 "en": "fix colorloopspeed is not working\nfix set xy has no effect \nsome small fixes",
                 "de": "Fix Colorloopspeed funktioniert nicht\nFix Set xy hat keine Auswirkung\neinige kleine Korrekturen",

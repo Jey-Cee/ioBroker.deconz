@@ -26,13 +26,17 @@ You must first link to deConz.
 
 ### No Support for Beta Versions of deConz
 
-### Required js-controller version >2.x.x
+### Required js-controller version >3.1.5
 
 Required node.js >= 10.x.x
 
 ## [Sponsors](https://github.com/iobroker-community-adapters/ioBroker.deconz/blob/master/SPONSORS.MD)
 
 ## Changelog
+
+### 2.0.0
+* changed id naming from id to mac (uniqueid)
+* possibility to rename devices
 
 ### 1.3.9
 * set port 80 if not defined

@@ -11,6 +11,7 @@ let hue_factor = 182.041666667;
 let ws = null;
 let alive_ts = 0;
 let reconnect = null;
+let ready = false;
 
 //Sentry for error reporting
 let Sentry;
@@ -159,8 +160,7 @@ class deconz extends utils.Adapter{
     }
 
     async onObjectChange(id, obj){
-        if(obj.type === 'device') {
-            console.log(id + ' ' + JSON.stringify(obj));
+        if(obj.type && obj.type === 'device' && ready === true) {
             switch(obj.common.role){
                 case 'group':
                     await setGroupAttributes(`{"name": "${obj.common.name}"}`, obj.native.id);
@@ -458,6 +458,7 @@ class deconz extends utils.Adapter{
                     wait = true;
                     break;
                 case 'deleteSensor':
+                    adapter.log.info('delet sensor');
                     await deleteSensor(obj.message, (res) => {
                         if (obj.callback) this.sendTo(obj.from, obj.command, JSON.stringify(res), obj.callback);
                     });
@@ -498,8 +499,6 @@ async function main() {
     adapter.subscribeObjects('Groups.*');
     adapter.subscribeObjects('Sensors.*');
 
-    adapter.log.info('Version 2');
-
     heartbeat();
     const results = await adapter.getObjectAsync('Gateway_info');
         if(results){
@@ -521,6 +520,10 @@ async function main() {
                 }
             }
         }
+        setTimeout(()=>{
+            ready = true;
+        }, 60*1000)
+
 }
 
 
@@ -758,11 +761,15 @@ async function getAutoUpdates() {
                     if (object === undefined) {
                        await getSensor(id);
                     }else if(data.e === 'changed' && data.name) {
-                        adapter.extendObject(object.id, {
-                            common: {
-                                name: data.name
-                            }
-                        })
+                        let obj = adapter.getObjectAsync(object.id);
+                        if(obj.common.name !== data.name){
+                            adapter.extendObject(object.id, {
+                                common: {
+                                    name: data.name
+                                }
+                            })
+                        }
+
                     }else {
                         id = object.id.replace(/^(\w*\.){3}/g, '');
                         if (typeof state == 'object') {
@@ -1022,7 +1029,7 @@ async function getGroupAttributes(groupId) {
                     //Changed check if helper, if skip it (cause it also dont exists)
                     let regex = new RegExp("helper[0-9]+ for group [0-9]+");
                     if (!regex.test(list['name'])) {
-                        adapter.setObjectNotExists(`Groups.${groupId}`, {
+                        adapter.extendObject(`Groups.${groupId}`, {
                             type: 'device',
                             common: {
                                 name: list['name'],
