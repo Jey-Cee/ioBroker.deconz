@@ -168,6 +168,8 @@
         "compact": true,
         "messagebox": true,
         "enabled": true,
+        "connectionType": "local",
+        "dataSource": "push",
         "plugins": {
             "sentry": {
                 "dsn": "https://c467944074ec441e9b56fdd0af6a3fdd@o379422.ingest.sentry.io/5204269",
