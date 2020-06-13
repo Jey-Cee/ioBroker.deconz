@@ -1435,7 +1435,7 @@ async function getAllSensors() {
                                             check = false;
                                         }
                                     }
-                                    if(check === true) ids.push(keyName);
+                                    if(typeof ids === 'array' && check === true) ids.push(keyName);
                                 }
 
                                 await adapter.extendObjectAsync(`Sensors.${sensorID}`, {
