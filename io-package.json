@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "deconz",
-        "version": "1.3.8",
+        "version": "1.3.9",
         "news": {
+            "1.3.9": {
+                "en": "set default port to 80",
+                "de": "Setzen Sie den Standardport auf 80",
+                "ru": "установить порт по умолчанию на 80",
+                "pt": "defina a porta padrão como 80",
+                "nl": "stel de standaardpoort in op 80",
+                "fr": "définir le port par défaut sur 80",
+                "it": "imposta la porta predefinita su 80",
+                "es": "establecer puerto predeterminado a 80",
+                "pl": "ustaw domyślny port na 80",
+                "zh-cn": "将默认端口设置为80"
+            },
             "1.3.8": {
                 "en": "fix colorloopspeed is not working\nfix set xy has no effect \nsome small fixes",
                 "de": "Fix Colorloopspeed funktioniert nicht\nFix Set xy hat keine Auswirkung\neinige kleine Korrekturen",

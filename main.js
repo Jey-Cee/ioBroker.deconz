@@ -899,7 +899,7 @@ async function getConfig() {
                 getAllLights();
                 getAllSensors();
                 getAllGroups();
-                getDevices();
+                //getDevices();
 
             }
         });
