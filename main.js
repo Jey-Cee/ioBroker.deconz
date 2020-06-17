@@ -714,7 +714,18 @@ async function getAutoUpdates() {
             let object;
             switch (type) {
                 case 'lights':
-                    await getLightState(id);
+                    if (typeof state == 'object') {
+                        if(Object.keys(state).length > 0) {
+                            object = await getObjectByDeviceId(id, 'Lights');
+                            for (let stateName in state) {
+                                new SetObjectAndState(id, object.value.common.name, 'Lights', stateName, state[stateName]);
+                           }
+                        } else {
+                            // in this case the new "attr"-attribute of the new event (lastseen) can be checked
+                        }
+                    } else {
+                        await getLightState(id);
+                    }
                     break;
                 case 'groups':
                 case 'scenes':
