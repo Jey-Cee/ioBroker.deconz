@@ -716,20 +716,18 @@ async function getAutoUpdates() {
             switch (type) {
                 case 'lights':
                     if (typeof state == 'object') {
-                        adapter.log.debug("Event has state-tag: Attributes will be updated");
-                        // This makes only sense, if deconf.config.websocketnotifyall is set to false
+                        adapter.log.debug("Event has state-tag");
                         if(Object.keys(state).length > 0) {
                             object = await getObjectByDeviceId(id, 'Lights');
                             for (let stateName in state) {
                                 adapter.log.debug(stateName + ": "+ state[stateName]);
-                                new SetObjectAndState(id, object.value.common.name, 'Lights', stateName, state[stateName]);
-                           }
+                                new SetObjectAndState(id, object.value.common.name, 'Lights', stateName, state[stateNam>                           }
                         } else {
                             adapter.log.debug("Event has no state-Changes");
                             // no state objects
                         }
                     } else if (typeof attr == 'object') {
-                        adapter.log.debug("Event has attr-Tag: No Update-Mechanism implemented");
+                        adapter.log.debug("Event has attr-Tag");
                         // in this case the new "attr"-attribute of the new event (lastseen) can be checked
                     } else {
                         await getLightState(id);
