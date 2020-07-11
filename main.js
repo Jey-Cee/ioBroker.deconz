@@ -735,21 +735,29 @@ async function getAutoUpdates() {
             let id = data['id'] ? data['id'] : data['gid'];
             let type = data['r'];
             let state = data['state'];
+            let attr = data['attr'];
             let config = data['config'];
             adapter.log.debug('Websocket message: ' + JSON.stringify(data));
 
             let object;
             switch (type) {
                 case 'lights':
-                    object = await getObjectByDeviceId(id, 'Lights');
-                    if (object === undefined) {
+                    if (typeof state == 'object') {
+                        adapter.log.debug("Event has state-tag");
+                        if(Object.keys(state).length > 0) {
+                            object = await getObjectByDeviceId(id, 'Lights');
+                            for (let stateName in state) {
+                                adapter.log.debug(stateName + ": "+ state[stateName]);
+                                new SetObjectAndState(id, object.value.common.name, 'Lights', stateName, state[stateName]);                           }
+                        } else {
+                            adapter.log.debug("Event has no state-Changes");
+                            // no state objects
+                        }
+                    } else if (typeof attr == 'object') {
+                        adapter.log.debug("Event has attr-Tag");
+                        // in this case the new "attr"-attribute of the new event (lastseen) can be checked
+                    } else {
                         await getLightState(id);
-                    }else if(data.e === 'changed' && data.name) {
-                        adapter.extendObject(object.id, {
-                            common: {
-                                name: data.name
-                            }
-                        })
                     }
                     break;
                 case 'groups':
@@ -944,7 +952,7 @@ async function getConfig() {
                 getAllLights();
                 getAllSensors();
                 getAllGroups();
-                getDevices();
+                //getDevices();
 
             }
         });

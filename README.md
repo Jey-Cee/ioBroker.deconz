@@ -7,12 +7,10 @@ ioBroker deConz dresden-elektronik Adapter
 
 [![NPM](https://nodei.co/npm/iobroker.deconz.png?downloads=true)](https://nodei.co/npm/iobroker.deconz/)
 
-
 ## Notice
 No Support for Beta Versions of deConz
 
 Required js-controller version >2.x.x, Required node.js >= 10.x.x
-
 
 ## English
 

@@ -17,6 +17,7 @@
                 "es": "cambio de nombre de id de id a mac (uniqueid)\nposibilidad de renombrar dispositivos",
                 "pl": "zmieniono nazewnictwo id z id na mac (uniqueid)\nmożliwość zmiany nazwy urządzeń",
                 "zh-cn": "将id命名从id更改为mac（唯一）\n重命名设备的可能性"
+
             }
         },
         "title": "deConz ZigBee",
