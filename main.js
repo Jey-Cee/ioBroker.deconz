@@ -745,8 +745,9 @@ async function getAutoUpdates() {
                         if(Object.keys(state).length > 0) {
                             object = await getObjectByDeviceId(id, 'Lights');
                             for (let stateName in state) {
+                                let oid = object.id.replace(/^(\w*\.){3}/g, '');
                                 adapter.log.debug(stateName + ": "+ state[stateName]);
-                                new SetObjectAndState(id, object.value.common.name, 'Lights', stateName, state[stateName]);                           }
+                                new SetObjectAndState(oid, object.value.common.name, 'Lights', stateName, state[stateName]);                           }
                         } else {
                             adapter.log.debug("Event has no state-Changes");
                             // no state objects
