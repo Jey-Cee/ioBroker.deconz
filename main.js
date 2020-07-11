@@ -209,8 +209,6 @@ class deconz extends utils.Adapter{
             return;
         }
 
-        this.log.debug('stateChange ' + id + ' ' + JSON.stringify(state));
-
         this.log.debug('dp: ' + dp + '; id:' + id + ' tmp: ' + tmp);
 
         let stateObj = await this.getObjectAsync(oid);
@@ -2255,7 +2253,7 @@ async function getObjectByDeviceId(id, type) {
                     break;
                 }
             }
-            break;
+            //break;
         }
     }
 
