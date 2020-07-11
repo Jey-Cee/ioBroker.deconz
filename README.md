@@ -7,32 +7,43 @@ ioBroker deConz dresden-elektronik Adapter
 
 [![NPM](https://nodei.co/npm/iobroker.deconz.png?downloads=true)](https://nodei.co/npm/iobroker.deconz/)
 
-English
---------------------
+## Notice
+No Support for Beta Versions of deConz
+
+Required js-controller version >2.x.x, Required node.js >= 10.x.x
+
+## English
+
 Connects to deConz software developed by dresden-elektronik. This software aims to be a universal ZigBee Gateway solution, using hardware from dresden-elektronik the ConBee USB stick and RaspBee a modul for the Raspberry Pi.
 
 
 You must first link to deConz.
 1.  a) Enter ip address for deConz 
-    b) Enter port if you have changed it, standard is 80.
+    b) Enter port number, standard is 80.
 2. After IP address and port is entered and saved hit "Create API Key" Button. Now you can enter the credentials for deConz or go to Phoscon APP and register ioBroker as third party APP.
+
+
+#### Send more than one command at the same time
+For this purpose there is a object called "action".
+
+Examples:
+
+`"on": true, "xy": [0.6586,0.3138]`
+
+`"on": true, "transitiontime": 5, "hue": 65500`
+
 
 ## Links
 [deConz](https://www.dresden-elektronik.de/funktechnik/products/software/pc/deconz/)  
 [REST plugin](https://github.com/dresden-elektronik/deconz-rest-plugin)  
 [Gateways (Hardware)](https://www.dresden-elektronik.de/funktechnik/solutions/wireless-light-control/gateways/)  
 
-## Notice
-
-### No Support for Beta Versions of deConz
-
-### Required js-controller version >2.x.x
-
-Required node.js >= 10.x.x
-
 ## [Sponsors](https://github.com/iobroker-community-adapters/ioBroker.deconz/blob/master/SPONSORS.MD)
 
 ## Changelog
+
+### 1.3.10
+* (bortim) added change-event handling, new in deConz v2.05.78
 
 ### 1.3.9
 * set default port to 80

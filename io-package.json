@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "deconz",
-        "version": "1.3.9",
+        "version": "1.3.10",
         "news": {
+            "1.3.10": {
+                "en": "added change-event handling",
+                "de": "change-event handling hinzugefügt",
+                "ru": "добавлена обработка событий изменений",
+                "pt": "manipulação de evento de mudança adicionada",
+                "nl": "verwerking van veranderingsgebeurtenissen toegevoegd",
+                "fr": "ajout de la gestion des événements de changement",
+                "it": "aggiunta gestione degli eventi di modifica",
+                "es": "manejo de eventos de cambio agregado",
+                "pl": "dodano obsługę zdarzeń zmian",
+                "zh-cn": "添加了变更事件处理"
+            },
             "1.3.9": {
                 "en": "set default port to 80",
                 "de": "Setzen Sie den Standardport auf 80",
