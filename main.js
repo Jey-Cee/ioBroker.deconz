@@ -160,7 +160,7 @@ class deconz extends utils.Adapter{
     }
 
     async onObjectChange(id, obj){
-        if(obj.type && obj.type === 'device' && ready === true) {
+        if(obj && obj.type && obj.type === 'device' && ready === true) {
             switch(obj.common.role){
                 case 'group':
                     await setGroupAttributes(`{"name": "${obj.common.name}"}`, obj.native.id);
@@ -762,7 +762,7 @@ async function getAutoUpdates() {
                        await getSensor(id);
                     }else if(data.e === 'changed' && data.name) {
                         let obj = adapter.getObjectAsync(object.id);
-                        if(obj.common.name !== data.name){
+                        if(obj && obj.common.name !== data.name){
                             adapter.extendObject(object.id, {
                                 common: {
                                     name: data.name

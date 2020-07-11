@@ -1,8 +1,11 @@
 {
     "common": {
         "name": "deconz",
-        "version": "2.0.0",
+        "version": "2.0.1",
         "news": {
+            "2.0.1": {
+                "en": "Bugfixes"
+            },
             "2.0.0": {
                 "en": "changed id naming from id to mac (uniqueid)\npossibility to rename devices",
                 "de": "ID-Benennung von ID in Mac geändert (uniqueid)\nMöglichkeit, Geräte umzubenennen",
@@ -14,126 +17,6 @@
                 "es": "cambio de nombre de id de id a mac (uniqueid)\nposibilidad de renombrar dispositivos",
                 "pl": "zmieniono nazewnictwo id z id na mac (uniqueid)\nmożliwość zmiany nazwy urządzeń",
                 "zh-cn": "将id命名从id更改为mac（唯一）\n重命名设备的可能性"
-            },
-            "1.3.8": {
-                "en": "fix colorloopspeed is not working\nfix set xy has no effect \nsome small fixes",
-                "de": "Fix Colorloopspeed funktioniert nicht\nFix Set xy hat keine Auswirkung\neinige kleine Korrekturen",
-                "ru": "исправить colorloopspeed не работает\nфиксированный набор xy не имеет никакого эффекта\nнекоторые небольшие исправления",
-                "pt": "corrigir colorloopspeed não está funcionando\no conjunto de correções xy não tem efeito\nalgumas pequenas correções",
-                "nl": "fix colorloopspeed werkt niet\nfix set xy heeft geen effect\nenkele kleine oplossingen",
-                "fr": "correction colorloopspeed ne fonctionne pas\nfix set xy n'a aucun effet\nquelques petites corrections",
-                "it": "correzione colorloopspeed non funziona\nfix set xy non ha alcun effetto\nalcune piccole correzioni",
-                "es": "arreglar colorloopspeed no funciona\nFix set xy no tiene efecto\nalgunas pequeñas correcciones",
-                "pl": "fix colorloopspeed nie działa\nzestaw poprawek xy nie ma wpływu\nkilka drobnych poprawek",
-                "zh-cn": "修复colorloopspeed不起作用\n修复程序集xy无效\n一些小修正"
-            },
-            "1.3.7": {
-                "en": "fix object definition dimup and dimdown",
-                "de": "Korrigieren Sie das Dimup und Dimdown der Objektdefinition",
-                "ru": "исправить определение объекта dimup и dimdown",
-                "pt": "corrigir definição de objeto dimup e dimdown",
-                "nl": "objectdefinitie dimup en dimdown repareren",
-                "fr": "corriger la définition d'objet dimup et dimdown",
-                "it": "risolve dimup e dimdown della definizione dell'oggetto",
-                "es": "fijar la definición del objeto atenuar y atenuar",
-                "pl": "napraw dimup i dimdown definicji obiektu",
-                "zh-cn": "修复对象定义dimup和dimdown"
-            },
-            "1.3.5": {
-                "en": "disable node v8 tests\nfix createscene object definition\nprevent websocket to connect if port, api key or ip is missing\ncatch errors on ackStateVal\nfix \"Cannot read property 'id' of undefined\" for controlId\nfix crash on scene actions with js-controller 3\ncatch onStateChange stateObj is null\nfix level update when bri was set by other deConz instance",
-                "de": "Deaktivieren Sie Node v8-Tests\nFix erstellt eine Objektdefinition\nVerhindern Sie, dass ein Websocket eine Verbindung herstellt, wenn Port, API-Schlüssel oder IP fehlen\nFehler auf ackStateVal abfangen\nFix \"Eigenschaft 'id' von undefined kann nicht gelesen werden\" für controlId\nBehebung eines Absturzes bei Szenenaktionen mit js-controller 3\ncatch onStateChange stateObj ist null\nUpdate auf Fixebene, wenn bri von einer anderen deConz-Instanz festgelegt wurde",
-                "ru": "отключить тесты узла v8\nисправление создает определение объекта сцены\nзапретить веб-сокет для подключения, если порт, API-ключ или IP-адрес отсутствует\nловить ошибки на ackStateVal\nисправление «Не могу прочитать свойство 'id' из неопределенного» для controlId\nисправление сбоев на сцене с помощью js-controller 3\nпоймать onStateChange stateObj является нулевым\nисправлено обновление уровня, когда bri был установлен другим экземпляром deConz",
-                "pt": "desativar testes do nó v8\ncorrigir definição de objeto createscene\nimpedir que o websocket se conecte se estiver faltando porta, chave api ou ip\ncapturar erros em ackStateVal\ncorreção \"Não é possível ler a propriedade 'id' de indefinido\" para controlId\ncorrigir falha em ações de cena com o controlador js 3\ncatch onStateChange stateObj é nulo\ncorrigir atualização de nível quando bri foi definido por outra instância deConz",
-                "nl": "knooppunt v8-tests uitschakelen\nfix creëert een objectdefinitie\nvoorkomen dat websocket verbinding maakt als poort, api-sleutel of ip ontbreekt\nvang fouten op ackStateVal\nfix \"Kan eigenschap 'id' van undefined niet lezen 'voor controlId\ncrash repareren bij scène-acties met js-controller 3\ncatch onStateChange stateObj is null\nupdate van niveau repareren wanneer bri werd ingesteld door een ander deConz-exemplaar",
-                "fr": "désactiver les tests du nœud v8\ncorrection de la définition d'objet createscene\nempêcher le websocket de se connecter si le port, la clé api ou l'ip est manquant\nintercepter les erreurs sur ackStateVal\ncorrection «Impossible de lire la propriété« id »d'undefined» pour controlId\ncorrection d'un crash sur les actions de la scène avec js-controller 3\ncatch onStateChange stateObj est null\ncorrection du niveau de mise à jour lorsque bri a été défini par une autre instance deConz",
-                "it": "disabilita i test del nodo v8\ncorreggi la definizione dell'oggetto createscene\nimpedire a websocket di connettersi se mancano porta, chiave api o ip\nrileva errori su ackStateVal\nfix \"Impossibile leggere la proprietà 'id' di undefined\" per controlId\nrisolve il crash delle azioni della scena con js-controller 3\ncatch onStateChange stateObj è null\naggiorna il livello di correzione quando bri è stato impostato da un'altra istanza di deConz",
-                "es": "deshabilitar las pruebas del nodo v8\nfijar la definición del objeto createcene\nevitar que se conecte WebSocket si falta el puerto, la clave API o IP\ndetectar errores en ackStateVal\narregla \"No se puede leer la propiedad 'id' de undefined\" para controlId\narregla el bloqueo en las acciones de la escena con js-controller 3\ncatch onStateChange stateObj es nulo\nactualización de nivel de reparación cuando bri fue configurado por otra instancia de deConz",
-                "pl": "wyłącz testy węzła v8\nfix tworzy definicję obiektu scen\nuniemożliwić połączenie z websocket, jeśli brakuje portu, klucza API lub ip\nwyłapuj błędy na ackStateVal\nnaprawiono „Nie można odczytać właściwości„ id ”niezdefiniowanej” dla controlId\nnaprawiono awarię akcji sceny za pomocą js-kontrolera 3\ncatch onStateChange stateObj ma wartość NULL\nnapraw poziom aktualizacji, gdy bri został ustawiony przez inną instancję deConz",
-                "zh-cn": "禁用节点v8测试\n修复createcene对象定义\n如果端口，API密钥或IP丢失，则阻止websocket连接\n在ackStateVal上捕获错误\n为controlId修复“无法读取未定义的属性'id'”\n使用js-controller 3修复场景动作崩溃\ncatch onStateChange stateObj为空\n当其他deConz实例设置了bri时，修复级别更新"
-            },
-            "1.3.4":{
-                "en": "fix message \"State value to set is invalid\"\nterminate websocket connection on error to make sure the session is closed\ncheck response is not undefined\ncatch request errors and send to sentry\nprevent sending message with wrong value type",
-                "de": "Fix meldung \"State value to set is invalid\"\nBeenden der Websocket-Verbindung bei einem Fehler, um sicherzustellen, dass die Sitzung geschlossen ist\nPrüfung das response nicht undefined ist\nAnforderungsfehler abfangen und an Sentry senden\nVerhindern Sie das Senden von Nachrichten mit falschem Werttyp",
-                "ru": "исправить сообщение «Неверное значение состояния»\nпрервите соединение websocket в случае ошибки, чтобы убедиться, что сессия закрыта\nпроверить ответ не является неопределенным\nпоймать ошибки запроса и отправить в часовой\nзапретить отправку сообщения с неправильным типом значения",
-                "pt": "mensagem de correção \"O valor do estado a ser definido é inválido\"\nencerre a conexão do websocket com erro para garantir que a sessão seja fechada\nresposta de verificação não é indefinida\npegar erros de solicitação e enviar para sentinela\nimpedir o envio de mensagem com o tipo de valor errado",
-                "nl": "bericht repareren \"In te stellen statuswaarde is ongeldig\"\nde websocket-verbinding beëindigen bij een fout om er zeker van te zijn dat de sessie wordt afgesloten\ncheck reactie is niet ongedefinieerd\nvang verzoekfouten en verzend naar schildwacht\nvoorkomen dat een bericht met een verkeerd waardetype wordt verzonden",
-                "fr": "message de correction \"La valeur d'état à définir n'est pas valide\"\nmettre fin à la connexion websocket en cas d'erreur pour vous assurer que la session est fermée\nla réponse de vérification n'est pas indéfinie\nintercepter les erreurs de demande et envoyer à la sentinelle\nempêcher l'envoi de message avec un type de valeur incorrect",
-                "it": "correzione messaggio \"Il valore di stato da impostare non è valido\"\nterminare la connessione websocket in caso di errore per assicurarsi che la sessione sia chiusa\nverifica che la risposta non sia indefinita\ncattura errori di richiesta e invia a sentinella\nimpedire l'invio di messaggi con un tipo di valore errato",
-                "es": "mensaje fijo \"El valor de estado para establecer no es válido\"\nterminar la conexión websocket en caso de error para asegurarse de que la sesión esté cerrada\nla respuesta de verificación no está indefinida\natrapar errores de solicitud y enviar a centinela\nevitar enviar mensajes con un tipo de valor incorrecto",
-                "pl": "napraw komunikat „Niepoprawna wartość stanu”\npo błędzie zakończ połączenie WebSocket, aby upewnić się, że sesja jest zamknięta\nodpowiedź odpowiedzi nie jest niezdefiniowana\nbłędy żądania połowu i wysłać do wartownika\nzapobiec wysyłaniu wiadomości o niewłaściwym typie wartości",
-                "zh-cn": "修复消息“要设置的状态值无效”\n发生错误时终止websocket连接以确保会话已关闭\n检查响应不是不确定的\n捕获请求错误并发送给哨兵\n防止发送错误值类型的消息"
-            },
-            "1.3.3": {
-                "en": "fix catch response of setLightState is undefined\nfix ws.terminate at unload\ncatch ip/port undefined at auto updates\ncatch res is undefined at deleteApiKey",
-                "de": "Die Fix-Catch-Antwort von setLightState ist undefiniert\nFix ws.terminate beim Entladen\nFang IP / Port undefiniert bei automatischen Updates\ncatch res ist bei deleteApiKey undefiniert",
-                "ru": "исправлена ошибка с ответом setLightState\nисправить ws.terminate при выгрузке\nпоймать IP / порт не определен при автообновлении\nпоймать res не определено в deleteApiKey",
-                "pt": "corrigir resposta de captura de setLightState é indefinido\ncorrigir ws.terminate ao descarregar\ncaptura ip / porta indefinida em atualizações automáticas\ncatch res é indefinido em deleteApiKey",
-                "nl": "catch-respons van setLightState is niet gedefinieerd\nfix ws.terminate bij het lossen\ncatch ip / port undefined bij automatische updates\ncatch res is niet gedefinieerd bij deleteApiKey",
-                "fr": "correction de la réponse de capture de setLightState non définie\ncorrection de ws.terminate au déchargement\nattraper ip / port non défini lors des mises à jour automatiques\ncatch res n'est pas défini à deleteApiKey",
-                "it": "la risposta catch catch di setLightState non è definita\ncorreggi ws.terminate allo scarico\ncattura ip / porta non definito agli aggiornamenti automatici\ncatch res non è definito in deleteApiKey",
-                "es": "la respuesta de captura fija de setLightState no está definida\narreglar ws.terminate al descargar\natrapar ip / puerto indefinido en las actualizaciones automáticas\ncatch res no está definido en deleteApiKey",
-                "pl": "naprawiona odpowiedź catch dla setLightState jest niezdefiniowana\nnaprawić ws.terminate przy rozładowaniu\ncatch ip / port undefined przy automatycznych aktualizacjach\nres res jest niezdefiniowany w deleteApiKey",
-                "zh-cn": "修复setLightState的捕获响应未定义\n在卸载时修复ws.terminate\n在自动更新时捕获未定义的ip /端口\n在deleteApiKey上未捕获catch res"
-            },
-            "1.3.2": {
-                "en": "transitiontime now in seconds instead 1/10 seconds\nfix colorspeed\nuse new class style\nadd sentry for error collection\nfix transition time if set to 0\nobjects will be now deleted if the device is removed by adapter\nfix multiple websocket connections\ntry to fix #120 reconnect after 60 seconds",
-                "de": "Übergangszeit jetzt in Sekunden statt 1/10 Sekunden\nFarbgeschwindigkeit korrigiert\nneuer Klassenstil benutzt\nSentry.io für die Fehlersammlung hinzugefügt\nTransitiontime korrigiert, wenn auf 0 gesetzt\nObjekte werden jetzt gelöscht, wenn das Gerät per Adapter entfernt wird\nFehler behoben mit mehreren Websocket-Verbindungen\nVersuch den Fehler #120 zu beheben Wiederverbindung nach 60 Sekunden",
-                "ru": "время перехода теперь в секундах вместо 1/10 секунды\nисправить цветовую скорость\nиспользовать новый стиль класса\nдобавить часового для сбора ошибок\nисправить время перехода, если установлено в 0\nобъекты будут теперь удалены, если устройство удалено адаптером\nисправить несколько соединений через веб-сокет\nпопытаться исправить # 120 восстановить через 60 секунд",
-                "pt": "tempo de transição agora em segundos, em vez de 1/10 segundos\ncorrigir cores\nuse novo estilo de classe\nadicionar sentinela para coleta de erros\ncorrigir o tempo de transição se definido como 0\nobjetos serão excluídos agora se o dispositivo for removido pelo adaptador\ncorrigir várias conexões de websocket\ntente consertar # 120 reconectar após 60 segundos",
-                "nl": "overgangstijd nu in seconden in plaats van 1/10 seconden\nkleurensnelheid repareren\ngebruik een nieuwe klassestijl\nschildwacht toevoegen voor foutverzameling\novergangstijd repareren indien ingesteld op 0\nobjecten worden nu verwijderd als het apparaat wordt verwijderd met een adapter\nrepareer meerdere websocket-verbindingen\nprobeer # 120 opnieuw te verbinden na 60 seconden",
-                "fr": "temps de transition maintenant en secondes au lieu de 1/10 secondes\ncorrection de la vitesse des couleurs\nutiliser un nouveau style de classe\najouter une sentinelle pour la collecte des erreurs\nfixer le temps de transition s'il est réglé sur 0\nles objets seront désormais supprimés si le périphérique est supprimé par l'adaptateur\ncorriger plusieurs connexions websocket\nessayez de corriger la reconnexion # 120 après 60 secondes",
-                "it": "tempo di transizione ora in secondi anziché 1/10 secondi\ncorrezione della velocità dei colori\nusa il nuovo stile di classe\naggiungi sentinella per la raccolta degli errori\nfissa il tempo di transizione se impostato su 0\ngli oggetti verranno ora eliminati se il dispositivo viene rimosso dall'adattatore\ncorreggere più connessioni WebSocket\nprova a correggere la riconnessione n. 120 dopo 60 secondi",
-                "es": "tiempo de transición ahora en segundos en lugar de 1/10 segundos\narreglar la velocidad del color\nusa un nuevo estilo de clase\nagregar centinela para la recopilación de errores\nfijar el tiempo de transición si se establece en 0\nlos objetos ahora se eliminarán si el dispositivo elimina el dispositivo\narreglar múltiples conexiones websocket\nintente arreglar la reconexión # 120 después de 60 segundos",
-                "pl": "czas przejścia teraz w sekundach zamiast 1/10 sekund\nnapraw prędkość kolorów\nużyj nowego stylu klasy\ndodaj wartownik do zbierania błędów\nnapraw czas przejścia, jeśli ustawiony na 0\nobiekty zostaną teraz usunięte, jeśli urządzenie zostanie usunięte przez adapter\nnaprawić wiele połączeń z gniazdem internetowym\nspróbuj naprawić # 120 ponowne połączenie po 60 sekundach",
-                "zh-cn": "现在的过渡时间以秒为单位，而不是1/10秒\n修复色速\n使用新的课堂风格\n添加哨兵以收集错误\n固定过渡时间（如果设置为0）\n如果通过适配器卸下设备，则现在将删除对象\n修复多个websocket连接\n尝试在60秒后修复＃120重新连接"
-            },
-            "1.3.1": {
-                "en": "fix set dimspeed\nconnect to Websocket in any case",
-                "de": "Fix Set Dimspeed\nStellen Sie auf jeden Fall eine Verbindung zu Websocket her",
-                "ru": "исправить набор Dimspeed\nподключиться к Websocket в любом случае",
-                "pt": "fix set dimspeed\nconecte-se ao Websocket em qualquer caso",
-                "nl": "stel dimspeed in\nmaak in ieder geval verbinding met Websocket",
-                "fr": "fix set dimspeed\nse connecter à Websocket dans tous les cas",
-                "it": "fix set dimspeed\nconnettersi a Websocket in ogni caso",
-                "es": "Fix set dimspeed\nconectarse a Websocket en cualquier caso",
-                "pl": "naprawić ustawiony dimspeed\nw każdym przypadku połącz się z Websocket",
-                "zh-cn": "修复设置dimspeed\n在任何情况下都连接到Websocket"
-            },
-            "1.3.0": {
-                "en": "fix websocket connection if there are no upnp broadcast answer from deconz\ncorrected duration role\nadded level to lights and groups",
-                "de": "Korrigieren Sie die Websocket-Verbindung, wenn keine UTP-Broadcast-Antwort von deconz vorliegt\nkorrigierte Dauer Rolle\nLichter und Gruppen hinzugefügt",
-                "ru": "исправить соединение через websocket, если нет ответа от deconz\nисправлена продолжительность роли\nдобавлен уровень для источников света и групп",
-                "pt": "corrigir conexão websocket se não houver resposta de transmissão upnp da deconz\nfunção de duração corrigida\nnível adicionado a luzes e grupos",
-                "nl": "repareer websocket-verbinding als er geen upnp-uitzendantwoord is van deconz\ngecorrigeerde duurrol\nniveau toegevoegd aan lichten en groepen",
-                "fr": "correction de la connexion websocket s'il n'y a pas de réponse de diffusion upnp de deconz\nrôle de durée corrigé\najout de niveau aux lumières et aux groupes",
-                "it": "correggi la connessione websocket se non ci sono risposte upnp broadcast da deconz\nruolo di durata corretta\naggiunto livello a luci e gruppi",
-                "es": "arregle la conexión websocket si no hay respuesta de difusión upnp de deconz\nrol de duración corregida\nnivel agregado a luces y grupos",
-                "pl": "napraw połączenie websocket, jeśli nie ma odpowiedzi rozgłaszania upnp z deconz\npoprawiona rola czasu trwania\ndodano poziom do świateł i grup",
-                "zh-cn": "如果没有来自deconz的upnp广播答案，请修复websocket连接\n更正的持续时间作用\n为灯光和组添加级别"
-            },
-            "1.2.6": {
-                "en": "fix crash by executing commands without parameters",
-                "de": "Beheben Sie den Absturz, indem Sie Befehle ohne Parameter ausführen",
-                "ru": "исправить сбой, выполнив команды без параметров",
-                "pt": "corrigir falha executando comandos sem parâmetros",
-                "nl": "crash oplossen door opdrachten zonder parameters uit te voeren",
-                "fr": "correction d'un crash en exécutant des commandes sans paramètres",
-                "it": "risolve il crash eseguendo comandi senza parametri",
-                "es": "arregla el bloqueo ejecutando comandos sin parámetros",
-                "pl": "napraw awarię, wykonując polecenia bez parametrów",
-                "zh-cn": "通过执行不带参数的命令来修复崩溃"
-            },
-            "1.1.2": {
-                "en": "fix button objects changed buttonpressed from boolean to number\n",
-                "de": "Knopfobjekte reparieren \nKnopfdruck von Boolean in Zahl geändert\n",
-                "ru": "исправить кнопки объектов \nизменена кнопка с логического значения на число\n",
-                "pt": "fixar objetos de botão \nmudou buttonpressed de booleano para número\n",
-                "nl": "fix knop objecten \nveranderd van buttonpressed van boolean naar nummer\n",
-                "fr": "fixer des objets de bouton \nchangé le bouton en booléen en nombre\n",
-                "it": "correggere gli oggetti pulsante \ncambiato bottone premuto da booleano in numero\n",
-                "es": "arreglar objetos de botón \nbotón pulsado cambiado de booleano a número\n",
-                "pl": "naprawić obiekty przycisków \nzmieniono naciśnięcie przycisku z boolean na numer\n",
-                "zh-cn": "修复按钮对象\n将按钮从布尔值更改为数字\n"
             }
         },
         "title": "deConz ZigBee",
