@@ -2039,6 +2039,9 @@ function UTCtoLocal(timeString) {
 }
 
 async function buttonEvents(id, event) {
+    if(!ready){
+        return;
+    }
     if (event !== null && event !== undefined) {
         let button = event.toString().substr(0, 1);
         let type = event.toString().substr(1, 3);
