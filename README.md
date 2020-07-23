@@ -57,6 +57,7 @@ Examples:
 
 ## Links
 - [Phoscon APP](https://phoscon.de/)
+- [Supported Devices](https://github.com/dresden-elektronik/deconz-rest-plugin/wiki/Supported-Devices)
 - [deConz](https://www.dresden-elektronik.de/funktechnik/products/software/pc/deconz/)  
 - [REST plugin on Github](https://github.com/dresden-elektronik/deconz-rest-plugin)  
 - [Gateways (Hardware)](https://www.dresden-elektronik.de/funktechnik/solutions/wireless-light-control/gateways/)  
