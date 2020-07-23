@@ -16,13 +16,36 @@ Required js-controller version >2.x.x, Required node.js >= 10.x.x
 
 Connects to deConz software developed by dresden-elektronik. This software aims to be a universal ZigBee Gateway solution, using hardware from dresden-elektronik the ConBee USB stick and RaspBee a modul for the Raspberry Pi.
 
+### Setup
+1. Read documentation of deConz/Phoscon, look at [links](https://github.com/iobroker-community-adapters/ioBroker.deconz#links) section.
+2. Start adapter
+3.  * Enter ip address for deConz 
+    * Enter port number, standard is 80.
+    * IP and port will be saved automaticaly
+    * **Alternative:** Close configuration and open again.
+    If deConz was found IP and port is shown now.
+4. Click on "Create API key"
+5.  * Enter username (Standard is delight)
+    * Enter password (is set during first login on Phoscon APP)
+    * **Alternative:** Open Phoscon APP -> Menu -> Settings -> Gateway -> Advanced -> Unlock Gateway
 
-You must first link to deConz.
-1.  a) Enter ip address for deConz 
-    b) Enter port number, standard is 80.
-2. After IP address and port is entered and saved hit "Create API Key" Button. Now you can enter the credentials for deConz or go to Phoscon APP and register ioBroker as third party APP.
+## German
 
+Verbindet mit der von dresden-elektronik entwickelten deConz-Software. Diese Software soll eine universelle ZigBee Gateway-Lösung sein, die die Hardware von dresden-elektronik, ConBee USB-Stick und RaspBee, ein Modul für den Raspberry Pi, verwendet.
 
+### Einrichten
+1. Dokumentation von deConz/Phoscon lesen, Quellen siehe [Links](https://github.com/iobroker-community-adapters/ioBroker.deconz#links).
+2.  Adapter starten
+3.  * IP Adresse von deConz und
+    * Port eingeben, Standard ist port 80
+    * IP und Port wird Automatisch gespeichert
+    * **Alterantiv:** Adpterkonfiguration schließen und erneut öffnen.
+    Wurde deConz gefunden steht jetzt IP und Port schon in der Maske.
+4.  "Erstelle API Key" Klicken
+5.  * Buntzername (Standard ist delight) und
+    * Passwort (wird beim ersten Anmelden in der Phoscon APP vergeben) eingeben
+     * **Alterantiv:** Phoscon APP öffnen -> Menü -> Einstellungen -> Gateway -> Erweitert -> Auf "App verbinden" klicken
+      
 #### Send more than one command at the same time
 For this purpose there is a object called "action".
 
@@ -33,9 +56,10 @@ Examples:
 `"on": true, "transitiontime": 5, "hue": 65500`
 
 ## Links
-[deConz](https://www.dresden-elektronik.de/funktechnik/products/software/pc/deconz/)  
-[REST plugin](https://github.com/dresden-elektronik/deconz-rest-plugin)  
-[Gateways (Hardware)](https://www.dresden-elektronik.de/funktechnik/solutions/wireless-light-control/gateways/)  
+- [Phoscon APP](https://phoscon.de/)
+- [deConz](https://www.dresden-elektronik.de/funktechnik/products/software/pc/deconz/)  
+- [REST plugin on Github](https://github.com/dresden-elektronik/deconz-rest-plugin)  
+- [Gateways (Hardware)](https://www.dresden-elektronik.de/funktechnik/solutions/wireless-light-control/gateways/)  
 
 ## [Sponsors](https://github.com/iobroker-community-adapters/ioBroker.deconz/blob/master/SPONSORS.MD)
 
