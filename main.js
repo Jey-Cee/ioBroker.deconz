@@ -2342,9 +2342,9 @@ function SetObjectAndState(id, name, type, stateName, value) {
         case 'ct':
             objType = 'number';
             objRole = 'level.color.temperature';
-            objMin = 153;
-            objMax = 500;
-            objDefault = 500;
+            objMin = 250;
+            objMax = 454;
+            objDefault = 454;
             break;
         case 'current':
             objType = 'number';
@@ -2441,8 +2441,8 @@ function SetObjectAndState(id, name, type, stateName, value) {
             objType = 'number';
             objRole = 'level.color.saturation';
             objMin = 0;
-            objMax = 255;
-            objDefault = 255;
+            objMax = 254;
+            objDefault = 254;
             break;
         case 'sensitivity':
             objType = 'number';

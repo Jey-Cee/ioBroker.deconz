@@ -317,6 +317,7 @@
 
         $('#sw_version').text('deConz Version: ' + info.swversion);
         $('#api_version').text('API Version: ' + info.apiversion);
+        $('#websocketport').text('Websocket port: ' + info.websocketport);
         $('#bridge').val(info.ipaddress);
         $('#port').val(info.port);
         $('#user').val(info.user);
@@ -403,6 +404,8 @@
                 <div class="chip" id="sw_version">
                 </div>
                 <div class="chip" id="api_version">
+                </div>
+                <div class="chip" id="websocketport">
                 </div>
             </div>
 
