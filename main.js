@@ -2158,7 +2158,6 @@ async function getObjectByDeviceId(id, type) {
                     break;
                 }
             }
-            //break;
         }
     }
 
@@ -2615,6 +2614,7 @@ function SetObjectAndState(id, name, type, stateName, value) {
 async function handleWSmessage(msg) {
     let data = JSON.parse(msg.data);
     let id = data['id'] ? data['id'] : data['gid'];
+    let event = data['e'];
     let type = data['r'];
     let state = data['state'];
     let attr = data['attr'];
@@ -2624,107 +2624,156 @@ async function handleWSmessage(msg) {
     let object;
     switch (type) {
         case 'lights': {
-            if (typeof state == 'object') {
-                adapter.log.debug("Event has state-tag");
-                if (Object.keys(state).length > 0) {
-                    object = await getObjectByDeviceId(id, 'Lights');
-                    for (let stateName in state) {
-                        let oid = object.id.replace(/^(\w*\.){3}/g, '');
-                        adapter.log.debug(stateName + ": " + state[stateName]);
-                        new SetObjectAndState(oid, object.value.common.name, 'Lights', stateName, state[stateName]);
+            switch (event) {
+                case 'changed': {
+                    if (typeof state == 'object') {
+                        if (Object.keys(state).length > 0) {
+                            object = await getObjectByDeviceId(id, 'Lights');
+                            for (let stateName in state) {
+                                let oid = object.id.replace(/^(\w*\.){3}/g, '');
+                                adapter.log.debug(stateName + ": " + state[stateName]);
+                                new SetObjectAndState(oid, object.value.common.name, 'Lights', stateName, state[stateName]);
+                            }
+                        } else {
+                            adapter.log.debug("Event has no state-Changes");
+                            // no state objects
+                        }
+                    } else if (typeof attr == 'object') {
+                        adapter.log.debug("Event has attr-Tag");
+                        // in this case the new "attr"-attribute of the new event (lastseen) can be checked
+                    } else {
+                        await getLightState(id);
                     }
-                } else {
-                    adapter.log.debug("Event has no state-Changes");
-                    // no state objects
+                    break;
                 }
-            } else if (typeof attr == 'object') {
-                adapter.log.debug("Event has attr-Tag");
-                // in this case the new "attr"-attribute of the new event (lastseen) can be checked
-            } else {
-                await getLightState(id);
+                case 'added':{
+                    await getLightState(id);
+                    break;
+                }
+                case 'deleted':{
+                    object = await getObjectByDeviceId(id, 'Lights');
+                    let oid = object.id.replace(/^(\w*\.){3}/g, '');
+                    await deleteDevice(oid);
+                    break;
+                }
+            }
+
+            break;
+        }
+        case 'groups':{
+            switch (event){
+                case 'changed': {
+                    await getGroupAttributes(id);
+                    break;
+                }
+                case 'added': {
+                    await getGroupAttributes(id);
+                    break;
+                }
+                case 'deleted': {
+                    object = await getObjectByDeviceId(id, 'Groups');
+                    let oid = object.id.replace(/^(\w*\.){3}/g, '');
+                    await deleteDevice(oid);
+                    break;
+                }
             }
             break;
         }
-        case 'groups':
         case 'scenes': {
             await getGroupAttributes(id);
             break;
         }
         case 'sensors': {
-            let sensorData = data;
-            object = await getObjectByDeviceId(id, 'Sensors');
-            adapter.log.info(JSON.stringify(object));
-            if (object === undefined) {
-                await getSensor(id);
-            } else if (sensorData.e === 'changed' && sensorData.name) {
-                if (object && object.value.common.name !== sensorData.name) {
-                    adapter.extendObject(object.id, {
-                        common: {
-                            name: sensorData.name
-                        }
-                    })
-                }
-
-            } else {
-                id = object.id.replace(/^(\w*\.){3}/g, '');
-                if (typeof state == 'object') {
-                    for (let obj in state) {
-
-                        if (obj === 'lastupdated') {
-                            adapter.setObjectNotExists(`${object.id}` + '.lastupdated', {
-                                type: 'state',
+            switch (event){
+                case 'changed': {
+                    let sensorData = data;
+                    object = await getObjectByDeviceId(id, 'Sensors');
+                    adapter.log.info(JSON.stringify(object));
+                    if (object === undefined) {
+                        await getSensor(id);
+                    } else if (sensorData.e === 'changed' && sensorData.name) {
+                        if (object && object.value.common.name !== sensorData.name) {
+                            adapter.extendObject(object.id, {
                                 common: {
-                                    name: 'lastupdated',
-                                    type: 'string',
-                                    role: 'state',
-                                    read: true,
-                                    write: false
-                                },
-                                native: {}
-                            });
+                                    name: sensorData.name
+                                }
+                            })
                         }
 
-                        adapter.getState(`${object.id}.lastupdated`, (err, lupdate) => {
-                            if (lupdate === null) {
-                                new SetObjectAndState(id, object.value.common.name, 'Sensors', obj, state[obj]);
-                            } else if (lupdate.val !== state[obj]) {
-                                if (obj === 'buttonevent') {
-                                    new SetObjectAndState(id, object.value.common.name, 'Sensors', obj, state[obj]);
-                                    adapter.setObjectNotExists(`${object.id}` + '.' + "buttonpressed", {
+                    } else {
+                        id = object.id.replace(/^(\w*\.){3}/g, '');
+                        if (typeof state == 'object') {
+                            for (let obj in state) {
+
+                                if (obj === 'lastupdated') {
+                                    adapter.setObjectNotExists(`${object.id}` + '.lastupdated', {
                                         type: 'state',
                                         common: {
-                                            name: 'Sensor' + id + ' ' + 'buttonpressed',
-                                            type: 'number',
+                                            name: 'lastupdated',
+                                            type: 'string',
                                             role: 'state',
                                             read: true,
                                             write: false
                                         },
                                         native: {}
                                     });
-                                    adapter.setState(`${object.id}` + '.' + 'buttonpressed', {
-                                        val: state[obj],
-                                        ack: true
-                                    });
-                                    setTimeout(() => {
-                                        adapter.setState(`${object.id}` + '.' + 'buttonpressed', {
-                                            val: 0,
-                                            ack: true
-                                        })
-                                    }, 800);
-                                } else {
-                                    new SetObjectAndState(id, object.value.common.name, 'Sensors', obj, state[obj]);
                                 }
-                            }
 
-                        })
+                                adapter.getState(`${object.id}.lastupdated`, (err, lupdate) => {
+                                    if (lupdate === null) {
+                                        new SetObjectAndState(id, object.value.common.name, 'Sensors', obj, state[obj]);
+                                    } else if (lupdate.val !== state[obj]) {
+                                        if (obj === 'buttonevent') {
+                                            new SetObjectAndState(id, object.value.common.name, 'Sensors', obj, state[obj]);
+                                            adapter.setObjectNotExists(`${object.id}` + '.' + "buttonpressed", {
+                                                type: 'state',
+                                                common: {
+                                                    name: 'Sensor' + id + ' ' + 'buttonpressed',
+                                                    type: 'number',
+                                                    role: 'state',
+                                                    read: true,
+                                                    write: false
+                                                },
+                                                native: {}
+                                            });
+                                            adapter.setState(`${object.id}` + '.' + 'buttonpressed', {
+                                                val: state[obj],
+                                                ack: true
+                                            });
+                                            setTimeout(() => {
+                                                adapter.setState(`${object.id}` + '.' + 'buttonpressed', {
+                                                    val: 0,
+                                                    ack: true
+                                                })
+                                            }, 800);
+                                        } else {
+                                            new SetObjectAndState(id, object.value.common.name, 'Sensors', obj, state[obj]);
+                                        }
+                                    }
+
+                                })
+                            }
+                        }
+                        if (typeof config == 'object') {
+                            for (let obj in config) {
+                                new SetObjectAndState(id, object.value.common.name, 'Sensors', obj, config[obj]);
+                            }
+                        }
                     }
+                    break;
                 }
-                if (typeof config == 'object') {
-                    for (let obj in config) {
-                        new SetObjectAndState(id, object.value.common.name, 'Sensors', obj, config[obj]);
-                    }
+                case 'added': {
+                    await getSensor(id);
+                    break;
+                }
+                case 'deleted':{
+                    object = await getObjectByDeviceId(id, 'Sensors');
+                    let oid = object.id.replace(/^(\w*\.){3}/g, '');
+                    await deleteDevice(oid);
+                    break;
                 }
             }
+
             break;
         }
     }
