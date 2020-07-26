@@ -155,11 +155,50 @@
             "_id": "Gateway_info.alive",
             "type": "state",
             "common": {
-                "name": "Gateway alive",
+                "name": "Gateway is alive",
                 "type": "boolean",
                 "role": "indicator.online",
                 "read": true,
                 "write": false,
+                "def": false
+            },
+            "native": {}
+        },
+        {
+            "_id": "Gateway_info.backup",
+            "type": "state",
+            "common": {
+                "name": "Backup",
+                "type": "boolean",
+                "role": "button",
+                "read": false,
+                "write": true,
+                "def": false
+            },
+            "native": {}
+        },
+        {
+            "_id": "Gateway_info.update_deconz",
+            "type": "state",
+            "common": {
+                "name": "Update deConz software (Pi only)",
+                "type": "boolean",
+                "role": "button",
+                "read": false,
+                "write": true,
+                "def": false
+            },
+            "native": {}
+        },
+        {
+            "_id": "Gateway_info.update_firmware",
+            "type": "state",
+            "common": {
+                "name": "Update firmware",
+                "type": "boolean",
+                "role": "button",
+                "read": false,
+                "write": true,
                 "def": false
             },
             "native": {}

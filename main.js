@@ -385,6 +385,15 @@ class deconz extends utils.Adapter {
                         parameters = `{"permitjoin": ${opentime}}`;
                         await modifyConfig(parameters);
                         break;
+                    case 'backup':
+                        backup();
+                        break;
+                    case 'update_deconz':
+                        updateSoftware();
+                        break;
+                    case 'update_firmware':
+                        updateFirmware();
+                        break;
                     default:
                         action = 'none';
                         break;
@@ -783,7 +792,6 @@ async function modifyConfig(parameters) {
     }
 }
 
-
 async function getConfig() {
     const {ip, port, user} = await getGatewayParam();
 
@@ -846,6 +854,85 @@ async function getConfig() {
         });
     }
 } //END getConfig
+
+async function backup() {
+    const {ip, port, user} = await getGatewayParam();
+
+    if (ip !== 'none' && port !== 'none' && user !== 'none') {
+        let options = {
+            url: 'http://' + ip + ':' + port + '/api/' + user + '/config/export',
+            method: 'POST'
+        };
+
+        request(options, async (error, res, body) => {
+            if (error) {
+                adapter.log.error('Could not create backup: ' + error);
+            } else {
+                await logging(res, body, 'backup');
+            }
+        })
+    }
+}
+
+async function updateSoftware() {
+    const {ip, port, user} = await getGatewayParam();
+
+    const gw = await adapter.getObjectAsync('Gateway_info');
+    const version = gw.native.swversion.split('.').map(el => {
+        let n = Number(el);
+        return n === 0 ? n : n || el;
+    }).toString();
+
+    if (ip !== 'none' && port !== 'none' && user !== 'none') {
+        let options = {
+            url: 'http://' + ip + ':' + port + '/api/' + user + '/config/update',
+            method: 'POST'
+        };
+
+        request(options, async (error, res, body) => {
+            if (error) {
+                adapter.log.error('Could not update deConz: ' + error);
+            } else {
+                await logging(res, body, 'update deConz');
+                let returned = JSON.parse(body)[0].success['/config/update'].split('.').map(el => {
+                    let n = Number(el);
+                    return n === 0 ? n : n || el;
+                }).toString();
+                if(returned !== version){
+                    adapter.log.info('deConz update done. New version: ' + returned + ' ' + version);
+                } else {
+                    adapter.log.info('No new deConz Version available');
+                }
+            }
+        })
+    }
+}
+
+async function updateFirmware() {
+    const {ip, port, user} = await getGatewayParam();
+
+    if (ip !== 'none' && port !== 'none' && user !== 'none') {
+        let options = {
+            url: 'http://' + ip + ':' + port + '/api/' + user + '/config/updatefirmware',
+            method: 'POST'
+        };
+
+        request(options, async (error, res, body) => {
+            if (error) {
+                adapter.log.error('Could not update firmware: ' + error);
+            } else {
+                if (res.statusCode === 503) {
+                    adapter.log.info('No firmware update available');
+                } else if (res.statusCode === 200){
+                    let returned = JSON.parse(body)[0].success['/config/updatefirmware'];
+                    adapter.log.info('Firmware update done. New version: ' + returned);
+                } else {
+                    await logging(res, body, 'update firmware');
+                }
+            }
+        })
+    }
+}
 //END deConz config ----------------------------------------------------------------------------------------------------
 
 
@@ -2138,6 +2225,9 @@ async function getObjectByDeviceId(id, type) {
     /*
     type = Groups, Lights, Sensors
      */
+
+    adapter.log.info('getObjectByDeviceId ' + id + ' ' + type);
+
     let obj = await adapter.getObjectListAsync({
         startkey: 'deconz.' + adapter.instance + '.' + type + '.',
         endkey: 'deconz.' + adapter.instance + '.' + type + '.\u9999'
