@@ -1260,7 +1260,7 @@ async function deleteGroup(groupId) {
                             for (let i = 0; i <= count; i++) {                                              //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ group handelt
                                 let keyName = Object.keys(enums)[i];
                                 if (enums[keyName].common.role === 'group' && enums[keyName].native.id === groupId) {
-                                    adapter.log.info('Delete device Object: ' + enums[keyName].id);
+                                    adapter.log.info('Delete group Objects: ' + enums[keyName]._id);
                                     let name = enums[keyName]._id;
 
                                     await deleteDevice(name);
@@ -1301,6 +1301,7 @@ async function getAllSensors() {
                         let keyName = Object.keys(list)[i];
                         //let sensorID = keyName;
                         let mac = list[keyName]['uniqueid'];
+                        adapter.log.info('getAllSensors MAC: ' + mac);
                         mac = mac.match(/..:..:..:..:..:..:..:../g).toString();
                         let sensorID = mac.replace(/:/g, '');
 
