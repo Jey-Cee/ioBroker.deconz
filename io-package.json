@@ -202,6 +202,63 @@
                 "def": false
             },
             "native": {}
+        },
+        {
+            "_id": "Gateway_info.touchlink",
+            "type": "channel",
+            "common": {
+                "name": "Touchlink"
+            },
+            "native": {}
+        },
+        {
+            "_id": "Gateway_info.touchlink.scan",
+            "type": "state",
+            "common": {
+                "name": "Scan for nearby devices (duration 15 seconds)",
+                "type": "boolean",
+                "role": "button",
+                "read": false,
+                "write": true,
+                "def": false
+            },
+            "native": {}
+        },
+        {
+            "_id": "Gateway_info.touchlink.scan_result",
+            "type": "state",
+            "common": {
+                "name": "List of found devices",
+                "type": "string",
+                "role": "json",
+                "read": true,
+                "write": false
+            },
+            "native": {}
+        },
+        {
+            "_id": "Gateway_info.touchlink.identify",
+            "type": "state",
+            "common": {
+                "name": "Identify device by id from scan result",
+                "type": "number",
+                "role": "state",
+                "read": false,
+                "write": true
+            },
+            "native": {}
+        },
+        {
+            "_id": "Gateway_info.touchlink.reset",
+            "type": "state",
+            "common": {
+                "name": "Reset device by id from scan result",
+                "type": "number",
+                "role": "state",
+                "read": false,
+                "write": true
+            },
+            "native": {}
         }
     ],
     "objects": [

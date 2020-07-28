@@ -10,8 +10,8 @@ let hue_factor = 182.041666667;
 
 let ws = null;
 let alive_ts = 0;
-let reconnect = null;
-let ready = false;
+let ready = false
+let timeoutScan, timeoutReady, timeoutWait, timeoutReconnect = null, timeoutAutoUpdates, timeoutButton, timeoutButtonpressed;
 
 //Sentry for error reporting
 let Sentry;
@@ -149,6 +149,14 @@ class deconz extends utils.Adapter {
         this.setState('info.connection', {val: false, ack: true});
         this.setState('Gateway_info.alive', {val: false, ack: true});
 
+        clearTimeout(timeoutScan);
+        clearTimeout(timeoutReady);
+        clearTimeout(timeoutWait);
+        clearTimeout(timeoutReconnect);
+        clearTimeout(timeoutAutoUpdates);
+        clearTimeout(timeoutButton);
+        clearTimeout(timeoutButtonpressed);
+
         try {
             this.log.info('cleaned everything up...');
             callback();
@@ -193,11 +201,11 @@ class deconz extends utils.Adapter {
                 } else if (state.val === true) {
                     if (state.lc !== alive_ts) {
                         alive_ts = state.lc;
-                        if (reconnect !== null) {
+                        if (timeoutReconnect !== null) {
                             if (ws !== null) {
                                 ws.terminate();
                             }
-                            clearTimeout(reconnect);
+                            clearTimeout(timeoutReconnect);
                         }
                         await getAutoUpdates();
                     }
@@ -386,13 +394,22 @@ class deconz extends utils.Adapter {
                         await modifyConfig(parameters);
                         break;
                     case 'backup':
-                        backup();
+                        await backup();
                         break;
                     case 'update_deconz':
-                        updateSoftware();
+                        await updateSoftware();
                         break;
                     case 'update_firmware':
-                        updateFirmware();
+                        await updateFirmware();
+                        break;
+                    case 'scan':
+                        await touchlinkScan();
+                        break;
+                    case 'identify':
+                        await touchlinkIdentify(state.val);
+                        break;
+                    case 'reset':
+                        await touchlinkReset(state.val);
                         break;
                     default:
                         action = 'none';
@@ -526,7 +543,7 @@ async function main() {
             }
         }
     }
-    setTimeout(() => {
+    timeoutReady = setTimeout(() => {
         ready = true;
     }, 60 * 1000)
 
@@ -536,7 +553,6 @@ async function main() {
 //search for Gateway
 let discovery = new SSDP.Discovery();
 let found_deconz = false;
-let wait;
 
 function autoDiscovery() {
     adapter.log.info('auto discovery');
@@ -558,7 +574,7 @@ function autoDiscovery() {
                     }
                 });
                 found_deconz = true;
-                clearTimeout(wait);
+                clearTimeout(timeoutWait);
                 discovery.close();
             }
         }
@@ -571,7 +587,7 @@ function autoDiscovery() {
             sentryMsg(error);
         }
         discovery.search({st: 'ssdp:all'});
-        wait = setTimeout(() => {
+        timeoutWait = setTimeout(() => {
             adapter.log.warn('Could not found deConz by broadcast, establishing Websocket without monitoring the connection state. This is happen if you are using VLAN or installed deConz in an container.')
             getAutoUpdates();
         }, 10 * 1000)
@@ -599,6 +615,63 @@ function heartbeat() {
     });
 }
 
+//START Make Abo using websocket
+const WebSocket = require('ws');
+
+function autoReconnect(host, port) {
+    timeoutReconnect = setTimeout(() => {
+        ws.terminate();
+        getAutoUpdates();
+    }, 60 * 1000);
+}
+
+async function getAutoUpdates() {
+
+    let host, port, user;
+    const results = await adapter.getObjectAsync('Gateway_info');
+
+    if (results) {
+        host = (results !== null && results.native.ipaddress !== undefined) ? results.native.ipaddress : null;
+        port = (results !== null && results.native.websocketport !== undefined) ? results.native.websocketport : null;
+        user = (results !== null && results.native.user !== undefined) ? results.native.user : null;
+    }
+
+    if (user !== null && host !== null && port !== null) {
+        ws = new WebSocket('ws://' + host + ':' + port);
+
+        ws.on('open', () => {
+            adapter.setState('info.connection', {val: true, ack: true});
+            adapter.log.debug('Subscribed to updates...');
+            autoReconnect();
+        });
+
+        ws.on('close', () => {
+            adapter.log.debug('Websocket connection closed');
+            //getAutoUpdates();
+        });
+
+        ws.on('error', async (err) => {
+            adapter.log.warn('Could not connect to websocket instance of deConz/Phoscon. ' + err);
+            if (ws !== null) ws.terminate();
+            adapter.setState('info.connection', {val: false, ack: true});
+            timeoutAutoUpdates = setTimeout(async () => {
+                await getAutoUpdates();
+            }, 60 * 1000)
+
+        });
+
+
+        ws.onmessage = async (msg) => {
+            clearTimeout(timeoutReconnect);
+            autoReconnect(host, port);
+            handleWSmessage(msg);
+        }
+
+    }
+}
+//END Make Abo using websocket
+
+//START deConz config --------------------------------------------------------------------------------------------------
 function createAPIkey(host, credentials, callback) {
     let auth;
 
@@ -688,62 +761,6 @@ async function deleteAPIkey() {
     }
 }
 
-//Make Abo using websocket
-const WebSocket = require('ws');
-
-function autoReconnect(host, port) {
-    reconnect = setTimeout(() => {
-        ws.terminate();
-        getAutoUpdates();
-    }, 60 * 1000);
-}
-
-async function getAutoUpdates() {
-
-    let host, port, user;
-    const results = await adapter.getObjectAsync('Gateway_info');
-
-    if (results) {
-        host = (results !== null && results.native.ipaddress !== undefined) ? results.native.ipaddress : null;
-        port = (results !== null && results.native.websocketport !== undefined) ? results.native.websocketport : null;
-        user = (results !== null && results.native.user !== undefined) ? results.native.user : null;
-    }
-
-    if (user !== null && host !== null && port !== null) {
-        ws = new WebSocket('ws://' + host + ':' + port);
-
-        ws.on('open', () => {
-            adapter.setState('info.connection', {val: true, ack: true});
-            adapter.log.debug('Subscribed to updates...');
-            autoReconnect();
-        });
-
-        ws.on('close', () => {
-            adapter.log.debug('Websocket connection closed');
-            //getAutoUpdates();
-        });
-
-        ws.on('error', async (err) => {
-            adapter.log.warn('Could not connect to websocket instance of deConz/Phoscon. ' + err);
-            if (ws !== null) ws.terminate();
-            adapter.setState('info.connection', {val: false, ack: true});
-            setTimeout(async () => {
-                await getAutoUpdates();
-            }, 60 * 1000)
-
-        });
-
-
-        ws.onmessage = async (msg) => {
-            clearTimeout(reconnect);
-            autoReconnect(host, port);
-            handleWSmessage(msg);
-        }
-
-    }
-}
-
-//START deConz config --------------------------------------------------------------------------------------------------
 async function modifyConfig(parameters) {
     let ip, port, user, ot;
     const results = await adapter.getObjectAsync('Gateway_info');
@@ -935,6 +952,86 @@ async function updateFirmware() {
 }
 //END deConz config ----------------------------------------------------------------------------------------------------
 
+//START Touchlink
+async function touchlinkScan() {
+    const {ip, port, user} = await getGatewayParam();
+
+    if (ip !== 'none' && port !== 'none' && user !== 'none') {
+        let options = {
+            url: 'http://' + ip + ':' + port + '/api/' + user + '/touchlink/scan',
+            method: 'POST'
+        };
+
+        request(options, async (error, res, body) => {
+            if (error) {
+                adapter.log.error('Could not start touchlink scan: ' + error);
+            } else if (await logging(res, body, 'touchlink scan')) {
+                adapter.setStateAsync('Gateway_info.touchlink.scan', {ack: true});
+                timeoutWait = setTimeout( async () => {
+                    await getTouchlinkScanResult();
+                }, 15 * 1000);
+            }
+        })
+    }
+}
+
+async function getTouchlinkScanResult() {
+    const {ip, port, user} = await getGatewayParam();
+
+    if (ip !== 'none' && port !== 'none' && user !== 'none') {
+        let options = {
+            url: 'http://' + ip + ':' + port + '/api/' + user + '/touchlink/scan',
+            method: 'GET'
+        };
+
+        request(options, async (error, res, body) => {
+            if (error) {
+                adapter.log.error('Could not connect get scan results. ' + error);
+            } else if (await logging(res, body, ' get scan result')) {
+                adapter.setStateAsync('Gateway_info.touchlink.scan_result', {val: body, ack: true});
+            }
+        });
+    }
+}
+
+async function touchlinkIdentify(id) {
+    const {ip, port, user} = await getGatewayParam();
+
+    if (ip !== 'none' && port !== 'none' && user !== 'none') {
+        let options = {
+            url: 'http://' + ip + ':' + port + '/api/' + user + '/touchlink/' + id + '/identify',
+            method: 'POST'
+        };
+
+        request(options, async (error, res, body) => {
+            if (error) {
+                adapter.log.error('Could not start touchlink identify ' + id + ': ' + error);
+            } else {
+                await logging(res, body, 'touchlink identify ' + id)
+            }
+        })
+    }
+}
+
+async function touchlinkReset(id) {
+    const {ip, port, user} = await getGatewayParam();
+
+    if (ip !== 'none' && port !== 'none' && user !== 'none') {
+        let options = {
+            url: 'http://' + ip + ':' + port + '/api/' + user + '/touchlink/' + id + '/reset',
+            method: 'POST'
+        };
+
+        request(options, async (error, res, body) => {
+            if (error) {
+                adapter.log.error('Could not start touchlink reset ' +id + ': ' + error);
+            } else {
+                await logging(res, body, 'touchlink  reset ' + id)
+            }
+        })
+    }
+}
+//END Touchlink
 
 //START  Group functions -----------------------------------------------------------------------------------------------
 async function getAllGroups() {
@@ -2205,7 +2302,7 @@ async function buttonEvents(id, event) {
             val: true,
             ack: true
         }).then(results => {
-            setTimeout(() => {
+            timeoutButton = setTimeout(() => {
                 adapter.setState(`${id}.${button}.${state}`, {
                     val: false,
                     ack: true
@@ -2729,7 +2826,7 @@ async function handleWSmessage(msg) {
                             // no state objects
                         }
                     } else if (typeof attr == 'object') {
-                        adapter.log.debug("Event has attr-Tag");
+                        //adapter.log.debug("Event has attr-Tag");
                         // in this case the new "attr"-attribute of the new event (lastseen) can be checked
                     } else {
                         await getLightState(id);
@@ -2830,7 +2927,7 @@ async function handleWSmessage(msg) {
                                                 val: state[obj],
                                                 ack: true
                                             });
-                                            setTimeout(() => {
+                                            timeoutButtonpressed = setTimeout(() => {
                                                 adapter.setState(`${object.id}` + '.' + 'buttonpressed', {
                                                     val: 0,
                                                     ack: true
