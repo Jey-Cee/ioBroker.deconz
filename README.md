@@ -75,6 +75,18 @@ Beispiele:
 
 ## Changelog
 
+### 2.0.3
+* fix incoming rename event for sensors
+* fix release_press is set to true at start
+* added websocket port info to configuration
+* added event types handling for websocket messages
+* added backup, deConz update & firmware update states under Gateway_info
+* added touchlink functions
+* fix sensor handling for virtual devices (fsm and vpir)
+
+### 2.0.2
+* Bugfix
+
 ### 2.0.1
 * Bugfixes
 

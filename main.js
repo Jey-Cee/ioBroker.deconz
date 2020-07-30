@@ -215,8 +215,6 @@ class deconz extends utils.Adapter {
             return;
         }
 
-        this.log.debug('dp: ' + dp + '; id:' + id + ' tmp: ' + tmp);
-
         let stateObj = await this.getObjectAsync(oid);
 
         if ((stateObj !== null && stateObj !== undefined) && typeof state.val === stateObj.common.type) {
@@ -1485,7 +1483,6 @@ async function getAllSensors() {
                         let keyName = Object.keys(list)[i];
                         //let sensorID = keyName;
                         let mac = list[keyName]['uniqueid'];
-                        adapter.log.info('getAllSensors MAC: ' + mac);
                         if(checkVirtualDevices(mac) !== true){
                             mac = mac.match(/..:..:..:..:..:..:..:../g).toString();
                         }
@@ -2336,8 +2333,6 @@ async function getObjectByDeviceId(id, type) {
     type = Groups, Lights, Sensors
      */
 
-    adapter.log.info('getObjectByDeviceId ' + id + ' ' + type);
-
     let obj = await adapter.getObjectListAsync({
         startkey: 'deconz.' + adapter.instance + '.' + type + '.',
         endkey: 'deconz.' + adapter.instance + '.' + type + '.\u9999'
@@ -2888,7 +2883,6 @@ async function handleWSmessage(msg) {
                 case 'changed': {
                     let sensorData = data;
                     object = await getObjectByDeviceId(id, 'Sensors');
-                    adapter.log.info(JSON.stringify(object));
                     if (object === undefined) {
                         await getSensor(id);
                     } else if (sensorData.e === 'changed' && sensorData.name) {
