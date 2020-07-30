@@ -2144,24 +2144,6 @@ function checkVirtualDevices(mac){
     return !(resFSM !== true && resVPIR !== true);
 }
 
-function nameFilter(name) {
-    let signs = [String.fromCharCode(46), String.fromCharCode(44), String.fromCharCode(92), String.fromCharCode(47), String.fromCharCode(91), String.fromCharCode(93), String.fromCharCode(123), String.fromCharCode(125), String.fromCharCode(32), String.fromCharCode(129), String.fromCharCode(154), String.fromCharCode(132), String.fromCharCode(142), String.fromCharCode(148), String.fromCharCode(153)]; //46=. 44=, 92=\ 47=/ 91=[ 93=] 123={ 125=} 32=Space 129=ü 154=Ü 132=ä 142=Ä 148=ö 153=Ö
-    signs.forEach((item, index) => {
-        let count = name.split(item).length - 1;
-
-        for (let i = 0; i < count; i++) {
-            name = name.replace(item, '_');
-        }
-
-        let result = name.search(/_$/);
-        if (result !== -1) {
-            name = name.replace(/_$/, '');
-        }
-
-    });
-    return name;
-}
-
 async function getGatewayParam() {
     const results = await adapter.getObjectAsync('Gateway_info');
     if (results) {
