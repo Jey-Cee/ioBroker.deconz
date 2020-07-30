@@ -66,6 +66,7 @@
         "enabled": true,
         "connectionType": "local",
         "dataSource": "push",
+        "localLink": "http://%bridge%:%port%",
         "plugins": {
             "sentry": {
                 "dsn": "https://c467944074ec441e9b56fdd0af6a3fdd@o379422.ingest.sentry.io/5204269",
@@ -98,7 +99,9 @@
         "type": "hardware"
     },
     "native": {
-        "sentry": true
+        "sentry": true,
+        "bridge": "127.0.0.1",
+        "port": 80
     },
     "instanceObjects": [
         {
