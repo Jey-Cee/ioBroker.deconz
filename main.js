@@ -1486,7 +1486,10 @@ async function getAllSensors() {
                         //let sensorID = keyName;
                         let mac = list[keyName]['uniqueid'];
                         adapter.log.info('getAllSensors MAC: ' + mac);
-                        mac = mac.match(/..:..:..:..:..:..:..:../g).toString();
+                        if(checkVirtualDevices(mac) !== true){
+                            mac = mac.match(/..:..:..:..:..:..:..:../g).toString();
+                        }
+
                         let sensorID = mac.replace(/:/g, '');
 
                         //create object for sensor device
@@ -1571,7 +1574,9 @@ async function getSensor(Id) {
                 if (await logging(res, body, 'get sensor ' + Id)) {
                     let list = JSON.parse(body);
                     let mac = list['uniqueid'];
-                    mac = mac.match(/..:..:..:..:..:..:..:../g).toString();
+                    if(checkVirtualDevices(mac) !== true){
+                        mac = mac.match(/..:..:..:..:..:..:..:../g).toString();
+                    }
                     let sensorId = mac.replace(/:/g, '');
 
                     let exists = await adapter.getObjectAsync('Sensors.' + sensorId);
@@ -2132,6 +2137,14 @@ function sentryMsg(msg) {
             });
         }
     }
+}
+
+function checkVirtualDevices(mac){
+    const regexFSM = new RegExp('fsm');
+    const regexVPIR = new RegExp('vpir');
+    const resFSM = regexFSM.test(mac);
+    const resVPIR = regexVPIR.test(mac);
+    return !(resFSM !== true && resVPIR !== true);
 }
 
 function nameFilter(name) {
