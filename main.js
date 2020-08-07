@@ -367,6 +367,7 @@ class deconz extends utils.Adapter {
                         break;
                     case 'offset':
                     case 'sensitivity':
+                    case 'sensitivitymax':
                     case 'usertest':
                     case 'ledindication':
                     case 'duration':
