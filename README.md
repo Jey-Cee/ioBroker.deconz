@@ -75,6 +75,10 @@ Beispiele:
 
 ## [Sponsors](https://github.com/iobroker-community-adapters/ioBroker.deconz/blob/master/SPONSORS.MD)
 
+## Join the Discord server to discuss everything about ioBroker-deconz integration!
+
+<a href="https://discord.gg/uPwfzvR"><img src="https://discordapp.com/api/guilds/743167951875604501/widget.png?style=banner2" width="25%"></a>
+
 ## Changelog
 
 ### 2.0.3
