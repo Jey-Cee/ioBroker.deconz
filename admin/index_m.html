@@ -72,7 +72,7 @@
                         }, function (err, _devices) {
                             socket.emit('getStates', function (err, _values) {
                                 if (_devices && _devices.rows && _devices.rows.length) {
-                                    for (var j = 0; j < _devices.rows.length; j++) {
+                                    for (let j = 0; j < _devices.rows.length; j++) {
                                         devices[_devices.rows[j].value._id] = _devices.rows[j].value;
                                         showDevice(_devices.rows[j].value, true);
                                     }
@@ -141,7 +141,7 @@
 
 
     async function getGatewayInfo(){
-        return new Promise(function(resolve, reject) {
+        return new Promise(function(resolve) {
             let info;
             getObject('deconz.' + instance + '.Gateway_info', (err, obj)=>{
                 info = obj.native;
@@ -338,18 +338,19 @@
             }, 1000);
             $('#opennetwork').html(_('Open for %s seconds', counter));
         }else if(counter === 0){
-            $('#opennetwork').html('Open Network');
-            $('#opennetwork').removeClass('disabled');
+            let $opennetwork = $('#opennetwork');
+            $opennetwork.html('Open Network');
+            $opennetwork.removeClass('disabled');
             counter = $('permit').val();
             sendTo('deconz.' + instance, 'getConfig');
         }
     }
 
     function save(callback) {
-        sendTo('deconz.' + instance, 'saveConfig', {'ipaddress': $('#bridge').val(), 'port': $('#port').val(), 'networkopenduration': $('#permit').val(), 'user': $('#user').val()}, (result) => {});
+        sendTo('deconz.' + instance, 'saveConfig', {'ipaddress': $('#bridge').val(), 'port': $('#port').val(), 'networkopenduration': $('#permit').val(), 'user': $('#user').val()}, () => {});
         let obj = {};
         $('.value').each(function () {
-            var $this = $(this);
+            let $this = $(this);
             if ($this.attr('type') === 'checkbox') {
                 obj[$this.attr('id')] = $this.prop('checked');
             } else {
@@ -396,7 +397,7 @@
         <div id="tab-main" class="col s12 page">
                 <div class="row">
                     <div class="input-field col s6 m4 l4">
-                        <img src="deconz.png" class="logo">
+                        <img src="deconz.png" alt="deConz" class="logo">
                     </div>
                 </div>
 
