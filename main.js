@@ -1,7 +1,7 @@
 'use strict';
 
 const utils = require('@iobroker/adapter-core'); // Get common adapter utils
-const request = require('request');
+const axios = require('axios').default;
 let SSDP = require('./lib/ssdp.js');
 
 let adapter;
@@ -241,7 +241,7 @@ class deconz extends utils.Adapter {
                         } else {
                             parameters = '{"bri": ' + JSON.stringify(state.val) + ', "on": false}';
                         }
-                        new SetObjectAndState(tmp[3], '', tmp[2], 'level', Math.floor((100 / 255) * state.val));
+                        await SetObjectAndState(tmp[3], '', tmp[2], 'level', Math.floor((100 / 255) * state.val));
                         break;
                     case 'level':
                         if (state.val > 0 && (transitionTime === 'none' || transitionTime === 0)) {
@@ -339,7 +339,7 @@ class deconz extends utils.Adapter {
                         if (obj.common.role === 'group') {
                             let controlId = obj.native.id;
                             let parameters = `{ "name": "${state.val}" }`;
-                            await setGroupScene(parameters, controlId, 0, '', oid, 'POST');
+                            await setGroupScene(parameters, controlId, 0, '', oid);
                             await getAllGroups();
                         }
                         break;
@@ -437,7 +437,7 @@ class deconz extends utils.Adapter {
                         case 'scene':
                             let parentDeviceId = id.split(".")[1];
                             //let parent = await adapter.getObjectAsync(adapter.name + '.' + adapter.instance + '.Groups.' + parentDeviceId);
-                            await setGroupScene(parameters, parentDeviceId, controlId, action, oid, method);
+                            await setGroupScene(parameters, parentDeviceId, controlId, action, oid);
                             break;
                     }
                 }
@@ -450,7 +450,7 @@ class deconz extends utils.Adapter {
         if (obj) {
             switch (obj.command) {
                 case 'createAPIkey':
-                    createAPIkey(obj.message.host, obj.message.credentials, (res) => {
+                    await createAPIkey(obj.message.host, obj.message.credentials, (res) => {
                         if (obj.callback) this.sendTo(obj.from, obj.command, JSON.stringify(res), obj.callback);
                     });
                     wait = true;
@@ -516,6 +516,7 @@ class deconz extends utils.Adapter {
 }
 
 async function main() {
+    adapter.log.info('Please wait while adapter is starting');
     adapter.subscribeStates('*');
     adapter.subscribeObjects('Lights.*');
     adapter.subscribeObjects('Groups.*');
@@ -544,6 +545,7 @@ async function main() {
     }
     timeoutReady = setTimeout(() => {
         ready = true;
+        adapter.log.info('Adapter is ready');
     }, 60 * 1000)
 
 }
@@ -671,7 +673,7 @@ async function getAutoUpdates() {
 //END Make Abo using websocket
 
 //START deConz config --------------------------------------------------------------------------------------------------
-function createAPIkey(host, credentials, callback) {
+async function createAPIkey(host, credentials, callback) {
     let auth;
 
     if (credentials !== null) {
@@ -681,8 +683,6 @@ function createAPIkey(host, credentials, callback) {
     }
 
     let options = {
-        url: 'http://' + host + '/api',
-        method: 'POST',
         headers: {
             'Content-Type': 'text/plain;charset=UTF-8',
             'Authorization': `Basic ${auth}`,
@@ -690,26 +690,24 @@ function createAPIkey(host, credentials, callback) {
         }
     };
     adapter.log.debug(host + ' auth: ' + auth);
-    try {
-        let req = request(options, async (error, res, body) => {
-            if (!error) {
-                adapter.log.info('STATUS: ' + JSON.stringify(res));
-                if (res.statusCode === 403) {
-                    callback({error: 101, message: 'Unlock Key not pressed'});
-                } else if (await logging(res, body, 'create API key')) {
-                    let apiKey = JSON.parse(body);
-                    adapter.log.info(JSON.stringify(apiKey[0]['success']['username']));
-                    callback({error: 0, message: apiKey[0]['success']['username']});
-                    await getConfig();
-                }
-            } else {
-                adapter.log.error('Could not connect to deConz/Phoscon. ' + error);
+
+    await axios.post(`http://${host}/api`, {}, options)
+        .then(async result => {
+            let res = result.status;
+            let body = result.data;
+            adapter.log.info('STATUS: ' + JSON.stringify(res));
+            if (res === 403) {
+                callback({error: 101, message: 'Unlock Key not pressed'});
+            } else if (await logging(res, body, 'create API key')) {
+                let apiKey = body;
+                adapter.log.info(JSON.stringify(apiKey[0]['success']['username']));
+                callback({error: 0, message: apiKey[0]['success']['username']});
+                await getConfig();
             }
+        }).catch(async error => {
+            sentryMsg(error);
         });
-        req.write('{"devicetype": "ioBroker"}');
-    } catch (err) {
-        adapter.log.error(err)
-    }
+
 
 }
 
@@ -718,23 +716,12 @@ async function deleteAPIkey() {
     const {ip, port, user} = await getGatewayParam();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
-        let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/config/whitelist/' + user,
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'text/plain;charset=UTF-8'
-            }
-        };
 
-        request(options, async (error, res, body) => {
-            if (error) {
-                sentryMsg(error);
-            } else {
-                let response;
-                try {
-                    response = JSON.parse(body);
-                } catch (err) {
-                }
+        await axios.delete(`http://${ip}:${port}/api/${user}/config/whitelist/${user}`)
+            .then(async result => {
+                let res = result.status;
+                let body = result.data;
+                let response = body;
                 if (res !== undefined) {
                     if (await logging(res, body, 'delete API key')) {
                         if (response[0]['success']) {
@@ -749,14 +736,16 @@ async function deleteAPIkey() {
                         } else if (response[0]['error']) {
                             adapter.log.warn(JSON.stringify(response[0]['error']));
                         }
-                    } else if (res.statusCode === 403) {
+                    } else if (res === 403) {
                         adapter.log.warn('You do not have the permission to do this! ');
-                    } else if (res.statusCode === 404) {
+                    } else if (res === 404) {
                         adapter.log.warn('Error 404 Not Found ')
                     }
                 }
-            }
-        });
+            }).catch(async error => {
+                sentryMsg(error);
+            });
+
     }
 }
 
@@ -769,24 +758,12 @@ async function modifyConfig(parameters) {
         user = results.native.user;
         ot = results.native.networkopenduration;
 
-        let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/config',
-            method: 'PUT',
-            headers: 'Content-Type" : "application/json',
-            body: parameters
-        };
 
-        request(options, async (error, res, body) => {
-            if (error) {
-                sentryMsg(error);
-            } else {
-                let response;
-                if (error) adapter.log.warn(error);
-                try {
-                    response = JSON.parse(body);
-                } catch (err) {
-                }
-
+        await axios.put(`http://${ip}:${port}/api/${user}/config`, parameters)
+            .then(async result => {
+                let res = result.status;
+                let body = result.data;
+                let response = body;
                 if (await logging(res, body, 'modify config') && response !== undefined && response !== 'undefined') {
                     if (response[0]['success']) {
                         switch (JSON.stringify(response[0]['success'])) {
@@ -798,13 +775,16 @@ async function modifyConfig(parameters) {
                     } else if (response[0]['error']) {
                         adapter.log.warn(JSON.stringify(response[0]['error']));
                     }
-                } else if (res.statusCode === 403) {
+                } else if (res === 403) {
                     adapter.log.warn('You do not have the permission to do this! ' + parameters);
-                } else if (res.statusCode === 400) {
+                } else if (res === 400) {
                     adapter.log.warn('Error 404 Not Found ' + parameters)
                 }
-            }
-        });
+
+            }).catch(async error => {
+                sentryMsg(error);
+            });
+
     }
 }
 
@@ -812,62 +792,61 @@ async function getConfig() {
     const {ip, port, user} = await getGatewayParam();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
-        let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/config',
-            method: 'GET'
-        };
 
-        request(options, async (error, res, body) => {
-            if (error) {
+        await axios.get(`http://${ip}:${port}/api/${user}/config`)
+            .then(async result => {
+                let res = result.status;
+                let body = result.data;
+                if (await logging(res, JSON.stringify(body), ' get config')) {
+                    let gateway = body;
+                    adapter.log.info('deConz Version: ' + gateway['swversion'] + '; API version: ' + gateway['apiversion']);
+                    await adapter.extendObjectAsync('Gateway_info', {
+                        type: 'device',
+                        common: {
+                            name: gateway['name'],
+                            role: 'gateway'
+                        },
+                        native: {
+                            apiversion: gateway['apiversion'],
+                            bridgeid: gateway['bridgeid'],
+                            datastoreversion: gateway['datastoreversion'],
+                            devicename: gateway['devicename'],
+                            dhcp: gateway['dhcp'],
+                            factorynew: gateway['factorynew'],
+                            gateway: gateway['gateway'],
+                            //ipaddress: gateway['ipaddress'],
+                            linkbutton: gateway['linkbutton'],
+                            mac: gateway['mac'],
+                            modelid: gateway['modelid'],
+                            netmask: gateway['netmask'],
+                            networkopenduration: gateway['networkopenduration'],
+                            panid: gateway['panid'],
+                            portalconnection: gateway['portalconnection'],
+                            portalservices: gateway['portalservices'],
+                            proxyaddress: gateway['proxyaddress'],
+                            proxyport: gateway['proxyport'],
+                            replacesbridgeid: gateway['replacesbridgeid'],
+                            starterkitid: gateway['starterkitid'],
+                            swversion: gateway['swversion'],
+                            timeformat: gateway['timeformat'],
+                            timezone: gateway['timezone'],
+                            uuid: gateway['uuid'],
+                            websocketnotifyall: gateway['websocketnotifyall'],
+                            websocketport: gateway['websocketport'],
+                            zigbeechannel: gateway['zigbeechannel']
+                        }
+                    });
+
+                    await getAllLights();
+                    await getAllSensors();
+                    await getAllGroups();
+                    //getDevices();
+                }
+            }).catch(async error => {
                 adapter.log.error('Could not connect to deConz/Phoscon. ' + error);
-            } else if (await logging(res, body, ' get config')) {
-                let gateway = JSON.parse(body);
-                adapter.log.info('deConz Version: ' + gateway['swversion'] + '; API version: ' + gateway['apiversion']);
-                adapter.extendObject('Gateway_info', {
-                    type: 'device',
-                    common: {
-                        name: gateway['name'],
-                        role: 'gateway'
-                    },
-                    native: {
-                        apiversion: gateway['apiversion'],
-                        bridgeid: gateway['bridgeid'],
-                        datastoreversion: gateway['datastoreversion'],
-                        devicename: gateway['devicename'],
-                        dhcp: gateway['dhcp'],
-                        factorynew: gateway['factorynew'],
-                        gateway: gateway['gateway'],
-                        //ipaddress: gateway['ipaddress'],
-                        linkbutton: gateway['linkbutton'],
-                        mac: gateway['mac'],
-                        modelid: gateway['modelid'],
-                        netmask: gateway['netmask'],
-                        networkopenduration: gateway['networkopenduration'],
-                        panid: gateway['panid'],
-                        portalconnection: gateway['portalconnection'],
-                        portalservices: gateway['portalservices'],
-                        proxyaddress: gateway['proxyaddress'],
-                        proxyport: gateway['proxyport'],
-                        replacesbridgeid: gateway['replacesbridgeid'],
-                        starterkitid: gateway['starterkitid'],
-                        swversion: gateway['swversion'],
-                        timeformat: gateway['timeformat'],
-                        timezone: gateway['timezone'],
-                        uuid: gateway['uuid'],
-                        websocketnotifyall: gateway['websocketnotifyall'],
-                        websocketport: gateway['websocketport'],
-                        zigbeechannel: gateway['zigbeechannel']
-                    }
-                });
+                sentryMsg(error);
+            });
 
-
-                await getAllLights();
-                await getAllSensors();
-                await getAllGroups();
-                //getDevices();
-
-            }
-        });
     }
 } //END getConfig
 
@@ -875,18 +854,15 @@ async function backup() {
     const {ip, port, user} = await getGatewayParam();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
-        let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/config/export',
-            method: 'POST'
-        };
 
-        request(options, async (error, res, body) => {
-            if (error) {
+        await axios.post(`http://${ip}:${port}/api/${user}/config/export`)
+            .then(async result => {
+                await logging(result.status, result.data, 'backup');
+            }).catch(async error => {
                 adapter.log.error('Could not create backup: ' + error);
-            } else {
-                await logging(res, body, 'backup');
-            }
-        })
+                sentryMsg(error);
+            });
+
     }
 }
 
@@ -900,17 +876,13 @@ async function updateSoftware() {
     }).toString();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
-        let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/config/update',
-            method: 'POST'
-        };
 
-        request(options, async (error, res, body) => {
-            if (error) {
-                adapter.log.error('Could not update deConz: ' + error);
-            } else {
+        await axios.put(`http://${ip}:${port}/api/${user}/config/update`)
+            .then(async result => {
+                let res = result.status;
+                let body = result.data;
                 await logging(res, body, 'update deConz');
-                let returned = JSON.parse(body)[0].success['/config/update'].split('.').map(el => {
+                let returned = body[0].success['/config/update'].split('.').map(el => {
                     let n = Number(el);
                     return n === 0 ? n : n || el;
                 }).toString();
@@ -919,8 +891,11 @@ async function updateSoftware() {
                 } else {
                     adapter.log.info('No new deConz Version available');
                 }
-            }
-        })
+            }).catch(async error => {
+                adapter.log.error('Could not update deConz: ' + error);
+                sentryMsg(error);
+            });
+
     }
 }
 
@@ -928,25 +903,24 @@ async function updateFirmware() {
     const {ip, port, user} = await getGatewayParam();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
-        let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/config/updatefirmware',
-            method: 'POST'
-        };
 
-        request(options, async (error, res, body) => {
-            if (error) {
-                adapter.log.error('Could not update firmware: ' + error);
-            } else {
-                if (res.statusCode === 503) {
+        await axios.post(`http://${ip}:${port}/api/${user}/config/updatefirmware`)
+            .then(async result => {
+                let res = result.status;
+                let body = result.data;
+                if (res === 503) {
                     adapter.log.info('No firmware update available');
-                } else if (res.statusCode === 200){
-                    let returned = JSON.parse(body)[0].success['/config/updatefirmware'];
+                } else if (res === 200){
+                    let returned = body[0].success['/config/updatefirmware'];
                     adapter.log.info('Firmware update done. New version: ' + returned);
                 } else {
                     await logging(res, body, 'update firmware');
                 }
-            }
-        })
+            }).catch(async error => {
+                adapter.log.error('Could not update firmware: ' + error);
+                sentryMsg(error);
+            });
+
     }
 }
 //END deConz config ----------------------------------------------------------------------------------------------------
@@ -956,21 +930,17 @@ async function touchlinkScan() {
     const {ip, port, user} = await getGatewayParam();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
-        let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/touchlink/scan',
-            method: 'POST'
-        };
 
-        request(options, async (error, res, body) => {
-            if (error) {
-                adapter.log.error('Could not start touchlink scan: ' + error);
-            } else if (await logging(res, body, 'touchlink scan')) {
+        await axios.post(`http://${ip}:${port}/api/${user}/touchlink/scan`)
+            .then(async () => {
                 await adapter.setStateAsync('Gateway_info.touchlink.scan', {ack: true});
                 timeoutWait = setTimeout( async () => {
                     await getTouchlinkScanResult();
                 }, 15 * 1000);
-            }
-        })
+            }).catch(async error => {
+                adapter.log.error('Could not start touchlink scan: ' + error);
+                sentryMsg(error);
+            });
     }
 }
 
@@ -978,18 +948,14 @@ async function getTouchlinkScanResult() {
     const {ip, port, user} = await getGatewayParam();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
-        let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/touchlink/scan',
-            method: 'GET'
-        };
-
-        request(options, async (error, res, body) => {
-            if (error) {
-                adapter.log.error('Could not connect get scan results. ' + error);
-            } else if (await logging(res, body, ' get scan result')) {
+        await axios.get(`http://${ip}:${port}/api/${user}/touchlink/scan`)
+            .then(async result => {
+                let body = result.data;
                 await adapter.setStateAsync('Gateway_info.touchlink.scan_result', {val: body, ack: true});
-            }
-        });
+            }).catch(async error => {
+                adapter.log.error('Could not connect get scan results. ' + error);
+                sentryMsg(error);
+            });
     }
 }
 
@@ -997,18 +963,16 @@ async function touchlinkIdentify(id) {
     const {ip, port, user} = await getGatewayParam();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
-        let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/touchlink/' + id + '/identify',
-            method: 'POST'
-        };
 
-        request(options, async (error, res, body) => {
-            if (error) {
-                adapter.log.error('Could not start touchlink identify ' + id + ': ' + error);
-            } else {
+        await axios.post(`http://${ip}:${port}/api/${user}/touchlink/${id}/identify`)
+            .then(async result => {
+                let res = result.status;
+                let body = result.data;
                 await logging(res, body, 'touchlink identify ' + id)
-            }
-        })
+            }).catch(async error => {
+                adapter.log.error('Could not start touchlink identify ' + id + ': ' + error);
+                sentryMsg(error);
+            });
     }
 }
 
@@ -1016,18 +980,16 @@ async function touchlinkReset(id) {
     const {ip, port, user} = await getGatewayParam();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
-        let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/touchlink/' + id + '/reset',
-            method: 'POST'
-        };
 
-        request(options, async (error, res, body) => {
-            if (error) {
-                adapter.log.error('Could not start touchlink reset ' +id + ': ' + error);
-            } else {
+        await axios.post(`http://${ip}:${port}/api/${user}/touchlink/${id}/reset`)
+            .then(async result => {
+                let res = result.status;
+                let body = result.data;
                 await logging(res, body, 'touchlink  reset ' + id)
-            }
-        })
+            }).catch(async error => {
+                adapter.log.error('Could not start touchlink reset ' +id + ': ' + error);
+                sentryMsg(error);
+            });
     }
 }
 //END Touchlink
@@ -1037,16 +999,13 @@ async function getAllGroups() {
     const {ip, port, user} = await getGatewayParam();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
-        let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/groups',
-            method: 'GET'
-        };
 
-        request(options, async (error, res, body) => {
-            if (error) {
-                sentryMsg(error);
-            } else {
-                let list = JSON.parse(body);
+        await axios.get(`http://${ip}:${port}/api/${user}/groups`)
+            .then(async result => {
+                let res = result.status;
+                let body = result.data;
+
+                let list = body;
                 let count = Object.keys(list).length - 1;
 
                 if (await logging(res, body, 'get all groups') && body !== '{}') {
@@ -1083,8 +1042,11 @@ async function getAllGroups() {
                         }
                     }
                 }
-            }
-        });
+
+            }).catch(async error => {
+                sentryMsg(error);
+            });
+
     }
 } //END getAllGroups
 
@@ -1092,16 +1054,12 @@ async function getGroupAttributes(groupId) {
     const {ip, port, user} = await getGatewayParam();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
-        let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/groups/' + groupId,
-            method: 'GET'
-        };
 
-        request(options, async (error, res, body) => {
-            if (error) {
-                sentryMsg(error);
-            } else {
-                let list = JSON.parse(body);
+        await axios.get(`http://${ip}:${port}/api/${user}/groups/${groupId}`)
+            .then(async result => {
+                let res = result.status;
+                let body = result.data;
+                let list = body;
 
                 if (await logging(res, body, 'get group attributes ' + groupId)) {
                     //create object for group with attributes
@@ -1131,17 +1089,17 @@ async function getGroupAttributes(groupId) {
                         //create states for light device
                         for (let z = 0; z <= count2; z++) {
                             let stateName = Object.keys(list['action'])[z];
-                            new SetObjectAndState(groupId, list['name'], 'Groups', stateName, list['action'][stateName]);
-                            new SetObjectAndState(groupId, list['name'], 'Groups', 'transitiontime', null);
+                            await SetObjectAndState(groupId, list['name'], 'Groups', stateName, list['action'][stateName]);
+                            await SetObjectAndState(groupId, list['name'], 'Groups', 'transitiontime', null);
                         }
                         let count3 = Object.keys(list['state']).length - 1;
                         //create states for light device
                         for (let z = 0; z <= count3; z++) {
                             let stateName = Object.keys(list['state'])[z];
-                            new SetObjectAndState(groupId, list['name'], 'Groups', stateName, list['state'][stateName]);
-                            new SetObjectAndState(groupId, list['name'], 'Groups', 'transitiontime', null);
+                            await SetObjectAndState(groupId, list['name'], 'Groups', stateName, list['state'][stateName]);
+                            await SetObjectAndState(groupId, list['name'], 'Groups', 'transitiontime', null);
                         }
-                        new SetObjectAndState(groupId, list['name'], 'Groups', 'level', null);
+                        await SetObjectAndState(groupId, list['name'], 'Groups', 'level', null);
                         await adapter.setObjectNotExistsAsync(`Groups.${groupId}.dimspeed`, {
                             type: 'state',
                             common: {
@@ -1196,8 +1154,11 @@ async function getGroupAttributes(groupId) {
                     }
                     await getGroupScenes(`Groups.${groupID}`, list['scenes']);
                 }
-            }
-        })
+
+            }).catch(async error => {
+                sentryMsg(error);
+            });
+
     }
 } //END getGroupAttributes
 
@@ -1311,22 +1272,16 @@ async function setGroupAttributes(parameters, groupId) {
     const {ip, port, user} = await getGatewayParam();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
-        let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/groups/' + groupId,
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: parameters
-        };
 
-        request(options, async (error, res, body) => {
-            if (error) {
-                sentryMsg(error);
-            } else {
+        await axios.put(`http://${ip}:${port}/api/${user}/groups/${groupId}`, parameters)
+            .then(async result => {
+                let res = result.status;
+                let body = result.data;
                 await logging(res, body, 'set group attribute ' + groupId);
-            }
-        });
+            }).catch(async error => {
+                sentryMsg(error);
+            });
+
     }
 } //END setGroupAttributes
 
@@ -1334,32 +1289,23 @@ async function setGroupState(parameters, groupId, stateId) {
     const {ip, port, user} = await getGatewayParam();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
-        let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/groups/' + groupId + '/action',
-            method: 'PUT',
-            headers: 'Content-Type : application/json',
-            body: parameters
-        };
 
-        request(options, async (error, res, body) => {
-            if (error) {
-                sentryMsg(error);
-            } else {
-                let response;
-                try {
-                    response = JSON.parse(body);
-                } catch (err) {
-                }
-
+        await axios.put(`http://${ip}:${port}/api/${user}/groups/${groupId}/action`, parameters)
+            .then(async result => {
+                let res = result.status;
+                let body = result.data;
+                let response = body;
                 if (await logging(res, body, 'set group state ' + groupId) && response !== undefined && response !== 'undefined') {
-                    new AckStateVal(stateId, response);
+                    await AckStateVal(stateId, response);
                 }
-            }
-        });
+            }).catch(async error => {
+                sentryMsg(error);
+            });
+
     }
 } //END setGroupState
 
-async function setGroupScene(parameters, groupId, sceneId, action, stateId, method) {
+async function setGroupScene(parameters, groupId, sceneId, action, stateId) {
     let sceneString = '';
     if (sceneId > 0) {
         sceneString = '/' + sceneId;
@@ -1371,29 +1317,18 @@ async function setGroupScene(parameters, groupId, sceneId, action, stateId, meth
     const {ip, port, user} = await getGatewayParam();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
-        let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/groups/' + groupId + '/scenes' + sceneString,
-            method: method,
-            headers: 'Content-Type" : "application/json',
-            body: parameters
-        };
 
-        request(options, async (error, res, body) => {
-            if (error) {
-                sentryMsg(error);
-                sentryMsg(error);
-            } else {
-                let response;
-                try {
-                    response = JSON.parse(body);
-                } catch (err) {
-                }
-
+        await axios.post(`http://${ip}:${port}/api/${user}/groups/${groupId}/scenes/${sceneString}`, parameters)
+            .then(async result => {
+                let res = result.status;
+                let body = result.data;
+                let response = body;
                 if (await logging(res, body, 'set group scene ' + groupId) && response !== undefined && response !== 'undefined') {
                     new AckStateVal(stateId, response);
                 }
-            }
-        });
+            }).catch(async error => {
+                sentryMsg(error);
+            });
     }
 } //END setGroupScene
 
@@ -1401,27 +1336,21 @@ async function createGroup(name, callback) {
     const {ip, port, user} = await getGatewayParam();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
-        let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/groups',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'text/plain;charset=UTF-8',
-                'Content-Length': Buffer.byteLength('{"name": "' + name + '"}')
-            }
-        };
-        try {
-            let req = request(options, async (error, res, body) => {
+
+        await axios.post(`http://${ip}:${port}/api/${user}/groups`, options)
+            .then(async result => {
+                let res = result.status;
+                let body = result.data;
                 if (await logging(res, body, 'create group ' + name)) {
-                    let apiKey = JSON.parse(body);
+                    let apiKey = body;
                     adapter.log.info(JSON.stringify(apiKey[0]['success']['id']));
                     callback({error: 0, message: 'success'});
                     await getGroupAttributes(apiKey[0]['success']['id']);
                 }
+            }).catch(async error => {
+                sentryMsg(error);
             });
-            req.write('{"name": "' + name + '"}');
-        } catch (err) {
-            adapter.log.error(err)
-        }
+
     }
 } //END createGroup
 
@@ -1430,22 +1359,12 @@ async function deleteGroup(groupId) {
     const {ip, port, user} = await getGatewayParam();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
-        let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/groups/' + groupId,
-            method: 'DELETE',
-            headers: 'Content-Type" : "application/json'
-        };
 
-        request(options, async (error, res, body) => {
-            if (error) {
-                sentryMsg(error);
-            } else {
-                let response;
-                try {
-                    response = JSON.parse(body);
-                } catch (err) {
-                }
-
+        await axios.delete(`http://${ip}:${port}/api/${user}/`)
+            .then(async result => {
+                let res = result.status;
+                let body = result.data;
+                let response = body;
                 if (await logging(res, body, 'delete group ' + groupId) && response !== undefined && response !== 'undefined') {
                     if (response[0]['success']) {
                         adapter.log.info('The group with id ' + groupId + ' was removed.');
@@ -1465,8 +1384,9 @@ async function deleteGroup(groupId) {
                         adapter.log.warn(JSON.stringify(response[0]['error']));
                     }
                 }
-            }
-        });
+            }).catch(async error => {
+                sentryMsg(error);
+            });
     }
 }
 
@@ -1478,22 +1398,19 @@ async function getAllSensors() {
     const {ip, port, user} = await getGatewayParam();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
-        let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/sensors',
-            method: 'GET'
-        };
-        request(options, async (error, res, body) => {
-            if (error) {
-                sentryMsg(error);
-            } else {
-                let list = JSON.parse(body);
+
+        await axios.get(`http://${ip}:${port}/api/${user}/sensors`)
+            .then(async result => {
+                let res = result.status;
+                let body = result.data;
+
+                let list = body;
                 let count = Object.keys(list).length - 1;
 
 
                 if (await logging(res, body, 'get all sensors') && body !== '{}') {
                     for (let i = 0; i <= count; i++) {              //Get each Sensor
                         let keyName = Object.keys(list)[i];
-                        //let sensorID = keyName;
                         let mac = list[keyName]['uniqueid'];
                         if(checkVirtualDevices(mac) !== true){
                             mac = mac.match(/..:..:..:..:..:..:..:../g).toString();
@@ -1551,7 +1468,7 @@ async function getAllSensors() {
                             //create states for sensor device
                             for (let z = 0; z <= count2; z++) {
                                 let stateName = Object.keys(list[keyName]['state'])[z];
-                                new SetObjectAndState(sensorID, list[keyName]['name'], 'Sensors', stateName, list[keyName]['state'][stateName]);
+                                await SetObjectAndState(sensorID, list[keyName]['name'], 'Sensors', stateName, list[keyName]['state'][stateName]);
                             }
 
 
@@ -1559,13 +1476,15 @@ async function getAllSensors() {
                             //create config states for sensor device
                             for (let x = 0; x <= count3; x++) {
                                 let stateName = Object.keys(list[keyName]['config'])[x];
-                                new SetObjectAndState(sensorID, list[keyName]['name'], 'Sensors', stateName, list[keyName]['config'][stateName]);
+                                await SetObjectAndState(sensorID, list[keyName]['name'], 'Sensors', stateName, list[keyName]['config'][stateName]);
                             }
                         }
                     }
                 }
-            }
-        });
+            }).catch(async error => {
+                sentryMsg(error);
+            });
+
     }
 } //END getAllSensors
 
@@ -1574,16 +1493,13 @@ async function getSensor(Id) {
     const {ip, port, user} = await getGatewayParam();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
-        let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/sensors/' + Id,
-            method: 'GET'
-        };
-        request(options, async (error, res, body) => {
-            if (error) {
-                sentryMsg(error);
-            } else {
+
+        await axios.get(`http://${ip}:${port}/api/${user}/sensors/${Id}`)
+            .then(async result => {
+                let res = result.status;
+                let body = result.data;
                 if (await logging(res, body, 'get sensor ' + Id)) {
-                    let list = JSON.parse(body);
+                    let list = body;
                     let mac = list['uniqueid'];
                     if(checkVirtualDevices(mac) !== true){
                         mac = mac.match(/..:..:..:..:..:..:..:../g).toString();
@@ -1648,12 +1564,12 @@ async function getSensor(Id) {
                             let TimeOffset = dateOff.getTimezoneOffset() * 60000;
 
                             if ((Now - LastUpdate + TimeOffset) < 2000) {
-                                new SetObjectAndState(sensorId, list['name'], 'Sensors', stateName, list['state'][stateName]);
+                                await SetObjectAndState(sensorId, list['name'], 'Sensors', stateName, list['state'][stateName]);
                             } else {
                                 adapter.log.info('buttonevent NOT updated for ' + list['name'] + ', too old: ' + ((Now - LastUpdate + TimeOffset) / 1000) + 'sec time difference update to now');
                             }
                         } else {
-                            new SetObjectAndState(sensorId, list['name'], 'Sensors', stateName, list['state'][stateName]);
+                            await SetObjectAndState(sensorId, list['name'], 'Sensors', stateName, list['state'][stateName]);
                         }
 
 
@@ -1661,12 +1577,14 @@ async function getSensor(Id) {
                         //create config for sensor device
                         for (let x = 0; x <= count3; x++) {
                             let stateName = Object.keys(list['config'])[x];
-                            new SetObjectAndState(sensorId, list['name'], 'Sensors', stateName, list['config'][stateName]);
+                            await SetObjectAndState(sensorId, list['name'], 'Sensors', stateName, list['config'][stateName]);
                         }
                     }
                 }
-            }
-        })
+            }).catch(async error => {
+                sentryMsg(error);
+            });
+
     }
 } //END getSensor
 
@@ -1675,53 +1593,30 @@ async function updateSensor(parameters, sensorId) {
     const {ip, port, user} = await getGatewayParam();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
-        let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/sensors/' + sensorId,
-            method: 'PUT',
-            headers: 'Content-Type" : "application/json',
-            body: parameters
-        };
 
-        request(options, async (error, res, body) => {
-            if (error) {
+        await axios.put(`http://${ip}:${port}/api/${user}/sensors/${sensorId}`, parameters)
+            .then( async result => {
+                    await logging(result.status, result.data, 'set sensor parameters');
+            }).catch( async error => {
                 sentryMsg(error);
-            } else {
-                await logging(res, body, 'set sensor parameters');
-            }
-        });
+            });
     }
 } //END updateSensor
 
-async function setSensorParameters(parameters, sensorId, stateId, callback) {
+async function setSensorParameters(parameters, sensorId, stateId) {
 
     const {ip, port, user} = await getGatewayParam();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
-        let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/sensors/' + sensorId + '/config',
-            method: 'PUT',
-            headers: 'Content-Type" : "application/json',
-            body: parameters
-        };
 
-        request(options, async (error, res, body) => {
-            if (error) {
+        await axios.put(`http://${ip}:${port}/api/${user}/sensors/${sensorId}/config`, parameters)
+            .then( async result => {
+                await logging(result.status, result.data, 'set sensor parameters');
+                await AckStateVal(stateId, result);
+            }).catch( async error => {
                 sentryMsg(error);
-            } else {
-                let response;
-                try {
-                    response = JSON.parse(body);
-                } catch (err) {
-                }
+            });
 
-                if (stateId && await logging(res, body, 'set sensor parameters') && response !== undefined && response !== 'undefined') {
-                    new AckStateVal(stateId, response);
-                }
-
-                if (callback)
-                    callback();
-            }
-        });
     }
 } //END setSensorParameters
 
@@ -1730,24 +1625,11 @@ async function deleteSensor(sensorId) {
     const {ip, port, user} = await getGatewayParam();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
-        let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/sensors/' + sensorId,
-            method: 'DELETE',
-            headers: 'Content-Type" : "application/json',
-        };
 
-        request(options, async (error, res, body) => {
-            if (error) {
-                sentryMsg(error);
-            } else {
-                adapter.log.debug('deleteSensor STATUS: ' + res.statusCode);
-                let response;
-                try {
-                    response = JSON.parse(body);
-                } catch (err) {
-                }
-
-                if (await logging(res, body, 'delete sensor ' + sensorId) && response !== undefined && response !== 'undefined') {
+        await axios.delete(`http://${ip}:${port}/api/${user}/sensors/${sensorId}`)
+            .then( async result => {
+                if (await logging(result.status, result.data, 'delete sensor ' + sensorId)) {
+                    let response = result.data;
                     if (response[0]['success']) {
                         adapter.log.info('The sensor with id ' + sensorId + ' was removed.');
                         adapter.getForeignObjects(adapter.name + '.' + adapter.instance + '*', 'device', async (err, enums) => {                    //alle Objekte des Adapters suchen
@@ -1767,8 +1649,10 @@ async function deleteSensor(sensorId) {
                         adapter.log.warn(JSON.stringify(response[0]['error']));
                     }
                 }
-            }
-        });
+            }).catch( async error => {
+                sentryMsg(error);
+            });
+
     }
 }
 
@@ -1781,18 +1665,14 @@ async function getAllLights() {
     const {ip, port, user} = await getGatewayParam();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
-        let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/lights',
-            method: 'GET'
-        };
-        request(options, async (error, res, body) => {
-            if (error) {
-                sentryMsg(error);
-            } else {
-                let list = JSON.parse(body);
+
+        await axios.get(`http://${ip}:${port}/api/${user}/lights`)
+            .then(async result => {
+
+                let list = result.data;
                 let count = Object.keys(list).length - 1;
 
-                if (await logging(res, body, 'get all lights') && body !== '{}') {
+                if (await logging(result.status, result.data, 'get all lights') && result.data !== '{}') {
                     for (let i = 0; i <= count; i++) {
                         let keyName = Object.keys(list)[i];
                         //let lightID = Object.keys(list)[i];
@@ -1825,9 +1705,9 @@ async function getAllLights() {
                             //create states for light device
                             for (let z = 0; z <= count2; z++) {
                                 let stateName = Object.keys(list[keyName]['state'])[z];
-                                new SetObjectAndState(lightID, list[keyName]['name'], 'Lights', stateName, list[keyName]['state'][stateName]);
-                                new SetObjectAndState(lightID, list[keyName]['name'], 'Lights', 'transitiontime', null);
-                                new SetObjectAndState(lightID, list[keyName]['name'], 'Lights', 'level', null);
+                                await SetObjectAndState(lightID, list[keyName]['name'], 'Lights', stateName, list[keyName]['state'][stateName]);
+                                await SetObjectAndState(lightID, list[keyName]['name'], 'Lights', 'transitiontime', null);
+                                await SetObjectAndState(lightID, list[keyName]['name'], 'Lights', 'level', null);
                                 await adapter.setObjectNotExistsAsync(`Lights.${lightID}.dimspeed`, {
                                     type: 'state',
                                     common: {
@@ -1883,8 +1763,10 @@ async function getAllLights() {
                         }
                     }
                 }
-            }
-        })
+
+            }).catch(async error => {
+                sentryMsg(error);
+            });
     }
 } //END getAllLights
 
@@ -1893,16 +1775,13 @@ async function getLightState(Id) {
     const {ip, port, user} = await getGatewayParam();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
-        let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/lights/' + Id,
-            method: 'GET'
-        };
-        request(options, async (error, res, body) => {
-            if (error) {
-                sentryMsg(error);
-            } else {
+
+        await axios.get(`http://${ip}:${port}/api/${user}/light/${Id}`)
+            .then(async result => {
+                let res = result.status;
+                let body = result.data;
                 if (await logging(res, body, 'get light state ' + Id)) {
-                    let list = JSON.parse(body);
+                    let list = body;
                     let keyName = Object.keys(list)[0];
 
                     let mac = list['uniqueid'];
@@ -1932,43 +1811,34 @@ async function getLightState(Id) {
                     //create states for light device
                     for (let z = 0; z <= count2; z++) {
                         let stateName = Object.keys(list['state'])[z];
-                        new SetObjectAndState(lightId, list[keyName]['name'], 'Lights', stateName, list['state'][stateName]);
+                        await SetObjectAndState(lightId, list[keyName]['name'], 'Lights', stateName, list['state'][stateName]);
                     }
                 }
-            }
-        })
+
+            }).catch(async error => {
+                sentryMsg(error);
+            });
+
+
     }
 } //END getLightState
 
-async function setLightState(parameters, lightId, stateId, callback) {
+async function setLightState(parameters, lightId, stateId) {
     const {ip, port, user} = await getGatewayParam();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
-        let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/lights/' + lightId + '/state',
-            method: 'PUT',
-            headers: 'Content-Type" : "application/json',
-            body: parameters
-        };
 
-        request(options, async (error, res, body) => {
-            if (error) {
-                sentryMsg(error);
-            } else {
-                let response;
-                try {
-                    response = JSON.parse(body);
-                } catch (err) {
-                }
-
+        await axios.put(`http://${ip}:${port}/api/${user}/lights/${lightId}/state`, parameters)
+            .then(async result => {
+                let res = result.status;
+                let body = result.data;
+                let response = body;
                 if (await logging(res, body, 'set light state ' + lightId) && response !== undefined && response !== 'undefined') {
-                    new AckStateVal(stateId, response);
+                    await AckStateVal(stateId, response);
                 }
-
-                if (callback)
-                    callback();
-            }
-        });
+            }).catch(async error => {
+                sentryMsg(error);
+            });
     }
 } //END setLightState
 
@@ -1976,20 +1846,16 @@ async function setLightAttributes(parameters, lightId) {
     const {ip, port, user} = await getGatewayParam();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
-        let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/lights/' + lightId,
-            method: 'PUT',
-            headers: 'Content-Type" : "application/json',
-            body: parameters
-        };
 
-        request(options, async (error, res, body) => {
-            if (error) {
-                sentryMsg(error);
-            } else {
+        await axios.put(`http://${ip}:${port}/api/${user}/lights/${lightId}`, parameters)
+            .then(async result => {
+                let res = result.status;
+                let body = result.data;
                 await logging(res, body, 'set light state ' + lightId);
-            }
-        });
+            }).catch(async error => {
+                sentryMsg(error);
+            });
+
     }
 } //END setLightAttributes
 
@@ -1997,22 +1863,12 @@ async function deleteLight(lightId) {
     const {ip, port, user} = await getGatewayParam();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
-        let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/lights/' + lightId,
-            method: 'DELETE',
-            headers: 'Content-Type" : "application/json',
-        };
 
-        request(options, async (error, res, body) => {
-            if (error) {
-                sentryMsg(error);
-            } else {
-                let response;
-                try {
-                    response = JSON.parse(body);
-                } catch (err) {
-                }
-
+        await axios.delete(`http://${ip}:${port}/api/${user}/lights/${lightId}`)
+            .then(async result => {
+                let res = result.status
+                let body = result.data;
+                let response = body;
                 if (await logging(res, body, 'delete light ' + lightId) && response !== undefined && response !== 'undefined') {
                     if (response[0]['success']) {
                         adapter.log.info('The light with id ' + lightId + ' was removed.')
@@ -2033,8 +1889,10 @@ async function deleteLight(lightId) {
                         adapter.log.warn(JSON.stringify(response[0]['error']));
                     }
                 }
-            }
-        });
+            }).catch(async error => {
+                sentryMsg(error);
+            });
+
     }
 }
 
@@ -2043,22 +1901,12 @@ async function removeFromGroups(lightId) {
     const {ip, port, user} = await getGatewayParam();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
-        let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/lights/' + lightId + '/groups',
-            method: 'DELETE',
-            headers: 'Content-Type" : "application/json'
-        };
 
-        request(options, async (error, res, body) => {
-            if (error) {
-                sentryMsg(error);
-            } else {
-                let response;
-                try {
-                    response = JSON.parse(body);
-                } catch (err) {
-                }
-
+        await axios.put(`http://${ip}:${port}/api/${user}/lights/${lightId}/groups`)
+            .then(async result => {
+                let res = result.status;
+                let body = result.data;
+                let response = body;
                 if (await logging(res, body, 'remove light from groups ' + lightId) && response !== undefined && response !== 'undefined') {
                     if (response[0]['success']) {
                         adapter.log.info('The light with id ' + lightId + ' was removed from all groups.')
@@ -2066,8 +1914,10 @@ async function removeFromGroups(lightId) {
                         adapter.log.warn(JSON.stringify(response[0]['error']));
                     }
                 }
-            }
-        });
+            }).catch(async error => {
+                sentryMsg(error);
+            });
+
     }
 }
 
@@ -2078,36 +1928,36 @@ async function getDevices() {
     const {ip, port, user} = await getGatewayParam();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
-        let options = {
-            url: 'http://' + ip + ':' + port + '/api/' + user + '/devices',
-            method: 'GET'
-        };
 
-        request(options, async (error, res, body) => {
-            if (error) {
-                sentryMsg(error);
-            } else {
+        await axios.get(`http://${ip}:${port}/api/${user}/devices`)
+            .then(async result => {
+                let res = result.status;
+                let body = result.data;
                 if (await logging(res, body, 'get devices')) {
                     adapter.log.debug('getDevices: ' + JSON.stringify(res) + ' ' + body);
                 }
-            }
-        });
+            }).catch(async error => {
+                sentryMsg(error);
+            });
+
     }
 }
 
 //END Devices functions ------------------------------------------------------------------------------------------------
 
 async function logging(res, message, action) {
-    //if(typeof message !== 'string'){
-    //    message = JSON.stringify(message);
-    //}
+    if(typeof message !== 'string'){
+        message = JSON.stringify(message);
+    }
     if (action === undefined) {
         action = '';
+    } else if (typeof action !== 'string') {
+        action = JSON.stringify(action);
     }
     if (res === undefined) {
         return;
     }
-    let statusCode = res.statusCode;
+    let statusCode = res;
     let check;
     switch (statusCode) {
         case 200:
@@ -2381,7 +2231,6 @@ async function getObjectByDeviceId(id, type) {
  * @param {string} type - Sensors, Lights, Groups
  * @param {string} stateName
  * @param value
- * @constructor
  */
 async function SetObjectAndState(id, name, type, stateName, value) {
 
@@ -2425,9 +2274,9 @@ async function SetObjectAndState(id, name, type, stateName, value) {
             objRole = 'indicator';
             objWrite = false;
             if (value === true) {
-                new SetObjectAndState(id, name, type, 'on', true);
+                await SetObjectAndState(id, name, type, 'on', true);
             } else if (value === false) {
-                new SetObjectAndState(id, name, type, 'on', false);
+                await SetObjectAndState(id, name, type, 'on', false);
             }
             break;
         case 'boost':
@@ -2523,7 +2372,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
             objMin = 0;
             objMax = 254;
             objDefault = 254;
-            new SetObjectAndState(id, name, type, 'level', Math.floor((100 / 254) * value));
+            await SetObjectAndState(id, name, type, 'level', Math.floor((100 / 254) * value));
             break;
         case 'buttonevent':
             objType = 'number';
@@ -2749,7 +2598,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
             objType = 'string';
             objRole = 'state';
             objStates = {none: 'none', colorloop: 'colorloop'};
-            new SetObjectAndState(id, name, type, 'colorspeed', null);
+            await SetObjectAndState(id, name, type, 'colorspeed', null);
             break;
         case 'lastupdated':
             objType = 'string';
@@ -2820,7 +2669,6 @@ async function SetObjectAndState(id, name, type, stateName, value) {
             ack: true
         });
     }
-
 }
 
 async function handleWSmessage(msg) {
@@ -2843,8 +2691,7 @@ async function handleWSmessage(msg) {
                             object = await getObjectByDeviceId(id, 'Lights');
                             for (let stateName in state) {
                                     let oid = object.id.replace(/^(\w*\.){3}/g, '');
-                                    adapter.log.debug(stateName + ": " + state[stateName]);
-                                    new SetObjectAndState(oid, object.value.common.name, 'Lights', stateName, state[stateName]);
+                                    await SetObjectAndState(oid, object.value.common.name, 'Lights', stateName, state[stateName]);
                             }
                         } else {
                             adapter.log.debug("Event has no state-Changes");
@@ -2934,10 +2781,10 @@ async function handleWSmessage(msg) {
 
                                 adapter.getState(`${object.id}.lastupdated`, async (err, lupdate) => {
                                     if (lupdate === null) {
-                                        new SetObjectAndState(id, object.value.common.name, 'Sensors', obj, state[obj]);
+                                        await SetObjectAndState(id, object.value.common.name, 'Sensors', obj, state[obj]);
                                     } else if (lupdate.val !== state[obj]) {
                                         if (obj === 'buttonevent') {
-                                            new SetObjectAndState(id, object.value.common.name, 'Sensors', obj, state[obj]);
+                                            await SetObjectAndState(id, object.value.common.name, 'Sensors', obj, state[obj]);
                                             await adapter.setObjectNotExistsAsync(`${object.id}` + '.' + "buttonpressed", {
                                                 type: 'state',
                                                 common: {
@@ -2962,7 +2809,7 @@ async function handleWSmessage(msg) {
                                                 })
                                             }, 800);
                                         } else {
-                                            new SetObjectAndState(id, object.value.common.name, 'Sensors', obj, state[obj]);
+                                            await SetObjectAndState(id, object.value.common.name, 'Sensors', obj, state[obj]);
                                         }
                                     }
 
@@ -2971,7 +2818,7 @@ async function handleWSmessage(msg) {
                         }
                         if (typeof config == 'object') {
                             for (let obj in config) {
-                                new SetObjectAndState(id, object.value.common.name, 'Sensors', obj, config[obj]);
+                                await SetObjectAndState(id, object.value.common.name, 'Sensors', obj, config[obj]);
                             }
                         }
                     }
