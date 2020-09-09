@@ -19,24 +19,6 @@
     let devices = {};
     let counter;
 
-
-    /*function setValue(id, value, onChange) {
-        let $value = $('#' + id + '.value');
-        if ($value.attr('type') === 'checkbox') {
-            $value.prop('checked', value).change(function() {
-                onChange();
-            });
-        } else {
-            $value.val(value).change(function() {
-                onChange();
-            }).keyup(function() {
-                $(this).trigger('change');
-            });
-        }
-    }*/
-
-
-
     function showDevice(obj) {
         let text = '';
         if(obj.common.role !== 'gateway' && obj.common.role !== 'group' && obj.common.role !== undefined && obj.common.role !== 'scene') {
@@ -72,7 +54,7 @@
                         }, function (err, _devices) {
                             socket.emit('getStates', function (err, _values) {
                                 if (_devices && _devices.rows && _devices.rows.length) {
-                                    for (let j = 0; j < _devices.rows.length; j++) {
+                                    for (var j = 0; j < _devices.rows.length; j++) {
                                         devices[_devices.rows[j].value._id] = _devices.rows[j].value;
                                         showDevice(_devices.rows[j].value, true);
                                     }
@@ -141,7 +123,7 @@
 
 
     async function getGatewayInfo(){
-        return new Promise(function(resolve) {
+        return new Promise(function(resolve, reject) {
             let info;
             getObject('deconz.' + instance + '.gateway_info', (err, obj)=>{
                 info = obj.native;
@@ -168,7 +150,7 @@
                 $key.prop('checked', settings[id]).change(function() {
                     onChange();
                 });
-            } else if( $key.attr('id') !== 'bridge' && $key.attr('id') !== 'port'){
+            } else{
                 // do not call onChange direct, because onChange could expect some arguments
                 $key.val(settings[id]).change(function() {
                     onChange();
@@ -208,12 +190,13 @@
             let manDone = false;
 
             $('#userCredentials').click(function (){
-                sendTo('deconz.' + instance, 'createAPIkey', {'host': $('#bridge.value').val() + ':' + $('#port.value').val(), "credentials": $('#username.value').val() + ':' + $('#password.value').val()}, (result) => {
+                sendTo('deconz.' + instance, 'createAPIkey', {'host': $('#bridge.value').val() + ':' + $('#port.value').val(), "credentials": { 'username' : $('#username.value').val(), 'password' : $('#password.value').val() } }, (result) => {
                     result = JSON.parse(result);
                     if(result.error === 0) {
                         $('#user.value').val(result.message).trigger('change');
                         count = 10;
                         showMessage(_('API Key created.'), _('Success'), 'info');
+                        $('#dialog-bridges').modal('close');
                         manDone = true;
                         return;
                     }else{
@@ -222,31 +205,6 @@
                     $('#dialog-bridges').modal('close');
                 })
             });
-
-            (function sendCreate(){
-                sendTo('deconz.' + instance, 'createAPIkey', {'host': $('#bridge.value').val() + ':' + $('#port.value').val(), "credentials": null}, (result) => {
-                    try {
-                        result = JSON.parse(result);
-                        if (result.error > 0 && manDone !== true) {
-                            if (result.error === 101 && count < 10 && ($('#user.value').val() !== null || $('#user.value').val() !== undefined || $('#user.value').val() !== '')) {
-                                count++;
-                                setTimeout(sendCreate, 3000);
-                                return;
-                            } else {
-                                showMessage(_('error creating API key: ') + _(result.message), _('Error'), 'info');
-                            }
-                        }else if(manDone === true){
-                            $('#dialog-bridges').modal('close');
-                            return;
-                        } else {
-                            $('#user.value').val(result.message).trigger('change');
-                        }
-                    } catch (e) {
-                        showMessage(_('error creating API key'), _('Error'), 'alert');
-                    }
-                    $('#dialog-bridges').modal('close');
-                });
-            })();
         });
 
 
@@ -298,6 +256,7 @@
             $(this).trigger('change');
         });
 
+
         // subscribe to changes
         socket.emit('subscribeStates', namespace + '.info.*');
         socket.emit('subscribeObjects', namespace + '.*'); // seems, this doesn't work
@@ -307,12 +266,6 @@
 
         // populate the list of known groups
         emitGroups();
-
-        $('#bridge').focusout(function(){$('.btn-save').trigger('click')});
-        $('#port').focusout(function(){$('.btn-save').trigger('click')});
-
-        //$('#bridge').focusout(function(){ save() });
-        //$('#port').focusout(function(){ save() });
 
 
         $('#sw_version').text('deConz Version: ' + info.swversion);
@@ -338,19 +291,18 @@
             }, 1000);
             $('#opennetwork').html(_('Open for %s seconds', counter));
         }else if(counter === 0){
-            let $opennetwork = $('#opennetwork');
-            $opennetwork.html('Open Network');
-            $opennetwork.removeClass('disabled');
+            $('#opennetwork').html('Open Network');
+            $('#opennetwork').removeClass('disabled');
             counter = $('permit').val();
             sendTo('deconz.' + instance, 'getConfig');
         }
     }
 
     function save(callback) {
-        sendTo('deconz.' + instance, 'saveConfig', {'ipaddress': $('#bridge').val(), 'port': $('#port').val(), 'networkopenduration': $('#permit').val(), 'user': $('#user').val()}, () => {});
+        sendTo('deconz.' + instance, 'saveConfig', {'ipaddress': $('#bridge').val(), 'port': $('#port').val(), 'networkopenduration': $('#permit').val(), 'user': $('#user').val()}, (result) => {});
         let obj = {};
         $('.value').each(function () {
-            let $this = $(this);
+            var $this = $(this);
             if ($this.attr('type') === 'checkbox') {
                 obj[$this.attr('id')] = $this.prop('checked');
             } else {
@@ -397,7 +349,7 @@
         <div id="tab-main" class="col s12 page">
                 <div class="row">
                     <div class="input-field col s6 m4 l4">
-                        <img src="deconz.png" alt="deConz" class="logo">
+                        <img src="deconz.png" class="logo">
                     </div>
                 </div>
 
@@ -411,11 +363,11 @@
             </div>
 
             <div class="row">
-                <div class="input-field col s12 m4 15">
+                <div class="input-field col s2">
                     <input class="value text" id="bridge" size="15" maxlength="15" type="text">
                     <label class="translate active" for="bridge" data-lang="deConz Addresse:">deConz IP Adresse</label>
                 </div>
-                <div class="input-field col s12 m8 l3">
+                <div class="input-field col s1">
                     <input class="value number" id="port" size="5" maxlength="5" type="number">
                     <label class="translate active" for="port" data-lang="Bridge Port">Port</label>
                 </div>
@@ -439,8 +391,11 @@
             <div id="dialog-bridges" class="modal" title="Select deConz">
                 <div class="modal-content">
                     <div class="row">
+                        <div class="translate col s4 offset-s4 center-align" data-lang="PW_Instruction">PW_Instruction</div>
+                    </div>
+                    <div class="row">
                         <div class="col s4 offset-s4">
-                            <div class="input-field col s12">
+                            <div class="input-field col s12 hide">
                                 <input placeholder="delight (standard)" class="value text" id="username" size="20" maxlength="20" type="text">
                                 <label class="translate active" for="username" data-lang="Username">Username</label>
                             </div>
@@ -455,10 +410,10 @@
                         </div>
                     </div>
                 </div>
-                    <div class="row">
+                    <div class="row hide">
                         <div class="translate col s4 offset-s4 center-align" data-lang="OR">or</div>
                     </div>
-                    <div class="row">
+                    <div class="row hide">
                         <div class="translate col s4 offset-s4 center-align" data-lang="Instruction">Instruction</div>
                     </div>
             </div>

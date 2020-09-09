@@ -117,10 +117,10 @@
     },
     "instanceObjects": [
         {
-            "_id": "Groups",
+            "_id": "groups",
             "type": "channel",
             "common": {
-                "name": "Information"
+                "name": "Groups"
             },
             "native": {}
         },
@@ -138,18 +138,18 @@
             "native": {}
         },
         {
-            "_id": "Lights",
+            "_id": "lights",
             "type": "channel",
             "common": {
-                "name": "Information"
+                "name": "Lights"
             },
             "native": {}
         },
         {
-            "_id": "Sensors",
+            "_id": "sensors",
             "type": "channel",
             "common": {
-                "name": "Information"
+                "name": "Sensors and switches"
             },
             "native": {}
         },
@@ -171,7 +171,7 @@
             "native": {}
         },
         {
-            "_id": "Gateway_info",
+            "_id": "gateway_info",
             "type": "device",
             "common": {
                 "name": "Information about the Gateway"
@@ -179,7 +179,7 @@
             "native": {}
         },
         {
-            "_id": "Gateway_info.network_open",
+            "_id": "gateway_info.network_open",
             "type": "state",
             "common": {
                 "name": "Open Network for new Zigbee devices",
@@ -192,7 +192,7 @@
             "native": {}
         },
         {
-            "_id": "Gateway_info.alive",
+            "_id": "gateway_info.alive",
             "type": "state",
             "common": {
                 "name": "Gateway is alive",
@@ -205,7 +205,7 @@
             "native": {}
         },
         {
-            "_id": "Gateway_info.backup",
+            "_id": "gateway_info.backup",
             "type": "state",
             "common": {
                 "name": "Backup",
@@ -218,7 +218,7 @@
             "native": {}
         },
         {
-            "_id": "Gateway_info.update_deconz",
+            "_id": "gateway_info.update_deconz",
             "type": "state",
             "common": {
                 "name": "Update deConz software (Pi only)",
@@ -231,7 +231,7 @@
             "native": {}
         },
         {
-            "_id": "Gateway_info.update_firmware",
+            "_id": "gateway_info.update_firmware",
             "type": "state",
             "common": {
                 "name": "Update firmware",
@@ -244,7 +244,7 @@
             "native": {}
         },
         {
-            "_id": "Gateway_info.touchlink",
+            "_id": "gateway_info.touchlink",
             "type": "channel",
             "common": {
                 "name": "Touchlink"
@@ -252,7 +252,7 @@
             "native": {}
         },
         {
-            "_id": "Gateway_info.touchlink.scan",
+            "_id": "gateway_info.touchlink.scan",
             "type": "state",
             "common": {
                 "name": "Scan for nearby devices (duration 15 seconds)",
@@ -265,7 +265,7 @@
             "native": {}
         },
         {
-            "_id": "Gateway_info.touchlink.scan_result",
+            "_id": "gateway_info.touchlink.scan_result",
             "type": "state",
             "common": {
                 "name": "List of found devices",
@@ -277,7 +277,7 @@
             "native": {}
         },
         {
-            "_id": "Gateway_info.touchlink.identify",
+            "_id": "gateway_info.touchlink.identify",
             "type": "state",
             "common": {
                 "name": "Identify device by id from scan result",
@@ -289,7 +289,7 @@
             "native": {}
         },
         {
-            "_id": "Gateway_info.touchlink.reset",
+            "_id": "gateway_info.touchlink.reset",
             "type": "state",
             "common": {
                 "name": "Reset device by id from scan result",
