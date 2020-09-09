@@ -1278,6 +1278,7 @@ async function createGroup(name, callback) {
     }
 } //END createGroup
 
+
 async function deleteGroup(groupId) {
 
     const {ip, port, user} = await getGatewayParam();
