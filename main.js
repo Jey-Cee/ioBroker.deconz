@@ -146,7 +146,7 @@ class deconz extends utils.Adapter {
     async onUnload(callback) {
         if (ws !== null) ws.terminate();
         this.setState('info.connection', {val: false, ack: true});
-        this.setState('Gateway_info.alive', {val: false, ack: true});
+        this.setState('gateway_info.alive', {val: false, ack: true});
 
         clearTimeout(timeoutScan);
         clearTimeout(timeoutReady);
@@ -186,10 +186,16 @@ class deconz extends utils.Adapter {
     }
 
     async onStateChange(id, state) {
-        let oid = id;
+        const originalId = id;
         let tmp = id.split('.');
-        let dp = tmp.pop();
-        id = tmp.slice(2).join('.');
+        const dp = tmp.pop();       //last part of id, object/state its self
+        if(tmp[tmp.length - 1] === 'manage'){
+            id = tmp.slice(tmp.length - 3, tmp.length - 1).join('.');
+        } else {
+            id = tmp.slice(2).join('.');
+        }
+
+
 
         if (!id || !state || state.ack) {
             if (dp === 'alive') {
@@ -216,7 +222,7 @@ class deconz extends utils.Adapter {
             return;
         }
 
-        let stateObj = await this.getObjectAsync(oid);
+        let stateObj = await this.getObjectAsync(originalId);
 
         if ((stateObj !== null && stateObj !== undefined) && typeof state.val === stateObj.common.type) {
             /**
@@ -225,12 +231,10 @@ class deconz extends utils.Adapter {
              */
             this.getState(this.name + '.' + this.instance + '.' + id + '.transitiontime', async (err, tTime) => {
                 let parameters = {};
-                let action = '';
-                let method = '';
                 let transitionTime = (err === null && tTime !== null) ? (tTime.val * 10) : 'none';
 
-                let obj = await this.getObjectAsync(this.name + '.' + this.instance + '.' + id);
-                if (obj === null) return false;
+                let parentObject = await this.getObjectAsync(this.name + '.' + this.instance + '.' + id);
+                if (parentObject === null) return false;
 
                 switch (dp) {
                     case 'bri':
@@ -336,11 +340,10 @@ class deconz extends utils.Adapter {
                         parameters = `{ ${state.val} }`;
                         break;
                     case 'createscene':
-                        if (obj.common.role === 'group') {
-                            let controlId = obj.native.id;
-                            let parameters = `{ "name": "${state.val}" }`;
-                            await setGroupScene(parameters, controlId, 0, '', oid);
-                            await getAllGroups();
+                        if (parentObject.common.role === 'group') {
+                            let controlId = parentObject.native.id;
+                            await createScene(state.val, controlId);
+                            await getGroupAttributes(controlId);
                         }
                         break;
                     case 'delete':
@@ -384,13 +387,15 @@ class deconz extends utils.Adapter {
                         parameters = `{ "${dp}": "${val}" }`;
                         break;
                     case 'network_open':
-                        let opentime;
-                        const results = await this.getObjectAsync('Gateway_info')
-                        if (results) {
-                            opentime = results.native.networkopenduration;
+                        if (state.val) {
+                            let opentime;
+                            const results = await this.getObjectAsync('gateway_info')
+                            if (results) {
+                                opentime = results.native.networkopenduration;
+                            }
+                            parameters = `{"permitjoin": ${opentime}}`;
+                            await modifyConfig(parameters);
                         }
-                        parameters = `{"permitjoin": ${opentime}}`;
-                        await modifyConfig(parameters);
                         break;
                     case 'backup':
                         await backup();
@@ -410,36 +415,69 @@ class deconz extends utils.Adapter {
                     case 'reset':
                         await touchlinkReset(state.val);
                         break;
-                    default:
-                        action = 'none';
+                    case 'creategroup':
+                        await createGroup(state.val)
+                        break;
+                    case 'addtogroup': {
+                        let groupObject = await adapter.getObjectAsync(`groups.${state.val}`);
+                        if (groupObject !== null){
+                            let lights = groupObject.native.lights;
+                            lights.push(parentObject.native.id);
+                            await setGroupAttributes({"lights": lights}, state.val);
+                            groupObject.native.lights = lights;
+                            await adapter.setObjectAsync(`groups.${state.val}`, groupObject)
+                                .then (result => {
+                                    objChangeByAdapter = true;
+                                }). catch (reject => {
+                                    adapter.log.error(reject);
+                                });
+                        }
+                        break;
+                    }
+                    case 'removefromgroup': {
+                        let groupObject = await adapter.getObjectAsync(`groups.${state.val}`);
+                        let lights = groupObject.native.lights;
+                        const index = lights.indexOf(parentObject.native.id);
+                        if (index > -1) {
+                            lights.splice(index, 1);
+                            await setGroupAttributes({"lights": lights}, state.val);
+                            groupObject.native.lights = lights;
+                            await adapter.setObjectAsync(`groups.${state.val}`, groupObject)
+                                .then (result => {
+                                    objChangeByAdapter = true;
+                            }). catch (reject => {
+                                adapter.log.error(reject);
+                            });
+                        }
+                        break;
+                    }
+                    case 'removegroups':
+                        await removeFromGroups((tmp[3]));
+                        break;
+                    case 'removescenes':
+                        await removeFromScenes(tmp[3]);
                         break;
                 }
 
-                if (action !== 'none') {
-                    if (typeof parameters === 'object') {
-                        parameters = JSON.stringify(parameters);
-                    }
+                if (typeof parameters === 'object') {
+                    parameters = JSON.stringify(parameters);
+                }
 
-                    let controlId = (obj !== null || obj !== undefined) ? obj.native.id : '';
+                let controlId = (parentObject !== null || parentObject !== undefined) ? parentObject.native.id : '';
 
-                    switch (obj.common.role) {
-                        case 'light':
-                            await setLightState(parameters, controlId, this.name + '.' + this.instance + '.' + id + '.' + dp);
-                            break;
-                        case 'group':
-                            if (dp !== 'createscene') {
-                                await setGroupState(parameters, controlId, this.name + '.' + this.instance + '.' + id + '.' + dp);
-                            }
-                            break;
-                        case 'sensor':
-                            await setSensorParameters(parameters, controlId, this.name + '.' + this.instance + '.' + id + '.' + dp);
-                            break;
-                        case 'scene':
-                            let parentDeviceId = id.split(".")[1];
-                            //let parent = await adapter.getObjectAsync(adapter.name + '.' + adapter.instance + '.Groups.' + parentDeviceId);
-                            await setGroupScene(parameters, parentDeviceId, controlId, action, oid);
-                            break;
-                    }
+                switch (parentObject.common.role && tmp[3] !== 'removefromgroup' && tmp[3] !== 'addtogroup' && tmp[3] !== 'delete' && tmp[3] !== 'removegroups' && tmp[3] !== 'removescenes') {
+                    case 'light':
+                        await setLightState(parameters, controlId, this.name + '.' + this.instance + '.' + id + '.' + dp);
+                        break;
+                    case 'group':
+                        if (dp !== 'createscene') {
+                            await setGroupState(parameters, controlId, this.name + '.' + this.instance + '.' + id + '.' + dp);
+                        }
+                        break;
+                    case 'sensor':
+                        await setSensorParameters(parameters, controlId, this.name + '.' + this.instance + '.' + id + '.' + dp);
+                        break;
+
                 }
             });
         }
@@ -465,7 +503,7 @@ class deconz extends utils.Adapter {
                     break;
                 case 'openNetwork':
                     let openTime;
-                    const results = await this.getObjectAsync('Gateway_info')
+                    const results = await this.getObjectAsync('gateway_info')
                     if (results) {
                         openTime = results.native.networkopenduration;
                     }
@@ -480,7 +518,7 @@ class deconz extends utils.Adapter {
                     wait = true;
                     break;
                 case 'deleteSensor':
-                    adapter.log.info('delet sensor');
+                    adapter.log.info('delete sensor');
                     await deleteSensor(obj.message, (res) => {
                         if (obj.callback) this.sendTo(obj.from, obj.command, JSON.stringify(res), obj.callback);
                     });
@@ -499,9 +537,10 @@ class deconz extends utils.Adapter {
                     wait = true;
                     break;
                 case 'saveConfig':
-                    this.extendObject('Gateway_info', {
+                    await this.extendObjectAsync('gateway_info', {
                         native: obj.message
                     });
+                    await getConfig();
                     break;
                 default:
                     this.log.warn("Unknown command: " + obj.command);
@@ -523,13 +562,13 @@ async function main() {
     adapter.subscribeObjects('Sensors.*');
 
     heartbeat();
-    const results = await adapter.getObjectAsync('Gateway_info');
+    const results = await adapter.getObjectAsync('gateway_info');
     if (results) {
         if (results.native.ipaddress === undefined) {  //only on first start
             autoDiscovery();
         } else {
             if (results.native.port === '' || results.native.port === null) {
-                await adapter.extendObjectAsync('Gateway_info', {
+                await adapter.extendObjectAsync('gateway_info', {
                     native: {
                         port: 80
                     }
@@ -550,7 +589,6 @@ async function main() {
 
 }
 
-
 //search for Gateway
 let discovery = new SSDP.Discovery();
 let found_deconz = false;
@@ -568,7 +606,7 @@ function autoDiscovery() {
 
                 adapter.log.debug('autodiscovery: ' + loc);
 
-                adapter.extendObject('Gateway_info', {
+                adapter.extendObject('gateway_info', {
                     native: {
                         ipaddress: loc[0],
                         port: loc[1]
@@ -603,7 +641,7 @@ function heartbeat() {
         if (msg.headers.nt === 'urn:schemas-upnp-org:device:basic:1') {
             if (msg.headers['gwid.phoscon.de']) {
                 let time = parseInt(msg.headers['cache-control'].replace('max-age=', ''));
-                adapter.setState('Gateway_info.alive', {val: true, ack: true, expire: time});
+                adapter.setState('gateway_info.alive', {val: true, ack: true, expire: time});
                 //adapter.log.debug('NOTIFY ' + JSON.stringify(msg))
             }
         }
@@ -629,7 +667,7 @@ function autoReconnect() {
 async function getAutoUpdates() {
 
     let host, port, user;
-    const results = await adapter.getObjectAsync('Gateway_info');
+    const results = await adapter.getObjectAsync('gateway_info');
 
     if (results) {
         host = (results !== null && results.native.ipaddress !== undefined) ? results.native.ipaddress : null;
@@ -726,7 +764,7 @@ async function deleteAPIkey() {
                     if (await logging(res, body, 'delete API key')) {
                         if (response[0]['success']) {
 
-                            adapter.extendObject('Gateway_info', {
+                            adapter.extendObject('gateway_info', {
                                 native: {
                                     user: ''
                                 }
@@ -751,7 +789,7 @@ async function deleteAPIkey() {
 
 async function modifyConfig(parameters) {
     let ip, port, user, ot;
-    const results = await adapter.getObjectAsync('Gateway_info');
+    const results = await adapter.getObjectAsync('gateway_info');
     if (results) {
         ip = results.native.ipaddress;
         port = results.native.port;
@@ -769,7 +807,7 @@ async function modifyConfig(parameters) {
                         switch (JSON.stringify(response[0]['success'])) {
                             case  `{"/config/permitjoin":${ot}}`:
                                 adapter.log.info(`Network is now open for ${ot} seconds to register new devices.`);
-                                adapter.setState('Gateway_info.network_open', {ack: true, expire: ot});
+                                adapter.setState(`${adapter.namespace}.gateway_info.network_open`, {ack: true, expire: ot});
                                 break;
                         }
                     } else if (response[0]['error']) {
@@ -782,6 +820,7 @@ async function modifyConfig(parameters) {
                 }
 
             }).catch(async error => {
+                adapter.log.error('Modify configuration: ' + error);
                 sentryMsg(error);
             });
 
@@ -800,7 +839,7 @@ async function getConfig() {
                 if (await logging(res, JSON.stringify(body), ' get config')) {
                     let gateway = body;
                     adapter.log.info('deConz Version: ' + gateway['swversion'] + '; API version: ' + gateway['apiversion']);
-                    await adapter.extendObjectAsync('Gateway_info', {
+                    await adapter.extendObjectAsync('gateway_info', {
                         type: 'device',
                         common: {
                             name: gateway['name'],
@@ -869,7 +908,7 @@ async function backup() {
 async function updateSoftware() {
     const {ip, port, user} = await getGatewayParam();
 
-    const gw = await adapter.getObjectAsync('Gateway_info');
+    const gw = await adapter.getObjectAsync('gateway_info');
     const version = gw.native.swversion.split('.').map(el => {
         let n = Number(el);
         return n === 0 ? n : n || el;
@@ -933,7 +972,7 @@ async function touchlinkScan() {
 
         await axios.post(`http://${ip}:${port}/api/${user}/touchlink/scan`)
             .then(async () => {
-                await adapter.setStateAsync('Gateway_info.touchlink.scan', {ack: true});
+                await adapter.setStateAsync('gateway_info.touchlink.scan', {ack: true});
                 timeoutWait = setTimeout( async () => {
                     await getTouchlinkScanResult();
                 }, 15 * 1000);
@@ -950,8 +989,8 @@ async function getTouchlinkScanResult() {
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
         await axios.get(`http://${ip}:${port}/api/${user}/touchlink/scan`)
             .then(async result => {
-                let body = result.data;
-                await adapter.setStateAsync('Gateway_info.touchlink.scan_result', {val: body, ack: true});
+                let body = JSON.stringify(result.data);
+                await adapter.setStateAsync('gateway_info.touchlink.scan_result', {val: body, ack: true});
             }).catch(async error => {
                 adapter.log.error('Could not connect get scan results. ' + error);
                 sentryMsg(error);
@@ -1038,7 +1077,6 @@ async function getAllGroups() {
                                 getGroupAttributes(list[keyName]['id']);
                                 getGroupScenes(`Groups.${groupID}`, list[keyName]['scenes']);
                             });
-
                         }
                     }
                 }
@@ -1081,6 +1119,26 @@ async function getGroupAttributes(groupId) {
                                 lights: list['lights'],
                                 lightsequence: list['lightsequence'],
                                 multideviceids: list['multideviceids']
+                            }
+                        }).then ( () => {
+                            objChangeByAdapter = true;
+                        }).catch( (error) => {
+                            adapter.log.error('extendObject: ' + error);
+                        });
+
+
+                        await adapter.setObjectNotExistsAsync(`groups.${groupID}.info`, {
+                            type: 'channel',
+                            common: {
+                                name: 'Information'
+                            }
+                        }).then ( () => {
+                            objChangeByAdapter = true;
+                        });
+                        await adapter.setObjectNotExistsAsync(`groups.${groupID}.manage`, {
+                            type: 'channel',
+                            common: {
+                                name: 'Manage group'
                             }
                         }).then ( () => {
                             objChangeByAdapter = true;
@@ -1162,112 +1220,6 @@ async function getGroupAttributes(groupId) {
     }
 } //END getGroupAttributes
 
-async function getGroupScenes(group, sceneList) {
-    //TODO: rewrite, function should only be called on startup or if websocket message says there was a scene added
-    //Changed check if group exists, if not skip it
-    adapter.getObject(adapter.name + '.' + adapter.instance + '.' + group, (err, obj) => {
-        if (obj !== undefined) {
-            adapter.setObjectNotExists(`${group}.createscene`, {
-                type: 'state',
-                common: {
-                    name: "createscene",
-                    role: "state",
-                    type: "string",
-                    read: false,
-                    write: true
-                }
-            });
-            if (sceneList !== undefined && sceneList.length === 0) {
-                return;
-            }
-
-            sceneList.forEach((scene) => {
-                if (scene.lightcount > 0) {
-                    adapter.setObject(`${group}.Scene_${scene.id}`, {
-                        type: 'channel',
-                        common: {
-                            name: scene.name,
-                            role: 'scene'
-                        },
-                        native: {
-                            type: 'scene',
-                            id: scene.id
-                        }
-                    });
-
-                    adapter.setObjectNotExists(`${group}.Scene_${scene.id}.recall`, {
-                        type: 'state',
-                        common: {
-                            name: "recall",
-                            role: 'button',
-                            type: 'boolean',
-                            read: false,
-                            write: true
-                        }
-                    });
-                    adapter.setObjectNotExists(`${group}.Scene_${scene.id}.store`, {
-                        type: 'state',
-                        common: {
-                            name: "store",
-                            role: 'button',
-                            type: 'boolean',
-                            read: false,
-                            write: true
-                        }
-                    });
-                    adapter.setObjectNotExists(`${group}.Scene_${scene.id}.delete`, {
-                        type: 'state',
-                        common: {
-                            name: "delete",
-                            role: 'button',
-                            type: 'boolean',
-                            read: false,
-                            write: true
-                        }
-                    });
-                    adapter.setObjectNotExists(`${group}.Scene_${scene.id}.lightcount`, {
-                        type: 'state',
-                        common: {
-                            name: "lightcount",
-                            role: 'state',
-                            type: 'number',
-                            read: true,
-                            write: false
-                        }
-                    }, () => {
-                        adapter.setState(`${group}.Scene_${scene.id}.lightcount`, scene.lightcount, true);
-                    });
-
-                    adapter.setObjectNotExists(`${group}.Scene_${scene.id}.transitiontime`, {
-                        type: 'state',
-                        common: {
-                            name: "transitiontime",
-                            role: 'argument',
-                            type: 'number',
-                            read: true,
-                            write: false
-                        }
-                    }, () => {
-                        adapter.setState(`${group}.Scene_${scene.id}.transitiontime`, scene.transitiontime, true);
-                    });
-                    adapter.setObjectNotExists(`${group}.Scene_${scene.id}.name`, {
-                        type: 'state',
-                        common: {
-                            name: "name",
-                            role: 'state',
-                            type: 'string',
-                            read: true,
-                            write: true
-                        }
-                    }, () => {
-                        adapter.setState(`${group}.Scene_${scene.id}.name`, scene.name, true);
-                    });
-                }
-            });
-        }
-    });
-} //END getGroupScenes
-
 async function setGroupAttributes(parameters, groupId) {
     const {ip, port, user} = await getGatewayParam();
 
@@ -1305,51 +1257,152 @@ async function setGroupState(parameters, groupId, stateId) {
     }
 } //END setGroupState
 
-async function setGroupScene(parameters, groupId, sceneId, action, stateId) {
-    let sceneString = '';
-    if (sceneId > 0) {
-        sceneString = '/' + sceneId;
-        if (action !== '') {
-            sceneString += '/' + action;
-        }
-    }
-
-    const {ip, port, user} = await getGatewayParam();
-
-    if (ip !== 'none' && port !== 'none' && user !== 'none') {
-
-        await axios.post(`http://${ip}:${port}/api/${user}/groups/${groupId}/scenes/${sceneString}`, parameters)
-            .then(async result => {
-                let res = result.status;
-                let body = result.data;
-                let response = body;
-                if (await logging(res, body, 'set group scene ' + groupId) && response !== undefined && response !== 'undefined') {
-                    new AckStateVal(stateId, response);
-                }
-            }).catch(async error => {
-                sentryMsg(error);
-            });
-    }
-} //END setGroupScene
-
 async function createGroup(name, callback) {
     const {ip, port, user} = await getGatewayParam();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
 
-        await axios.post(`http://${ip}:${port}/api/${user}/groups`, options)
+        await axios.post(`http://${ip}:${port}/api/${user}/groups`, {'name': name})
             .then(async result => {
                 let res = result.status;
                 let body = result.data;
                 if (await logging(res, body, 'create group ' + name)) {
                     let apiKey = body;
-                    adapter.log.info(JSON.stringify(apiKey[0]['success']['id']));
-                    callback({error: 0, message: 'success'});
+                    adapter.log.info(JSON.stringify('New group with id ' + apiKey[0]['success']['id'] + ' created.'));
                     await getGroupAttributes(apiKey[0]['success']['id']);
+                    callback({error: 0, message: 'success'});
                 }
             }).catch(async error => {
                 sentryMsg(error);
             });
+    }
+} //END createGroup
+
+async function deleteGroup(groupId) {
+
+    const {ip, port, user} = await getGatewayParam();
+
+    if (ip !== 'none' && port !== 'none' && user !== 'none') {
+
+        await axios.delete(`http://${ip}:${port}/api/${user}/groups/${groupId}`)
+            .then(async result => {
+                let res = result.status;
+                let body = result.data;
+                let response = body;
+                if (await logging(res, body, 'delete group ' + groupId) && response !== undefined && response !== 'undefined') {
+                    if (response[0]['success']) {
+                        adapter.log.info('The group with id ' + groupId + ' was removed.');
+                        adapter.getForeignObjects(adapter.name + '.' + adapter.instance + '*', 'device', async (err, enums) => {                    //alle Objekte des Adapters suchen
+                            let count = Object.keys(enums).length - 1;                                      //Anzahl der Objekte
+                            for (let i = 0; i <= count; i++) {                                              //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ group handelt
+                                let keyName = Object.keys(enums)[i];
+                                if (enums[keyName].common.role === 'group' && enums[keyName].native.id === groupId) {
+                                    adapter.log.info('Delete group Objects: ' + enums[keyName]._id);
+                                    let name = enums[keyName]._id;
+
+                                    await deleteDevice(name);
+                                }
+                            }
+                        });
+                    } else if (response[0]['error']) {
+                        adapter.log.warn(JSON.stringify(response[0]['error']));
+                    }
+                }
+            }).catch(async error => {
+                sentryMsg(error);
+            });
+    }
+}
+
+//END  Group functions -------------------------------------------------------------------------------------------------
+
+//START Scenes functions
+async function getAllScenes(group, sceneList) {
+    //Changed check if group exists, if not skip it
+    await adapter.getObjectAsync(adapter.name + '.' + adapter.instance + '.groups.' + group, async (err, obj) => {
+        if (obj !== undefined) {
+
+            if (sceneList !== undefined && sceneList.length === 0) {
+                return;
+            }
+
+            await adapter.setObjectNotExistsAsync(`groups.${group}.scenes`, {
+                type: 'channel',
+                common: {
+                    name: 'Scenes'
+                }
+            }).then ( () => {
+                objChangeByAdapter = true;
+            });
+
+            const arrStates = ['recall', 'store', 'delete', 'lightcount', 'transitiontime'];
+            for (const sceneListKey in sceneList) {
+                await getSceneAttributes(group, sceneList[sceneListKey].id)
+            }
+
+        }
+    });
+} //END getAllScenes
+
+async function getSceneAttributes(groupId, sceneId) {
+    const {ip, port, user} = await getGatewayParam();
+
+    if (ip !== 'none' && port !== 'none' && user !== 'none') {
+
+        await axios.get(`http://${ip}:${port}/api/${user}/groups/${groupId}/scenes/${sceneId}`)
+            .then(async result => {
+                let res = result.status;
+                let body = result.data;
+                let response = body;
+                await adapter.setObjectNotExistsAsync(`groups.${groupId}.scenes.${sceneId}`, {
+                    type: 'channel',
+                    common: {
+                        name: response.name,
+                        role: 'scene'
+                    },
+                    native: {}
+                });
+
+                const arrStates = ['recall', 'store', 'delete', 'lightcount', 'transitiontime'];
+                for (const arrStatesKey in arrStates) {
+                    let value = null;
+                    switch (arrStates[arrStatesKey]){
+                        case 'lightcount':
+                            value = response.lightcount;
+                            break;
+                        case 'transitiontime':
+                            value = response.transitiontime;
+                            break;
+                    }
+                    await SetObjectAndState(`${groupId}`, 'scenes', arrStates[arrStatesKey], value, null, sceneId)
+                }
+            }).catch(async error => {
+                await logging(error.response.status, error.response.status, 'get scene ' + sceneId)
+                sentryMsg(error);
+            });
+    }
+} //END getAllScenes
+
+async function createScene(sceneName, groupId) {
+
+    const {ip, port, user} = await getGatewayParam();
+
+    if (ip !== 'none' && port !== 'none' && user !== 'none') {
+
+        await axios.post(`http://${ip}:${port}/api/${user}/groups/${groupId}/scenes`, {'name': sceneName})
+            .then(async result => {
+                let res = result.status;
+                let body = result.data;
+                let response = body;
+                if (await logging(res, body, 'create scene ' + groupId) && response !== undefined && response !== 'undefined') {
+                    await AckStateVal(`${adapter.namespace}.${adapter.instance}.groups.${groupId}.createscene`, response);
+                }
+            }).catch(async error => {
+                await logging(error.response.status, error.response.status, 'create scene ' + groupId)
+                sentryMsg(error);
+            });
+    }
+} //END createScene
 
     }
 } //END createGroup
@@ -1421,9 +1474,9 @@ async function getAllSensors() {
                         //create object for sensor device
                         let regex = new RegExp("CLIP-Sensor TOOGLE-");
                         if (!regex.test(list[keyName]['name'])) {
-                            let exists = await adapter.getObjectAsync('Sensors.' + sensorID);
+                            let exists = await adapter.getObjectAsync('sensors.' + sensorID);
                             if (exists === null) {
-                                await adapter.setObjectNotExistsAsync(`Sensors.${sensorID}`, {
+                                await adapter.setObjectNotExistsAsync(`sensors.${sensorID}`, {
                                     type: 'device',
                                     common: {
                                         name: list[keyName]['name'],
@@ -1440,6 +1493,14 @@ async function getAllSensors() {
                                         type: list[keyName]['type'],
                                         uniqueid: list[keyName]['uniqueid']
                                     }
+                                });
+                                await adapter.setObjectNotExistsAsync(`sensors.${sensorID}.info`, {
+                                    type: 'channel',
+                                    common: {
+                                        name: 'Information'
+                                    }
+                                }).then ( () => {
+                                    objChangeByAdapter = true;
                                 });
                             } else {
                                 let ids = exists.native.id;
@@ -1527,6 +1588,14 @@ async function getSensor(Id) {
                                 type: list['type'],
                                 uniqueid: list['uniqueid']
                             }
+                        });
+                        await adapter.setObjectNotExistsAsync(`sensors.${sensorId}.info`, {
+                            type: 'channel',
+                            common: {
+                                name: 'Information'
+                            }
+                        }).then ( () => {
+                            objChangeByAdapter = true;
                         });
                     } else {
                         let ids = exists.native.id;
@@ -1700,6 +1769,24 @@ async function getAllLights() {
                         }).then ( () => {
                             objChangeByAdapter = true;
                         });
+
+                        await adapter.setObjectNotExistsAsync(`lights.${lightID}.info`, {
+                            type: 'channel',
+                            common: {
+                                name: 'Information'
+                            }
+                        }).then ( () => {
+                            objChangeByAdapter = true;
+                        });
+                        await adapter.setObjectNotExistsAsync(`lights.${lightID}.manage`, {
+                            type: 'channel',
+                            common: {
+                                name: 'Manage light'
+                            }
+                        }).then ( () => {
+                            objChangeByAdapter = true;
+                        });
+
                         if (list[keyName]['state']) {
                             let count2 = Object.keys(list[keyName]['state']).length - 1;
                             //create states for light device
@@ -1807,11 +1894,38 @@ async function getLightState(Id) {
                     }).then ( () => {
                         objChangeByAdapter = true;
                     });
+                    await adapter.setObjectNotExistsAsync(`lights.${lightId}.info`, {
+                        type: 'channel',
+                        common: {
+                            name: 'Information'
+                        }
+                    }).then ( () => {
+                        objChangeByAdapter = true;
+                    });
+                    await adapter.setObjectNotExistsAsync(`lights.${lightId}.manage`, {
+                        type: 'channel',
+                        common: {
+                            name: 'Manage light'
+                        }
+                    }).then ( () => {
+                        objChangeByAdapter = true;
+                    });
                     let count2 = Object.keys(list['state']).length - 1;
                     //create states for light device
                     for (let z = 0; z <= count2; z++) {
                         let stateName = Object.keys(list['state'])[z];
                         await SetObjectAndState(lightId, list[keyName]['name'], 'Lights', stateName, list['state'][stateName]);
+                    }
+                    let manage = ['delete', 'removegroups', 'removescenes', 'addtogroup', 'removefromgroup'];
+
+                    for (const manageKey in manage) {
+                        await SetObjectAndState(lightId, 'lights', manage[manageKey], null, 'manage');
+                    }
+
+                    let staticObjs = ['dimspeed', 'dimup', 'dimdown', 'action'];
+
+                    for (const staticObjsKey in staticObjs) {
+                        await SetObjectAndState(lightId, 'lights', staticObjs[staticObjsKey], null,)
                     }
                 }
 
@@ -1915,12 +2029,38 @@ async function removeFromGroups(lightId) {
                     }
                 }
             }).catch(async error => {
+                adapter.log.error(error);
                 sentryMsg(error);
             });
 
     }
 }
 
+async function removeFromScenes(lightId) {
+
+    const {ip, port, user} = await getGatewayParam();
+
+    if (ip !== 'none' && port !== 'none' && user !== 'none') {
+
+        await axios.put(`http://${ip}:${port}/api/${user}/lights/${lightId}/scenes`)
+            .then(async result => {
+                let res = result.status;
+                let body = result.data;
+                let response = body;
+                if (await logging(res, body, 'remove light from scenes ' + lightId) && response !== undefined && response !== 'undefined') {
+                    if (response[0]['success']) {
+                        adapter.log.info('The light with id ' + lightId + ' was removed from all scenes.')
+                    } else if (response[0]['error']) {
+                        adapter.log.warn(JSON.stringify(response[0]['error']));
+                    }
+                }
+            }).catch(async error => {
+                adapter.log.error(error);
+                sentryMsg(error);
+            });
+
+    }
+}
 //END  Light functions -------------------------------------------------------------------------------------------------
 
 //START Devices functions ----------------------------------------------------------------------------------------------
@@ -2024,7 +2164,7 @@ function checkVirtualDevices(mac){
 }
 
 async function getGatewayParam() {
-    const results = await adapter.getObjectAsync('Gateway_info');
+    const results = await adapter.getObjectAsync('gateway_info');
     if (results) {
         return {
             ip: results.native.ipaddress ? results.native.ipaddress : 'none',
@@ -2040,13 +2180,13 @@ async function deleteDevice(deviceId) {
             for (let r in result.rows) {
                 await adapter.delObjectAsync(result.rows[r].id)
                     .then(result => {
-                        console.log(result);
+                        //console.log(result);
                     }, reject => {
-                        console.log(reject);
+                        adapter.log.error(reject);
                     });
             }
         }, reject => {
-            console.log(reject);
+            adapter.log.error(reject);
         })
 
 
@@ -2688,7 +2828,7 @@ async function handleWSmessage(msg) {
                 case 'changed': {
                     if (typeof state == 'object') {
                         if (Object.keys(state).length > 0) {
-                            object = await getObjectByDeviceId(id, 'Lights');
+                            object = await getObjectByDeviceId(id, 'lights');
                             for (let stateName in state) {
                                     let oid = object.id.replace(/^(\w*\.){3}/g, '');
                                     await SetObjectAndState(oid, object.value.common.name, 'Lights', stateName, state[stateName]);
@@ -2739,7 +2879,11 @@ async function handleWSmessage(msg) {
             break;
         }
         case 'scenes': {
-            await getGroupAttributes(id);
+            if (data.e !== 'scene-called'){
+
+            } else {
+                await getSceneAttributes(id, data.scid);
+            }
             break;
         }
         case 'sensors': {

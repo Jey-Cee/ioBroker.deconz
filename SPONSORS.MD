@@ -15,3 +15,4 @@ Thank you to ...
 * Siegfried B.
 * Tizian H.
 * Andreas V.
+* Felix B.

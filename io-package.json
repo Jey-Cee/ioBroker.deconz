@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "deconz",
-        "version": "2.0.3",
+        "version": "2.0.4",
         "news": {
+            "2.0.4": {
+                "en": "remove sentry for js-controller version <3\nreplace request with axios\nuse object_definition.js and iobroker-adapter-helpers\nadded channel objects for information and scenes for better overview\nrefactored scenes\nuse only lower case for ids\nadded management for groups and lights",
+                "de": "Entfernen Sie den Wachposten für die js-controller Version <3\nAnfrage durch Axios ersetzen\nVerwenden Sie object_definition.js und iobroker-adapter-helpers\nKanalobjekte für Informationen und Szenen zur besseren Übersicht hinzugefügt\nüberarbeitete Szenen\nVerwenden Sie für IDs nur Kleinbuchstaben\nVerwaltung für Gruppen und Lichter hinzugefügt",
+                "ru": "удалить часовую для js-контроллера версии <3\nзаменить запрос на axios\nиспользуйте object_definition.js и iobroker-adapter-helpers\nдобавлены объекты каналов для информации и сцен для лучшего обзора\nотремонтированные сцены\nиспользуйте только нижний регистр для идентификаторов\nдобавлено управление группами и освещением",
+                "pt": "remover sentinela para js-controlador versão <3\nsubstituir pedido por axios\nuse object_definition.js e iobroker-adapter-helpers\nobjetos de canal adicionados para informações e cenas para uma melhor visão geral\ncenas refatoradas\nuse apenas minúsculas para ids\nadicionado gerenciamento para grupos e luzes",
+                "nl": "verwijder schildwacht voor js-controller versie <3\nvervang verzoek door axios\ngebruik object_definition.js en iobroker-adapter-helpers\nkanaalobjecten toegevoegd voor informatie en scènes voor een beter overzicht\ngerefactored scènes\ngebruik alleen kleine letters voor ID's\ntoegevoegd beheer voor groepen en lichten",
+                "fr": "supprimer la sentinelle pour la version js-controller <3\nremplacer la demande par axios\nutiliser object_definition.js et iobroker-adapter-helpers\najout d'objets de canal pour des informations et des scènes pour une meilleure vue d'ensemble\nscènes refactorisées\nn'utiliser que des minuscules pour les identifiants\ngestion supplémentaire pour les groupes et les lumières",
+                "it": "rimuovere sentry per js-controller versione <3\nsostituire la richiesta con axios\nusa object_definition.js e iobroker-adapter-helpers\naggiunti oggetti canale per informazioni e scene per una migliore panoramica\nscene rifattorizzate\nusa solo lettere minuscole per gli ID\naggiunta la gestione per gruppi e luci",
+                "es": "eliminar sentry para js-controller versión <3\nreemplazar solicitud con axios\nuse object_definition.js y iobroker-adapter-helpers\nobjetos de canal agregados para información y escenas para una mejor visión general\nescenas refactorizadas\nuse solo minúsculas para los identificadores\ngestión añadida para grupos y luces",
+                "pl": "usuń wartownik dla wersji kontrolera js <3\nzamień żądanie na axios\nużyj object_definition.js i iobroker-adapter-helpers\ndodano obiekty kanału dla informacji i scen dla lepszego przeglądu\nrefaktoryzowane sceny\ndla identyfikatorów używaj tylko małych liter\ndodane zarządzanie grupami i światłami",
+                "zh-cn": "删除js-controller版本<3的哨兵\n用axios替换请求\n使用object_definition.js和iobroker-adapter-helpers\n添加了通道对象以获取信息和场景，从而获得更好的概览\n重构场景\nID仅使用小写字母\n增加了对群组和灯光的管理"
+            },
             "2.0.3": {
                 "en": "fix incoming rename event for sensors\nfix release_press is set to true at start\nadded websocket port info to configuration\nadded event types handling for websocket messages\nadded backup, deConz update & firmware update states under Gateway_info\nadded touchlink functions\nfix sensor handling for virtual devices (fsm and vpir)",
                 "de": "Eingehendes Umbenennungsereignis für Sensoren korrigieren\nfix release_press wird beim Start auf true gesetzt\nWebsocket-Port-Informationen zur Konfiguration hinzugefügt\nBehandlung von Ereignistypen für Websocket-Nachrichten hinzugefügt\nStatus für Backup, DeConz-Update und Firmware-Update unter Gateway_info hinzugefügt\nTouchlink-Funktionen hinzugefügt\nKorrektur der Sensorhandhabung für virtuelle Geräte (fsm und vpir)",
@@ -109,6 +121,19 @@
             "type": "channel",
             "common": {
                 "name": "Information"
+            },
+            "native": {}
+        },
+        {
+            "_id": "groups.creategroup",
+            "type": "state",
+            "common": {
+                "name": "Create a new group",
+                "type": "string",
+                "role": "state",
+                "read": true,
+                "write": true
+
             },
             "native": {}
         },
