@@ -141,7 +141,7 @@ class deconz extends utils.Adapter {
                         } else {
                             parameters = '{"bri": ' + JSON.stringify(state.val) + ', "on": false}';
                         }
-                        await SetObjectAndState(tmp[3], tmp[2], 'level', Math.floor((100 / 255) * state.val));
+                        await SetObjectAndState(tmp[3], '', tmp[2], 'level', Math.floor((100 / 255) * state.val));
                         break;
                     case 'level':
                         if (state.val > 0 && (transitionTime === 'none' || transitionTime === 0)) {
@@ -454,7 +454,7 @@ async function main() {
     adapter.subscribeObjects('lights.*');
     adapter.subscribeObjects('groups.*');
     adapter.subscribeObjects('sensors.*');
-    
+
     heartbeat();
     const results = await adapter.getObjectAsync('gateway_info');
     if (results) {
@@ -625,6 +625,7 @@ async function createAPIkey(host, credentials, callback) {
             'Content-Length': Buffer.byteLength('{"devicetype": "ioBroker"}')
         }
     };
+    adapter.log.debug(host + ' auth: ' + auth);
 
     await axios.post(`http://${host}/api`, {  "devicetype": "iobroker" }, options)
         .then(async result => {
@@ -1611,6 +1612,7 @@ async function deleteSensor(sensorId) {
 
 //START  Light functions -----------------------------------------------------------------------------------------------
 async function getAllLights() {
+
     const {ip, port, user} = await getGatewayParam();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
