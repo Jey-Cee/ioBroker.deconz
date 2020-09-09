@@ -1405,8 +1405,6 @@ async function createScene(sceneName, groupId) {
     }
 } //END createScene
 
-    }
-} //END createGroup
 
 async function deleteGroup(groupId) {
 
