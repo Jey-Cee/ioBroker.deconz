@@ -9,12 +9,16 @@ let SSDP = require('./lib/ssdp.js');
 
 let adapter;
 
-let hue_factor = 182.041666667;
+const hue_factor = 182.041666667;
 
 let ws = null;
+/** @type {number} */
 let alive_ts = 0;
+/** @type {boolean} */
 let ready = false;
+/** @type {boolean} */
 let objChangeByAdapter = false;
+
 let timeoutScan, timeoutReady, timeoutWait, timeoutReconnect = null, timeoutAutoUpdates, timeoutButton, timeoutButtonpressed;
 
 
@@ -23,6 +27,7 @@ class deconz extends utils.Adapter {
      * @param {Partial<ioBroker.AdapterOptions>} [options={}]
      */
     constructor(options) {
+        // @ts-ignore
         super({
             ...options,
             name: 'deconz'
@@ -81,6 +86,11 @@ class deconz extends utils.Adapter {
 
     }
 
+    /**
+     * @param {string} id
+     * @param {any} state
+     * @returns {Promise<void>}
+     */
     async onStateChange(id, state) {
         const originalId = id;
         let tmp = id.split('.');
@@ -126,7 +136,8 @@ class deconz extends utils.Adapter {
              * @param {object|null} tTime - object for state transitiontime
              */
             this.getState(this.name + '.' + this.instance + '.' + id + '.transitiontime', async (err, tTime) => {
-                let parameters = {};
+                let parameters = {}
+                /** @type {number|string} */
                 let transitionTime = (err === null && tTime !== null) ? (tTime.val * 10) : 'none';
 
                 let parentObject = await this.getObjectAsync(this.name + '.' + this.instance + '.' + id);
@@ -357,20 +368,22 @@ class deconz extends utils.Adapter {
 
                 let controlId = (parentObject !== null || parentObject !== undefined) ? parentObject.native.id : '';
 
-                switch (parentObject.common.role && tmp[3] !== 'removefromgroup' && tmp[3] !== 'addtogroup' && tmp[3] !== 'delete' && tmp[3] !== 'removegroups' && tmp[3] !== 'removescenes') {
-                    case 'light':
-                        await setLightState(parameters, controlId, this.name + '.' + this.instance + '.' + id + '.' + dp);
-                        break;
-                    case 'group':
-                        if (dp !== 'createscene') {
-                            await setGroupState(parameters, controlId, this.name + '.' + this.instance + '.' + id + '.' + dp);
-                        }
-                        break;
-                    case 'sensor':
-                        await setSensorParameters(parameters, controlId, this.name + '.' + this.instance + '.' + id + '.' + dp);
-                        break;
-
+                if (tmp[3] !== 'removefromgroup' && tmp[3] !== 'addtogroup' && tmp[3] !== 'delete' && tmp[3] !== 'removegroups' && tmp[3] !== 'removescenes'){
+                    switch (parentObject.common.role) {
+                        case 'light':
+                            await setLightState(parameters, controlId, this.name + '.' + this.instance + '.' + id + '.' + dp);
+                            break;
+                        case 'group':
+                            if (dp !== 'createscene') {
+                                await setGroupState(parameters, controlId, this.name + '.' + this.instance + '.' + id + '.' + dp);
+                            }
+                            break;
+                        case 'sensor':
+                            await setSensorParameters(parameters, controlId, this.name + '.' + this.instance + '.' + id + '.' + dp);
+                            break;
+                    }
                 }
+
             });
         }
     }
