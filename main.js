@@ -152,7 +152,7 @@ class deconz extends utils.Adapter {
                         } else {
                             parameters = '{"bri": ' + JSON.stringify(state.val) + ', "on": false}';
                         }
-                        await SetObjectAndState(tmp[3], '', tmp[2], 'level', Math.floor((100 / 255) * state.val));
+                        await SetObjectAndState(tmp[3], tmp[2], 'level', Math.floor((100 / 255) * state.val));
                         break;
                     case 'level':
                         if (state.val > 0 && (transitionTime === 'none' || transitionTime === 0)) {
@@ -2098,7 +2098,16 @@ async function buttonEvents(id, event) {
     if (event !== null && event !== undefined) {
         let button = event.toString().substr(0, 1);
         let type = event.toString().substr(1, 3);
-        await adapter.setObjectNotExistsAsync(`${id}.${button}`, {
+        await adapter.setObjectNotExistsAsync(`sensors.${id}.buttons`, {
+            type: 'channel',
+            common: {
+                name: 'Buttons'
+            },
+            native: {}
+        }).then ( () => {
+            objChangeByAdapter = true;
+        });
+        await adapter.setObjectNotExistsAsync(`${id}.buttons.${button}`, {
             type: 'channel',
             common: {
                 name: 'Button ' + button
@@ -2144,18 +2153,18 @@ async function buttonEvents(id, event) {
                 state = 'many_press';
                 break;
         }
-        await SetObjectAndState(`${id}.${button}`, 'sensors', state, null, 'buttons');
+        await SetObjectAndState(`${id}.buttons.${button}`, 'sensors', state, null, null);
 
-        await adapter.setStateAsync(`${id}.${button}.${state}`, {
+        await adapter.setStateAsync(`sensors.${id}.buttons.${button}.${state}`, {
             val: true,
             ack: true
         }).then ( () => {
             timeoutButton = setTimeout(() => {
-                adapter.setState(`${id}.${button}.${state}`, {
+                adapter.setState(`sensors.${id}.buttons.${button}.${state}`, {
                     val: false,
                     ack: true
                 })
-            }, 100);
+            }, 250);
         });
 
     }
@@ -2221,7 +2230,7 @@ async function SetObjectAndState(id, type, stateName, value = null, channel  = n
             await SetObjectAndState(id, type, 'level', Math.floor((100 / 254) * value));
             break;
         case 'buttonevent':
-            await buttonEvents(`${type}.${id}.buttonevent`, value);
+            await buttonEvents(`${id}`, value);
             break;
         case 'heatsetpoint':
             value = value / 100;
