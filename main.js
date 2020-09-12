@@ -2107,7 +2107,7 @@ async function buttonEvents(id, event) {
         }).then ( () => {
             objChangeByAdapter = true;
         });
-        await adapter.setObjectNotExistsAsync(`${id}.buttons.${button}`, {
+        await adapter.setObjectNotExistsAsync(`sensors.${id}.buttons.${button}`, {
             type: 'channel',
             common: {
                 name: 'Button ' + button
@@ -2153,19 +2153,14 @@ async function buttonEvents(id, event) {
                 state = 'many_press';
                 break;
         }
-        await SetObjectAndState(`${id}.buttons.${button}`, 'sensors', state, null, null);
+        await SetObjectAndState(`${id}.buttons.${button}`, 'sensors', state, true, null);
 
-        await adapter.setStateAsync(`sensors.${id}.buttons.${button}.${state}`, {
-            val: true,
-            ack: true
-        }).then ( () => {
-            timeoutButton = setTimeout(() => {
-                adapter.setState(`sensors.${id}.buttons.${button}.${state}`, {
-                    val: false,
-                    ack: true
-                })
-            }, 250);
-        });
+        timeoutButton = setTimeout(() => {
+            adapter.setState(`sensors.${id}.buttons.${button}.${state}`, {
+                val: false,
+                ack: true
+            })
+        }, 150);
 
     }
 }
@@ -2296,7 +2291,7 @@ async function SetObjectAndState(id, type, stateName, value = null, channel  = n
     }
 
 
-    await adapter.setObjectNotExistsAsync(stateId, obj)
+   await adapter.setObjectNotExistsAsync(stateId, obj)
         .then ( () => {
             objChangeByAdapter = true;
         });
