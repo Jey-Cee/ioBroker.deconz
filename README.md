@@ -106,6 +106,9 @@ If you like my work, please feel free to provide a personal donation
 
 ## Changelog
 
+### 2.0.5
+* fix buttonpressed not shown
+
 ### 2.0.4
 * remove sentry for js-controller version <3
 * replace request with axios

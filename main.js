@@ -2403,7 +2403,7 @@ async function handleWSmessage(msg) {
                                     await SetObjectAndState(id, 'sensors', 'lastupdated');
                                 }
 
-                                adapter.getState(`${object.id}.lastupdated`, async (err, lupdate) => {
+                                adapter.getState(`${object.id}.info.lastupdated`, async (err, lupdate) => {
                                     if (lupdate === null) {
                                         await SetObjectAndState(id, 'sensors', obj, state[obj]);
                                     } else if (lupdate.val !== state[obj]) {
@@ -2411,12 +2411,12 @@ async function handleWSmessage(msg) {
                                             await SetObjectAndState(id, 'sensors', obj, state[obj]);
                                             await SetObjectAndState(id, 'sensors', 'buttonpressed');
 
-                                            await adapter.setStateAsync(`${object.id}` + '.' + 'buttonpressed', {
+                                            await adapter.setStateAsync(`${object.id}.buttonpressed`, {
                                                 val: state[obj],
                                                 ack: true
                                             });
                                             timeoutButtonpressed = setTimeout(() => {
-                                                adapter.setState(`${object.id}` + '.' + 'buttonpressed', {
+                                                adapter.setState(`${object.id}.buttonpressed`, {
                                                     val: 0,
                                                     ack: true
                                                 })
