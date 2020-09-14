@@ -92,7 +92,17 @@ systemDictionary = {
         "es": "Enable adapter first",
         "pl": "Enable adapter first"
     },
-    "Ok": {"en": "Ok", "de": "Ok", "ru": "Ok", "pt": "Ok", "nl": "Ok", "fr": "Ok", "it": "Ok", "es": "Ok", "pl": "Ok"},
+        "Ok": {
+            "en": "Ok",
+            "de": "Ok",
+            "ru": "Ok",
+            "pt": "Ok",
+            "nl": "Ok",
+            "fr": "Ok",
+            "it": "Ok",
+            "es": "Ok",
+            "pl": "Ok"
+        },
     "Settings": {
         "en": "Settings",
         "de": "Einstellungen",
