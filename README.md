@@ -42,6 +42,9 @@ Examples:
 
 ## Changelog
 
+### 1.3.11
+* fix auto reconnect
+
 ### 1.3.10
 * (bortim) added change-event handling, new in deConz v2.05.78
 

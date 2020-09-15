@@ -658,6 +658,7 @@ async function deleteAPIkey() {
 const WebSocket = require('ws');
 
 function autoReconnect(host, port){
+    clearTimeout(reconnect);
     reconnect = setTimeout(() => {
         ws.terminate();
         getAutoUpdates();
@@ -701,7 +702,6 @@ async function getAutoUpdates() {
 
 
         ws.onmessage = async (msg) => {
-            clearTimeout(reconnect);
             autoReconnect(host, port);
             let data = JSON.parse(msg.data);
             let id = data['id'] ? data['id'] : data['gid'];
