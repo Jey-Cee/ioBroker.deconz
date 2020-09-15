@@ -566,6 +566,7 @@ function heartbeat() {
 const WebSocket = require('ws');
 
 function autoReconnect() {
+    clearTimeout(timeoutReconnect);
     timeoutReconnect = setTimeout(() => {
         ws.terminate();
         getAutoUpdates();
@@ -609,7 +610,6 @@ async function getAutoUpdates() {
 
 
         ws.onmessage = async (msg) => {
-            clearTimeout(timeoutReconnect);
             autoReconnect();
             await handleWSmessage(msg);
         }
