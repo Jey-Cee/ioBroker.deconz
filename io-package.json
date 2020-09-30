@@ -1,8 +1,11 @@
 {
     "common": {
         "name": "deconz",
-        "version": "2.0.4",
+        "version": "2.0.5",
         "news": {
+            "2.0.5": {
+                "en": "fix buttonpressed not shown"
+            },
             "2.0.4": {
                 "en": "remove sentry for js-controller version <3\nreplace request with axios\nuse object_definition.js and iobroker-adapter-helpers\nadded channel objects for information and scenes for better overview\nrefactored scenes\nuse only lower case for ids\nadded management for groups and lights",
                 "de": "Entfernen Sie den Wachposten für die js-controller Version <3\nAnfrage durch Axios ersetzen\nVerwenden Sie object_definition.js und iobroker-adapter-helpers\nKanalobjekte für Informationen und Szenen zur besseren Übersicht hinzugefügt\nüberarbeitete Szenen\nVerwenden Sie für IDs nur Kleinbuchstaben\nVerwaltung für Gruppen und Lichter hinzugefügt",

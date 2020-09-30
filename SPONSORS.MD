@@ -16,3 +16,5 @@ Thank you to ...
 * Tizian H.
 * Andreas V.
 * Felix B.
+* Eduard S.
+* Canim
