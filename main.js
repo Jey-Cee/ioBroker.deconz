@@ -468,6 +468,8 @@ async function main() {
     adapter.subscribeObjects('groups.*');
     adapter.subscribeObjects('sensors.*');
 
+    await getLatestVersion();
+
     heartbeat();
     const results = await adapter.getObjectAsync('gateway_info');
     if (results) {
@@ -562,7 +564,7 @@ function heartbeat() {
     });
 }
 
-//START Make Abo using websocket
+//START Make Abo using websocket ---------------------------------------------------------------------------------------
 const WebSocket = require('ws');
 
 function autoReconnect() {
@@ -616,7 +618,7 @@ async function getAutoUpdates() {
 
     }
 }
-//END Make Abo using websocket
+//END Make Abo using websocket -----------------------------------------------------------------------------------------
 
 //START deConz config --------------------------------------------------------------------------------------------------
 async function createAPIkey(host, credentials, callback) {
@@ -1191,7 +1193,7 @@ async function deleteGroup(groupId) {
 
 //END  Group functions -------------------------------------------------------------------------------------------------
 
-//START Scenes functions
+//START Scenes functions -----------------------------------------------------------------------------------------------
 async function getAllScenes(group, sceneList) {
     //Changed check if group exists, if not skip it
     await adapter.getObjectAsync(adapter.name + '.' + adapter.instance + '.groups.' + group, async (err, obj) => {
@@ -1338,7 +1340,7 @@ async function deleteScene(sceneId, groupId) {
             });
     }
 } //END deleteScene
-//END Scenes functions
+//END Scenes functions -------------------------------------------------------------------------------------------------
 
 //START  Sensor functions ----------------------------------------------------------------------------------------------
 async function getAllSensors() {
@@ -1572,14 +1574,29 @@ async function setSensorParameters(parameters, sensorId, stateId) {
     const {ip, port, user} = await getGatewayParam();
 
     if (ip !== 'none' && port !== 'none' && user !== 'none') {
+        console.log(typeof sensorId);
+        if (typeof sensorId === 'object'){
+            for (const id in sensorId){
+                await axios.put(`http://${ip}:${port}/api/${user}/sensors/${sensorId[id]}/config`, parameters)
+                    .then( async result => {
+                        await logging(result.status, result.data, 'set sensor parameters');
+                        await AckStateVal(stateId, result);
+                    }).catch( async error => {
+                        adapter.log.error(error)
+                        sentryMsg(error);
+                    });
+            }
+        } else {
+            await axios.put(`http://${ip}:${port}/api/${user}/sensors/${sensorId}/config`, parameters)
+                .then( async result => {
+                    await logging(result.status, result.data, 'set sensor parameters');
+                    await AckStateVal(stateId, result);
+                }).catch( async error => {
+                    adapter.log.error(error)
+                    sentryMsg(error);
+                });
+        }
 
-        await axios.put(`http://${ip}:${port}/api/${user}/sensors/${sensorId}/config`, parameters)
-            .then( async result => {
-                await logging(result.status, result.data, 'set sensor parameters');
-                await AckStateVal(stateId, result);
-            }).catch( async error => {
-                sentryMsg(error);
-            });
 
     }
 } //END setSensorParameters
@@ -2029,6 +2046,24 @@ async function getGatewayParam() {
             user: results.native.user ? results.native.user : 'none'
         };
     }
+}
+
+//Read latest release on Github of deConz
+async function getLatestVersion() {
+    const url = 'https://api.github.com/repos/dresden-elektronik/deconz-rest-plugin/releases/latest';
+
+    const release =  await axios.get(url);
+    let tagName = release.data.tag_name;
+    tagName = tagName.replace('V', '');
+    tagName = tagName.replace('_stable', '');
+    const arrVersion = tagName.split('_');
+    const version = `${ parseInt(arrVersion[0]) }.${ parseInt(arrVersion[1]) }.${ parseInt(arrVersion[2]) }`
+
+    await adapter.extendObjectAsync('gateway_info', {
+        native: {
+            latestVersion: version
+        }
+    })
 }
 
 async function deleteDevice(deviceId) {

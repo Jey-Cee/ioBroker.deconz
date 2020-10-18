@@ -267,8 +267,13 @@
         // populate the list of known groups
         emitGroups();
 
+        if (info.swversion === info.latestVersion) {
+            $('#sw_version').text('deConz Version: ' + info.swversion);
+        } else {
+            $('#sw_version').text(`deConz Version ${info.swversion} installed, version ${info.latestVersion} available`);
+            $('#sw_version').css('background-color', 'orange');
+        }
 
-        $('#sw_version').text('deConz Version: ' + info.swversion);
         $('#api_version').text('API Version: ' + info.apiversion);
         $('#websocketport').text('Websocket port: ' + info.websocketport);
         $('#bridge').val(info.ipaddress);
