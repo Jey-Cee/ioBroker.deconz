@@ -2427,9 +2427,11 @@ async function handleWSmessage(msg) {
                     if (typeof state == 'object') {
                         if (Object.keys(state).length > 0) {
                             object = await getObjectByDeviceId(id, 'lights');
-                            for (let stateName in state) {
+                            if (object){
+                                for (let stateName in state) {
                                     let oid = object.id.replace(/^(\w*\.){3}/g, '');
                                     await SetObjectAndState(oid, 'lights', stateName, state[stateName]);
+                                }
                             }
                         } else {
                             adapter.log.debug("Event has no state-Changes");
