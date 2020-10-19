@@ -1061,20 +1061,27 @@ async function getGroupAttributes(groupId) {
                         }).then ( () => {
                             objChangeByAdapter = true;
                         });
-                        let count2 = Object.keys(list['action']).length - 1;
-                        //create states for light device
-                        for (let z = 0; z <= count2; z++) {
-                            let stateName = Object.keys(list['action'])[z];
-                            await SetObjectAndState(groupId, 'groups', stateName, list['action'][stateName]);
-                            await SetObjectAndState(groupId, 'groups', 'transitiontime', null);
+
+                        if(list['action']) {
+                            let count2 = Object.keys(list['action']).length - 1;
+                            //create states for light device
+                            for (let z = 0; z <= count2; z++) {
+                                let stateName = Object.keys(list['action'])[z];
+                                await SetObjectAndState(groupId, 'groups', stateName, list['action'][stateName]);
+                                await SetObjectAndState(groupId, 'groups', 'transitiontime', null);
+                            }
                         }
-                        let count3 = Object.keys(list['state']).length - 1;
-                        //create states for light device
-                        for (let z = 0; z <= count3; z++) {
-                            let stateName = Object.keys(list['state'])[z];
-                            await SetObjectAndState(groupId, 'groups', stateName, list['state'][stateName]);
-                            await SetObjectAndState(groupId, 'groups', 'transitiontime', null);
+
+                        if(list['state']){
+                            let count3 = Object.keys(list['state']).length - 1;
+                            //create states for light device
+                            for (let z = 0; z <= count3; z++) {
+                                let stateName = Object.keys(list['state'])[z];
+                                await SetObjectAndState(groupId, 'groups', stateName, list['state'][stateName]);
+                                await SetObjectAndState(groupId, 'groups', 'transitiontime', null);
+                            }
                         }
+
                         await SetObjectAndState(groupId,'groups', 'level', null, null);
                         let manage = ['delete', 'createscene'];
 
