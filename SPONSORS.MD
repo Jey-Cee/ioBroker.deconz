@@ -17,3 +17,4 @@ Thank you to ...
 | Andreas V. | Felix B. | Eduard S. |
 | Canim | Wolfgang K. | Phil-lpp |
 | LoxDUS | jensven | Steff75 |
+| Stefan M. |
