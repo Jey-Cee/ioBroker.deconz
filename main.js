@@ -1369,6 +1369,11 @@ async function getAllSensors() {
                     for (let i = 0; i <= count; i++) {              //Get each Sensor
                         let keyName = Object.keys(list)[i];
                         let mac = list[keyName]['uniqueid'];
+
+                        if (!mac) {
+                            return false;
+                        }
+
                         if(checkVirtualDevices(mac) !== true){
                             mac = mac.match(/..:..:..:..:..:..:..:../g);
                             if (mac !== null) mac = mac.toString();
@@ -1468,6 +1473,11 @@ async function getSensor(Id) {
                 if (await logging(res, body, 'get sensor ' + Id)) {
                     let list = body;
                     let mac = list['uniqueid'];
+
+                    if (!mac){
+                        return false;
+                    }
+
                     if(checkVirtualDevices(mac) !== true){
                         mac = mac.match(/..:..:..:..:..:..:..:../g).toString();
                     }
