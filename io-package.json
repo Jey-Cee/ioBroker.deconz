@@ -1,7 +1,7 @@
 {
     "common": {
         "name": "deconz",
-        "version": "2.0.5",
+        "version": "2.0.6",
         "news": {
             "2.0.5": {
                 "en": "fix buttonpressed not shown"

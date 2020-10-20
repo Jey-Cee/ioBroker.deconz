@@ -19,6 +19,8 @@ let ready = false;
 /** @type {boolean} */
 let objChangeByAdapter = false;
 
+let startTime, collectActive = true;
+
 let timeoutScan, timeoutReady, timeoutWait, timeoutReconnect = null, timeoutAutoUpdates, timeoutButton, timeoutButtonpressed;
 
 
@@ -468,6 +470,7 @@ async function main() {
     adapter.subscribeObjects('groups.*');
     adapter.subscribeObjects('sensors.*');
 
+    startTime = Date.now();
     await getLatestVersion();
     await sendDeviceInformation();
 
@@ -2088,63 +2091,6 @@ async function getLatestVersion() {
     })
 }
 
-//Send device information to developer
-async function sendDeviceInformation() {
-    const {ip, port, user} = await getGatewayParam();
-
-    if (ip !== 'none' && port !== 'none' && user !== 'none') {
-        const gw = await adapter.getObjectAsync('gateway_info');
-
-
-        const lights =  await axios.get(`http://${ip}:${port}/api/${user}/lights`);
-        const sensors =  await axios.get(`http://${ip}:${port}/api/${user}/sensors`);
-        const db = await axios.get('https://deconz.all-smart.net/devices');
-
-        for (let device in lights.data){
-            let exists = false;
-
-            for (let dev in db.data) {
-                if (lights.data[device].modelid === db.data[dev].ModelID && db.data[dev].deConzVersion === gw.native.swversion && lights.data[device].swversion === db.data[dev].swversion && lights.data[device].type === db.data[dev].Type){
-                    exists = true;
-                }
-            }
-
-            if (exists === true){
-                continue;
-            }
-            let message = { UniqueID: lights.data[device].uniqueid, ModelID: lights.data[device].modelid, Manufacturer: lights.data[device].manufacturername, swversion: lights.data[device].swversion, deConzVersion: gw.native.swversion, Type: lights.data[device].type, Raw: lights.data[device] };
-            try {
-               const res = await axios.post('https://deconz.all-smart.net/devices', message);
-            } catch (error) {
-                console.log(error);
-            }
-        }
-
-        for (let device in sensors.data){
-            let exists = false;
-            try {
-                const db = await axios.get('https://deconz.all-smart.net/devices');
-                for (let dev in db.data) {
-                    if (sensors.data[device].modelid === db.data[dev].ModelID && db.data[dev].deConzVersion === gw.native.swversion && sensors.data[device].swversion === db.data[dev].swversion && sensors.data[device].type === db.data[dev].Type){
-                        exists = true;
-                    }
-                }
-            } catch (error) {
-                console.log(error);
-            }
-            if (exists === true){
-                continue;
-            }
-            let message = { UniqueID: sensors.data[device].uniqueid, ModelID: sensors.data[device].modelid, Manufacturer: sensors.data[device].manufacturername, swversion: sensors.data[device].swversion, deConzVersion: gw.native.swversion, Type: sensors.data[device].type, Raw: sensors.data[device] };
-            try {
-                const res = await axios.post('https://deconz.all-smart.net/devices', message);
-            } catch (error) {
-                console.log(error);
-            }
-        }
-
-    }
-}
 
 async function deleteDevice(deviceId) {
     await adapter.getObjectListAsync({startkey: deviceId, endkey: deviceId + '.\u9999'})
@@ -2427,7 +2373,10 @@ async function handleWSmessage(msg) {
     let attr = data['attr'];
     let config = data['config'];
     adapter.log.debug('Websocket message: ' + JSON.stringify(data));
-    new CollectWSmessages(msg);
+    if (collectActive === true){
+        CollectWSmessages(data);
+    }
+
 
     let object;
     switch (type) {
@@ -2573,9 +2522,98 @@ async function handleWSmessage(msg) {
 
 }
 
-function CollectWSmessages(message) {
+//START Send device information to developer
+async function sendDeviceInformation() {
+    const {ip, port, user} = await getGatewayParam();
+
+    if (ip !== 'none' && port !== 'none' && user !== 'none') {
+        const gw = await adapter.getObjectAsync('gateway_info');
+
+
+        const lights =  await axios.get(`http://${ip}:${port}/api/${user}/lights`);
+        const sensors =  await axios.get(`http://${ip}:${port}/api/${user}/sensors`);
+        const db = await axios.get('https://deconz.all-smart.net/devices');
+
+        for (let device in lights.data){
+            let exists = false;
+
+            for (let dev in db.data) {
+                if (lights.data[device].modelid === db.data[dev].ModelID && db.data[dev].deConzVersion === gw.native.swversion && lights.data[device].swversion === db.data[dev].swversion && lights.data[device].type === db.data[dev].Type){
+                    exists = true;
+                }
+            }
+
+            if (exists === true){
+                continue;
+            }
+            let message = { UniqueID: lights.data[device].uniqueid, ModelID: lights.data[device].modelid, Manufacturer: lights.data[device].manufacturername, swversion: lights.data[device].swversion, deConzVersion: gw.native.swversion, Type: lights.data[device].type, Raw: lights.data[device] };
+            try {
+                const res = await axios.post('https://deconz.all-smart.net/devices', message);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        for (let device in sensors.data){
+            let exists = false;
+            try {
+                const db = await axios.get('https://deconz.all-smart.net/devices');
+                for (let dev in db.data) {
+                    if (sensors.data[device].modelid === db.data[dev].ModelID && db.data[dev].deConzVersion === gw.native.swversion && sensors.data[device].swversion === db.data[dev].swversion && sensors.data[device].type === db.data[dev].Type){
+                        exists = true;
+                    }
+                }
+            } catch (error) {
+                console.log(error);
+            }
+            if (exists === true){
+                continue;
+            }
+            let message = { UniqueID: sensors.data[device].uniqueid, ModelID: sensors.data[device].modelid, Manufacturer: sensors.data[device].manufacturername, swversion: sensors.data[device].swversion, deConzVersion: gw.native.swversion, Type: sensors.data[device].type, Raw: sensors.data[device] };
+            try {
+                const res = await axios.post('https://deconz.all-smart.net/devices', message);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+    }
+}
+
+async function CollectWSmessages(message) {
+    let dataToSend = {};
+
+    if ((Date.now() - startTime) >= 5400000){
+        collectActive = false;
+    }
+
+    if(message.r !== 'groups') {
+        const {ip, port, user} = await getGatewayParam();
+
+        if (ip !== 'none' && port !== 'none' && user !== 'none') {
+            const gw = await adapter.getObjectAsync('gateway_info');
+            try {
+                let device = await axios.get(`http://${ip}:${port}/api/${user}/${message.r}/${message.id}`);
+
+                dataToSend.UniqueID = device.data.uniqueid;
+                dataToSend.ModelID = device.data.modelid;
+                dataToSend.Type = device.data.type;
+                dataToSend.Event = message.e;
+                dataToSend.Messages_type = message.t;
+                dataToSend.Resource = message.r;
+                dataToSend.Raw = message;
+                dataToSend.deConzVersion = gw.native.swversion;
+
+                const res = await axios.post('https://deconz.all-smart.net/messages', dataToSend);
+            } catch (error){
+                console.log(error);
+            }
+
+        }
+    }
 
 }
+//END Send device information to developer
 
 // @ts-ignore parent is a valid property on module
 if (module.parent) {
