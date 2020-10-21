@@ -174,9 +174,9 @@ class deconz extends utils.Adapter {
                         break;
                     case 'hue':
                         if (transitionTime === 'none' || transitionTime === 0) {
-                            parameters = '{"hue": ' + Math.round(parseInt(JSON.stringify(state.val)) * hue_factor) + '}';
+                            parameters = '{"hue": ' + Math.round(parseFloat(JSON.stringify(state.val)) * hue_factor) + '}';
                         } else {
-                            parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "hue": ' + Math.round(parseInt(JSON.stringify(state.val)) * hue_factor) + '}';
+                            parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "hue": ' + Math.round(parseFloat(JSON.stringify(state.val)) * hue_factor) + '}';
                         }
                         break;
                     case 'sat':
