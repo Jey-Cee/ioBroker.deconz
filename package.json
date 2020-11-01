@@ -29,7 +29,7 @@
         "@iobroker/adapter-core": "^2.4.0",
         "iobroker-adapter-helpers": "0.0.8",
         "request": "^2.83.0",
-        "axios": "^0.20.0",
+        "axios": "^0.21.0",
         "ws": "^7.3.1",
         "@sentry/node": "^5.22.3",
         "@sentry/integrations": "^5.22.3",
