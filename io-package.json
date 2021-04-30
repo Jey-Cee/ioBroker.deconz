@@ -255,6 +255,8 @@
             "type": "state",
             "common": {
                 "name": "Connection to deConz",
+                "type": "boolean",
+                "role": "indicator",
                 "def": false
             },
             "native": {}

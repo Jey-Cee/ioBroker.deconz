@@ -2132,7 +2132,7 @@ function SetObjectAndState(id, name, type, stateName, value) {
             objWrite = false;
             break;
         case 'xy':
-            objType = 'string';
+            objType = 'object';
             objRole = 'color.CIE';
             objDefault = '0.10000, 0.10000';
             break;
@@ -2278,7 +2278,7 @@ function SetObjectAndState(id, name, type, stateName, value) {
         case 'ct':
             objType = 'number';
             objRole = 'level.color.temperature';
-            objMin = 153;
+            objMin = 0;
             objMax = 500;
             objDefault = 500;
             break;
@@ -2304,6 +2304,7 @@ function SetObjectAndState(id, name, type, stateName, value) {
         case 'group':
             objType = 'number';
             objRole = 'state';
+            value = parseInt(value);
             break;
         case 'heatsetpoint':
             objType = 'number';
