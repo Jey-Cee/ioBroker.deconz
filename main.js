@@ -2135,6 +2135,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
             objType = 'object';
             objRole = 'color.CIE';
             objDefault = '0.10000, 0.10000';
+            value = JSON.stringify(value);
             break;
         case 'alarm':
             objType = 'boolean';
