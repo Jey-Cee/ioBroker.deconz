@@ -2109,7 +2109,7 @@ async function getObjectByDeviceId(id, type) {
  * @param value
  * @constructor
  */
-function SetObjectAndState(id, name, type, stateName, value) {
+async function SetObjectAndState(id, name, type, stateName, value) {
 
     let objType = 'mixed';
     let objRole = 'state';
@@ -2534,7 +2534,7 @@ function SetObjectAndState(id, name, type, stateName, value) {
     }
 
 
-    adapter.setObjectNotExists(`${type}.${id}` + '.' + stateName, {
+    await adapter.setObjectNotExistsAsync(`${type}.${id}` + '.' + stateName, {
         type: 'state',
         common: objCommon,
         native: {}
