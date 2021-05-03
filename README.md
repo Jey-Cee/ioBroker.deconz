@@ -42,6 +42,9 @@ Examples:
 
 ## Changelog
 
+### 1.3.13
+* fixes for js-controller 3.3
+
 ### 1.3.12
 * fixes for js-controller 3.3
 
