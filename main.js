@@ -2534,7 +2534,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     }
 
 
-    await adapter.setObjectNotExistsAsync(`${type}.${id}` + '.' + stateName, {
+    await adapter.extendObjectAsync(`${type}.${id}` + '.' + stateName, {
         type: 'state',
         common: objCommon,
         native: {}
