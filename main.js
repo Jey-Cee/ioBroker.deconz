@@ -218,7 +218,7 @@ class deconz extends utils.Adapter{
                         } else {
                             parameters = '{"bri": ' + JSON.stringify(state.val) + ', "on": false}';
                         }
-                        new SetObjectAndState(tmp[3], '', tmp[2], 'level', Math.floor((100 / 255) * state.val));
+                        await SetObjectAndState(tmp[3], '', tmp[2], 'level', Math.floor((100 / 255) * state.val));
                         break;
                     case 'level':
                         if (state.val > 0 && (transitionTime === 'none' || transitionTime === 0)) {
@@ -721,7 +721,7 @@ async function getAutoUpdates() {
                             object = await getObjectByDeviceId(id, 'Lights');
                             for (let stateName in state) {
                                 adapter.log.debug(stateName + ": "+ state[stateName]);
-                                new SetObjectAndState(id, object.value.common.name, 'Lights', stateName, state[stateName]);                           }
+                                await SetObjectAndState(id, object.value.common.name, 'Lights', stateName, state[stateName]);                           }
                         } else {
                             adapter.log.debug("Event has no state-Changes");
                             // no state objects
@@ -760,12 +760,12 @@ async function getAutoUpdates() {
                                     });
                                 }
 
-                                adapter.getState(`${adapter.name}.${adapter.instance}.Sensors.${id}.lastupdated`, (err, lupdate) => {
+                                adapter.getState(`${adapter.name}.${adapter.instance}.Sensors.${id}.lastupdated`, async (err, lupdate) => {
                                     if (lupdate === null) {
-                                        new SetObjectAndState(id, object.value.common.name, 'Sensors', obj, state[obj]);
+                                        await SetObjectAndState(id, object.value.common.name, 'Sensors', obj, state[obj]);
                                     } else if (lupdate.val !== state[obj]) {
                                         if (obj === 'buttonevent') {
-                                            new SetObjectAndState(id, object.value.common.name, 'Sensors', obj, state[obj]);
+                                            await SetObjectAndState(id, object.value.common.name, 'Sensors', obj, state[obj]);
                                             adapter.setObjectNotExists(`Sensors.${id}` + '.' + "buttonpressed", {
                                                 type: 'state',
                                                 common: {
@@ -788,7 +788,7 @@ async function getAutoUpdates() {
                                                 })
                                             }, 800);
                                         } else {
-                                            new SetObjectAndState(id, object.value.common.name, 'Sensors', obj, state[obj]);
+                                            await SetObjectAndState(id, object.value.common.name, 'Sensors', obj, state[obj]);
                                         }
                                     }
 
@@ -797,7 +797,7 @@ async function getAutoUpdates() {
                         }
                         if (typeof config == 'object') {
                             for (let obj in config) {
-                                new SetObjectAndState(id, object.value.common.name, 'Sensors', obj, config[obj]);
+                                await SetObjectAndState(id, object.value.common.name, 'Sensors', obj, config[obj]);
                             }
                         }
 
@@ -1021,17 +1021,17 @@ async function getGroupAttributes(groupId) {
                         //create states for light device
                         for (let z = 0; z <= count2; z++) {
                             let stateName = Object.keys(list['action'])[z];
-                            new SetObjectAndState(groupId, list['name'], 'Groups', stateName, list['action'][stateName]);
-                            new SetObjectAndState(groupId, list['name'], 'Groups', 'transitiontime', null);
+                            await SetObjectAndState(groupId, list['name'], 'Groups', stateName, list['action'][stateName]);
+                            await SetObjectAndState(groupId, list['name'], 'Groups', 'transitiontime', null);
                         }
                         let count3 = Object.keys(list['state']).length - 1;
                         //create states for light device
                         for (let z = 0; z <= count3; z++) {
                             let stateName = Object.keys(list['state'])[z];
-                            new SetObjectAndState(groupId, list['name'], 'Groups', stateName, list['state'][stateName]);
-                            new SetObjectAndState(groupId, list['name'], 'Groups', 'transitiontime', null);
+                            await SetObjectAndState(groupId, list['name'], 'Groups', stateName, list['state'][stateName]);
+                            await SetObjectAndState(groupId, list['name'], 'Groups', 'transitiontime', null);
                         }
-                        new SetObjectAndState(groupId, list['name'], 'Groups', 'level', null);
+                        await SetObjectAndState(groupId, list['name'], 'Groups', 'level', null);
                         adapter.setObjectNotExists(`Groups.${groupId}.dimspeed`, {
                             type: 'state',
                             common: {
@@ -1372,7 +1372,7 @@ async function getAllSensors() {
                             //create states for sensor device
                             for (let z = 0; z <= count2; z++) {
                                 let stateName = Object.keys(list[keyName]['state'])[z];
-                                new SetObjectAndState(sensorID, list[keyName]['name'], 'Sensors', stateName, list[keyName]['state'][stateName]);
+                                await SetObjectAndState(sensorID, list[keyName]['name'], 'Sensors', stateName, list[keyName]['state'][stateName]);
                             }
 
 
@@ -1380,7 +1380,7 @@ async function getAllSensors() {
                             //create config states for sensor device
                             for (let x = 0; x <= count3; x++) {
                                 let stateName = Object.keys(list[keyName]['config'])[x];
-                                new SetObjectAndState(sensorID, list[keyName]['name'], 'Sensors', stateName, list[keyName]['config'][stateName]);
+                                await SetObjectAndState(sensorID, list[keyName]['name'], 'Sensors', stateName, list[keyName]['config'][stateName]);
                             }
                         }
                     }
@@ -1439,12 +1439,12 @@ async function getSensor(sensorId) {
                             let TimeOffset = dateOff.getTimezoneOffset() * 60000;
 
                             if ((Now - LastUpdate + TimeOffset) < 2000) {
-                                new SetObjectAndState(sensorId, list['name'], 'Sensors', stateName, list['state'][stateName]);
+                                await SetObjectAndState(sensorId, list['name'], 'Sensors', stateName, list['state'][stateName]);
                             } else {
                                 adapter.log.info('buttonevent NOT updated for ' + list['name'] + ', too old: ' + ((Now - LastUpdate + TimeOffset) / 1000) + 'sec time difference update to now');
                             }
                         } else {
-                            new SetObjectAndState(sensorId, list['name'], 'Sensors', stateName, list['state'][stateName]);
+                            await SetObjectAndState(sensorId, list['name'], 'Sensors', stateName, list['state'][stateName]);
                         }
 
 
@@ -1452,7 +1452,7 @@ async function getSensor(sensorId) {
                         //create config for sensor device
                         for (let x = 0; x <= count3; x++) {
                             let stateName = Object.keys(list['config'])[x];
-                            new SetObjectAndState(sensorId, list['name'], 'Sensors', stateName, list['config'][stateName]);
+                            await SetObjectAndState(sensorId, list['name'], 'Sensors', stateName, list['config'][stateName]);
                         }
                     }
                 }
@@ -1592,9 +1592,9 @@ async function getAllLights() {
                             //create states for light device
                             for (let z = 0; z <= count2; z++) {
                                 let stateName = Object.keys(list[keyName]['state'])[z];
-                                new SetObjectAndState(lightID, list[keyName]['name'], 'Lights', stateName, list[keyName]['state'][stateName]);
-                                new SetObjectAndState(lightID, list[keyName]['name'], 'Lights', 'transitiontime', null);
-                                new SetObjectAndState(lightID, list[keyName]['name'], 'Lights', 'level', null);
+                                await SetObjectAndState(lightID, list[keyName]['name'], 'Lights', stateName, list[keyName]['state'][stateName]);
+                                await SetObjectAndState(lightID, list[keyName]['name'], 'Lights', 'transitiontime', null);
+                                await SetObjectAndState(lightID, list[keyName]['name'], 'Lights', 'level', null);
                                 adapter.setObjectNotExists(`Lights.${lightID}.dimspeed`, {
                                     type: 'state',
                                     common: {
@@ -1685,7 +1685,7 @@ async function getLightState(lightId) {
                     //create states for light device
                     for (let z = 0; z <= count2; z++) {
                         let stateName = Object.keys(list['state'])[z];
-                        new SetObjectAndState(lightId, list[keyName]['name'], 'Lights', stateName, list['state'][stateName]);
+                        await SetObjectAndState(lightId, list[keyName]['name'], 'Lights', stateName, list['state'][stateName]);
                     }
                 }
             }
@@ -2107,7 +2107,6 @@ async function getObjectByDeviceId(id, type) {
  * @param {string} type - Sensors, Lights, Groups
  * @param {string} stateName
  * @param value
- * @constructor
  */
 async function SetObjectAndState(id, name, type, stateName, value) {
 
@@ -2152,9 +2151,9 @@ async function SetObjectAndState(id, name, type, stateName, value) {
             objRole = 'indicator';
             objWrite = false;
             if(value === true){
-                new SetObjectAndState(id, name, type, 'on', true);
+                await SetObjectAndState(id, name, type, 'on', true);
             }else if(value === false){
-                new SetObjectAndState(id, name, type, 'on', false);
+                await SetObjectAndState(id, name, type, 'on', false);
             }
             break;
         case 'boost':
@@ -2250,7 +2249,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
             objMin = 0;
             objMax = 254;
             objDefault = 254;
-            let bri = new SetObjectAndState(id, name, type, 'level',  Math.floor((100 / 254) * value));
+            let bri = await SetObjectAndState(id, name, type, 'level',  Math.floor((100 / 254) * value));
             break;
         case 'buttonevent':
             objType = 'number';
@@ -2477,7 +2476,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
             objType = 'string';
             objRole = 'state';
             objStates = {none: 'none', colorloop: 'colorloop'};
-            let cs = new SetObjectAndState(id, name, type, 'colorspeed', null);
+            let cs = await SetObjectAndState(id, name, type, 'colorspeed', null);
             break;
         case 'lastupdated':
             objType = 'string';
@@ -2546,7 +2545,6 @@ async function SetObjectAndState(id, name, type, stateName, value) {
             ack: true
         });
     }
-
 }
 
 
