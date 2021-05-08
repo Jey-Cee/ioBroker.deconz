@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "deconz",
-        "version": "1.3.14",
+        "version": "1.3.15",
         "news": {
+            "1.3.15": {
+                "en": "fix info message: \"State value to set for \"deconz.0.Sensors.3.pending\" has to be stringified but received type \"object\"\"\nfix info message: State value to set for \"deconz.0.Sensors.3.orientation\" has to be stringified but received type \"object\"",
+                "de": "Info-Meldung korrigieren: \"Der für\" deconz.0.Sensors.3.pending \"festzulegende Statuswert muss stringifiziert werden, muss jedoch vom Typ\" object \"empfangen werden.\"\nInfo-Nachricht korrigieren: Der für \"deconz.0.Sensors.3.orientation\" zu setzende Statuswert muss stringifiziert werden, aber vom Typ \"object\" erhalten",
+                "ru": "исправить информационное сообщение: \"Значение состояния, которое нужно установить для\" deconz.0.Sensors.3.pending \", должно быть преобразовано в строку, но получен тип\" объект \"\"\nисправление информационного сообщения: значение состояния, устанавливаемое для \"deconz.0.Sensors.3.orientation\", должно быть преобразовано в строку, но получен тип \"объект\"",
+                "pt": "mensagem de informação de correção: \"Valor de estado a ser definido para\" deconz.0.Sensors.3.pending \"deve ser transformado em string, mas recebeu o tipo\" objeto \"\"\nmensagem de informação de correção: o valor do estado a ser definido para \"deconz.0.Sensors.3.orientation\" deve ser transformado em string, mas recebeu o tipo \"objeto\"",
+                "nl": "fix info message: \"State value to set for\" deconz.0.Sensors.3.pending \"moet stringified maar ontvangen type\" object \"\"\nfix info message: State value to set for \"deconz.0.Sensors.3.orientation\" moet stringified maar ontvangen type \"object\"",
+                "fr": "Correction du message d'information: \"La valeur de l'état à définir pour\" deconz.0.Sensors.3.pending \"doit être stringifiée mais le type reçu\" object \"\"\ncorrection du message d'information: la valeur d'état à définir pour \"deconz.0.Sensors.3.orientation\" doit être stringifiée mais le type reçu \"object\"",
+                "it": "messaggio informativo risolto: \"Il valore dello stato da impostare per\" deconz.0.Sensors.3.pending \"deve essere stringificato ma ricevuto il tipo\" oggetto \"\"\nmessaggio informativo risolto: il valore di stato da impostare per \"deconz.0.Sensors.3.orientation\" deve essere stringificato ma ricevuto il tipo \"oggetto\"",
+                "es": "Corregir mensaje de información: \"El valor de estado para establecer para\" deconz.0.Sensors.3.pending \"tiene que estar en cadena pero se recibió el tipo\" objeto \"\"\nmensaje de información de corrección: el valor de estado para establecer para \"deconz.0.Sensors.3.orientation\" tiene que estar en cadena pero se recibió el tipo \"objeto\"",
+                "pl": "komunikat informacyjny o naprawie: \"Wartość stanu do ustawienia dla\" deconz.0.Sensors.3.pending \"musi zostać zdefiniowana, ale otrzymano typ\" object \"\"\nkomunikat informacyjny naprawy: Wartość stanu do ustawienia dla „deconz.0.Sensors.3.orientation” musi zostać określona, ale otrzymano typ „object”",
+                "zh-cn": "修复信息消息：“必须为“ deconz.0.Sensors.3.pending”设置的状态值必须被字符串化，但是接收到的类型为“ object”\n修复信息消息：必须将为“ deconz.0.Sensors.3.orientation”设置的状态值进行字符串化，但接收到的类型为“对象”"
+            },
             "1.3.14": {
                 "en": "fixes for js-controller 3.3"
             },

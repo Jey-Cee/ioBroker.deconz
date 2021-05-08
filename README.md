@@ -42,7 +42,7 @@ Examples:
 
 ## Changelog
 
-### **WORK IN PROGRESS**
+### 1.3.15 (2021-05-08)
 * fix info message: "State value to set for "deconz.0.Sensors.3.pending" has to be stringified but received type "object""
 * fix info message: State value to set for "deconz.0.Sensors.3.orientation" has to be stringified but received type "object"
 
