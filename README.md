@@ -42,6 +42,10 @@ Examples:
 
 ## Changelog
 
+### **WORK IN PROGRESS**
+* fix info message: "State value to set for "deconz.0.Sensors.3.pending" has to be stringified but received type "object""
+* fix info message: State value to set for "deconz.0.Sensors.3.orientation" has to be stringified but received type "object"
+
 ### 1.3.13
 * fixes for js-controller 3.3
 
@@ -262,7 +266,7 @@ Examples:
 ## License
 Apache-2.0
 
-Copyright (c) 2017-2020 Jey Cee jey-cee@live.com
+Copyright (c) 2017-2021 Jey Cee jey-cee@live.com
 
 
 

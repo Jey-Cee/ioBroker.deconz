@@ -2125,10 +2125,12 @@ async function SetObjectAndState(id, name, type, stateName, value) {
         case 'orientation':
             objType = 'array';
             objWrite = false;
+            value = JSON.stringify(value);
             break;
         case 'pending':
             objType = 'array';
             objWrite = false;
+            value = JSON.stringify(value);
             break;
         case 'xy':
             objType = 'object';
