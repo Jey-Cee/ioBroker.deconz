@@ -1,0 +1,4 @@
+chore: release v1.3.16
+
+fix info message: "State value to set for "deconz.0.Sensors.3.pending" has to be stringified but received type "object""
+fix info message: State value to set for "deconz.0.Sensors.3.orientation" has to be stringified but received type "object"
