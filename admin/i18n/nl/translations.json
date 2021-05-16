@@ -1,14 +1,14 @@
 {
-    "'Please wait, searching for deConz...'": "Please wait, searching for deConz...",
+    "'Please wait, searching for deConz...'": "Even geduld, ik zoek de deConz...",
     "API key": "API key",
     "Auto setup": "Auto setup",
     "Bridge port": "Bridge port",
-    "Create API key": "Create API key",
+    "Create API key": "Maak API key",
     "Create Group": "Maak een groep",
-    "Delete API key": "Delete API key",
+    "Delete API key": "Verwijder API key",
     "Devices (ID of Device)": "Apparaten (ID van apparaat)",
     "Duration": "Looptijd",
-    "Enable adapter first": "Enable adapter first",
+    "Enable adapter first": "Activeer de adapter eerst",
     "Instruction": "Ga naar Phoscon APP -> Instellingen -> Geavanceerd en klik op \"Gateway ontgrendelen\". Tijdlimiet 30 seconden. Laat dit bericht open.",
     "Lights (ID of Light)": "Lichten (ID van licht)",
     "Main settings": "Belangrijkste instellingen",
@@ -27,7 +27,7 @@
     "deConz Address": "deConz Address",
     "deConz REST API Version": "deConz REST API-versie",
     "deConz Version": "deConz-versie",
-    "deConz adapter settings": "deConz adapter settings",
-    "error creating API key: ": "error creating API key: ",
+    "deConz adapter settings": "deConz adapter instellingen",
+    "error creating API key: ": "fout bij aanmaken API key: ",
     "link button not pressed": "Please first click on \"Unlock Gateway\" in the web app"
 }
