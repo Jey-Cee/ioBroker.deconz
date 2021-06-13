@@ -210,6 +210,8 @@
         "license": "Apache-2.0",
         "platform": "Javascript/Node.js",
         "mode": "daemon",
+        "connectionType": "local",
+        "dataSource": "push",
         "compact": true,
         "messagebox": true,
         "enabled": true,
