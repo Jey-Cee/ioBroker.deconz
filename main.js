@@ -356,6 +356,8 @@ class deconz extends utils.Adapter{
                     case 'boost':
                     case 'off':
                     case 'mode':
+                    case 'volume':
+                    case 'melody':
                         parameters = `{ "${dp}": "${state.val}" }`;
                         break;
                     case 'heatsetpoint':
@@ -2359,6 +2361,11 @@ async function SetObjectAndState(id, name, type, stateName, value) {
             objWrite = false;
             objUnit = 'Lux';
             break;
+        case 'melody':
+            objType = 'number';
+            objRole = 'state';
+            objDefault = 1;
+            break;
         case 'offset':
             objType = 'number';
             objRole = 'state';
@@ -2467,6 +2474,11 @@ async function SetObjectAndState(id, name, type, stateName, value) {
             objDefault = 0;
             objUnit = 'V';
             break;
+        case 'volume':
+            objType = 'number';
+            objRole = 'level.value';
+            objDefault = 1;
+            break;
         case 'alert':
             objType = 'string';
             objRole = 'state';
@@ -2487,10 +2499,13 @@ async function SetObjectAndState(id, name, type, stateName, value) {
         case 'effectspeed':
             objType = 'number';
             objRole = 'state';
+            objDefault = 1;
             break;
         case 'effectcolours':
             objType = 'array';
             objType = 'state';
+            objDefault = '[[255,0,0],[0,255,0],[0,0,255]]';
+            value = JSON.stringify(value);
             break;
         case 'lastupdated':
             objType = 'string';
