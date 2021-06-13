@@ -279,11 +279,15 @@ class deconz extends utils.Adapter{
                         break;
                     case 'effect':
                         if (state.val === 'colorloop') {
-                            let speed = await this.getStateAsync(this.name + '.' + this.instance + '.' + id + '.colorspeed');
+                            const speed = await this.getStateAsync(this.name + '.' + this.instance + '.' + id + '.colorspeed');
                             if (speed.val === null || speed.val === undefined) {
                                 speed.val = 1;
                             }
                             parameters = '{"colorloopspeed": ' + speed.val + ', "effect": ' + JSON.stringify(state.val) + '}';
+                        } else if(state.val === 'steady' || state.val === 'snow' || state.val === 'rainbow' || state.val === 'snake' || state.val === 'twinkle' || state.val === 'fireworks' || state.val === 'flag' || state.val === 'waves' || state.val === 'updown' || state.val === 'vintage' || state.val === 'fading' || state.val === 'collide' || state.val === 'strobe' || state.val === 'sparkles' || state.val === 'carnival' || state.val === 'glow'){
+                            const effectspeed = await this.getStateAsync(this.name + '.' + this.instance + '.' + id + '.effectspeed');
+                            const effectcolours = await this.getStateAsync(this.name + '.' + this.instance + '.' + id + '.effectcolours');
+                            parameters = `{"effect": ${JSON.stringify(state.val)}, "effectSpeed":  ${JSON.stringify(effectspeed.val)}, "effectColours": ${JSON.stringify(effectcolours.val)}}`
                         } else {
                             parameters = '{"effect": ' + JSON.stringify(state.val) + '}';
                         }
@@ -2477,8 +2481,16 @@ async function SetObjectAndState(id, name, type, stateName, value) {
         case 'effect':
             objType = 'string';
             objRole = 'state';
-            objStates = {none: 'none', colorloop: 'colorloop'};
+            objStates = {none: 'none', colorloop: 'colorloop', steady: 'steady', snow: 'snow', rainbow: 'rainbow', snake: 'snake', twinkle: 'twinkle', fireworks: 'fireworks', flag: 'flag', waves: 'waves', updown: 'updown', vintage: 'vintage', fading: 'fading', collide: 'collide', strobe: 'strobe', sparkles: 'sparkles', carnival: 'carnival', glow: 'glow', sunset: 'sunset', party: 'party', worklight: 'worklight', campfire: 'campfire', romance: 'romance', nightlight: 'nightlight'};
             let cs = await SetObjectAndState(id, name, type, 'colorspeed', null);
+            break;
+        case 'effectspeed':
+            objType = 'number';
+            objRole = 'state';
+            break;
+        case 'effectcolours':
+            objType = 'array';
+            objType = 'state';
             break;
         case 'lastupdated':
             objType = 'string';
