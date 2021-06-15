@@ -43,6 +43,9 @@ Examples:
 
 ## Changelog
 
+### 1.3.17
+* fix crash [#248](https://github.com/iobroker-community-adapters/ioBroker.deconz/issues/248)
+
 ### 1.3.16 
 * added datapoints melody and volume (Used by NEO-Alarm-Sirene by Tuya)
 * added new effects for Müller Licht Tint: sunset, party, worklight, campfire, romance, nightlight
