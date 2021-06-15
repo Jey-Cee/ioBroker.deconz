@@ -5,7 +5,7 @@
         "news": {
             "1.3.17": {
                 "en": "fix crash [#248](https://github.com/iobroker-community-adapters/ioBroker.deconz/issues/248)"
-            }
+            },
             "1.3.16": {
                 "en": "added datapoints melody and volume (Used by NEO-Alarm-Sirene by Tuya)\nadded new effects for Müller Licht Tint: sunset, party, worklight, campfire, romance, nightlight\nadded new effects for Lidl Melinera: steady, snow, rainbow, snake, twinkle, fireworks, flag, waves, updown, vintage, fading, collide, strobe, sparkles, carnival, glow\nadded 2 new datapoints they were used by Lidl Melinera effects: effectspeed: simple number; effectcolours: array of rgb values = [[255,0,0],[0,255,0],[0,0,255]]",
                 "de": "Datenpunkte melody und volume hinzugefügt (verwendet von NEO-Alarm-Sirene von Tuya)\nneue Effekte für Müller Licht Tint hinzugefügt: Sonnenuntergang, Party, Arbeitslicht, Lagerfeuer, Romantik, Nachtlicht\nneue Effekte für Lidl Melinera hinzugefügt: Steady, Snow, Rainbow, Snake, Twinkle, Fireworks, Flag, Waves, Updown, Vintage, Fading, Collide, Strobe, Sparkles, Carnival, Glow\n2 neue Datenpunkte hinzugefügt, die von Lidl verwendet wurden Melinera-Effekte: effectspeed: einfache Zahl; Effektfarben: Array von RGB-Werten = [[255,0,0],[0,255,0],[0,0,255]]",
