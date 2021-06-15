@@ -287,7 +287,7 @@ class deconz extends utils.Adapter{
                         } else if(state.val === 'steady' || state.val === 'snow' || state.val === 'rainbow' || state.val === 'snake' || state.val === 'twinkle' || state.val === 'fireworks' || state.val === 'flag' || state.val === 'waves' || state.val === 'updown' || state.val === 'vintage' || state.val === 'fading' || state.val === 'collide' || state.val === 'strobe' || state.val === 'sparkles' || state.val === 'carnival' || state.val === 'glow'){
                             const effectspeed = await this.getStateAsync(this.name + '.' + this.instance + '.' + id + '.effectspeed');
                             const effectcolours = await this.getStateAsync(this.name + '.' + this.instance + '.' + id + '.effectcolours');
-                            parameters = `{"effect": ${JSON.stringify(state.val)}, "effectSpeed":  ${JSON.stringify(effectspeed.val)}, "effectColours": ${JSON.stringify(effectcolours.val)}}`
+                            parameters = `{"effect": ${JSON.stringify(state.val)}, "effectSpeed":  ${JSON.stringify(effectspeed ? effectspeed.val : 1)}, "effectColours": ${JSON.stringify(effectcolours ? effectcolours.val : [[255,0,0],[0,255,0],[0,0,255]])}}`
                         } else {
                             parameters = '{"effect": ' + JSON.stringify(state.val) + '}';
                         }
