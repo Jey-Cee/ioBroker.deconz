@@ -363,7 +363,7 @@ class deconz extends utils.Adapter{
                     case 'heatsetpoint':
                     case 'temperature':
                         let val = Math.floor(state.val * 100);
-                        parameters = `{ "${dp}": "${val}" }`;
+                        parameters = `{ "${dp}": ${val} }`;
                         break;
                     case 'network_open':
                         let opentime;
