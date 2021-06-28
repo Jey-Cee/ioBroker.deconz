@@ -195,7 +195,7 @@ class deconz extends utils.Adapter{
 
         let stateObj = await this.getObjectAsync(oid);
 
-        if((stateObj !== null && stateObj !== undefined) && typeof state.val === stateObj.common.type) {
+        if((stateObj !== null && stateObj !== undefined)) {
             /**
              * @param {any} err
              * @param {object|null} tTime - object for state transitiontime
