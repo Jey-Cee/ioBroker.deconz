@@ -259,7 +259,7 @@ class deconz extends utils.Adapter{
                         break;
                     case 'xy':
                         if (transitionTime === 'none' || transitionTime === 0) {
-                            parameters = '{"xy": [' + state.val + ']}';
+                            parameters = '{"xy":' + state.val + '}';
                         } else {
                             parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "xy": [' + state.val + ']}';
                         }
