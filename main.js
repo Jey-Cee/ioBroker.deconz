@@ -2287,8 +2287,8 @@ async function SetObjectAndState(id, name, type, stateName, value) {
             objType = 'number';
             objRole = 'level.color.temperature';
             objMin = 0;
-            objMax = 500;
-            objDefault = 500;
+            objMax = 8000;
+            objDefault = 8000;
             break;
         case 'current':
             objType = 'number';
