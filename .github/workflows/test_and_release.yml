@@ -79,7 +79,7 @@ jobs:
           node-version: ${{ needs.get-minimum-node-version.outputs.MIN_NODE }}
 
       - name: Install Dependencies
-        run: npm ci
+        run: npm i
 
 
   # Runs adapter tests on all supported node versions and OSes
