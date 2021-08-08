@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "deconz",
-        "version": "1.3.18",
+        "version": "1.3.19",
         "news": {
+            "1.3.19": {
+                "en": "fix for js-controller 3.3.x",
+                "de": "Fix für js-Controller 3.3.x",
+                "ru": "исправление для js-controller 3.3.x",
+                "pt": "correção para js-controller 3.3.x",
+                "nl": "fix voor js-controller 3.3.x",
+                "fr": "correctif pour js-controller 3.3.x",
+                "it": "correzione per js-controller 3.3.x",
+                "es": "arreglo para js-controller 3.3.x",
+                "pl": "poprawka dla kontrolera js 3.3.x",
+                "zh-cn": "修复 js 控制器 3.3.x"
+            },
             "1.3.18": {
                 "en": "fix crash [#248](https://github.com/iobroker-community-adapters/ioBroker.deconz/issues/248)"
             },

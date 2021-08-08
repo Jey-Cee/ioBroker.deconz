@@ -43,7 +43,7 @@ Examples:
 
 ## Changelog
 
-### **WORK IN PROGRESS**
+### 1.3.19 (2021-08-08)
 * fix for js-controller 3.3.x
 
 ### 1.3.17
