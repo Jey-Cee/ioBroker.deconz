@@ -132,10 +132,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Use Node.js ${{ MIN_NODE }}
+      - name: Use Node.js ${{ env.MIN_NODE }}
         uses: actions/setup-node@v1
         with:
-          node-version: ${{ MIN_NODE }}
+          node-version: ${{ env.MIN_NODE }}
 
       - name: Extract the version and commit body from the tag
         id: extract_release
