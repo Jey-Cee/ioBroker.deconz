@@ -91,7 +91,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        node_version: ${{ fromJSON(needs.get-node-lts.outputs.matrix) }}
+        node-version: ${{ fromJSON(needs.get-node-lts.outputs.matrix) }}
         os: [ubuntu-latest, windows-latest]
 
     steps:
