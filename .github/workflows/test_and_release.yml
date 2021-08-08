@@ -1,46 +1,87 @@
+# This is a composition of lint and test scripts
+# Make sure to update this file along with the others
+
 name: Test and Release
+
+env:
+  # Specify the minimum Node version for the tests
+  MIN_NODE: 10
 
 # Run this job on all pushes and pull requests
 # as well as tags with a semantic version
 on:
   push:
     branches:
-      - "*"
+      - '*'
     tags:
       # normal versions
-      - "v[0-9]+.[0-9]+.[0-9]+"
+      - "v?[0-9]+.[0-9]+.[0-9]+"
       # pre-releases
-      - "v[0-9]+.[0-9]+.[0-9]+-**"
+      - "v?[0-9]+.[0-9]+.[0-9]+-**"
   pull_request: {}
 
 jobs:
+  get-node-lts:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Node LTS versions
+        uses: Jey-Cee/node-lts-versions@1.1.8
+        id: node-lts-versions
+
+      - id: set-matrix
+        run: echo "::set-output name=matrix::${{ steps.node-lts-versions.outputs.lts }}"
+
+  # Get the minimum Node version from iobroker.js-controller
+  get-minimum-node-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - name: Download package.json from js-controller
+        uses: carlosperate/download-file-action@v1.0.3
+        id: download-package
+        with:
+          file-url: 'https://raw.githubusercontent.com/ioBroker/ioBroker.js-controller/master/package.json'
+          file-name: 'package.json'
+          location: './js-controller'
+
+      - name: Read node and npm versions from package.json
+        uses: skjnldsv/read-package-engines-version-actions@v1
+        with:
+          path: "./js-controller"
+        id: package-engines-versions
+
+      - name: Show version number
+        run: |
+          NODE_VERSION="${{ steps.package-engines-versions.outputs.nodeVersion }}"
+          NODE_VERSION_CLEANED="${NODE_VERSION//>=/}"
+          NODE_VERSION_CLEANED="${NODE_VERSION_CLEANED//.[[:digit:]].[[:digit:]]/}"
+          echo "MIN_NODE=$NODE_VERSION_CLEANED" >> $GITHUB_ENV
+
   # Performs quick checks before the expensive test runs
   check-and-lint:
     if: contains(github.event.head_commit.message, '[skip ci]') == false
 
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [14.x]
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
+      - uses: actions/checkout@v1
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: ${{ MIN_NODE }}
+
 
       - name: Install Dependencies
         run: npm ci
 
-
-      - name: Lint source code
-        run: npm run lint
-      - name: Test package files
-        run: npm run test:package
 
   # Runs adapter tests on all supported node versions and OSes
   adapter-tests:
@@ -51,62 +92,57 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        node-version: [10.x, 12.x, 14.x, 16.x]
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        node_version: ${{ fromJSON(needs.get-node-lts.outputs.matrix) }}
+        os: [ubuntu-latest, windows-latest]
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
+      - uses: actions/checkout@v1
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
-           node-version: ${{ matrix.node-version }}
+          node-version: ${{ matrix.node-version }}
 
       - name: Install Dependencies
         run: npm ci
 
-      - name: Run unit tests
-        run: npm run test:unit
-
-      - name: Run integration tests (unix only)
-        if: startsWith(runner.OS, 'windows') == false
-        run: DEBUG=testing:* npm run test:integration
-
-      - name: Run integration tests (windows only)
-        if: startsWith(runner.OS, 'windows')
-        run: set DEBUG=testing:* & npm run test:integration
+      - name: Run local tests
+        run: npm test
+  #      - name: Run unit tests
+  #        run: npm run test:unit
+  #      - name: Run integration tests # (linux/osx)
+  #        if: startsWith(runner.OS, 'windows') == false
+  #        run: DEBUG=testing:* npm run test:integration
+  #      - name: Run integration tests # (windows)
+  #        if: startsWith(runner.OS, 'windows')
+  #        run: set DEBUG=testing:* & npm run test:integration
 
   # Deploys the final package to NPM
   deploy:
     needs: [adapter-tests]
 
-    # Trigger this step only when a commit on any branch is tagged with a version number
+    # Trigger this step only when a commit on master is tagged with a version number
     if: |
       contains(github.event.head_commit.message, '[skip ci]') == false &&
       github.event_name == 'push' &&
-      startsWith(github.ref, 'refs/tags/v')
-
+      startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [14.x]
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js ${{ MIN_NODE }}
         uses: actions/setup-node@v1
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: ${{ MIN_NODE }}
 
       - name: Extract the version and commit body from the tag
         id: extract_release
         # The body may be multiline, therefore we need to escape some characters
         run: |
           VERSION="${{ github.ref }}"
-          VERSION=${VERSION##*/v}
+          VERSION=${VERSION##*/}
+          VERSION=${VERSION##*v}
           echo "::set-output name=VERSION::$VERSION"
           BODY=$(git show -s --format=%b)
           BODY="${BODY//'%'/'%25'}"
@@ -117,9 +153,8 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Create a clean build
-        run: npm run build
-
+      #      - name: Create a clean build
+      #        run: npm run build
       - name: Publish package to npm
         run: |
           npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
@@ -137,3 +172,20 @@ jobs:
           # Prerelease versions create prereleases on Github
           prerelease: ${{ contains(steps.extract_release.outputs.VERSION, '-') }}
           body: ${{ steps.extract_release.outputs.BODY }}
+
+      - name: Notify Sentry.io about the release
+        run: |
+          npm i -g @sentry/cli
+          export SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
+          export SENTRY_URL=https://sentry.iobroker.net
+          export SENTRY_ORG=iobroker
+          export SENTRY_PROJECT=iobroker-ping
+          export SENTRY_VERSION=iobroker.ping@${{ env.VERSION }}
+          sentry-cli releases new $SENTRY_VERSION
+          sentry-cli releases finalize $SENTRY_VERSION
+
+        # Add the following line BEFORE finalize if repositories are connected in Sentry
+        # sentry-cli releases set-commits $SENTRY_VERSION --auto
+
+        # Add the following line BEFORE finalize if sourcemap uploads are needed
+        # sentry-cli releases files $SENTRY_VERSION upload-sourcemaps build/
