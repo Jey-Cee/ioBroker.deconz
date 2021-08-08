@@ -67,6 +67,7 @@ jobs:
 
   # Performs quick checks before the expensive test runs
   check-and-lint:
+    needs: [get-minimum-node-version]
     if: contains(github.event.head_commit.message, '[skip ci]') == false
 
     runs-on: ubuntu-latest
@@ -87,7 +88,7 @@ jobs:
   adapter-tests:
     if: contains(github.event.head_commit.message, '[skip ci]') == false
 
-    needs: [check-and-lint]
+    needs: [check-and-lint, get-node-lts]
 
     runs-on: ${{ matrix.os }}
     strategy:
