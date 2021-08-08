@@ -3,10 +3,6 @@
 
 name: Test and Release
 
-env:
-  # Specify the minimum Node version for the tests
-  MIN_NODE: 10
-
 # Run this job on all pushes and pull requests
 # as well as tags with a semantic version
 on:
@@ -39,6 +35,8 @@ jobs:
   # Get the minimum Node version from iobroker.js-controller
   get-minimum-node-version:
     runs-on: ubuntu-latest
+    outputs:
+      MIN_NODE: ${{ steps.get_version.outputs.MIN_NODE }}
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -58,12 +56,13 @@ jobs:
           path: "./js-controller"
         id: package-engines-versions
 
-      - name: Show version number
+      - name: Get version
+        id: get_version
         run: |
           NODE_VERSION="${{ steps.package-engines-versions.outputs.nodeVersion }}"
           NODE_VERSION_CLEANED="${NODE_VERSION//>=/}"
           NODE_VERSION_CLEANED="${NODE_VERSION_CLEANED//.[[:digit:]].[[:digit:]]/}"
-          echo "MIN_NODE=$NODE_VERSION_CLEANED" >> $GITHUB_ENV
+          echo "::set-output name=MIN_NODE::$NODE_VERSION_CLEANED"
 
   # Performs quick checks before the expensive test runs
   check-and-lint:
@@ -77,8 +76,7 @@ jobs:
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
-          node-version: ${{ env.MIN_NODE }}
-
+          node-version: ${{ needs.get-minimum-node-version.outputs.MIN_NODE }}
 
       - name: Install Dependencies
         run: npm ci
@@ -132,10 +130,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Use Node.js ${{ MIN_NODE }}
+      - name: Use Node.js ${{ needs.get-minimum-node-version.outputs.MIN_NODE }}
         uses: actions/setup-node@v1
         with:
-          node-version: ${{ MIN_NODE }}
+          node-version: ${{ needs.get-minimum-node-version.outputs.MIN_NODE }}
 
       - name: Extract the version and commit body from the tag
         id: extract_release
