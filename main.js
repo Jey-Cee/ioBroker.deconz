@@ -285,9 +285,14 @@ class deconz extends utils.Adapter{
                             }
                             parameters = '{"colorloopspeed": ' + speed.val + ', "effect": ' + JSON.stringify(state.val) + '}';
                         } else if(state.val === 'steady' || state.val === 'snow' || state.val === 'rainbow' || state.val === 'snake' || state.val === 'twinkle' || state.val === 'fireworks' || state.val === 'flag' || state.val === 'waves' || state.val === 'updown' || state.val === 'vintage' || state.val === 'fading' || state.val === 'collide' || state.val === 'strobe' || state.val === 'sparkles' || state.val === 'carnival' || state.val === 'glow'){
-                            const effectspeed = await this.getStateAsync(this.name + '.' + this.instance + '.' + id + '.effectspeed');
+                            let effectspeed = await this.getStateAsync(this.name + '.' + this.instance + '.' + id + '.effectspeed');
                             const effectcolours = await this.getStateAsync(this.name + '.' + this.instance + '.' + id + '.effectcolours');
-                            parameters = `{"effect": ${JSON.stringify(state.val)}, "effectSpeed":  ${JSON.stringify(effectspeed ? effectspeed.val : 1)}, "effectColours": ${JSON.stringify(effectcolours ? effectcolours.val : [[255,0,0],[0,255,0],[0,0,255]])}}`
+                            if(effectspeed !== null){
+                                effectspeed = effectspeed.val;
+                            } else {
+                                effectspeed = 1;
+                            }
+                            parameters = `{"effect": ${JSON.stringify(state.val)}, "effectSpeed":  ${JSON.stringify(effectspeed )}, "effectColours": ${JSON.stringify(effectcolours ? effectcolours.val : [[255,0,0],[0,255,0],[0,0,255]])}}`
                         } else {
                             parameters = '{"effect": ' + JSON.stringify(state.val) + '}';
                         }
@@ -2255,8 +2260,8 @@ async function SetObjectAndState(id, name, type, stateName, value) {
             objType = 'number';
             objRole = 'level.brightness';
             objMin = 0;
-            objMax = 254;
-            objDefault = 254;
+            objMax = 255;
+            objDefault = 255;
             let bri = await SetObjectAndState(id, name, type, 'level',  Math.floor((100 / 254) * value));
             break;
         case 'buttonevent':
