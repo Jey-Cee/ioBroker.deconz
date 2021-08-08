@@ -187,4 +187,4 @@ jobs:
         # sentry-cli releases set-commits $SENTRY_VERSION --auto
 
         # Add the following line BEFORE finalize if sourcemap uploads are needed
-        # sentry-cli releases files $SENTRY_VERSION upload-sourcemaps build/
+        # sentry-cli releases files $SENTRY_VERSION upload-sourcemaps build
