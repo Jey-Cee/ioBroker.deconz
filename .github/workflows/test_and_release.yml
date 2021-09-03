@@ -79,7 +79,7 @@ jobs:
           node-version: ${{ needs.get-minimum-node-version.outputs.MIN_NODE }}
 
       - name: Install Dependencies
-        run: npm i
+        run: npm ci
 
 
   # Runs adapter tests on all supported node versions and OSes
@@ -102,7 +102,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Install Dependencies
-        run: npm i
+        run: npm ci
 
       - name: Run local tests
         run: npm test
@@ -150,7 +150,7 @@ jobs:
           echo "::set-output name=BODY::$BODY"
 
       - name: Install Dependencies
-        run: npm i
+        run: npm ci
 
       #      - name: Create a clean build
       #        run: npm run build
