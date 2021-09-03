@@ -227,7 +227,7 @@
         "mode": "daemon",
         "connectionType": "local",
         "dataSource": "push",
-        "localLink": "https://%bridge%:%port%",
+        "localLink": "http://%bridge%:%port%",
         "compact": true,
         "messagebox": true,
         "enabled": true,
