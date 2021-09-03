@@ -1115,7 +1115,7 @@ function getGroupScenes(group, sceneList) {
 
             sceneList.forEach((scene) => {
                 if (scene.lightcount > 0) {
-                    adapter.setObject(`${group}.Scene_${scene.id}`, {
+                    adapter.setObjectNotExists(`${group}.Scene_${scene.id}`, {
                         type: 'channel',
                         common: {
                             name: scene.name,
@@ -1675,7 +1675,7 @@ async function getLightState(lightId) {
                     let list = JSON.parse(body);
                     let keyName = Object.keys(list)[0];
                     //create object for light device
-                    adapter.setObject(`Lights.${lightId}`, {
+                    adapter.extendObject(`Lights.${lightId}`, {
                         type: 'device',
                         common: {
                             name: list['name'],
@@ -2568,7 +2568,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     }
 
 
-    await adapter.extendObjectAsync(`${type}.${id}` + '.' + stateName, {
+    await adapter.setObjectNotExistsAsync(`${type}.${id}` + '.' + stateName, {
         type: 'state',
         common: objCommon,
         native: {}
