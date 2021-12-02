@@ -363,7 +363,7 @@ class deconz extends utils.Adapter{
                     case 'mode':
                     case 'volume':
                     case 'melody':
-                        parameters = `{ "${dp}": "${state.val}" }`;
+                        parameters = `{ "${dp}": ${state.val} }`;
                         break;
                     case 'heatsetpoint':
                     case 'temperature':
