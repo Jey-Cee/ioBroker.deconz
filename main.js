@@ -2374,8 +2374,8 @@ async function SetObjectAndState(id, name, type, stateName, value) {
         case 'offset':
             objType = 'number';
             objRole = 'state';
-            objMin = -500;
-            objMax = 500;
+            objMin = -999;
+            objMax = 999;
             objDefault = 0;
             break;
         case 'power':
