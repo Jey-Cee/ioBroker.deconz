@@ -1726,9 +1726,31 @@ async function setLightState(parameters, lightId, stateId, callback) {
                 }
 
                 if (await logging(res, body, 'set light state ' + lightId) && response !== undefined && response !== 'undefined') {
-                    new ackStateVal(stateId, response);
+                    let oldParameters;
+                    try {
+                        oldParameters = JSON.parse(parameters);
+                    } catch (err) {
+                    }
+                    if(oldParameters){
+                        let retryParameters = {}
+                        response.forEach((message) => {
+                            if('error' in message){
+                                let failedAction = message.error.address.split("/")[4]
+                                if(failedAction){
+                                    adapter.log.warn('Failed action "' + failedAction + '" on light ' + lightId + '! Description: ' + message.error.description);
+                                    if(message.error.description.includes("951")){
+                                        retryParameters[failedAction] = oldParameters[failedAction]
+                                    }
+                                }
+                            }
+                        })
+                        if(Object.keys(retryParameters).length > 0){
+                            adapter.log.warn('Gateway busy! Retry: ' + JSON.stringify(retryParameters));
+                            setTimeout(function(){setLightState(JSON.stringify(retryParameters), lightId, stateId, callback)},1000);
+                        }
+                        new ackStateVal(stateId, response);
+                    }
                 }
-
                 if (callback)
                     callback();
             }
