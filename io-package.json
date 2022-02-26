@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "deconz",
-        "version": "1.3.19",
+        "version": "1.3.20",
         "news": {
+            "1.3.20": {
+                "en": "add retry if gateway is busy\nchange min/max range for offset\nupdated translations\nfix link for overview page\nfix parameter can not be set since deConz 2.11.5\nfix xy is invalid: #289 #295\nremove Sentry",
+                "de": "Fügen Sie einen Wiederholungsversuch hinzu, wenn das Gateway beschäftigt ist\nMin/Max-Bereich für Offset ändern\naktualisierte Übersetzungen\nFix Link für Übersichtsseite\nfix Parameter kann seit deConz 2.11.5 nicht gesetzt werden\nFix xy ist ungültig: #289 #295\nSentry entfernen",
+                "ru": "добавить повтор, если шлюз занят\nизменить мин./макс. диапазон для смещения\nобновленные переводы\nисправить ссылку на обзорную страницу\nпараметр fix не может быть установлен, начиная с deConz 2.11.5\nисправить xy недопустимо: # 289 # 295\nудалить часового",
+                "pt": "adicionar nova tentativa se o gateway estiver ocupado\nalterar intervalo mínimo/máximo para deslocamento\ntraduções atualizadas\ncorrigir link para página de visão geral\nparâmetro fix não pode ser definido desde deConz 2.11.5\ncorreção xy é inválida: #289 #295\nremover Sentinela",
+                "nl": "voeg opnieuw toe als gateway bezet is\nverander min/max bereik voor offset\nbijgewerkte vertalingen\nfix link voor overzichtspagina\nfix parameter kan niet worden ingesteld sinds deConz 2.11.5\nfix xy is ongeldig: #289 #295\nverwijder Sentry",
+                "fr": "ajouter une nouvelle tentative si la passerelle est occupée\nchanger la plage min/max pour le décalage\ntraductions mises à jour\nlien fixe pour la page de présentation\nle paramètre fix ne peut pas être défini depuis deConz 2.11.5\ncorriger xy n'est pas valide : #289 #295\nsupprimer sentinelle",
+                "it": "aggiungi riprova se il gateway è occupato\nmodificare l'intervallo min/max per l'offset\ntraduzioni aggiornate\ncollegamento di correzione per la pagina di panoramica\nfix parametro non può essere impostato da deConz 2.11.5\nfix xy non è valido: #289 #295\nrimuovi Sentinella",
+                "es": "agregar reintento si la puerta de enlace está ocupada\ncambiar el rango mínimo/máximo para la compensación\ntraducciones actualizadas\narreglar el enlace para la página de resumen\nEl parámetro fijo no se puede configurar desde deConz 2.11.5\narreglar xy no es válido: #289 #295\nquitar centinela",
+                "pl": "dodaj spróbuj ponownie, jeśli bramka jest zajęta\nzmień zakres min/maks dla przesunięcia\nzaktualizowane tłumaczenia\nnapraw link do strony przeglądu\nnie można ustawić parametru fix od czasu deConz 2.11.5\nnaprawienie xy jest nieprawidłowe: #289 #295\nusuń Sentry",
+                "zh-cn": "如果网关忙，则添加重试\n更改偏移的最小/最大范围\n更新的翻译\n修复概览页面的链接\n自 deConz 2.11.5 以来无法设置修复参数\n修复 xy 无效：#289 #295\n移除哨兵"
+            },
             "1.3.19": {
                 "en": "fix for js-controller 3.3.x",
                 "de": "Fix für js-Controller 3.3.x",
@@ -231,8 +243,7 @@
         "compact": true,
         "messagebox": true,
         "enabled": true,
-        "plugins": {
-        },
+        "plugins": {},
         "dependencies": [
             {
                 "js-controller": ">=2.0.0"

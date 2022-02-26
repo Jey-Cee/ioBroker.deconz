@@ -43,7 +43,7 @@ Examples:
 
 ## Changelog
 
-### **WORK IN PROGRESS**
+### 1.3.20 (2022-02-26)
 * (withstu) add retry if gateway is busy
 * change min/max range for offset
 * updated translations
