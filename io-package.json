@@ -16,7 +16,7 @@
                 "zh-cn": "修复 js 控制器 3.3.x"
             },
             "1.3.18": {
-                "en": "fix crash [#248](https://github.com/iobroker-community-adapters/ioBroker.deconz/issues/248)"
+                "en": "fix crash [#248](https://github.com/Jey-Cee/ioBroker.deconz/issues/248)"
             },
             "1.3.16": {
                 "en": "added datapoints melody and volume (Used by NEO-Alarm-Sirene by Tuya)\nadded new effects for Müller Licht Tint: sunset, party, worklight, campfire, romance, nightlight\nadded new effects for Lidl Melinera: steady, snow, rainbow, snake, twinkle, fireworks, flag, waves, updown, vintage, fading, collide, strobe, sparkles, carnival, glow\nadded 2 new datapoints they were used by Lidl Melinera effects: effectspeed: simple number; effectcolours: array of rgb values = [[255,0,0],[0,255,0],[0,0,255]]",
@@ -232,18 +232,13 @@
         "messagebox": true,
         "enabled": true,
         "plugins": {
-            "sentry": {
-                "dsn": "https://c467944074ec441e9b56fdd0af6a3fdd@o379422.ingest.sentry.io/5204269",
-                "pathWhitelist": [],
-                "errorBlacklist": []
-            }
         },
         "dependencies": [
             {
                 "js-controller": ">=2.0.0"
             }
         ],
-        "readme": "https://github.com/iobroker-community-adapters/ioBroker.deconz/blob/master/README.md",
+        "readme": "https://github.com/Jey-Cee/ioBroker.deconz/blob/master/README.md",
         "loglevel": "info",
         "keywords": [
             "deconz",
@@ -259,7 +254,7 @@
         ],
         "icon": "deconz.png",
         "materialize": true,
-        "extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.deconz/master/admin/deconz.png",
+        "extIcon": "https://raw.githubusercontent.com/Jey-Cee/ioBroker.deconz/master/admin/deconz.png",
         "type": "hardware"
     },
     "native": {

@@ -12,112 +12,6 @@ let ws = null;
 let alive_ts = 0;
 let reconnect = null;
 
-//Sentry for error reporting
-let Sentry;
-let SentryIntegrations;
-function initSentry(callback) {
-    if (!adapter.ioPack.common || !adapter.ioPack.common.plugins || !adapter.ioPack.common.plugins.sentry) {
-        return callback && callback();
-    }
-    const sentryConfig = adapter.ioPack.common.plugins.sentry;
-    if (!sentryConfig.dsn) {
-        adapter.log.warn('Invalid Sentry definition, no dsn provided. Disable error reporting');
-        return callback && callback();
-    }
-    // Require needed tooling
-    Sentry = require('@sentry/node');
-    SentryIntegrations = require('@sentry/integrations');
-    // By installing source map support, we get the original source
-    // locations in error messages
-    require('source-map-support').install();
-
-    let sentryPathWhitelist = [];
-    if (sentryConfig.pathWhitelist && Array.isArray(sentryConfig.pathWhitelist)) {
-        sentryPathWhitelist = sentryConfig.pathWhitelist;
-    }
-    if (adapter.pack.name && !sentryPathWhitelist.includes(adapter.pack.name)) {
-        sentryPathWhitelist.push(adapter.pack.name);
-    }
-    let sentryErrorBlacklist = [];
-    if (sentryConfig.errorBlacklist && Array.isArray(sentryConfig.errorBlacklist)) {
-        sentryErrorBlacklist = sentryConfig.errorBlacklist;
-    }
-    if (!sentryErrorBlacklist.includes('SyntaxError')) {
-        sentryErrorBlacklist.push('SyntaxError');
-    }
-
-    Sentry.init({
-        release: adapter.pack.name + '@' + adapter.pack.version,
-        dsn: sentryConfig.dsn,
-        integrations: [
-            new SentryIntegrations.Dedupe()
-        ]
-    });
-    Sentry.configureScope(scope => {
-        scope.setTag('version', adapter.common.installedVersion || adapter.common.version);
-        if (adapter.common.installedFrom) {
-            scope.setTag('installedFrom', adapter.common.installedFrom);
-        }
-        else {
-            scope.setTag('installedFrom', adapter.common.installedVersion || adapter.common.version);
-        }
-        scope.addEventProcessor(function(event, hint) {
-            // Try to filter out some events
-            if (event.exception && event.exception.values && event.exception.values[0]) {
-                const eventData = event.exception.values[0];
-                // if error type is one from blacklist we ignore this error
-                if (eventData.type && sentryErrorBlacklist.includes(eventData.type)) {
-                    return null;
-                }
-                if (eventData.stacktrace && eventData.stacktrace.frames && Array.isArray(eventData.stacktrace.frames) && eventData.stacktrace.frames.length) {
-                    // if last exception frame is from an nodejs internal method we ignore this error
-                    if (eventData.stacktrace.frames[eventData.stacktrace.frames.length - 1].filename && (eventData.stacktrace.frames[eventData.stacktrace.frames.length - 1].filename.startsWith('internal/') || eventData.stacktrace.frames[eventData.stacktrace.frames.length - 1].filename.startsWith('Module.'))) {
-                        return null;
-                    }
-                    // Check if any entry is whitelisted from pathWhitelist
-                    const whitelisted = eventData.stacktrace.frames.find(frame => {
-                        if (frame.function && frame.function.startsWith('Module.')) {
-                            return false;
-                        }
-                        if (frame.filename && frame.filename.startsWith('internal/')) {
-                            return false;
-                        }
-                        if (frame.filename && !sentryPathWhitelist.find(path => path && path.length && frame.filename.includes(path))) {
-                            return false;
-                        }
-                        return true;
-                    });
-                    if (!whitelisted) {
-                        return null;
-                    }
-                }
-            }
-
-            return event;
-        });
-
-
-        adapter.getForeignObject('system.config', (err, obj) => {
-            if (obj && obj.common && obj.common.diag) {
-                adapter.getForeignObject('system.meta.uuid', (err, obj) => {
-                    // create uuid
-                    if (!err  && obj) {
-                        Sentry.configureScope(scope => {
-                            scope.setUser({
-                                id: obj.native.uuid
-                            });
-                        });
-                    }
-                    callback && callback();
-                });
-            }
-            else {
-                callback && callback();
-            }
-        });
-    });
-}
-
 class deconz extends utils.Adapter{
     /**
      * @param {Partial<ioBroker.AdapterOptions>} [options={}]
@@ -137,12 +31,8 @@ class deconz extends utils.Adapter{
     async onReady() {
         adapter = this;
 
-        if (adapter.supportsFeature && adapter.supportsFeature('PLUGINS')) {
-            await main();
-        }
-        else {
-            initSentry(main);
-        }
+        await main();
+
     }
 
     async onUnload(callback) {
@@ -544,9 +434,6 @@ function autoDiscovery() {
 
 
     discovery.listen('',(error) => {
-        if (error) {
-            sentryMsg(error);
-        }
         discovery.search({st: 'ssdp:all'});
         wait = setTimeout( () => {
             adapter.log.warn('Could not found deConz by broadcast, establishing Websocket without monitoring the connection state. This is happen if you are using VLAN or installed deConz in an container.')
@@ -571,7 +458,7 @@ function heartbeat() {
 
     discovery.listen((error) => {
         if (error) {
-            sentryMsg(error);
+            adapter.log.warn(error)
         }
     });
 }
@@ -633,7 +520,7 @@ async function deleteAPIkey() {
 
         request(options, async (error, res, body) => {
             if (error) {
-                sentryMsg(error);
+                adapter.log.warn(error);
             } else {
                 let response;
                 try {
@@ -840,7 +727,7 @@ async function modifyConfig(parameters) {
 
         request(options, async (error, res, body) => {
             if (error) {
-                sentryMsg(error);
+                adapter.log.warn(error);
             } else {
                 let response;
                 if (error) adapter.log.warn(error);
@@ -948,7 +835,7 @@ async function getAllGroups() {
 
         request(options, async (error, res, body) => {
             if (error) {
-                sentryMsg(error);
+                adapter.warn.log(error)
             } else {
                 let list = JSON.parse(body);
                 let count = Object.keys(list).length - 1;
@@ -1002,7 +889,7 @@ async function getGroupAttributes(groupId) {
 
         request(options, async (error, res, body) => {
             if (error) {
-                sentryMsg(error);
+                adapter.warn.log(error)
             } else {
                 let list = JSON.parse(body);
 
@@ -1207,7 +1094,7 @@ async function setGroupState(parameters, groupId, stateId) {
 
         request(options, async (error, res, body) => {
             if (error) {
-                sentryMsg(error);
+                adapter.warn.log(error)
             } else {
                 let response;
                 try {
@@ -1244,8 +1131,8 @@ async function setGroupScene(parameters, groupId, sceneId, action, stateId, meth
 
         request(options, async (error, res, body) => {
             if (error) {
-                sentryMsg(error);
-                sentryMsg(error);
+                adapter.warn.log(error)
+                adapter.warn.log(error)
             } else {
                 let response;
                 try {
@@ -1302,7 +1189,7 @@ async function deleteGroup(groupId) {
 
         request(options, async (error, res, body) => {
             if (error) {
-                sentryMsg(error);
+                adapter.warn.log(error)
             } else {
                 let response;
                 try {
@@ -1347,7 +1234,7 @@ async function getAllSensors() {
         };
         request(options, async (error, res, body) => {
             if (error) {
-                sentryMsg(error);
+                adapter.warn.log(error)
             } else {
                 let list = JSON.parse(body);
                 let count = Object.keys(list).length - 1;
@@ -1412,7 +1299,7 @@ async function getSensor(sensorId) {
         };
         request(options, async (error, res, body) => {
             if (error) {
-                sentryMsg(error);
+                adapter.warn.log(error)
             } else {
                 if (await logging(res, body, 'get sensor ' + sensorId)) {
                     let list = JSON.parse(body);
@@ -1486,7 +1373,7 @@ async function setSensorParameters(parameters, sensorId, stateId, callback) {
 
         request(options, async (error, res, body) => {
             if (error) {
-                sentryMsg(error);
+                adapter.warn.log(error)
             } else {
                 let response;
                 try {
@@ -1518,7 +1405,7 @@ async function deleteSensor(sensorId) {
 
         request(options, async (error, res, body) => {
             if (error) {
-                sentryMsg(error);
+                adapter.warn.log(error)
             } else {
                 adapter.log.debug('deleteSensor STATUS: ' + res.statusCode);
                 let response;
@@ -1567,7 +1454,7 @@ async function getAllLights() {
         };
         request(options, async (error, res, body) => {
             if (error) {
-                sentryMsg(error);
+                adapter.warn.log(error)
             } else {
                 let list = JSON.parse(body);
                 let count = Object.keys(list).length - 1;
@@ -1669,7 +1556,7 @@ async function getLightState(lightId) {
         };
         request(options, async (error, res, body) => {
             if (error) {
-                sentryMsg(error);
+                adapter.warn.log(error)
             } else {
                 if (await logging(res, body, 'get light state ' + lightId)) {
                     let list = JSON.parse(body);
@@ -1717,7 +1604,7 @@ async function setLightState(parameters, lightId, stateId, callback) {
 
         request(options, async (error, res, body) => {
             if (error) {
-                sentryMsg(error);
+                adapter.warn.log(error)
             } else {
                 let response;
                 try {
@@ -1770,7 +1657,7 @@ async function deleteLight(lightId) {
 
         request(options, async (error, res, body) => {
             if (error) {
-                sentryMsg(error);
+                adapter.warn.log(error)
             } else {
                 let response;
                 try {
@@ -1816,7 +1703,7 @@ async function removeFromGroups(lightId) {
 
         request(options, async (error, res, body) => {
             if (error) {
-                sentryMsg(error);
+                adapter.warn.log(error)
             } else {
                 let response;
                 try {
@@ -1850,7 +1737,7 @@ async function getDevices() {
 
         request(options, async (error, res, body) => {
             if (error) {
-                sentryMsg(error);
+                adapter.warn.log(error)
             } else {
                 if (await logging(res, body, 'get devices')) {
                     adapter.log.debug('getDevices: ' + JSON.stringify(res) + ' ' + body);
@@ -1914,20 +1801,6 @@ async function logging(res, message, action) {
             break;
     }
     return check;
-}
-
-function sentryMsg(msg) {
-    if (adapter.supportsFeature && adapter.supportsFeature('PLUGINS')) {
-        const sentryInstance = adapter.getPluginInstance('sentry');
-        if (sentryInstance) {
-            const Sentry = sentryInstance.getSentryObject();
-            Sentry && Sentry.withScope(scope => {
-                scope.setLevel('info');
-                scope.setExtra('key', 'value');
-                Sentry.captureMessage(msg, 'info'); // Level "info"
-            });
-        }
-    }
 }
 
 function nameFilter(name) {
@@ -2168,7 +2041,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
         case 'xy':
             objType = 'array';
             objRole = 'color.CIE';
-            objDefault = [0.1,0.1];
+            objDefault = '[0.1,0.1]';
             value = JSON.stringify(value);
             break;
         case 'alarm':
