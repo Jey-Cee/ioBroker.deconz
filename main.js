@@ -30,7 +30,6 @@ class deconz extends utils.Adapter{
 
     async onReady() {
         adapter = this;
-
         await main();
 
     }
@@ -835,7 +834,7 @@ async function getAllGroups() {
 
         request(options, async (error, res, body) => {
             if (error) {
-                adapter.warn.log(error)
+                adapter.log.warn(error)
             } else {
                 let list = JSON.parse(body);
                 let count = Object.keys(list).length - 1;
@@ -889,7 +888,7 @@ async function getGroupAttributes(groupId) {
 
         request(options, async (error, res, body) => {
             if (error) {
-                adapter.warn.log(error)
+                adapter.log.warn(error)
             } else {
                 let list = JSON.parse(body);
 
@@ -1094,7 +1093,7 @@ async function setGroupState(parameters, groupId, stateId) {
 
         request(options, async (error, res, body) => {
             if (error) {
-                adapter.warn.log(error)
+                adapter.log.warn(error)
             } else {
                 let response;
                 try {
@@ -1131,8 +1130,8 @@ async function setGroupScene(parameters, groupId, sceneId, action, stateId, meth
 
         request(options, async (error, res, body) => {
             if (error) {
-                adapter.warn.log(error)
-                adapter.warn.log(error)
+                adapter.log.warn(error)
+                adapter.log.warn(error)
             } else {
                 let response;
                 try {
@@ -1189,7 +1188,7 @@ async function deleteGroup(groupId) {
 
         request(options, async (error, res, body) => {
             if (error) {
-                adapter.warn.log(error)
+                adapter.log.warn(error)
             } else {
                 let response;
                 try {
@@ -1234,7 +1233,7 @@ async function getAllSensors() {
         };
         request(options, async (error, res, body) => {
             if (error) {
-                adapter.warn.log(error)
+                adapter.log.warn(error)
             } else {
                 let list = JSON.parse(body);
                 let count = Object.keys(list).length - 1;
@@ -1299,7 +1298,7 @@ async function getSensor(sensorId) {
         };
         request(options, async (error, res, body) => {
             if (error) {
-                adapter.warn.log(error)
+                adapter.log.warn(error)
             } else {
                 if (await logging(res, body, 'get sensor ' + sensorId)) {
                     let list = JSON.parse(body);
@@ -1373,7 +1372,7 @@ async function setSensorParameters(parameters, sensorId, stateId, callback) {
 
         request(options, async (error, res, body) => {
             if (error) {
-                adapter.warn.log(error)
+                adapter.log.warn(error)
             } else {
                 let response;
                 try {
@@ -1405,7 +1404,7 @@ async function deleteSensor(sensorId) {
 
         request(options, async (error, res, body) => {
             if (error) {
-                adapter.warn.log(error)
+                adapter.log.warn(error)
             } else {
                 adapter.log.debug('deleteSensor STATUS: ' + res.statusCode);
                 let response;
@@ -1454,7 +1453,7 @@ async function getAllLights() {
         };
         request(options, async (error, res, body) => {
             if (error) {
-                adapter.warn.log(error)
+                adapter.log.warn(error)
             } else {
                 let list = JSON.parse(body);
                 let count = Object.keys(list).length - 1;
@@ -1556,7 +1555,7 @@ async function getLightState(lightId) {
         };
         request(options, async (error, res, body) => {
             if (error) {
-                adapter.warn.log(error)
+                adapter.log.warn(error)
             } else {
                 if (await logging(res, body, 'get light state ' + lightId)) {
                     let list = JSON.parse(body);
@@ -1604,7 +1603,7 @@ async function setLightState(parameters, lightId, stateId, callback) {
 
         request(options, async (error, res, body) => {
             if (error) {
-                adapter.warn.log(error)
+                adapter.log.warn(error)
             } else {
                 let response;
                 try {
@@ -1657,7 +1656,7 @@ async function deleteLight(lightId) {
 
         request(options, async (error, res, body) => {
             if (error) {
-                adapter.warn.log(error)
+                adapter.log.warn(error)
             } else {
                 let response;
                 try {
@@ -1703,7 +1702,7 @@ async function removeFromGroups(lightId) {
 
         request(options, async (error, res, body) => {
             if (error) {
-                adapter.warn.log(error)
+                adapter.log.warn(error)
             } else {
                 let response;
                 try {
@@ -1737,7 +1736,7 @@ async function getDevices() {
 
         request(options, async (error, res, body) => {
             if (error) {
-                adapter.warn.log(error)
+                adapter.log.warn(error)
             } else {
                 if (await logging(res, body, 'get devices')) {
                     adapter.log.debug('getDevices: ' + JSON.stringify(res) + ' ' + body);
