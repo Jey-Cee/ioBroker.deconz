@@ -2204,7 +2204,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
             objType = 'number';
             objRole = 'value';
             objMin = 0;
-            objMax = 600;
+            objMax = 999999;
             objDefault = 600;
             objUnit = 's';
             break;
@@ -2402,7 +2402,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
             break;
         case 'effectcolours':
             objType = 'array';
-            objType = 'state';
+            objRole = 'state';
             objDefault = '[[255,0,0],[0,255,0],[0,0,255]]';
             value = JSON.stringify(value);
             break;
@@ -2420,6 +2420,12 @@ async function SetObjectAndState(id, name, type, stateName, value) {
         case 'mode':
             objType = 'string';
             objRole = 'state';
+            break;
+        case 'schedule':
+            objType = 'object';
+            objRole = 'schedule';
+            objDefault = '{}';
+            value = JSON.stringify(value);
             break;
         case 'scheduler':
             objType = 'string';
