@@ -42,8 +42,7 @@ Examples:
 ## [Sponsors](https://github.com/Jey-Cee/ioBroker.deconz/blob/master/SPONSORS.MD)
 
 ## Changelog
-
-### **WORK IN PROGRESS**
+### 1.3.21 (2022-05-13)
 * added schedule to object definition
 * changed limit for duration to 999999
 
@@ -158,7 +157,6 @@ Examples:
 * (mobilutz) remove ip overwrite
 * (njeisecke) add transitiontime for bri_inc (dim step)
 
-
 ### 1.2.3
 * fix expire time for alive 
 * add object for open zigbee network to add new devices without admin config
@@ -196,14 +194,11 @@ Examples:
 *  (asgothian) added object "buttonpressd"
 *  some fixes
 
-
 ### 1.0.2
 * fix set bri for groups
 
-
 ### 1.0.1
 * small fixes
-
 
 ### 1.0.0
 *  (thewhobox) skip helper groups
@@ -217,7 +212,6 @@ Examples:
 *  (jey-cee) new possible to change duration (if the device accept it)
 *  (jey-cee) get API key with credentials
 
-
 ### 0.4.0
 * (asgothian) Fix for hue change
 * (halloamt)  Added support for dimming lights and groups
@@ -226,11 +220,9 @@ Examples:
 ### 0.3.1
 * Fixing hue from range 0-65535 to 0-360
 
-
 ### 0.3.0
 * Added scene support
 *  Drop nodejs 4 support
-
 
 ### 0.2.5
 * Fix/Change handling create objects during running Adapter
@@ -293,6 +285,3 @@ Examples:
 Apache-2.0
 
 Copyright (c) 2017-2022 Jey Cee jey-cee@live.com
-
-
-
