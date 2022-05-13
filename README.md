@@ -43,6 +43,10 @@ Examples:
 
 ## Changelog
 
+### **WORK IN PROGRESS**
+* added schedule to object definition
+* changed limit for duration to 999999
+
 ### 1.3.20 (2022-02-26)
 * (withstu) add retry if gateway is busy
 * change min/max range for offset
