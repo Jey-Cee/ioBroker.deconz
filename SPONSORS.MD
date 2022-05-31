@@ -4,6 +4,17 @@ This list contains persons who support this adapter. If you want to support also
 
 Thank you to ...
 
+### 2022
+
+* fa-bio
+* UweLm
+
+### 2021
+
+* fa-bio
+* jensven
+  
+  
 ### 2020
 
 * Marco Laser
