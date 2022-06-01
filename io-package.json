@@ -50,7 +50,8 @@
       "fr": "deConz ZigBee",
       "it": "deConz ZigBee",
       "es": "deConz ZigBee",
-      "pl": "deConz ZigBee"
+      "pl": "deConz ZigBee",
+      "zh-cn": "deConz ZigBee"
     },
     "desc": {
       "en": "Connects to the deConz Software that is an gateway solution for ZigBee. deConz works with ConBee USB stick and RaspBee modul for Raspberry Pi which is also from Dresden-Elektronik.",
@@ -61,7 +62,8 @@
       "fr": "Se connecte au logiciel deConz qui est une solution de passerelle pour ZigBee. deConz fonctionne avec la clé USB ConBee et le module RaspBee pour Raspberry Pi, également de Dresden-Elektronik.",
       "it": "Si collega al software deConz che è una soluzione gateway per ZigBee. deConz funziona con ConBee USB stick e RaspBee modul per Raspberry Pi, anch'esso di Dresden-Elektronik.",
       "es": "Se conecta al software deConz que es una solución de puerta de enlace para ZigBee. deConz funciona con el dispositivo USB ConBee y el módulo RaspBee para Raspberry Pi, que también es de Dresden-Elektronik.",
-      "pl": "Łączy się z oprogramowaniem deConz, które jest rozwiązaniem bramkowym dla ZigBee. deConz współpracuje z pamięcią USB ConBee i modułem RaspBee dla Raspberry Pi, który jest również z firmy Dresden-Elektronik."
+      "pl": "Łączy się z oprogramowaniem deConz, które jest rozwiązaniem bramkowym dla ZigBee. deConz współpracuje z pamięcią USB ConBee i modułem RaspBee dla Raspberry Pi, który jest również z firmy Dresden-Elektronik.",
+      "zh-cn": "deConz与ConBee USB棒和Raspberry Pi的RaspBee模块一起使用，后者也是来自Dresden-Elektronik。"
     },
     "authors": [
       "Jey Cee <jey-cee@live.com>"
