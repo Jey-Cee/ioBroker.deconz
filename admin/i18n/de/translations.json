@@ -1,6 +1,6 @@
 {
     "'Please wait, searching for deConz...'": "Bitte warten, deConz wird gesucht...",
-    "API key": "API-Key",
+    "API key": "API-Schlüssel",
     "Auto setup": "Automatisches Setup",
     "Bridge port": "Bridge-Port",
     "Create API key": "Erstelle API Key",
@@ -11,7 +11,7 @@
     "Enable adapter first": "Adapter bitte zuerst aktivieren",
     "Instruction": "Gehen Sie zur Phoscon APP -> Einstellungen -> Erweitert und klicken Sie auf \"Unlock Gateway\". Zeitlimit 30 Sekunden. Lassen Sie diese Nachricht geöffnet.",
     "Lights (ID of Light)": "Lampen (ID der Lampe)",
-    "Main settings": "Allgemeine Einstellungen",
+    "Main settings": "Haupteinstellungen",
     "Manage Devices": "Geräte verwalten",
     "Manage Groups": "Gruppen verwalten",
     "Manage deConz": "deConz Verwalten",
