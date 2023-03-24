@@ -815,6 +815,10 @@ async function getAutoUpdates() {
             adapter.log.debug("Event has state-tag");
             if (Object.keys(state).length > 0) {
               object = await getObjectByDeviceId(id, "Lights");
+              if (object === undefined) {
+                adapter.log.debug("Object not found");
+                return;
+              }
               for (let stateName in state) {
                 adapter.log.debug(stateName + ": " + state[stateName]);
                 await SetObjectAndState(
