@@ -472,7 +472,7 @@ async function main() {
 
     startTime = Date.now();
     await getLatestVersion();
-    await sendDeviceInformation();
+    //await sendDeviceInformation();
 
     heartbeat();
     const results = await adapter.getObjectAsync('gateway_info');
@@ -2374,7 +2374,7 @@ async function handleWSmessage(msg) {
     let config = data['config'];
     adapter.log.debug('Websocket message: ' + JSON.stringify(data));
     if (collectActive === true){
-        CollectWSmessages(data);
+        //CollectWSmessages(data);
     }
 
 
