@@ -537,7 +537,7 @@ function autoDiscovery() {
 
     discovery.listen('', (error) => {
         if (error) {
-            sentryMsg(error);
+            //sentryMsg(error);
         }
         discovery.search({st: 'ssdp:all'});
         timeoutWait = setTimeout(() => {
@@ -563,7 +563,7 @@ function heartbeat() {
 
      discovery.listen((error) => {
         if (error) {
-            sentryMsg(error);
+            //sentryMsg(error);
         }
     });
 }
@@ -662,7 +662,7 @@ async function createAPIkey(host, credentials, callback) {
         }).catch(async error => {
             callback({error: 101, message: 'Password invalid'});
             adapter.log.info(error);
-            sentryMsg(error);
+            //sentryMsg(error);
         });
 
 
@@ -700,7 +700,7 @@ async function deleteAPIkey() {
                     }
                 }
             }).catch(async error => {
-                sentryMsg(error);
+                //sentryMsg(error);
             });
 
     }
@@ -740,7 +740,7 @@ async function modifyConfig(parameters) {
 
             }).catch(async error => {
                 adapter.log.error('Modify configuration: ' + error);
-                sentryMsg(error);
+                //sentryMsg(error);
             });
 
     }
@@ -804,7 +804,7 @@ async function getConfig() {
                 }
             }).catch(async error => {
                 adapter.log.error('Could not connect to deConz/Phoscon. ' + error);
-                sentryMsg(error);
+                //sentryMsg(error);
             });
 
     }
@@ -820,7 +820,7 @@ async function backup() {
                 await logging(result.status, result.data, 'backup');
             }).catch(async error => {
                 adapter.log.error('Could not create backup: ' + error);
-                sentryMsg(error);
+                //sentryMsg(error);
             });
 
     }
@@ -853,7 +853,7 @@ async function updateSoftware() {
                 }
             }).catch(async error => {
                 adapter.log.error('Could not update deConz: ' + error);
-                sentryMsg(error);
+                //sentryMsg(error);
             });
 
     }
@@ -878,7 +878,7 @@ async function updateFirmware() {
                 }
             }).catch(async error => {
                 adapter.log.error('Could not update firmware: ' + error);
-                sentryMsg(error);
+                //sentryMsg(error);
             });
 
     }
@@ -899,7 +899,7 @@ async function touchlinkScan() {
                 }, 15 * 1000);
             }).catch(async error => {
                 adapter.log.error('Could not start touchlink scan: ' + error);
-                sentryMsg(error);
+                //sentryMsg(error);
             });
     }
 }
@@ -914,7 +914,7 @@ async function getTouchlinkScanResult() {
                 await adapter.setStateAsync('gateway_info.touchlink.scan_result', {val: body, ack: true});
             }).catch(async error => {
                 adapter.log.error('Could not connect get scan results. ' + error);
-                sentryMsg(error);
+                //sentryMsg(error);
             });
     }
 }
@@ -931,7 +931,7 @@ async function touchlinkIdentify(id) {
                 await logging(res, body, 'touchlink identify ' + id)
             }).catch(async error => {
                 adapter.log.error('Could not start touchlink identify ' + id + ': ' + error);
-                sentryMsg(error);
+                //sentryMsg(error);
             });
     }
 }
@@ -948,7 +948,7 @@ async function touchlinkReset(id) {
                 await logging(res, body, 'touchlink  reset ' + id)
             }).catch(async error => {
                 adapter.log.error('Could not start touchlink reset ' +id + ': ' + error);
-                sentryMsg(error);
+                //sentryMsg(error);
             });
     }
 }
@@ -1003,7 +1003,7 @@ async function getAllGroups() {
                 }
 
             }).catch(async error => {
-                sentryMsg(error);
+                //sentryMsg(error);
             });
 
     }
@@ -1101,7 +1101,7 @@ async function getGroupAttributes(groupId) {
                 }
 
             }).catch(async error => {
-                sentryMsg(error);
+                //sentryMsg(error);
             });
 
     }
@@ -1118,7 +1118,7 @@ async function setGroupAttributes(parameters, groupId) {
                 let body = result.data;
                 await logging(res, body, 'set group attribute ' + groupId);
             }).catch(async error => {
-                sentryMsg(error);
+                //sentryMsg(error);
             });
 
     }
@@ -1138,7 +1138,7 @@ async function setGroupState(parameters, groupId, stateId) {
                     await AckStateVal(stateId, response);
                 }
             }).catch(async error => {
-                sentryMsg(error);
+                //sentryMsg(error);
             });
 
     }
@@ -1160,7 +1160,7 @@ async function createGroup(name, callback) {
                     callback({error: 0, message: 'success'});
                 }
             }).catch(async error => {
-                sentryMsg(error);
+                //sentryMsg(error);
             });
     }
 } //END createGroup
@@ -1197,7 +1197,7 @@ async function deleteGroup(groupId) {
                     }
                 }
             }).catch(async error => {
-                sentryMsg(error);
+                //sentryMsg(error);
             });
     }
 }
@@ -1266,7 +1266,7 @@ async function getSceneAttributes(groupId, sceneId) {
                 }
             }).catch(async error => {
                 await logging(error.response.status, error.response.status, 'get scene ' + sceneId)
-                sentryMsg(error);
+                //sentryMsg(error);
             });
     }
 } //END getAllScenes
@@ -1287,7 +1287,7 @@ async function createScene(sceneName, groupId) {
                 }
             }).catch(async error => {
                 await logging(error.response.status, error.response.status, 'create scene ' + groupId)
-                sentryMsg(error);
+                //sentryMsg(error);
             });
     }
 } //END createScene
@@ -1308,7 +1308,7 @@ async function recallScene(sceneId, groupId) {
                 }
             }).catch(async error => {
                 await logging(error.response.status, error.response.status, 'recall scene ' + groupId)
-                sentryMsg(error);
+                //sentryMsg(error);
             });
     }
 } //END recallScene
@@ -1329,7 +1329,7 @@ async function storeScene(sceneId, groupId) {
                 }
             }).catch(async error => {
                 await logging(error.response.status, error.response.status, 'store scene ' + groupId)
-                sentryMsg(error);
+                //sentryMsg(error);
             });
     }
 } //END storeScene
@@ -1347,7 +1347,7 @@ async function deleteScene(sceneId, groupId) {
                 await logging(res, body, 'delete scene ' + groupId);
             }).catch(async error => {
                 await logging(error.response.status, error.response.status, 'delete scene ' + groupId)
-                sentryMsg(error);
+                //sentryMsg(error);
             });
     }
 } //END deleteScene
@@ -1457,7 +1457,7 @@ async function getAllSensors() {
                 }
             }).catch(async error => {
                 await logging(error.status, error.data, 'get all sensors')
-                sentryMsg(error);
+                //sentryMsg(error);
             });
 
     }
@@ -1570,7 +1570,7 @@ async function getSensor(Id) {
                     }
                 }
             }).catch(async error => {
-                sentryMsg(error);
+                //sentryMsg(error);
             });
 
     }
@@ -1586,7 +1586,7 @@ async function updateSensor(parameters, sensorId) {
             .then( async result => {
                     await logging(result.status, result.data, 'set sensor parameters');
             }).catch( async error => {
-                sentryMsg(error);
+                //sentryMsg(error);
             });
     }
 } //END updateSensor
@@ -1605,7 +1605,7 @@ async function setSensorParameters(parameters, sensorId, stateId) {
                         await AckStateVal(stateId, result);
                     }).catch( async error => {
                         adapter.log.error(error)
-                        sentryMsg(error);
+                        //sentryMsg(error);
                     });
             }
         } else {
@@ -1615,7 +1615,7 @@ async function setSensorParameters(parameters, sensorId, stateId) {
                     await AckStateVal(stateId, result);
                 }).catch( async error => {
                     adapter.log.error(error)
-                    sentryMsg(error);
+                    //sentryMsg(error);
                 });
         }
 
@@ -1653,7 +1653,7 @@ async function deleteSensor(sensorId) {
                     }
                 }
             }).catch( async error => {
-                sentryMsg(error);
+                //sentryMsg(error);
             });
 
     }
@@ -1751,7 +1751,7 @@ async function getAllLights() {
 
             }).catch(async error => {
                 await logging(error.status, error.data, 'get all lights')
-                sentryMsg(error);
+                //sentryMsg(error);
             });
     }
 } //END getAllLights
@@ -1829,7 +1829,7 @@ async function getLightState(Id) {
                 }
 
             }).catch(async error => {
-                sentryMsg(error);
+                //sentryMsg(error);
             });
 
 
@@ -1850,7 +1850,7 @@ async function setLightState(parameters, lightId, stateId) {
                     await AckStateVal(stateId, response);
                 }
             }).catch(async error => {
-                sentryMsg(error);
+                //sentryMsg(error);
             });
     }
 } //END setLightState
@@ -1866,7 +1866,7 @@ async function setLightAttributes(parameters, lightId) {
                 let body = result.data;
                 await logging(res, body, 'set light state ' + lightId);
             }).catch(async error => {
-                sentryMsg(error);
+                //sentryMsg(error);
             });
 
     }
@@ -1903,7 +1903,7 @@ async function deleteLight(lightId) {
                     }
                 }
             }).catch(async error => {
-                sentryMsg(error);
+                //sentryMsg(error);
             });
 
     }
@@ -1929,7 +1929,7 @@ async function removeFromGroups(lightId) {
                 }
             }).catch(async error => {
                 adapter.log.error(error);
-                sentryMsg(error);
+                //sentryMsg(error);
             });
 
     }
@@ -1955,7 +1955,7 @@ async function removeFromScenes(lightId) {
                 }
             }).catch(async error => {
                 adapter.log.error(error);
-                sentryMsg(error);
+                //sentryMsg(error);
             });
 
     }
@@ -1976,7 +1976,7 @@ async function getDevices() {
                     adapter.log.debug('getDevices: ' + JSON.stringify(res) + ' ' + body);
                 }
             }).catch(async error => {
-                sentryMsg(error);
+                //sentryMsg(error);
             });
 
     }
