@@ -1,200 +1,218 @@
 {
-  "common": {
-    "name": "deconz",
-    "version": "1.3.21",
-    "news": {
-      "1.3.21": {
-        "en": "added schedule to object definition\nchanged limit for duration to 999999",
-        "de": "Zeitplan zur Objektdefinition hinzugefügt\nLimit für die Dauer auf 999999 geändert",
-        "ru": "добавлено расписание в определение объекта\nизменен лимит продолжительности на 999999",
-        "pt": "agendamento adicionado à definição do objeto\nlimite de duração alterado para 999999",
-        "nl": "schema toegevoegd aan objectdefinitie\nlimiet voor duur gewijzigd in 999999",
-        "fr": "calendrier ajouté à la définition d'objet\nmodification de la limite de durée à 999999",
-        "it": "aggiunta pianificazione alla definizione dell'oggetto\nmodificato il limite di durata a 999999",
-        "es": "programación agregada a la definición de objeto\nlímite cambiado para la duración a 999999",
-        "pl": "dodano harmonogram do definicji obiektu\nzmieniono limit czasu trwania na 999999",
-        "zh-cn": "将计划添加到对象定义\n将持续时间限制更改为 999999"
-      },
-      "1.3.20": {
-        "en": "add retry if gateway is busy\nchange min/max range for offset\nupdated translations\nfix link for overview page\nfix parameter can not be set since deConz 2.11.5\nfix xy is invalid: #289 #295\nremove Sentry",
-        "de": "Fügen Sie einen Wiederholungsversuch hinzu, wenn das Gateway beschäftigt ist\nMin/Max-Bereich für Offset ändern\naktualisierte Übersetzungen\nFix Link für Übersichtsseite\nfix Parameter kann seit deConz 2.11.5 nicht gesetzt werden\nFix xy ist ungültig: #289 #295\nSentry entfernen",
-        "ru": "добавить повтор, если шлюз занят\nизменить мин./макс. диапазон для смещения\nобновленные переводы\nисправить ссылку на обзорную страницу\nпараметр fix не может быть установлен, начиная с deConz 2.11.5\nисправить xy недопустимо: # 289 # 295\nудалить часового",
-        "pt": "adicionar nova tentativa se o gateway estiver ocupado\nalterar intervalo mínimo/máximo para deslocamento\ntraduções atualizadas\ncorrigir link para página de visão geral\nparâmetro fix não pode ser definido desde deConz 2.11.5\ncorreção xy é inválida: #289 #295\nremover Sentinela",
-        "nl": "voeg opnieuw toe als gateway bezet is\nverander min/max bereik voor offset\nbijgewerkte vertalingen\nfix link voor overzichtspagina\nfix parameter kan niet worden ingesteld sinds deConz 2.11.5\nfix xy is ongeldig: #289 #295\nverwijder Sentry",
-        "fr": "ajouter une nouvelle tentative si la passerelle est occupée\nchanger la plage min/max pour le décalage\ntraductions mises à jour\nlien fixe pour la page de présentation\nle paramètre fix ne peut pas être défini depuis deConz 2.11.5\ncorriger xy n'est pas valide : #289 #295\nsupprimer sentinelle",
-        "it": "aggiungi riprova se il gateway è occupato\nmodificare l'intervallo min/max per l'offset\ntraduzioni aggiornate\ncollegamento di correzione per la pagina di panoramica\nfix parametro non può essere impostato da deConz 2.11.5\nfix xy non è valido: #289 #295\nrimuovi Sentinella",
-        "es": "agregar reintento si la puerta de enlace está ocupada\ncambiar el rango mínimo/máximo para la compensación\ntraducciones actualizadas\narreglar el enlace para la página de resumen\nEl parámetro fijo no se puede configurar desde deConz 2.11.5\narreglar xy no es válido: #289 #295\nquitar centinela",
-        "pl": "dodaj spróbuj ponownie, jeśli bramka jest zajęta\nzmień zakres min/maks dla przesunięcia\nzaktualizowane tłumaczenia\nnapraw link do strony przeglądu\nnie można ustawić parametru fix od czasu deConz 2.11.5\nnaprawienie xy jest nieprawidłowe: #289 #295\nusuń Sentry",
-        "zh-cn": "如果网关忙，则添加重试\n更改偏移的最小/最大范围\n更新的翻译\n修复概览页面的链接\n自 deConz 2.11.5 以来无法设置修复参数\n修复 xy 无效：#289 #295\n移除哨兵"
-      },
-      "1.3.19": {
-        "en": "fix for js-controller 3.3.x",
-        "de": "Fix für js-Controller 3.3.x",
-        "ru": "исправление для js-controller 3.3.x",
-        "pt": "correção para js-controller 3.3.x",
-        "nl": "fix voor js-controller 3.3.x",
-        "fr": "correctif pour js-controller 3.3.x",
-        "it": "correzione per js-controller 3.3.x",
-        "es": "arreglo para js-controller 3.3.x",
-        "pl": "poprawka dla kontrolera js 3.3.x",
-        "zh-cn": "修复 js 控制器 3.3.x"
-      }
+    "common": {
+        "name": "deconz",
+        "version": "1.3.22",
+        "news": {
+            "1.3.22": {
+                "en": "Re-enabled window covers\nDependencies got updated\nAdded ukrainian translation",
+                "de": "Fensterabdeckungen wieder aktiviert\nAbhängigkeiten wurden aktualisiert\nUkrainische Übersetzung hinzugefügt",
+                "ru": "Снова включены покрытия окон\nОбновлены зависимости\nДобавлен украинский перевод",
+                "pt": "Capas de janela reativadas\nDependências atualizadas\nAdicionada tradução para ucraniano",
+                "nl": "Raamafdekkingen opnieuw ingeschakeld\nAfhankelijkheden zijn bijgewerkt\nOekraïense vertaling toegevoegd",
+                "fr": "Couvre-fenêtres réactivés\nLes dépendances ont été mises à jour\nAjout d'une traduction ukrainienne",
+                "it": "Coperture delle finestre riattivate\nLe dipendenze sono state aggiornate\nAggiunta la traduzione in ucraino",
+                "es": "Cubiertas de ventanas reactivadas\nSe actualizaron las dependencias\nSe agregó traducción al ucraniano",
+                "pl": "Ponownie włączono osłony okien\n Zaktualizowano zależności\n Dodano tłumaczenie na język ukraiński",
+                "uk": "Знову включені кришки вікон\nОновлено залежності\nДодано український переклад",
+                "zh-cn": "重新启用窗套\n依赖项已更新\n添加了乌克兰语翻译"
+            },
+            "1.3.21": {
+                "en": "added schedule to object definition\nchanged limit for duration to 999999",
+                "de": "Zeitplan zur Objektdefinition hinzugefügt\nLimit für die Dauer auf 999999 geändert",
+                "ru": "добавлено расписание в определение объекта\nизменен лимит продолжительности на 999999",
+                "pt": "agendamento adicionado à definição do objeto\nlimite de duração alterado para 999999",
+                "nl": "schema toegevoegd aan objectdefinitie\nlimiet voor duur gewijzigd in 999999",
+                "fr": "calendrier ajouté à la définition d'objet\nmodification de la limite de durée à 999999",
+                "it": "aggiunta pianificazione alla definizione dell'oggetto\nmodificato il limite di durata a 999999",
+                "es": "programación agregada a la definición de objeto\nlímite cambiado para la duración a 999999",
+                "pl": "dodano harmonogram do definicji obiektu\nzmieniono limit czasu trwania na 999999",
+                "zh-cn": "将计划添加到对象定义\n将持续时间限制更改为 999999",
+                "uk": "додано розклад до визначення об'єкта\nобмеження тривалості змінено на 999999"
+            },
+            "1.3.20": {
+                "en": "add retry if gateway is busy\nchange min/max range for offset\nupdated translations\nfix link for overview page\nfix parameter can not be set since deConz 2.11.5\nfix xy is invalid: #289 #295\nremove Sentry",
+                "de": "Fügen Sie einen Wiederholungsversuch hinzu, wenn das Gateway beschäftigt ist\nMin/Max-Bereich für Offset ändern\naktualisierte Übersetzungen\nFix Link für Übersichtsseite\nfix Parameter kann seit deConz 2.11.5 nicht gesetzt werden\nFix xy ist ungültig: #289 #295\nSentry entfernen",
+                "ru": "добавить повтор, если шлюз занят\nизменить мин./макс. диапазон для смещения\nобновленные переводы\nисправить ссылку на обзорную страницу\nпараметр fix не может быть установлен, начиная с deConz 2.11.5\nисправить xy недопустимо: # 289 # 295\nудалить часового",
+                "pt": "adicionar nova tentativa se o gateway estiver ocupado\nalterar intervalo mínimo/máximo para deslocamento\ntraduções atualizadas\ncorrigir link para página de visão geral\nparâmetro fix não pode ser definido desde deConz 2.11.5\ncorreção xy é inválida: #289 #295\nremover Sentinela",
+                "nl": "voeg opnieuw toe als gateway bezet is\nverander min/max bereik voor offset\nbijgewerkte vertalingen\nfix link voor overzichtspagina\nfix parameter kan niet worden ingesteld sinds deConz 2.11.5\nfix xy is ongeldig: #289 #295\nverwijder Sentry",
+                "fr": "ajouter une nouvelle tentative si la passerelle est occupée\nchanger la plage min/max pour le décalage\ntraductions mises à jour\nlien fixe pour la page de présentation\nle paramètre fix ne peut pas être défini depuis deConz 2.11.5\ncorriger xy n'est pas valide : #289 #295\nsupprimer sentinelle",
+                "it": "aggiungi riprova se il gateway è occupato\nmodificare l'intervallo min/max per l'offset\ntraduzioni aggiornate\ncollegamento di correzione per la pagina di panoramica\nfix parametro non può essere impostato da deConz 2.11.5\nfix xy non è valido: #289 #295\nrimuovi Sentinella",
+                "es": "agregar reintento si la puerta de enlace está ocupada\ncambiar el rango mínimo/máximo para la compensación\ntraducciones actualizadas\narreglar el enlace para la página de resumen\nEl parámetro fijo no se puede configurar desde deConz 2.11.5\narreglar xy no es válido: #289 #295\nquitar centinela",
+                "pl": "dodaj spróbuj ponownie, jeśli bramka jest zajęta\nzmień zakres min/maks dla przesunięcia\nzaktualizowane tłumaczenia\nnapraw link do strony przeglądu\nnie można ustawić parametru fix od czasu deConz 2.11.5\nnaprawienie xy jest nieprawidłowe: #289 #295\nusuń Sentry",
+                "zh-cn": "如果网关忙，则添加重试\n更改偏移的最小/最大范围\n更新的翻译\n修复概览页面的链接\n自 deConz 2.11.5 以来无法设置修复参数\n修复 xy 无效：#289 #295\n移除哨兵",
+                "uk": "додати повторну спробу, якщо шлюз зайнятий\nзмінити мінімальний/максимальний діапазон для зміщення\nоновлені переклади\nвиправити посилання для сторінки огляду\nпараметр fix не можна встановити з deConz 2.11.5\nвиправити xy недійсний: #289 #295\nвидалити Sentry"
+            },
+            "1.3.19": {
+                "en": "fix for js-controller 3.3.x",
+                "de": "Fix für js-Controller 3.3.x",
+                "ru": "исправление для js-controller 3.3.x",
+                "pt": "correção para js-controller 3.3.x",
+                "nl": "fix voor js-controller 3.3.x",
+                "fr": "correctif pour js-controller 3.3.x",
+                "it": "correzione per js-controller 3.3.x",
+                "es": "arreglo para js-controller 3.3.x",
+                "pl": "poprawka dla kontrolera js 3.3.x",
+                "zh-cn": "修复 js 控制器 3.3.x",
+                "uk": "виправлення для js-контролера 3.3.x"
+            }
+        },
+        "title": "deConz ZigBee",
+        "titleLang": {
+            "en": "deConz ZigBee",
+            "de": "deConz ZigBee",
+            "ru": "deConz ZigBee",
+            "pt": "deConz ZigBee",
+            "nl": "deConz ZigBee",
+            "fr": "deConz ZigBee",
+            "it": "deConz ZigBee",
+            "es": "deConz ZigBee",
+            "pl": "deConz ZigBee",
+            "zh-cn": "deConz ZigBee",
+            "uk": "deConz ZigBee"
+        },
+        "desc": {
+            "en": "Connects to the deConz Software that is an gateway solution for ZigBee. deConz works with ConBee USB stick and RaspBee modul for Raspberry Pi which is also from Dresden-Elektronik.",
+            "de": "Verbindet sich mit der deConz-Software, die eine Gateway-Lösung für ZigBee ist. deConz arbeitet mit dem ConBee USB Stick und dem RaspBee Modul für den Raspberry Pi, die ebenfalls von Dresden-Elektronik sind.",
+            "ru": "Подключается к программному обеспечению deConz, которое является шлюзовым решением для ZigBee. deConz работает с ConBee и RaspBee, который также из Дрездена-Электроника.",
+            "pt": "Conecta ao software deConz que é uma solução de gateway para o ZigBee. DeConz trabalha com o conwee USB stick e RaspBee modul para Raspberry Pi que também é de Dresden-Elektronik.",
+            "nl": "Maakt verbinding met de deConz-software die een gateway-oplossing is voor ZigBee. deConz werkt met ConBee USB-stick en RaspBee-module voor Raspberry Pi, die ook van Dresden-Elektronik is.",
+            "fr": "Se connecte au logiciel deConz qui est une solution de passerelle pour ZigBee. deConz fonctionne avec la clé USB ConBee et le module RaspBee pour Raspberry Pi, également de Dresden-Elektronik.",
+            "it": "Si collega al software deConz che è una soluzione gateway per ZigBee. deConz funziona con ConBee USB stick e RaspBee modul per Raspberry Pi, anch'esso di Dresden-Elektronik.",
+            "es": "Se conecta al software deConz que es una solución de puerta de enlace para ZigBee. deConz funciona con el dispositivo USB ConBee y el módulo RaspBee para Raspberry Pi, que también es de Dresden-Elektronik.",
+            "pl": "Łączy się z oprogramowaniem deConz, które jest rozwiązaniem bramkowym dla ZigBee. deConz współpracuje z pamięcią USB ConBee i modułem RaspBee dla Raspberry Pi, który jest również z firmy Dresden-Elektronik.",
+            "zh-cn": "deConz与ConBee USB棒和Raspberry Pi的RaspBee模块一起使用，后者也是来自Dresden-Elektronik。",
+            "uk": "Підключається до програмного забезпечення deConz, яке є шлюзом для ZigBee. deConz працює з USB-накопичувачем ConBee і модулем RaspBee для Raspberry Pi, який також виготовляється Dresden-Elektronik."
+        },
+        "authors": [
+            "Jey Cee <jey-cee@live.com>"
+        ],
+        "license": "Apache-2.0",
+        "platform": "Javascript/Node.js",
+        "mode": "daemon",
+        "connectionType": "local",
+        "dataSource": "push",
+        "localLinks": {
+            "_default": "http://%bridge%:%port%"
+        },
+        "compact": true,
+        "messagebox": true,
+        "enabled": true,
+        "plugins": {},
+        "dependencies": [
+            {
+                "js-controller": ">=2.0.0"
+            }
+        ],
+        "readme": "https://github.com/Jey-Cee/ioBroker.deconz/blob/master/README.md",
+        "loglevel": "info",
+        "keywords": [
+            "deconz",
+            "philips",
+            "tradfri",
+            "lightify",
+            "dresden-elektronik",
+            "hue",
+            "led",
+            "rgb",
+            "smartlink",
+            "zigbee"
+        ],
+        "icon": "deconz.png",
+        "materialize": true,
+        "extIcon": "https://raw.githubusercontent.com/Jey-Cee/ioBroker.deconz/master/admin/deconz.png",
+        "type": "hardware"
     },
-    "title": "deConz ZigBee",
-    "titleLang": {
-      "en": "deConz ZigBee",
-      "de": "deConz ZigBee",
-      "ru": "deConz ZigBee",
-      "pt": "deConz ZigBee",
-      "nl": "deConz ZigBee",
-      "fr": "deConz ZigBee",
-      "it": "deConz ZigBee",
-      "es": "deConz ZigBee",
-      "pl": "deConz ZigBee",
-      "zh-cn": "deConz ZigBee"
+    "native": {
+        "sentry": true
     },
-    "desc": {
-      "en": "Connects to the deConz Software that is an gateway solution for ZigBee. deConz works with ConBee USB stick and RaspBee modul for Raspberry Pi which is also from Dresden-Elektronik.",
-      "de": "Verbindet sich mit der deConz-Software, die eine Gateway-Lösung für ZigBee ist. deConz arbeitet mit dem ConBee USB Stick und dem RaspBee Modul für den Raspberry Pi, die ebenfalls von Dresden-Elektronik sind.",
-      "ru": "Подключается к программному обеспечению deConz, которое является шлюзовым решением для ZigBee. deConz работает с ConBee и RaspBee, который также из Дрездена-Электроника.",
-      "pt": "Conecta ao software deConz que é uma solução de gateway para o ZigBee. DeConz trabalha com o conwee USB stick e RaspBee modul para Raspberry Pi que também é de Dresden-Elektronik.",
-      "nl": "Maakt verbinding met de deConz-software die een gateway-oplossing is voor ZigBee. deConz werkt met ConBee USB-stick en RaspBee-module voor Raspberry Pi, die ook van Dresden-Elektronik is.",
-      "fr": "Se connecte au logiciel deConz qui est une solution de passerelle pour ZigBee. deConz fonctionne avec la clé USB ConBee et le module RaspBee pour Raspberry Pi, également de Dresden-Elektronik.",
-      "it": "Si collega al software deConz che è una soluzione gateway per ZigBee. deConz funziona con ConBee USB stick e RaspBee modul per Raspberry Pi, anch'esso di Dresden-Elektronik.",
-      "es": "Se conecta al software deConz que es una solución de puerta de enlace para ZigBee. deConz funciona con el dispositivo USB ConBee y el módulo RaspBee para Raspberry Pi, que también es de Dresden-Elektronik.",
-      "pl": "Łączy się z oprogramowaniem deConz, które jest rozwiązaniem bramkowym dla ZigBee. deConz współpracuje z pamięcią USB ConBee i modułem RaspBee dla Raspberry Pi, który jest również z firmy Dresden-Elektronik.",
-      "zh-cn": "deConz与ConBee USB棒和Raspberry Pi的RaspBee模块一起使用，后者也是来自Dresden-Elektronik。"
-    },
-    "authors": [
-      "Jey Cee <jey-cee@live.com>"
+    "instanceObjects": [
+        {
+            "_id": "Groups",
+            "type": "channel",
+            "common": {
+                "name": "Information"
+            },
+            "native": {}
+        },
+        {
+            "_id": "Lights",
+            "type": "channel",
+            "common": {
+                "name": "Information"
+            },
+            "native": {}
+        },
+        {
+            "_id": "Sensors",
+            "type": "channel",
+            "common": {
+                "name": "Information"
+            },
+            "native": {}
+        },
+        {
+            "_id": "info",
+            "type": "device",
+            "common": {
+                "name": "Information for adapter"
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.connection",
+            "type": "state",
+            "common": {
+                "name": "Connection to deConz",
+                "type": "boolean",
+                "role": "indicator",
+                "def": false
+            },
+            "native": {}
+        },
+        {
+            "_id": "Gateway_info",
+            "type": "device",
+            "common": {
+                "name": "Information about the Gateway"
+            },
+            "native": {}
+        },
+        {
+            "_id": "Gateway_info.network_open",
+            "type": "state",
+            "common": {
+                "name": "Open Network for new Zigbee devices",
+                "type": "boolean",
+                "role": "indicator",
+                "read": true,
+                "write": true,
+                "def": false
+            },
+            "native": {}
+        },
+        {
+            "_id": "Gateway_info.alive",
+            "type": "state",
+            "common": {
+                "name": "Gateway alive",
+                "type": "boolean",
+                "role": "indicator.online",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        }
     ],
-    "license": "Apache-2.0",
-    "platform": "Javascript/Node.js",
-    "mode": "daemon",
-    "connectionType": "local",
-    "dataSource": "push",
-    "localLinks": {
-      "_default": "http://%bridge%:%port%"
-    },
-    "compact": true,
-    "messagebox": true,
-    "enabled": true,
-    "plugins": {},
-    "dependencies": [
-      {
-        "js-controller": ">=2.0.0"
-      }
-    ],
-    "readme": "https://github.com/Jey-Cee/ioBroker.deconz/blob/master/README.md",
-    "loglevel": "info",
-    "keywords": [
-      "deconz",
-      "philips",
-      "tradfri",
-      "lightify",
-      "dresden-elektronik",
-      "hue",
-      "led",
-      "rgb",
-      "smartlink",
-      "zigbee"
-    ],
-    "icon": "deconz.png",
-    "materialize": true,
-    "extIcon": "https://raw.githubusercontent.com/Jey-Cee/ioBroker.deconz/master/admin/deconz.png",
-    "type": "hardware"
-  },
-  "native": {
-    "sentry": true
-  },
-  "instanceObjects": [
-    {
-      "_id": "Groups",
-      "type": "channel",
-      "common": {
-        "name": "Information"
-      },
-      "native": {}
-    },
-    {
-      "_id": "Lights",
-      "type": "channel",
-      "common": {
-        "name": "Information"
-      },
-      "native": {}
-    },
-    {
-      "_id": "Sensors",
-      "type": "channel",
-      "common": {
-        "name": "Information"
-      },
-      "native": {}
-    },
-    {
-      "_id": "info",
-      "type": "device",
-      "common": {
-        "name": "Information for adapter"
-      },
-      "native": {}
-    },
-    {
-      "_id": "info.connection",
-      "type": "state",
-      "common": {
-        "name": "Connection to deConz",
-        "type": "boolean",
-        "role": "indicator",
-        "def": false
-      },
-      "native": {}
-    },
-    {
-      "_id": "Gateway_info",
-      "type": "device",
-      "common": {
-        "name": "Information about the Gateway"
-      },
-      "native": {}
-    },
-    {
-      "_id": "Gateway_info.network_open",
-      "type": "state",
-      "common": {
-        "name": "Open Network for new Zigbee devices",
-        "type": "boolean",
-        "role": "indicator",
-        "read": true,
-        "write": true,
-        "def": false
-      },
-      "native": {}
-    },
-    {
-      "_id": "Gateway_info.alive",
-      "type": "state",
-      "common": {
-        "name": "Gateway alive",
-        "type": "boolean",
-        "role": "indicator.online",
-        "read": true,
-        "write": false,
-        "def": false
-      },
-      "native": {}
-    }
-  ],
-  "objects": [
-    {
-      "_id": "enum.functions.color",
-      "common": {
-        "name": "Color",
-        "members": []
-      },
-      "type": "enum",
-      "native": {}
-    }
-  ]
+    "objects": [
+        {
+            "_id": "enum.functions.color",
+            "common": {
+                "name": "Color",
+                "members": []
+            },
+            "type": "enum",
+            "native": {}
+        }
+    ]
 }
