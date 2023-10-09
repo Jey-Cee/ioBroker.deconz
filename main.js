@@ -617,7 +617,7 @@ function autoDiscovery() {
     discovery.search({ st: "ssdp:all" });
     wait = setTimeout(() => {
       adapter.log.warn(
-        "Could not found deConz by broadcast, establishing Websocket without monitoring the connection state. This is happen if you are using VLAN or installed deConz in an container."
+        "Unable to find deConz by broadcast, establishing Websocket without monitoring the connection state. This usually happens when you are using a VLAN or installed deConz in a container."
       );
       getAutoUpdates();
     }, 10 * 1000);
