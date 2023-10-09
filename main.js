@@ -163,6 +163,18 @@ class deconz extends utils.Adapter {
                   "}";
               }
               break;
+            case "stop":
+              if (transitionTime === "none" || transitionTime === 0) {
+                parameters = '{"stop": ' + JSON.stringify(state.val) + "}";
+              } else {
+                parameters =
+                  '{"transitiontime": ' +
+                  JSON.stringify(transitionTime) +
+                  ', "on": ' +
+                  JSON.stringify(state.val) +
+                  "}";
+              }
+              break;
             case "hue":
               if (transitionTime === "none" || transitionTime === 0) {
                 parameters =
@@ -370,6 +382,8 @@ class deconz extends utils.Adapter {
                 },
               });
               break;
+            case "tilt":
+            case "lift":
             case "offset":
             case "sensitivity":
             case "usertest":
@@ -412,12 +426,16 @@ class deconz extends utils.Adapter {
               obj !== null || obj !== undefined ? obj.native.id : "";
 
             switch (obj.common.role) {
+              case "blind":
               case "light":
                 await setLightState(
                   parameters,
                   controlId,
                   this.name + "." + this.instance + "." + id + "." + dp
                 );
+                if ('stop' === dp){
+                  await getLightState( id.split('.').pop() );
+                }
                 break;
               case "group":
                 if (dp !== "createscene") {
@@ -1889,101 +1907,180 @@ async function getAllLights() {
             //mac = mac.match(/..:..:..:..:..:..:..:../g).toString();
             //let lightID = mac.replace(/:/g, '');
 
-            //create object for light device
-            adapter.setObjectNotExists(`Lights.${lightID}`, {
-              type: "device",
-              common: {
-                name: list[keyName]["name"],
-                role: "light",
-              },
-              native: {
-                etag: list[keyName]["etag"],
-                hascolor: list[keyName]["hascolor"],
-                id: Object.keys(list)[i],
-                manufacturername: list[keyName]["manufacturername"],
-                modelid: list[keyName]["modelid"],
-                swversion: list[keyName]["swversion"],
-                type: list[keyName]["type"],
-                uniqueid: list[keyName]["uniqueid"],
-              },
-            });
-            if (list[keyName]["state"]) {
-              let count2 = Object.keys(list[keyName]["state"]).length - 1;
-              //create states for light device
-              for (let z = 0; z <= count2; z++) {
-                let stateName = Object.keys(list[keyName]["state"])[z];
-                await SetObjectAndState(
-                  lightID,
-                  list[keyName]["name"],
-                  "Lights",
-                  stateName,
-                  list[keyName]["state"][stateName]
-                );
-                await SetObjectAndState(
-                  lightID,
-                  list[keyName]["name"],
-                  "Lights",
-                  "transitiontime",
-                  null
-                );
-                await SetObjectAndState(
-                  lightID,
-                  list[keyName]["name"],
-                  "Lights",
-                  "level",
-                  null
-                );
-                adapter.setObjectNotExists(`Lights.${lightID}.dimspeed`, {
-                  type: "state",
+            switch (list[keyName]['type']){
+              case 'Window covering device':  // is this a window covering unit?
+              case 'Window covering controller':  // is this a window covering unit?
+                adapter.setObjectNotExists(`Lights.${lightID}`, {
+                  type: 'device',
                   common: {
-                    name: list[keyName]["name"] + " " + "dimspeed",
-                    type: "number",
-                    role: "level.dimspeed",
-                    min: 0,
-                    max: 254,
-                    read: false,
-                    write: true,
+                    name: list[keyName]['name'],
+                    role: 'blind'
                   },
-                  native: {},
+                  native: {
+                    etag: list[keyName]['etag'],
+                    hascolor: list[keyName]['hascolor'],
+                    id: Object.keys(list)[i],
+                    manufacturername: list[keyName]['manufacturername'],
+                    modelid: list[keyName]['modelid'],
+                    swversion: list[keyName]['swversion'],
+                    type: list[keyName]['type'],
+                    uniqueid: list[keyName]['uniqueid']
+                  }
                 });
-                adapter.setObjectNotExists(`Lights.${lightID}.dimup`, {
-                  type: "state",
+                await createBlindsDevice(list, keyName, lightID);
+                break;
+              default:
+                adapter.setObjectNotExists(`Lights.${lightID}`, {
+                  type: 'device',
                   common: {
-                    name: list[keyName]["name"] + " " + "dimup",
-                    role: "button",
-                    type: "boolean",
-                    read: false,
-                    write: true,
+                    name: list[keyName]['name'],
+                    role: 'light'
                   },
+                  native: {
+                    etag: list[keyName]['etag'],
+                    hascolor: list[keyName]['hascolor'],
+                    id: Object.keys(list)[i],
+                    manufacturername: list[keyName]['manufacturername'],
+                    modelid: list[keyName]['modelid'],
+                    swversion: list[keyName]['swversion'],
+                    type: list[keyName]['type'],
+                    uniqueid: list[keyName]['uniqueid']
+                  }
                 });
-                adapter.setObjectNotExists(`Lights.${lightID}.dimdown`, {
-                  type: "state",
-                  common: {
-                    name: list[keyName]["name"] + " " + "dimdown",
-                    role: "button",
-                    type: "boolean",
-                    read: false,
-                    write: true,
-                  },
-                });
-                adapter.setObjectNotExists(`Lights.${lightID}.action`, {
-                  type: "state",
-                  common: {
-                    name: list[keyName]["name"] + " " + "action",
-                    role: "argument",
-                    type: "string",
-                    read: false,
-                    write: true,
-                  },
-                });
-              }
+                await createLightDevice(list, keyName, lightID);
+                break;
             }
+
           }
         }
       }
     });
   }
 } //END getAllLights
+
+async function createLightDevice(list, keyName, lightID){
+  if (list[keyName]["state"]) {
+    let count2 = Object.keys(list[keyName]["state"]).length - 1;
+    //create states for light device
+    for (let z = 0; z <= count2; z++) {
+      let stateName = Object.keys(list[keyName]["state"])[z];
+      await SetObjectAndState(
+          lightID,
+          list[keyName]["name"],
+          "Lights",
+          stateName,
+          list[keyName]["state"][stateName]
+      );
+      await SetObjectAndState(
+          lightID,
+          list[keyName]["name"],
+          "Lights",
+          "transitiontime",
+          null
+      );
+      await SetObjectAndState(
+          lightID,
+          list[keyName]["name"],
+          "Lights",
+          "level",
+          null
+      );
+      adapter.setObjectNotExists(`Lights.${lightID}.dimspeed`, {
+        type: "state",
+        common: {
+          name: list[keyName]["name"] + " " + "dimspeed",
+          type: "number",
+          role: "level.dimspeed",
+          min: 0,
+          max: 254,
+          read: false,
+          write: true,
+        },
+        native: {},
+      });
+      adapter.setObjectNotExists(`Lights.${lightID}.dimup`, {
+        type: "state",
+        common: {
+          name: list[keyName]["name"] + " " + "dimup",
+          role: "button",
+          type: "boolean",
+          read: false,
+          write: true,
+        },
+      });
+      adapter.setObjectNotExists(`Lights.${lightID}.dimdown`, {
+        type: "state",
+        common: {
+          name: list[keyName]["name"] + " " + "dimdown",
+          role: "button",
+          type: "boolean",
+          read: false,
+          write: true,
+        },
+      });
+      adapter.setObjectNotExists(`Lights.${lightID}.action`, {
+        type: "state",
+        common: {
+          name: list[keyName]["name"] + " " + "action",
+          role: "argument",
+          type: "string",
+          read: false,
+          write: true,
+        },
+      });
+    }
+  }
+}
+
+async function createBlindsDevice(list, keyName, lightID){
+  if (list[keyName]["state"]) {
+    let count2 = Object.keys(list[keyName]["state"]).length - 1;
+    //create states for light device
+    for (let z = 0; z <= count2; z++) {
+      let stateName = Object.keys(list[keyName]["state"])[z];
+      await SetObjectAndState(
+          lightID,
+          list[keyName]["name"],
+          "Lights",
+          stateName,
+          list[keyName]["state"][stateName]
+      );
+      await SetObjectAndState(
+          lightID,
+          list[keyName]["name"],
+          "Lights",
+          "transitiontime",
+          null
+      );
+      adapter.setObjectNotExists(`Lights.${lightID}.stop`, {
+        type: "state",
+        common: {
+          name: list[keyName]["name"] + " " + "stop",
+          type: "boolean",
+          role: "button",
+          read: false,
+          write: true,
+          default:false
+        },
+        native: {},
+      });
+      /*
+      adapter.setObjectNotExists(`Blinds.${lightID}.tilt`, {
+        type: "state",
+        common: {
+          name: list[keyName]["name"] + " " + "dimup",
+          role: "level.tilt",
+          type: "number",
+          read: false,
+          write: true,
+          min:0,
+          max:100
+        },
+      });
+       */
+    }
+  }
+}
 
 async function getLightState(lightId) {
   const { ip, port, user } = await getGatewayParam();
@@ -2001,23 +2098,47 @@ async function getLightState(lightId) {
           let list = JSON.parse(body);
           let keyName = Object.keys(list)[0];
           //create object for light device
-          adapter.extendObject(`Lights.${lightId}`, {
-            type: "device",
-            common: {
-              name: list["name"],
-              role: "light",
-            },
-            native: {
-              etag: list["etag"],
-              hascolor: list["hascolor"],
-              id: lightId,
-              manufacturername: list["manufacturername"],
-              modelid: list["modelid"],
-              swversion: list["swversion"],
-              type: list["type"],
-              uniqueid: list["uniqueid"],
-            },
-          });
+          switch(list['type']){
+            case 'Window covering device':  // is this a window covering unit?
+            case 'Window covering controller':  // is this a window covering unit?
+              adapter.extendObject(`Lights.${lightId}`, {
+                type: 'device',
+                common: {
+                  name: list['name'],
+                  role: 'blind'
+                },
+                native: {
+                  etag: list['etag'],
+                  hascolor: list['hascolor'],
+                  id: lightId,
+                  manufacturername: list['manufacturername'],
+                  modelid: list['modelid'],
+                  swversion: list['swversion'],
+                  type: list['type'],
+                  uniqueid: list['uniqueid']
+                }
+              });
+              break;
+            default:
+              adapter.extendObject(`Lights.${lightId}`, {
+                type: 'device',
+                common: {
+                  name: list['name'],
+                  role: 'light'
+                },
+                native: {
+                  etag: list['etag'],
+                  hascolor: list['hascolor'],
+                  id: lightId,
+                  manufacturername: list['manufacturername'],
+                  modelid: list['modelid'],
+                  swversion: list['swversion'],
+                  type: list['type'],
+                  uniqueid: list['uniqueid']
+                }
+              });
+              break;
+          }
           let count2 = Object.keys(list["state"]).length - 1;
           //create states for light device
           for (let z = 0; z <= count2; z++) {
@@ -2909,6 +3030,21 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objType = "number";
       objRole = "level.value";
       objDefault = 1;
+      break;
+    case "lift":
+      objType = "number";
+      objRole = "level.value";
+      objDefault = 0;
+      break;
+    case "tilt":
+      objType = "number";
+      objRole = "level.value";
+      objDefault = 1;
+      break;
+    case "stop":
+      objType = "boolean";
+      objRole = "button";
+      objDefault = true;
       break;
     case "alert":
       objType = "string";
