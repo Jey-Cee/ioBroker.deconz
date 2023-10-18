@@ -345,7 +345,7 @@
     }
 
     function save(callback) {
-        sendTo('deconz.' + instance, 'saveConfig', {'ipaddress': $('#bridge').val(), 'port': $('#port').val(), 'websocketPort': $('#websocketPort').val(), 'networkopenduration': $('#permit').val(), 'user': $('#user').val()}, (result) => {});
+        sendTo('deconz.' + instance, 'saveConfig', {'ipaddress': $('#bridge').val(), 'port': $('#port').val(), 'websocketport': $('#websocketport').val(), 'networkopenduration': $('#permit').val(), 'user': $('#user').val()}, (result) => {});
         let obj = {};
         $('.value').each(function () {
             var $this = $(this);
@@ -416,8 +416,8 @@
                     <label class="translate active" for="port" data-lang="Bridge Port">Port</label>
                 </div>
                 <div class="input-field col s12 m8 l3">
-                    <input class="value number" id="websocketPort" size="5" maxlength="5" type="number" value="443">
-                    <label class="translate active" for="websocketPort" data-lang="Websocket Port">Websocket Port</label>
+                    <input class="value number" id="websocketport" size="5" maxlength="5" type="number" value="443">
+                    <label class="translate active" for="websocketport" data-lang="Websocket Port">Websocket Port</label>
                 </div>
             </div>
             <div class="row">
