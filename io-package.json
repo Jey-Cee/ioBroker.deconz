@@ -1,8 +1,12 @@
 {
   "common": {
     "name": "deconz",
-    "version": "1.3.21",
+    "version": "1.3.23",
     "news": {
+      "1.3.23": {
+        "en": "fix crash when new device was added\n added possibility to change the port for websocket connection\n updated/added translations",
+        "de": "Absturz behoben, wenn ein neues Gerät hinzugefügt wurde\n Möglichkeit hinzugefügt, den Port für die WebSocket-Verbindung zu ändern\n Übersetzungen aktualisiert/hinzugefügt"
+      },
       "1.3.21": {
         "en": "added schedule to object definition\nchanged limit for duration to 999999",
         "de": "Zeitplan zur Objektdefinition hinzugefügt\nLimit für die Dauer auf 999999 geändert",
