@@ -47,7 +47,9 @@ Examples:
 * fix crash when new device was added closes [#319](https://github.com/Jey-Cee/ioBroker.deconz/issues/319)
 * added possibility to change the port for websocket connection
 * updated/added translations
-
+* (grizzelbee) Fix: Re-enabled window covers
+* (grizzelbee) Upd: Dependencies got updated
+* (grizzelbee) New: Added ukrainian translation
 
 ### 1.3.21 (2022-05-13)
 * added schedule to object definition
