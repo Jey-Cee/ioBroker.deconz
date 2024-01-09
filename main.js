@@ -3119,6 +3119,10 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objType = "string";
       objRole = "state";
       break;
+    case "preset":
+      objType = "string";
+      objRole = "state";
+      break;
     case "schedule":
       objType = "object";
       objRole = "schedule";
