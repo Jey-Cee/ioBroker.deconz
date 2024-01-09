@@ -2780,6 +2780,11 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objRole = "sensor.alarm.flood";
       objWrite = false;
       break;
+    case "windowopen_set":
+      objType = "boolean";
+      objRole = "indicator";
+      objWrite = true;
+      break;
     case "scheduleron":
     case "tampered":
     case "dark":
