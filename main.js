@@ -714,14 +714,7 @@ async function deleteAPIkey() {
   if (ip !== "none" && port !== "none" && user !== "none") {
     let options = {
       url:
-        "http://" +
-        ip +
-        ":" +
-        port +
-        "/api/" +
-        user +
-        "/config/whitelist/" +
-        user,
+        "http://" + ip + ":" + port + "/api/" + user + "/config/whitelist/" + user,
       method: "DELETE",
       headers: {
         "Content-Type": "text/plain;charset=UTF-8",
@@ -979,7 +972,9 @@ async function modifyConfig(parameters) {
     let options = {
       url: "http://" + ip + ":" + port + "/api/" + user + "/config",
       method: "PUT",
-      headers: 'Content-Type" : "application/json',
+      headers: {
+        "Content-Type" : "application/json",
+      }
       body: parameters,
     };
 
@@ -1419,18 +1414,11 @@ async function setGroupState(parameters, groupId, stateId) {
 
   if (ip !== "none" && port !== "none" && user !== "none") {
     let options = {
-      url:
-        "http://" +
-        ip +
-        ":" +
-        port +
-        "/api/" +
-        user +
-        "/groups/" +
-        groupId +
-        "/action",
+      url: "http://" + ip + ":" + port + "/api/" + user + "/groups/" + groupId + "/action",
       method: "PUT",
-      headers: "Content-Type : application/json",
+      headers: {
+        "Content-Type" : "application/json",
+      }
       body: parameters,
     };
 
@@ -1475,19 +1463,11 @@ async function setGroupScene(
 
   if (ip !== "none" && port !== "none" && user !== "none") {
     let options = {
-      url:
-        "http://" +
-        ip +
-        ":" +
-        port +
-        "/api/" +
-        user +
-        "/groups/" +
-        groupId +
-        "/scenes" +
-        sceneString,
+      url: "http://" + ip + ":" + port + "/api/" + user + "/groups/" + groupId + "/scenes" + sceneString,
       method: method,
-      headers: 'Content-Type" : "application/json',
+      headers: {
+        "Content-Type" : "application/json",
+      }
       body: parameters,
     };
 
@@ -1684,8 +1664,7 @@ async function getSensor(sensorId) {
 
   if (ip !== "none" && port !== "none" && user !== "none") {
     let options = {
-      url:
-        "http://" + ip + ":" + port + "/api/" + user + "/sensors/" + sensorId,
+      url: "http://" + ip + ":" + port + "/api/" + user + "/sensors/" + sensorId,
       method: "GET",
     };
     request(options, async (error, res, body) => {
@@ -1781,18 +1760,11 @@ async function setSensorParameters(parameters, sensorId, stateId, callback) {
 
   if (ip !== "none" && port !== "none" && user !== "none") {
     let options = {
-      url:
-        "http://" +
-        ip +
-        ":" +
-        port +
-        "/api/" +
-        user +
-        "/sensors/" +
-        sensorId +
-        "/config",
+      url: "http://" + ip + ":" + port + "/api/" + user + "/sensors/" + sensorId + "/config",
       method: "PUT",
-      headers: 'Content-Type" : "application/json',
+      headers: {
+        "Content-Type" : "application/json",
+      }
       body: parameters,
     };
 
@@ -1824,10 +1796,11 @@ async function deleteSensor(sensorId) {
 
   if (ip !== "none" && port !== "none" && user !== "none") {
     let options = {
-      url:
-        "http://" + ip + ":" + port + "/api/" + user + "/sensors/" + sensorId,
+      url: "http://" + ip + ":" + port + "/api/" + user + "/sensors/" + sensorId,
       method: "DELETE",
-      headers: 'Content-Type" : "application/json',
+      headers: {
+        "Content-Type" : "application/json",
+      }
     };
 
     request(options, async (error, res, body) => {
@@ -2163,17 +2136,11 @@ async function setLightState(parameters, lightId, stateId, callback) {
   if (ip !== "none" && port !== "none" && user !== "none") {
     let options = {
       url:
-        "http://" +
-        ip +
-        ":" +
-        port +
-        "/api/" +
-        user +
-        "/lights/" +
-        lightId +
-        "/state",
+        "http://" + ip + ":" + port + "/api/" + user + "/lights/" + lightId + "/state",
       method: "PUT",
-      headers: 'Content-Type" : "application/json',
+      headers: {
+        "Content-Type" : "application/json",
+      }
       body: parameters,
     };
 
@@ -2244,7 +2211,9 @@ async function deleteLight(lightId) {
     let options = {
       url: "http://" + ip + ":" + port + "/api/" + user + "/lights/" + lightId,
       method: "DELETE",
-      headers: 'Content-Type" : "application/json',
+      headers: {
+        "Content-Type" : "application/json",
+      }
     };
 
     request(options, async (error, res, body) => {
@@ -2300,18 +2269,11 @@ async function removeFromGroups(lightId) {
 
   if (ip !== "none" && port !== "none" && user !== "none") {
     let options = {
-      url:
-        "http://" +
-        ip +
-        ":" +
-        port +
-        "/api/" +
-        user +
-        "/lights/" +
-        lightId +
-        "/groups",
+      url: "http://" + ip + ":" + port + "/api/" + user + "/lights/" + lightId + "/groups",
       method: "DELETE",
-      headers: 'Content-Type" : "application/json',
+      headers: {
+        "Content-Type" : "application/json",
+      }
     };
 
     request(options, async (error, res, body) => {
