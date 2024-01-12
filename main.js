@@ -713,8 +713,7 @@ async function deleteAPIkey() {
 
   if (ip !== "none" && port !== "none" && user !== "none") {
     let options = {
-      url:
-        "http://" + ip + ":" + port + "/api/" + user + "/config/whitelist/" + user,
+      url: "http://" + ip + ":" + port + "/api/" + user + "/config/whitelist/" + user,
       method: "DELETE",
       headers: {
         "Content-Type": "text/plain;charset=UTF-8",
@@ -974,7 +973,7 @@ async function modifyConfig(parameters) {
       method: "PUT",
       headers: {
         "Content-Type" : "application/json",
-      }
+      },
       body: parameters,
     };
 
@@ -1418,7 +1417,7 @@ async function setGroupState(parameters, groupId, stateId) {
       method: "PUT",
       headers: {
         "Content-Type" : "application/json",
-      }
+      },
       body: parameters,
     };
 
@@ -1467,7 +1466,7 @@ async function setGroupScene(
       method: method,
       headers: {
         "Content-Type" : "application/json",
-      }
+      },
       body: parameters,
     };
 
@@ -1528,7 +1527,9 @@ async function deleteGroup(groupId) {
     let options = {
       url: "http://" + ip + ":" + port + "/api/" + user + "/groups/" + groupId,
       method: "DELETE",
-      headers: 'Content-Type" : "application/json',
+      headers: {
+        "Content-Type" : "application/json",
+      },
     };
 
     request(options, async (error, res, body) => {
@@ -1764,7 +1765,7 @@ async function setSensorParameters(parameters, sensorId, stateId, callback) {
       method: "PUT",
       headers: {
         "Content-Type" : "application/json",
-      }
+      },
       body: parameters,
     };
 
@@ -1800,7 +1801,7 @@ async function deleteSensor(sensorId) {
       method: "DELETE",
       headers: {
         "Content-Type" : "application/json",
-      }
+      },
     };
 
     request(options, async (error, res, body) => {
@@ -2135,12 +2136,11 @@ async function setLightState(parameters, lightId, stateId, callback) {
 
   if (ip !== "none" && port !== "none" && user !== "none") {
     let options = {
-      url:
-        "http://" + ip + ":" + port + "/api/" + user + "/lights/" + lightId + "/state",
+      url: "http://" + ip + ":" + port + "/api/" + user + "/lights/" + lightId + "/state",
       method: "PUT",
       headers: {
         "Content-Type" : "application/json",
-      }
+      },
       body: parameters,
     };
 
@@ -2213,7 +2213,7 @@ async function deleteLight(lightId) {
       method: "DELETE",
       headers: {
         "Content-Type" : "application/json",
-      }
+      },
     };
 
     request(options, async (error, res, body) => {
@@ -2273,7 +2273,7 @@ async function removeFromGroups(lightId) {
       method: "DELETE",
       headers: {
         "Content-Type" : "application/json",
-      }
+      },
     };
 
     request(options, async (error, res, body) => {
