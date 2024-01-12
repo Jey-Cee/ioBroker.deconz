@@ -972,7 +972,7 @@ async function modifyConfig(parameters) {
       url: "http://" + ip + ":" + port + "/api/" + user + "/config",
       method: "PUT",
       headers: {
-        "Content-Type" : "application/json",
+        "Content-Type": "application/json",
       },
       body: parameters,
     };
@@ -1416,7 +1416,7 @@ async function setGroupState(parameters, groupId, stateId) {
       url: "http://" + ip + ":" + port + "/api/" + user + "/groups/" + groupId + "/action",
       method: "PUT",
       headers: {
-        "Content-Type" : "application/json",
+        "Content-Type": "application/json",
       },
       body: parameters,
     };
@@ -1465,7 +1465,7 @@ async function setGroupScene(
       url: "http://" + ip + ":" + port + "/api/" + user + "/groups/" + groupId + "/scenes" + sceneString,
       method: method,
       headers: {
-        "Content-Type" : "application/json",
+        "Content-Type": "application/json",
       },
       body: parameters,
     };
@@ -1528,7 +1528,7 @@ async function deleteGroup(groupId) {
       url: "http://" + ip + ":" + port + "/api/" + user + "/groups/" + groupId,
       method: "DELETE",
       headers: {
-        "Content-Type" : "application/json",
+        "Content-Type": "application/json",
       },
     };
 
@@ -1764,7 +1764,7 @@ async function setSensorParameters(parameters, sensorId, stateId, callback) {
       url: "http://" + ip + ":" + port + "/api/" + user + "/sensors/" + sensorId + "/config",
       method: "PUT",
       headers: {
-        "Content-Type" : "application/json",
+        "Content-Type": "application/json",
       },
       body: parameters,
     };
@@ -1800,7 +1800,7 @@ async function deleteSensor(sensorId) {
       url: "http://" + ip + ":" + port + "/api/" + user + "/sensors/" + sensorId,
       method: "DELETE",
       headers: {
-        "Content-Type" : "application/json",
+        "Content-Type": "application/json",
       },
     };
 
@@ -2139,7 +2139,7 @@ async function setLightState(parameters, lightId, stateId, callback) {
       url: "http://" + ip + ":" + port + "/api/" + user + "/lights/" + lightId + "/state",
       method: "PUT",
       headers: {
-        "Content-Type" : "application/json",
+        "Content-Type": "application/json",
       },
       body: parameters,
     };
@@ -2212,7 +2212,7 @@ async function deleteLight(lightId) {
       url: "http://" + ip + ":" + port + "/api/" + user + "/lights/" + lightId,
       method: "DELETE",
       headers: {
-        "Content-Type" : "application/json",
+        "Content-Type": "application/json",
       },
     };
 
@@ -2272,7 +2272,7 @@ async function removeFromGroups(lightId) {
       url: "http://" + ip + ":" + port + "/api/" + user + "/lights/" + lightId + "/groups",
       method: "DELETE",
       headers: {
-        "Content-Type" : "application/json",
+        "Content-Type": "application/json",
       },
     };
 
