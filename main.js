@@ -2725,10 +2725,6 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objWrite = false;
       break;
     case "windowopen_set":
-      objType = "boolean";
-      objRole = "indicator";
-      objWrite = true;
-      break;
     case "scheduleron":
     case "tampered":
     case "dark":
@@ -3067,10 +3063,26 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "mode":
       objType = "string";
       objRole = "state";
+      objDefault = "heat";
+      objStates = {
+        auto: "auto",
+        heat: "heat",
+        off: "off",
+      };
       break;
     case "preset":
       objType = "string";
       objRole = "state";
+      objDefault = "manual";
+      objStates = {
+        holiday: "holiday",
+        auto: "auto",
+        manual: "manual",
+        comfort: "comfort",
+        eco: "eco",
+        boost: "boost",
+        complex: "complex",
+      };
       break;
     case "schedule":
       objType = "object";
