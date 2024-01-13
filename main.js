@@ -2725,6 +2725,8 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objWrite = false;
       break;
     case "windowopen_set":
+      objRole = "switch";
+      break;
     case "scheduleron":
     case "tampered":
     case "dark":
