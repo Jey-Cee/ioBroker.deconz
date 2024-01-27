@@ -107,18 +107,11 @@ class deconz extends utils.Adapter {
                 state.val > 0 &&
                 (transitionTime === "none" || transitionTime === 0)
               ) {
-                parameters =
-                  '{"bri": ' + JSON.stringify(state.val) + ', "on": true}';
+                parameters = '{"bri": ' + JSON.stringify(state.val) + ', "on": true}';
               } else if (state.val > 0) {
-                parameters =
-                  '{"transitiontime": ' +
-                  JSON.stringify(transitionTime) +
-                  ', "bri": ' +
-                  JSON.stringify(state.val) +
-                  ', "on": true}';
+                parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "bri": ' + JSON.stringify(state.val) + ', "on": true}';
               } else {
-                parameters =
-                  '{"bri": ' + JSON.stringify(state.val) + ', "on": false}';
+                parameters = '{"bri": ' + JSON.stringify(state.val) + ', "on": false}';
               }
               await SetObjectAndState(
                 tmp[3],
@@ -133,109 +126,60 @@ class deconz extends utils.Adapter {
                 state.val > 0 &&
                 (transitionTime === "none" || transitionTime === 0)
               ) {
-                parameters =
-                  '{"bri": ' +
-                  Math.floor((255 / 100) * state.val) +
-                  ', "on": true}';
+                parameters = '{"bri": ' + Math.floor((255 / 100) * state.val) + ', "on": true}';
               } else if (state.val > 0) {
-                parameters =
-                  '{"transitiontime": ' +
-                  JSON.stringify(transitionTime) +
-                  ', "bri": ' +
-                  Math.floor((255 / 100) * state.val) +
-                  ', "on": true}';
+                parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "bri": ' + Math.floor((255 / 100) * state.val) + ', "on": true}';
               } else {
-                parameters =
-                  '{"bri": ' +
-                  Math.floor((255 / 100) * state.val) +
-                  ', "on": false}';
+                parameters = '{"bri": ' + Math.floor((255 / 100) * state.val) + ', "on": false}';
               }
               break;
             case "on":
               if (transitionTime === "none" || transitionTime === 0) {
                 parameters = '{"on": ' + JSON.stringify(state.val) + "}";
               } else {
-                parameters =
-                  '{"transitiontime": ' +
-                  JSON.stringify(transitionTime) +
-                  ', "on": ' +
-                  JSON.stringify(state.val) +
-                  "}";
+                parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "on": ' + JSON.stringify(state.val) + "}";
               }
               break;
             case "stop":
               if (transitionTime === "none" || transitionTime === 0) {
                 parameters = '{"stop": ' + JSON.stringify(state.val) + "}";
               } else {
-                parameters =
-                  '{"transitiontime": ' +
-                  JSON.stringify(transitionTime) +
-                  ', "on": ' +
-                  JSON.stringify(state.val) +
-                  "}";
+                parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "on": ' + JSON.stringify(state.val) + "}";
               }
               break;
             case "hue":
               if (transitionTime === "none" || transitionTime === 0) {
-                parameters =
-                  '{"hue": ' +
-                  Math.round(parseInt(JSON.stringify(state.val)) * hue_factor) +
-                  "}";
+                parameters = '{"hue": ' + Math.round(parseInt(JSON.stringify(state.val)) * hue_factor) + "}";
               } else {
-                parameters =
-                  '{"transitiontime": ' +
-                  JSON.stringify(transitionTime) +
-                  ', "hue": ' +
-                  Math.round(parseInt(JSON.stringify(state.val)) * hue_factor) +
-                  "}";
+                parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "hue": ' + Math.round(parseInt(JSON.stringify(state.val)) * hue_factor) + "}";
               }
               break;
             case "sat":
               if (transitionTime === "none" || transitionTime === 0) {
                 parameters = '{"sat": ' + JSON.stringify(state.val) + "}";
               } else {
-                parameters =
-                  '{"transitiontime": ' +
-                  JSON.stringify(transitionTime) +
-                  ', "sat": ' +
-                  JSON.stringify(state.val) +
-                  "}";
+                parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "sat": ' + JSON.stringify(state.val) + "}";
               }
               break;
             case "ct":
               if (transitionTime === "none" || transitionTime === 0) {
                 parameters = '{"ct": ' + JSON.stringify(state.val) + "}";
               } else {
-                parameters =
-                  '{"transitiontime": ' +
-                  JSON.stringify(transitionTime) +
-                  ', "ct": ' +
-                  JSON.stringify(state.val) +
-                  "}";
+                parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "ct": ' + JSON.stringify(state.val) + "}";
               }
               break;
             case "xy":
               if (transitionTime === "none" || transitionTime === 0) {
                 parameters = '{"xy":' + state.val + "}";
               } else {
-                parameters =
-                  '{"transitiontime": ' +
-                  JSON.stringify(transitionTime) +
-                  ', "xy":' +
-                  state.val +
-                  "}";
+                parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "xy":' + state.val + "}";
               }
               break;
             case "alert":
               if (transitionTime === "none" || transitionTime === 0) {
                 parameters = '{"alert": ' + JSON.stringify(state.val) + "}";
               } else {
-                parameters =
-                  '{"transitiontime": ' +
-                  JSON.stringify(transitionTime) +
-                  ', "alert": ' +
-                  JSON.stringify(state.val) +
-                  "}";
+                parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "alert": ' + JSON.stringify(state.val) + "}";
               }
               break;
             case "colorspeed":
@@ -243,10 +187,7 @@ class deconz extends utils.Adapter {
                 this.name + "." + this.instance + "." + id + ".effect"
               );
               if (effect && effect.val === "colorloop") {
-                parameters =
-                  '{"colorloopspeed": ' +
-                  state.val +
-                  ', "effect": "colorloop"}';
+                parameters = '{"colorloopspeed": ' + state.val + ', "effect": "colorloop"}';
               }
               break;
             case "effect":
@@ -257,12 +198,7 @@ class deconz extends utils.Adapter {
                 if (speed.val === null || speed.val === undefined) {
                   speed.val = 1;
                 }
-                parameters =
-                  '{"colorloopspeed": ' +
-                  speed.val +
-                  ', "effect": ' +
-                  JSON.stringify(state.val) +
-                  "}";
+                parameters = '{"colorloopspeed": ' + speed.val + ', "effect": ' + JSON.stringify(state.val) + "}";
               } else if (
                 state.val === "steady" ||
                 state.val === "snow" ||
@@ -392,15 +328,21 @@ class deconz extends utils.Adapter {
             case "delay":
             case "locked":
             case "windowopen_set":
+            case "externalwindowopen":
             case "boost":
             case "off":
             case "mode":
+              parameters = `{ "${dp}": ${state.val} }`;
+              break;
             case "preset":
+              parameters = `{ "${dp}": ${state.val} }`;
+              break;
             case "volume":
             case "melody":
               parameters = `{ "${dp}": ${state.val} }`;
               break;
             case "heatsetpoint":
+            case "externalsensortemp":   
             case "temperature":
               let val = Math.floor(state.val * 100);
               parameters = `{ "${dp}": ${val} }`;
@@ -610,9 +552,7 @@ function autoDiscovery() {
 
   discovery.on("message", (msg, rinfo, iface) => {
     if (msg.headers.st === "urn:schemas-upnp-org:device:basic:1") {
-      adapter.log.debug(
-        `M-SEARCH from ${rinfo.address} for "${msg.headers.st}"`
-      );
+      adapter.log.debug( `M-SEARCH from ${rinfo.address} for "${msg.headers.st}"` );
       if (msg.headers["gwid.phoscon.de"] !== undefined) {
         let loc = msg.headers.location.replace("/description.xml", "");
         loc = loc.replace("http://", "");
@@ -2727,7 +2667,14 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objWrite = false;
       break;
     case "windowopen_set":
+      objType = "boolean";
       objRole = "switch";
+      objWrite = true;
+      break;
+    case "externalwindowopen":
+      objType = "boolean";
+      objRole = "switch";
+      objWrite = true;
       break;
     case "scheduleron":
     case "tampered":
@@ -2819,6 +2766,13 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objType = "number";
       objRole = "level.temperature";
       objDefault = 20.0;
+      objUnit = "°C";
+      value = value / 100;
+      break;
+    case "externalsensortemp":
+      objType = "number";
+      objRole = "level.temperature";
+      objDefault = 0;
       objUnit = "°C";
       value = value / 100;
       break;
