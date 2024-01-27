@@ -2612,10 +2612,6 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objWrite = false;
       break;
     case "displayflipped":
-      objType = "boolean";
-      objRole = "indicator";
-      objWrite = false;
-      break;
     case "errorcode":
       objType = "string";
       objRole = "indicator.error";
@@ -2673,15 +2669,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objWrite = false;
       break;
     case "windowopen_set":
-      objType = "boolean";
-      objRole = "switch";
-      objWrite = true;
-      break;
     case "externalwindowopen":
-      objType = "boolean";
-      objRole = "switch";
-      objWrite = false;
-      break;
     case "scheduleron":
     case "tampered":
     case "dark":
