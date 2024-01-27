@@ -2613,12 +2613,12 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       break;
     case "displayflipped":
       objType = "boolean";
-      objRole = "state";
+      objRole = "indicator";
       objWrite = false;
       break;
     case "errorcode":
       objType = "string";
-      objRole = "state";
+      objRole = "indicator.error";
       objDefault = "none";
       break;
     case "fire":
