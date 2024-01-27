@@ -391,9 +391,11 @@ class deconz extends utils.Adapter {
             case "duration":
             case "delay":
             case "locked":
+            case "windowopen_set":
             case "boost":
             case "off":
             case "mode":
+            case "preset":
             case "volume":
             case "melody":
               parameters = `{ "${dp}": ${state.val} }`;
