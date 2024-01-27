@@ -326,6 +326,7 @@ class deconz extends utils.Adapter {
             case "ledindication":
             case "duration":
             case "delay":
+            case "displayflipped":
             case "errorcode":
             case "locked":
             case "windowopen_set":
