@@ -326,6 +326,7 @@ class deconz extends utils.Adapter {
             case "ledindication":
             case "duration":
             case "delay":
+            case "errorcode":
             case "locked":
             case "windowopen_set":
             case "externalwindowopen":
@@ -2612,8 +2613,13 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       break;
     case "displayflipped":
       objType = "boolean";
-      objRole = "indicator";
+      objRole = "state";
       objWrite = false;
+      break;
+    case "errorcode":
+      objType = "string";
+      objRole = "state";
+      objDefault = "none";
       break;
     case "fire":
       objType = "boolean";
@@ -2674,7 +2680,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "externalwindowopen":
       objType = "boolean";
       objRole = "switch";
-      objWrite = true;
+      objWrite = false;
       break;
     case "scheduleron":
     case "tampered":
@@ -3021,12 +3027,6 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "mode":
       objType = "string";
       objRole = "state";
-      objDefault = "heat";
-      objStates = {
-        auto: "auto",
-        heat: "heat",
-        off: "off",
-      };
       break;
     case "preset":
       objType = "string";
