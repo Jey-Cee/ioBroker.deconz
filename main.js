@@ -259,9 +259,7 @@ class deconz extends utils.Adapter {
               }
               let speed = dp === "dimup" ? dimspeed.val : dimspeed.val * -1;
               if (transitionTime !== "none") {
-                parameters = `{ "transitiontime": ${JSON.stringify(
-                  transitionTime
-                )} , "bri_inc": ${speed} }`;
+                parameters = `{ "transitiontime": ${JSON.stringify(transitionTime)} , "bri_inc": ${speed} }`;
               } else {
                 parameters = `{ "bri_inc": ${speed} }`;
               }
@@ -308,9 +306,6 @@ class deconz extends utils.Adapter {
                 },
               });
               break;
-            case "airquality":
-              parameters = `{ "${dp}": "${state.val}" }`;
-              break;
               //boolean
             case "boost":
             case "delay":
@@ -331,6 +326,7 @@ class deconz extends utils.Adapter {
               parameters = `{ "${dp}": ${state.val} }`;
               break;
               //string
+            case "airquality":
             case "clickmode":
             case "devicemode":
             case "errorcode":
@@ -709,18 +705,9 @@ async function getAutoUpdates() {
   const results = await adapter.getObjectAsync("Gateway_info");
 
   if (results) {
-    host =
-      results !== null && results.native.ipaddress !== undefined
-        ? results.native.ipaddress
-        : null;
-    port =
-      results !== null && results.native.websocketport !== undefined
-        ? results.native.websocketport
-        : 443;
-    user =
-      results !== null && results.native.user !== undefined
-        ? results.native.user
-        : null;
+    host = results !== null && results.native.ipaddress !== undefined ? results.native.ipaddress : null;
+    port = results !== null && results.native.websocketport !== undefined ? results.native.websocketport : 443;
+    user = results !== null && results.native.user !== undefined ? results.native.user : null;
   }
 
   if (user !== null && host !== null && port !== null) {
@@ -924,17 +911,12 @@ async function modifyConfig(parameters) {
           response = JSON.parse(body);
         } catch (err) {}
 
-        if (
-          (await logging(res, body, "modify config")) &&
-          response !== undefined &&
-          response !== "undefined"
-        ) {
+        if ((await logging(res, body, "modify config")) && response !== undefined && response !== "undefined") 
+        {
           if (response[0]["success"]) {
             switch (JSON.stringify(response[0]["success"])) {
               case `{"/config/permitjoin":${ot}}`:
-                adapter.log.info(
-                  `Network is now open for ${ot} seconds to register new devices.`
-                );
+                adapter.log.info(`Network is now open for ${ot} seconds to register new devices.`);
                 adapter.setState("Gateway_info.network_open", {
                   ack: true,
                   expire: ot,
@@ -968,12 +950,7 @@ async function getConfig() {
         adapter.log.error("Could not connect to deConz/Phoscon. " + error);
       } else if (await logging(res, body, " get config")) {
         let gateway = JSON.parse(body);
-        adapter.log.info(
-          "deConz Version: " +
-            gateway["swversion"] +
-            "; API version: " +
-            gateway["apiversion"]
-        );
+        adapter.log.info("deConz Version: " + gateway["swversion"] + "; API version: " + gateway["apiversion"]);
         adapter.extendObject("Gateway_info", {
           type: "device",
           common: {
@@ -1477,15 +1454,9 @@ async function deleteGroup(groupId) {
                 for (let i = 0; i <= count; i++) {
                   //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ group handelt
                   let keyName = Object.keys(enums)[i];
-                  if (
-                    enums[keyName].common.role === "group" &&
-                    enums[keyName].native.id === groupId
-                  ) {
-                    adapter.log.info(
-                      "Delete device Object: " + enums[keyName].id
-                    );
+                  if (enums[keyName].common.role === "group" && enums[keyName].native.id === groupId) {
+                    adapter.log.info("Delete device Object: " + enums[keyName].id);
                     let name = enums[keyName]._id;
-
                     await deleteDevice(name);
                   }
                 }
@@ -1621,10 +1592,8 @@ async function getSensor(sensorId) {
           for (let z = 0; z <= count2; z++) {
             let stateName = Object.keys(list["state"])[z];
 
-            if (
-              stateName === "buttonevent" &&
-              list["modelid"] === "lumi.Sensors.switch.aq2"
-            ) {
+            if (stateName === "buttonevent" && list["modelid"] === "lumi.Sensors.switch.aq2") 
+            {
               let LastUpdate = Number(new Date(list["state"]["lastupdated"]));
               let Now = Number(new Date().getTime());
               let dateOff = new Date();
@@ -2124,13 +2093,9 @@ async function deleteLight(lightId) {
                 for (let i = 0; i <= count; i++) {
                   //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ sensor handelt
                   let keyName = Object.keys(enums)[i];
-                  if (
-                    enums[keyName].common.role === "light" &&
-                    enums[keyName].native.id === lightId
-                  ) {
-                    adapter.log.info(
-                      "delete device Object: " + enums[keyName]._id
-                    );
+                  if (enums[keyName].common.role === "light" && enums[keyName].native.id === lightId) 
+                  {
+                    adapter.log.info("delete device Object: " + enums[keyName]._id);
                     let name = enums[keyName]._id;
 
                     await deleteDevice(name);
@@ -2166,11 +2131,8 @@ async function removeFromGroups(lightId) {
           response = JSON.parse(body);
         } catch (err) {}
 
-        if (
-          (await logging(res, body, "remove light from groups " + lightId)) &&
-          response !== undefined &&
-          response !== "undefined"
-        ) {
+        if ((await logging(res, body, "remove light from groups " + lightId)) && response !== undefined && response !== "undefined") 
+        {
           if (response[0]["success"]) {
             adapter.log.info("The light with id " + lightId + " was removed from all groups.");
           } else if (response[0]["error"]) {
@@ -2226,15 +2188,11 @@ async function logging(res, message, action) {
       check = true;
       break;
     case 201:
-      adapter.log.info(
-        `Code 201: A new resource was created ${action}: ${message}`
-      );
+      adapter.log.info(`Code 201: A new resource was created ${action}: ${message}`);
       check = true;
       break;
     case 202:
-      adapter.log.info(
-        `Code 202: Request will be processed but isn\'t finished yet ${action}: ${message}`
-      );
+      adapter.log.info(`Code 202: Request will be processed but isn\'t finished yet ${action}: ${message}`);
       check = false;
       break;
     case 304:
@@ -2356,11 +2314,8 @@ function ackStateVal(stateId, response) {
  * @return {string}
  */
 function UTCtoLocal(timeString) {
-  if (
-    timeString !== "none" &&
-    timeString !== null &&
-    timeString !== undefined
-  ) {
+  if (timeString !== "none" && timeString !== null && timeString !== undefined) 
+  {
     let jsT = Date.parse(timeString + "Z");
 
     let d = new Date();
