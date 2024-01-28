@@ -325,6 +325,7 @@ class deconz extends utils.Adapter {
             case "airquality":
               parameters = `{ "${dp}": "${state.val}" }`;
               break;
+              //boolean
             case "boost":
             case "delay":
             case "duration":
@@ -341,6 +342,7 @@ class deconz extends utils.Adapter {
             case "melody":
               parameters = `{ "${dp}": ${state.val} }`;
               break;
+              //string
             case "clickmode":
             case "devicemode":
             case "errorcode":
@@ -350,6 +352,7 @@ class deconz extends utils.Adapter {
             case "windowopen":
               parameters = `{ "${dp}": "${state.val}" }`;
               break;
+              //temperature
             case "heatsetpoint":
             case "coolsetpoint":
             case "externalsensortemp":   
@@ -2524,6 +2527,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
   let objDefault = null;
 
   switch (stateName) {
+    //attributes
     case "alarm":
       objType = "boolean";
       objRole = "sensor.alarm";
