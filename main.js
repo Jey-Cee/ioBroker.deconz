@@ -325,42 +325,30 @@ class deconz extends utils.Adapter {
             case "airquality":
               parameters = `{ "${dp}": "${state.val}" }`;
               break;
-            case "tilt":
+            case "boost":
+            case "delay":
+            case "duration":
+            case "ledindication":
+            case "locked":
             case "lift":
+            case "off":
             case "offset":
             case "sensitivity":
+            case "tilt":
             case "usertest":
-            case "ledindication":
-            case "clickmode":
-              parameters = `{ "${dp}": "${state.val}" }`;
-              break;
-            case "duration":
-            case "delay":
-            case "devicemode":
-              parameters = `{ "${dp}": "${state.val}" }`;
-              break;
-            case "errorcode":
-            case "fanmode":
-              parameters = `{ "${dp}": "${state.val}" }`;
-              break;
-            case "locked":
-            case "windowopen":
-              parameters = `{ "${dp}": "${state.val}" }`;
-              break;
-            case "windowopen_set":
-              parameters = `{ "${dp}": ${state.val} }`;
-              break;
-            case "boost":
-            case "off":
-            case "mode":
-              parameters = `{ "${dp}": "${state.val}" }`;
-              break;
-            case "preset":
-              parameters = `{ "${dp}": "${state.val}" }`;
-              break;
             case "volume":
+            case "windowopen_set":              
             case "melody":
               parameters = `{ "${dp}": ${state.val} }`;
+              break;
+            case "clickmode":
+            case "devicemode":
+            case "errorcode":
+            case "fanmode":
+            case "mode":
+            case "preset":
+            case "windowopen":
+              parameters = `{ "${dp}": "${state.val}" }`;
               break;
             case "heatsetpoint":
             case "coolsetpoint":
@@ -2663,6 +2651,10 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objRole = "state";
       break;
     case "dark":
+      objType = "boolean";
+      objRole = "state";
+      objWrite = false;
+      break;
     case "daylight":
       objType = "boolean";
       objRole = "state";
@@ -2826,6 +2818,9 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objWrite = false;
       break;
     case "locked":
+      objType = "boolean";
+      objRole = "switch";
+      break;
     case "localtime":
       objType = "string";
       objRole = "value.datetime";
@@ -2858,7 +2853,13 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objRole = "state";
       break;
     case "on":
+      objType = "boolean";
+      objRole = "switch";
+      break;
     case "off":
+      objType = "boolean";
+      objRole = "switch";
+      break;
     case "offset":
       objType = "number";
       objRole = "state";
@@ -2927,6 +2928,10 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objDefault = 255;
       break;
     case "scheduleron":
+      objType = "boolean";
+      objRole = "state";
+      objWrite = false;
+      break;
     case "sensitivity":
       objType = "number";
       objRole = "state";
@@ -2984,6 +2989,10 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objRole = "state";
       break;
     case "tampered":
+      objType = "boolean";
+      objRole = "state";
+      objWrite = false;
+      break;
     case "temperature":
       objType = "number";
       objRole = "value.temperature";
@@ -3026,6 +3035,9 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objDefault = 0;
       break;
     case "usertest":
+      objType = "boolean";
+      objRole = "switch";
+      break;
     case "valve":
       objType = "number";
       objRole = "value.valve";
