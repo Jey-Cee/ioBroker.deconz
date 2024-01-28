@@ -103,10 +103,8 @@ class deconz extends utils.Adapter {
 
           switch (dp) {
             case "bri":
-              if (
-                state.val > 0 &&
-                (transitionTime === "none" || transitionTime === 0)
-              ) {
+              if (state.val > 0 && (transitionTime === "none" || transitionTime === 0))  
+              {
                 parameters = '{"bri": ' + JSON.stringify(state.val) + ', "on": true}';
               } else if (state.val > 0) {
                 parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "bri": ' + JSON.stringify(state.val) + ', "on": true}';
@@ -590,9 +588,7 @@ function autoDiscovery() {
   discovery.listen("", (error) => {
     discovery.search({ st: "ssdp:all" });
     wait = setTimeout(() => {
-      adapter.log.warn(
-        "Unable to find deConz by broadcast, establishing Websocket without monitoring the connection state. This usually happens when you are using a VLAN or installed deConz in a container."
-      );
+      adapter.log.warn("Unable to find deConz by broadcast, establishing Websocket without monitoring the connection state. This usually happens when you are using a VLAN or installed deConz in a container.");
       getAutoUpdates();
     }, 10 * 1000);
   });
@@ -753,9 +749,7 @@ async function getAutoUpdates() {
     });
 
     ws.on("error", async (err) => {
-      adapter.log.warn(
-        "Could not connect to websocket instance of deConz/Phoscon. " + err
-      );
+      adapter.log.warn("Could not connect to websocket instance of deConz/Phoscon. " + err);
       if (ws !== null) ws.terminate();
       adapter.setState("info.connection", { val: false, ack: true });
       setTimeout(async () => {
@@ -962,9 +956,7 @@ async function modifyConfig(parameters) {
             adapter.log.warn(JSON.stringify(response[0]["error"]));
           }
         } else if (res.statusCode === 403) {
-          adapter.log.warn(
-            "You do not have the permission to do this! " + parameters
-          );
+          adapter.log.warn("You do not have the permission to do this! " + parameters);
         } else if (res.statusCode === 400) {
           adapter.log.warn("Error 404 Not Found " + parameters);
         }
@@ -1382,11 +1374,8 @@ async function setGroupState(parameters, groupId, stateId) {
           response = JSON.parse(body);
         } catch (err) {}
 
-        if (
-          (await logging(res, body, "set group state " + groupId)) &&
-          response !== undefined &&
-          response !== "undefined"
-        ) {
+        if ((await logging(res, body, "set group state " + groupId)) && response !== undefined && response !== "undefined") 
+        {
           new ackStateVal(stateId, response);
         }
       }
@@ -1430,11 +1419,8 @@ async function setGroupScene(
           response = JSON.parse(body);
         } catch (err) {}
 
-        if (
-          (await logging(res, body, "set group scene " + groupId)) &&
-          response !== undefined &&
-          response !== "undefined"
-        ) {
+        if ((await logging(res, body, "set group scene " + groupId)) && response !== undefined && response !== "undefined") 
+        {
           new ackStateVal(stateId, response);
         }
       }
@@ -1489,11 +1475,8 @@ async function deleteGroup(groupId) {
           response = JSON.parse(body);
         } catch (err) {}
 
-        if (
-          (await logging(res, body, "delete group " + groupId)) &&
-          response !== undefined &&
-          response !== "undefined"
-        ) {
+        if ((await logging(res, body, "delete group " + groupId)) && response !== undefined && response !== "undefined") 
+        {
           if (response[0]["success"]) {
             adapter.log.info("The group with id " + groupId + " was removed.");
             adapter.getForeignObjects(
@@ -1667,13 +1650,7 @@ async function getSensor(sensorId) {
                   list["state"][stateName]
                 );
               } else {
-                adapter.log.info(
-                  "buttonevent NOT updated for " +
-                    list["name"] +
-                    ", too old: " +
-                    (Now - LastUpdate + TimeOffset) / 1000 +
-                    "sec time difference update to now"
-                );
+                adapter.log.info("buttonevent NOT updated for " + list["name"] + ", too old: " + (Now - LastUpdate + TimeOffset) / 1000 + "sec time difference update to now");
               }
             } else {
               await SetObjectAndState(
@@ -1724,11 +1701,8 @@ async function setSensorParameters(parameters, sensorId, stateId, callback) {
           response = JSON.parse(body);
         } catch (err) {}
 
-        if (
-          (await logging(res, body, "set sensor parameters")) &&
-          response !== undefined &&
-          response !== "undefined"
-        ) {
+        if ((await logging(res, body, "set sensor parameters")) && response !== undefined && response !== "undefined") 
+        {
           new ackStateVal(stateId, response);
         }
 
@@ -1758,15 +1732,10 @@ async function deleteSensor(sensorId) {
           response = JSON.parse(body);
         } catch (err) {}
 
-        if (
-          (await logging(res, body, "delete sensor " + sensorId)) &&
-          response !== undefined &&
-          response !== "undefined"
-        ) {
+        if ((await logging(res, body, "delete sensor " + sensorId)) && response !== undefined && response !== "undefined") 
+        {
           if (response[0]["success"]) {
-            adapter.log.info(
-              "The sensor with id " + sensorId + " was removed."
-            );
+            adapter.log.info("The sensor with id " + sensorId + " was removed.");
             adapter.getForeignObjects(
               adapter.name + "." + adapter.instance + "*",
               "device",
@@ -1776,13 +1745,9 @@ async function deleteSensor(sensorId) {
                 for (let i = 0; i <= count; i++) {
                   //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ sensor handelt
                   let keyName = Object.keys(enums)[i];
-                  if (
-                    enums[keyName].common.role === "sensor" &&
-                    enums[keyName].native.id === sensorId
-                  ) {
-                    adapter.log.info(
-                      "delete device Object: " + enums[keyName]._id
-                    );
+                  if (enums[keyName].common.role === "sensor" && enums[keyName].native.id === sensorId) 
+                  {
+                    adapter.log.info("delete device Object: " + enums[keyName]._id);
                     let name = enums[keyName]._id;
 
                     await deleteDevice(name);
@@ -2095,11 +2060,8 @@ async function setLightState(parameters, lightId, stateId, callback) {
           response = JSON.parse(body);
         } catch (err) {}
 
-        if (
-          (await logging(res, body, "set light state " + lightId)) &&
-          response !== undefined &&
-          response !== "undefined"
-        ) {
+        if ((await logging(res, body, "set light state " + lightId)) && response !== undefined && response !== "undefined") 
+        {
           let oldParameters;
           try {
             oldParameters = JSON.parse(parameters);
@@ -2110,14 +2072,7 @@ async function setLightState(parameters, lightId, stateId, callback) {
               if ("error" in message) {
                 let failedAction = message.error.address.split("/")[4];
                 if (failedAction) {
-                  adapter.log.warn(
-                    'Failed action "' +
-                      failedAction +
-                      '" on light ' +
-                      lightId +
-                      "! Description: " +
-                      message.error.description
-                  );
+                  adapter.log.warn('Failed action "' + failedAction + '" on light ' + lightId + "! Description: " + message.error.description);
                   if (message.error.description.includes("951")) {
                     retryParameters[failedAction] = oldParameters[failedAction];
                   }
@@ -2125,8 +2080,7 @@ async function setLightState(parameters, lightId, stateId, callback) {
               }
             });
             if (Object.keys(retryParameters).length > 0) {
-              adapter.log.warn(
-                "Gateway busy! Retry: " + JSON.stringify(retryParameters)
+              adapter.log.warn("Gateway busy! Retry: " + JSON.stringify(retryParameters)
               );
               setTimeout(function () {
                 setLightState(
@@ -2229,9 +2183,7 @@ async function removeFromGroups(lightId) {
           response !== "undefined"
         ) {
           if (response[0]["success"]) {
-            adapter.log.info(
-              "The light with id " + lightId + " was removed from all groups."
-            );
+            adapter.log.info("The light with id " + lightId + " was removed from all groups.");
           } else if (response[0]["error"]) {
             adapter.log.warn(JSON.stringify(response[0]["error"]));
           }
@@ -2631,7 +2583,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "errorcode":
       objType = "string";
       objRole = "indicator.error";
-      objDefault = "none";
+      objWrite = false;
       break;
     case "fire":
       objType = "boolean";
@@ -2687,12 +2639,10 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "windowopen_set":
       objType = "boolean";
       objRole = "indicator";
-      objWrite = true;
       break;
     case "externalwindowopen":
       objType = "boolean";
       objRole = "indicator";
-      objWrite = false;
       break;
     case "scheduleron":
     case "tampered":
