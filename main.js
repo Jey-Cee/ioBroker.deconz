@@ -322,6 +322,9 @@ class deconz extends utils.Adapter {
                 },
               });
               break;
+            case "airquality":
+              parameters = `{ "${dp}": "${state.val}" }`;
+              break;
             case "tilt":
             case "lift":
             case "offset":
@@ -341,6 +344,9 @@ class deconz extends utils.Adapter {
               parameters = `{ "${dp}": "${state.val}" }`;
               break;
             case "locked":
+            case "windowopen":
+              parameters = `{ "${dp}": "${state.val}" }`;
+              break;
             case "windowopen_set":
               parameters = `{ "${dp}": ${state.val} }`;
               break;
@@ -2530,26 +2536,21 @@ async function SetObjectAndState(id, name, type, stateName, value) {
   let objDefault = null;
 
   switch (stateName) {
-    case "orientation":
-      objType = "array";
-      objWrite = false;
-      value = JSON.stringify(value);
-      break;
-    case "pending":
-      objType = "array";
-      objWrite = false;
-      value = JSON.stringify(value);
-      break;
-    case "xy":
-      objType = "array";
-      objRole = "color.CIE";
-      objDefault = "[0.1,0.1]";
-      value = JSON.stringify(value);
-      break;
     case "alarm":
       objType = "boolean";
       objRole = "sensor.alarm";
       objWrite = false;
+      break;
+    case "alert":
+      objType = "string";
+      objRole = "state";
+      objDefault = "none";
+      objStates = {
+        none: "none",
+        select: "select",
+        lselect: "lselect",
+        blink: "blink",
+      };
       break;
     case "all_on":
       objType = "boolean";
@@ -2566,112 +2567,9 @@ async function SetObjectAndState(id, name, type, stateName, value) {
         await SetObjectAndState(id, name, type, "on", false);
       }
       break;
-    case "boost":
-      objType = "boolean";
-      objRole = "switch";
-      break;
-    case "carbonmonoxide":
-      objType = "boolean";
-      objRole = "sensor.alarm";
-      objWrite = false;
-      break;
-    case "configured":
-      objType = "boolean";
-      objRole = "indicator";
-      objWrite = false;
-      break;
-    case "clickmode":
+    case "airquality":
       objType = "string";
       objRole = "state";
-      break;
-    case "displayflipped":
-      objType = "boolean";
-      objRole = "switch";
-      break;
-    case "devicemode":
-      objType = "string";
-      objRole = "state";
-      break;
-    case "errorcode":
-      objType = "string";
-      objRole = "indicator.error";
-      objWrite = false;
-      break;
-    case "fire":
-      objType = "boolean";
-      objRole = "sensor.alarm.fire";
-      objWrite = false;
-      break;
-    case "flag":
-      objType = "boolean";
-      objRole = "indicator";
-      objWrite = false;
-      break;
-    case "hostflags":
-      objType = "number";
-      objRole = "indicator";
-      objWrite = false;
-      break;
-    case "fanmode":
-      objType = "string";
-      objRole = "state";
-      break;
-    case "ledindication":
-      objType = "boolean";
-      objRole = "indicator";
-      break;
-    case "on":
-    case "off":
-    case "locked":
-    case "usertest":
-    case "toggle":
-      objType = "boolean";
-      objRole = "switch";
-      break;
-    case "lowbattery":
-      objType = "boolean";
-      objRole = "indicator.lowbat";
-      objWrite = false;
-      break;
-    case "open":
-      objType = "boolean";
-      objRole = "sensor.open";
-      objWrite = false;
-      break;
-    case "presence":
-      objType = "boolean";
-      objRole = "sensor.motion";
-      objWrite = false;
-      break;
-    case "reachable":
-      objType = "boolean";
-      objRole = "indicator.reachable";
-      objWrite = false;
-      break;
-    case "vibration":
-      objType = "boolean";
-      objRole = "sensor.vibration";
-      break;
-    case "water":
-      objType = "boolean";
-      objRole = "sensor.alarm.flood";
-      objWrite = false;
-      break;
-    case "windowopen_set":
-      objType = "boolean";
-      objRole = "switch";
-      break;
-    case "externalwindowopen":
-      objType = "boolean";
-      objRole = "switch";
-      break;
-    case "scheduleron":
-    case "tampered":
-    case "dark":
-    case "daylight":
-      objType = "boolean";
-      objRole = "state";
-      objWrite = false;
       break;
     case "battery":
       objType = "number";
@@ -2702,12 +2600,14 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objWrite = false;
       buttonEvents(`${type}.${id}.buttonevent`, value);
       break;
-    case "colorspeed":
-      objType = "number";
-      objRole = "state";
-      objMin = 1;
-      objMax = 255;
-      objDefault = 255;
+    case "boost":
+      objType = "boolean";
+      objRole = "switch";
+      break;
+    case "carbonmonoxide":
+      objType = "boolean";
+      objRole = "sensor.alarm";
+      objWrite = false;
       break;
     case "configid":
       objType = "number";
@@ -2719,6 +2619,30 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objWrite = false;
       objDefault = 0;
       objUnit = "Wh";
+      break;
+    case "coolsetpoint":
+      objType = "number";
+      objRole = "level.temperature";
+      objDefault = 0;
+      objUnit = "°C";
+      value = value / 100;
+      break;
+    case "configured":
+      objType = "boolean";
+      objRole = "indicator";
+      objWrite = false;
+      break;
+    case "colorspeed":
+      objType = "number";
+      objRole = "state";
+      objMin = 1;
+      objMax = 255;
+      objDefault = 255;
+      break;
+    case "colormode":
+      objType = "string";
+      objRole = "state";
+      objStates = { hs: "hs", xy: "xy", ct: "ct" };
       break;
     case "ct":
       objType = "number";
@@ -2734,9 +2658,27 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objDefault = 0;
       objUnit = "mA";
       break;
+    case "clickmode":
+      objType = "string";
+      objRole = "state";
+      break;
+    case "dark":
+    case "daylight":
+      objType = "boolean";
+      objRole = "state";
+      objWrite = false;
+      break;
     case "delay":
       objType = "number";
       objRole = "state";
+      break;
+    case "devicemode":
+      objType = "string";
+      objRole = "state";
+      break;
+    case "displayflipped":
+      objType = "boolean";
+      objRole = "switch";
       break;
     case "duration":
       objType = "number";
@@ -2746,220 +2688,10 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objDefault = 600;
       objUnit = "s";
       break;
-    case "group":
-      objType = "number";
-      objRole = "state";
-      value = parseInt(value);
-      break;
-    case "heatsetpoint":
-      objType = "number";
-      objRole = "level.temperature";
-      objDefault = 20.0;
-      objUnit = "°C";
-      value = value / 100;
-      break;
-    case "coolsetpoint":
-      objType = "number";
-      objRole = "level.temperature";
-      objDefault = 0;
-      objUnit = "°C";
-      value = value / 100;
-      break;
-    case "externalsensortemp":
-      objType = "number";
-      objRole = "level.temperature";
-      objDefault = 0;
-      objUnit = "°C";
-      value = value / 100;
-      break;
-    case "hue":
-      objType = "number";
-      objRole = "level.color.hue";
-      objMin = 0;
-      objMax = 360;
-      objDefault = 360;
-      objUnit = "°";
-      value = Math.round((value * 100) / hue_factor) / 100;
-      break;
-    case "humidity":
-      objType = "number";
-      objRole = "value.humidity";
-      objWrite = false;
-      objMin = 0;
-      objMax = 100;
-      objDefault = 0;
-      objUnit = "%";
-      value = value / 100;
-      break;
-    case "level":
-      objType = "number";
-      objRole = "level.brightness";
-      objMin = 0;
-      objMax = 100;
-      objDefault = 100;
-      objUnit = "%";
-      break;
-    case "lightlevel":
-      objType = "number";
-      objRole = "value";
-      objWrite = false;
-      objDefault = 0;
-      break;
-    case "lux":
-      objType = "number";
-      objRole = "value.brightness";
-      objDefault = 0;
-      objWrite = false;
-      objUnit = "Lux";
-      break;
-    case "melody":
-      objType = "number";
-      objRole = "state";
-      objDefault = 1;
-      break;
-    case "offset":
-      objType = "number";
-      objRole = "state";
-      objMin = -999;
-      objMax = 999;
-      objDefault = 0;
-      break;
-    case "power":
-      objType = "number";
-      objRole = "value.power";
-      objWrite = false;
-      objDefault = 0;
-      objUnit = "W";
-      break;
-    case "pressure":
-      objType = "number";
-      objRole = "value.pressure";
-      objWrite = false;
-      objDefault = 0;
-      objUnit = "hPa";
-      break;
-    case "sat":
-      objType = "number";
-      objRole = "level.color.saturation";
-      objMin = 0;
-      objMax = 255;
-      objDefault = 255;
-      break;
-    case "sensitivity":
-      objType = "number";
-      objRole = "state";
-      objDefault = 0;
-      break;
-    case "sensitivitymax":
-      objType = "number";
-      objRole = "state";
-      objDefault = 0;
-      break;
-    case "speed":
-      objType = "number";
-      objRole = "state";
-      objDefault = 0;
-      break;
-    case "status":
-      objType = "number";
-      objRole = "state";
-      objWrite = false;
-      objDefault = 0;
-      break;
-    case "sunriseoffset":
-      objType = "number";
-      objRole = "state";
-      break;
-    case "sunsetoffset":
-      objType = "number";
-      objRole = "state";
-      break;
-    case "temperature":
-      objType = "number";
-      objRole = "value.temperature";
-      objWrite = false;
-      objDefault = 0;
-      objUnit = "°C";
-      value = value / 100;
-      break;
-    case "tholddark":
-      objType = "number";
-      objRole = "value";
-      objDefault = 0;
-      objWrite = false;
-      break;
-    case "tholdoffset":
-      objType = "number";
-      objRole = "value";
-      objDefault = 0;
-      break;
-    case "tiltangle":
-      objType = "number";
-      objRole = "value.tilt";
-      objWrite = false;
-      objDefault = 0;
-      objUnit = "°";
-      break;
-    case "transitiontime":
-      objType = "number";
-      objRole = "state";
-      objUnit = "s";
-      objDefault = 0;
-      break;
-    case "vibrationstrength":
-      objType = "number";
-      objRole = "value";
-      objWrite = false;
-      objDefault = 0;
-      break;
-    case "valve":
-      objType = "number";
-      objRole = "value.valve";
-      objWrite = false;
-      objDefault = 0;
-      break;
-    case "voltage":
-      objType = "number";
-      objRole = "value.voltage";
-      objWrite = false;
-      objDefault = 0;
-      objUnit = "V";
-      break;
-    case "volume":
-      objType = "number";
-      objRole = "level.value";
-      objDefault = 1;
-      break;
-    case "lift":
-      objType = "number";
-      objRole = "level.value";
-      objDefault = 0;
-      break;
-    case "tilt":
-      objType = "number";
-      objRole = "level.value";
-      objDefault = 1;
-      break;
-    case "stop":
-      objType = "boolean";
-      objRole = "button";
-      objDefault = true;
-      break;
-    case "alert":
+    case "errorcode":
       objType = "string";
-      objRole = "state";
-      objDefault = "none";
-      objStates = {
-        none: "none",
-        select: "select",
-        lselect: "lselect",
-        blink: "blink",
-      };
-      break;
-    case "colormode":
-      objType = "string";
-      objRole = "state";
-      objStates = { hs: "hs", xy: "xy", ct: "ct" };
+      objRole = "indicator.error";
+      objWrite = false;
       break;
     case "effect":
       objType = "string";
@@ -3003,25 +2735,170 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objDefault = "[[255,0,0],[0,255,0],[0,0,255]]";
       value = JSON.stringify(value);
       break;
+    case "externalsensortemp":
+      objType = "number";
+      objRole = "level.temperature";
+      objDefault = 0;
+      objUnit = "°C";
+      value = value / 100;
+      break;
+    case "externalwindowopen":
+      objType = "boolean";
+      objRole = "switch";
+      break;
+    case "fanmode":
+      objType = "string";
+      objRole = "state";
+      break;
+    case "fire":
+      objType = "boolean";
+      objRole = "sensor.alarm.fire";
+      objWrite = false;
+      break;
+    case "flag":
+      objType = "boolean";
+      objRole = "indicator";
+      objWrite = false;
+      break;
+    case "group":
+      objType = "number";
+      objRole = "state";
+      value = parseInt(value);
+      break;
+    case "heatsetpoint":
+      objType = "number";
+      objRole = "level.temperature";
+      objDefault = 20.0;
+      objUnit = "°C";
+      value = value / 100;
+      break;
+    case "hue":
+      objType = "number";
+      objRole = "level.color.hue";
+      objMin = 0;
+      objMax = 360;
+      objDefault = 360;
+      objUnit = "°";
+      value = Math.round((value * 100) / hue_factor) / 100;
+      break;
+    case "humidity":
+      objType = "number";
+      objRole = "value.humidity";
+      objWrite = false;
+      objMin = 0;
+      objMax = 100;
+      objDefault = 0;
+      objUnit = "%";
+      value = value / 100;
+      break;
+    case "hostflags":
+      objType = "number";
+      objRole = "indicator";
+      objWrite = false;
+      break;
     case "lastupdated":
       objType = "string";
       objRole = "value.datetime";
       objWrite = false;
       value = UTCtoLocal(value);
       break;
+    case "ledindication":
+      objType = "boolean";
+      objRole = "indicator";
+      break;
+    case "level":
+      objType = "number";
+      objRole = "level.brightness";
+      objMin = 0;
+      objMax = 100;
+      objDefault = 100;
+      objUnit = "%";
+      break;
+    case "lightlevel":
+      objType = "number";
+      objRole = "value";
+      objWrite = false;
+      objDefault = 0;
+      break;
+    case "lowbattery":
+      objType = "boolean";
+      objRole = "indicator.lowbat";
+      objWrite = false;
+      break;
+    case "locked":
     case "localtime":
       objType = "string";
       objRole = "value.datetime";
       objWrite = false;
+      break;     
+    case "lift":
+      objType = "number";
+      objRole = "level.value";
+      objDefault = 0;
       break;
-    case "mode":
-      objType = "string";
-      objRole = "state";
+    case "lux":
+      objType = "number";
+      objRole = "value.brightness";
+      objDefault = 0;
+      objWrite = false;
+      objUnit = "Lux";
       break;
     case "measured_value":
       objType = "number";
       objRole = "state";
       objWrite = false;
+      break;
+    case "melody":
+      objType = "number";
+      objRole = "state";
+      objDefault = 1;
+      break;
+    case "mode":
+      objType = "string";
+      objRole = "state";
+      break;
+    case "on":
+    case "off":
+    case "offset":
+      objType = "number";
+      objRole = "state";
+      objMin = -999;
+      objMax = 999;
+      objDefault = 0;
+      break;
+    case "open":
+      objType = "boolean";
+      objRole = "sensor.open";
+      objWrite = false;
+      break;
+    case "orientation":
+      objType = "array";
+      objWrite = false;
+      value = JSON.stringify(value);
+      break;
+    case "pending":
+      objType = "array";
+      objWrite = false;
+      value = JSON.stringify(value);
+      break;
+    case "power":
+      objType = "number";
+      objRole = "value.power";
+      objWrite = false;
+      objDefault = 0;
+      objUnit = "W";
+      break;
+    case "presence":
+      objType = "boolean";
+      objRole = "sensor.motion";
+      objWrite = false;
+      break;
+    case "pressure":
+      objType = "number";
+      objRole = "value.pressure";
+      objWrite = false;
+      objDefault = 0;
+      objUnit = "hPa";
       break;
     case "preset":
       objType = "string";
@@ -3037,15 +2914,39 @@ async function SetObjectAndState(id, name, type, stateName, value) {
         complex: "complex",
       };
       break;
-    case "schedule":
-      objType = "object";
-      objRole = "schedule";
-      objDefault = "{}";
-      value = JSON.stringify(value);
+    case "reachable":
+      objType = "boolean";
+      objRole = "indicator.reachable";
+      objWrite = false;
       break;
-    case "scheduler":
-      objType = "string";
+    case "sat":
+      objType = "number";
+      objRole = "level.color.saturation";
+      objMin = 0;
+      objMax = 255;
+      objDefault = 255;
+      break;
+    case "scheduleron":
+    case "sensitivity":
+      objType = "number";
       objRole = "state";
+      objDefault = 0;
+      break;
+    case "sensitivitymax":
+      objType = "number";
+      objRole = "state";
+      objDefault = 0;
+      break;
+    case "speed":
+      objType = "number";
+      objRole = "state";
+      objDefault = 0;
+      break;
+    case "status":
+      objType = "number";
+      objRole = "state";
+      objWrite = false;
+      objDefault = 0;
       break;
     case "sunrise":
       objType = "string";
@@ -3056,6 +2957,121 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objType = "string";
       objRole = "date.sunset";
       objWrite = false;
+      break;
+    case "sunriseoffset":
+      objType = "number";
+      objRole = "state";
+      objWrite = false;
+      break;
+    case "sunsetoffset":
+      objType = "number";
+      objRole = "state";
+      objWrite = false;
+      break;
+    case "stop":
+      objType = "boolean";
+      objRole = "button";
+      objDefault = true;
+      break;
+    case "schedule":
+      objType = "object";
+      objRole = "schedule";
+      objDefault = "{}";
+      value = JSON.stringify(value);
+      break;
+    case "scheduler":
+      objType = "string";
+      objRole = "state";
+      break;
+    case "tampered":
+    case "temperature":
+      objType = "number";
+      objRole = "value.temperature";
+      objWrite = false;
+      objDefault = 0;
+      objUnit = "°C";
+      value = value / 100;
+      break;
+    case "toggle":
+      objType = "boolean";
+      objRole = "switch";
+      break;
+    case "tholddark":
+      objType = "number";
+      objRole = "value";
+      objDefault = 0;
+      objWrite = false;
+      break;
+    case "tholdoffset":
+      objType = "number";
+      objRole = "value";
+      objDefault = 0;
+      break;
+    case "tilt":
+      objType = "number";
+      objRole = "level.value";
+      objDefault = 1;
+      break;
+    case "tiltangle":
+      objType = "number";
+      objRole = "value.tilt";
+      objWrite = false;
+      objDefault = 0;
+      objUnit = "°";
+      break;
+    case "transitiontime":
+      objType = "number";
+      objRole = "state";
+      objUnit = "s";
+      objDefault = 0;
+      break;
+    case "usertest":
+    case "valve":
+      objType = "number";
+      objRole = "value.valve";
+      objWrite = false;
+      objDefault = 0;
+      break;
+    case "voltage":
+      objType = "number";
+      objRole = "value.voltage";
+      objWrite = false;
+      objDefault = 0;
+      objUnit = "V";
+      break;
+    case "volume":
+      objType = "number";
+      objRole = "level.value";
+      objDefault = 1;
+      break;
+    case "vibration":
+      objType = "boolean";
+      objRole = "sensor.vibration";
+      break;
+    case "vibrationstrength":
+      objType = "number";
+      objRole = "value";
+      objWrite = false;
+      objDefault = 0;
+      break;
+    case "water":
+      objType = "boolean";
+      objRole = "sensor.alarm.flood";
+      objWrite = false;
+      break;
+    case "windowopen":
+      objType = "string";
+      objRole = "state";
+      break;
+    case "windowopen_set":
+      objType = "boolean";
+      objRole = "switch";
+      break;
+    case "xy":
+      objType = "array";
+      objRole = "color.CIE";
+      objDefault = "[0.1,0.1]";
+      value = JSON.stringify(value);
       break;
   }
 
