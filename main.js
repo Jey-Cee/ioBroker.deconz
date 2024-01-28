@@ -178,20 +178,6 @@ class deconz extends utils.Adapter {
                 parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "alert": ' + JSON.stringify(state.val) + "}";
               }
               break;
-            case "displayflipped":
-              if (transitionTime === "none" || transitionTime === 0) {
-                parameters = '{"displayflipped": ' + JSON.stringify(state.val) + "}";
-              } else {
-                parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "displayflipped": ' + JSON.stringify(state.val) + "}";
-              }
-              break;
-            case "externalwindowopen":
-              if (transitionTime === "none" || transitionTime === 0) {
-                parameters = '{"externalwindowopen": ' + JSON.stringify(state.val) + "}";
-              } else {
-                parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "externalwindowopen": ' + JSON.stringify(state.val) + "}";
-              }
-              break;
             case "colorspeed":
               let effect = await this.getStateAsync(
                 this.name + "." + this.instance + "." + id + ".effect"
@@ -328,7 +314,9 @@ class deconz extends utils.Adapter {
               //boolean
             case "boost":
             case "delay":
+            case "displayflipped":
             case "duration":
+            case "externalwindowopen":              
             case "ledindication":
             case "locked":
             case "lift":
