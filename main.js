@@ -342,6 +342,8 @@ class deconz extends utils.Adapter {
               break;
             case "locked":
             case "windowopen_set":
+              parameters = `{ "${dp}": ${state.val} }`;
+              break;
             case "boost":
             case "off":
             case "mode":
