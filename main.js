@@ -120,10 +120,8 @@ class deconz extends utils.Adapter {
               );
               break;
             case "level":
-              if (
-                state.val > 0 &&
-                (transitionTime === "none" || transitionTime === 0)
-              ) {
+              if (state.val > 0 && (transitionTime === "none" || transitionTime === 0)) 
+              {
                 parameters = '{"bri": ' + Math.floor((255 / 100) * state.val) + ', "on": true}';
               } else if (state.val > 0) {
                 parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "bri": ' + Math.floor((255 / 100) * state.val) + ', "on": true}';
@@ -240,13 +238,7 @@ class deconz extends utils.Adapter {
                 } else {
                   effectspeed = 1;
                 }
-                parameters = `{"effect": ${JSON.stringify(
-                  state.val
-                )}, "effectSpeed":  ${JSON.stringify(
-                  effectspeed
-                )}, "effectColours": ${JSON.stringify(
-                  effectcolours
-                    ? effectcolours.val
+                parameters = `{"effect": ${JSON.stringify(state.val)}, "effectSpeed":  ${JSON.stringify(effectspeed)}, "effectColours": ${JSON.stringify(effectcolours ? effectcolours.val
                     : [
                         [255, 0, 0],
                         [0, 255, 0],
@@ -336,9 +328,18 @@ class deconz extends utils.Adapter {
             case "sensitivity":
             case "usertest":
             case "ledindication":
+            case "clickmode":
+              parameters = `{ "${dp}": "${state.val}" }`;
+              break;
             case "duration":
             case "delay":
+            case "devicemode":
+              parameters = `{ "${dp}": "${state.val}" }`;
+              break;
             case "errorcode":
+            case "fanmode":
+              parameters = `{ "${dp}": "${state.val}" }`;
+              break;
             case "locked":
             case "windowopen_set":
             case "boost":
@@ -354,6 +355,7 @@ class deconz extends utils.Adapter {
               parameters = `{ "${dp}": ${state.val} }`;
               break;
             case "heatsetpoint":
+            case "coolsetpoint":
             case "externalsensortemp":   
             case "temperature":
               let val = Math.floor(state.val * 100);
@@ -2576,9 +2578,17 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objRole = "indicator";
       objWrite = false;
       break;
+    case "clickmode":
+      objType = "string";
+      objRole = "state";
+      break;
     case "displayflipped":
       objType = "boolean";
-      objRole = "indicator";
+      objRole = "switch";
+      break;
+    case "devicemode":
+      objType = "string";
+      objRole = "state";
       break;
     case "errorcode":
       objType = "string";
@@ -2594,6 +2604,15 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objType = "boolean";
       objRole = "indicator";
       objWrite = false;
+      break;
+    case "hostflags":
+      objType = "number";
+      objRole = "indicator";
+      objWrite = false;
+      break;
+    case "fanmode":
+      objType = "string";
+      objRole = "state";
       break;
     case "ledindication":
       objType = "boolean";
@@ -2638,11 +2657,11 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       break;
     case "windowopen_set":
       objType = "boolean";
-      objRole = "indicator";
+      objRole = "switch";
       break;
     case "externalwindowopen":
       objType = "boolean";
-      objRole = "indicator";
+      objRole = "switch";
       break;
     case "scheduleron":
     case "tampered":
@@ -2734,6 +2753,13 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objType = "number";
       objRole = "level.temperature";
       objDefault = 20.0;
+      objUnit = "°C";
+      value = value / 100;
+      break;
+    case "coolsetpoint":
+      objType = "number";
+      objRole = "level.temperature";
+      objDefault = 0;
       objUnit = "°C";
       value = value / 100;
       break;
@@ -2989,6 +3015,11 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "mode":
       objType = "string";
       objRole = "state";
+      break;
+    case "measured_value":
+      objType = "number";
+      objRole = "state";
+      objWrite = false;
       break;
     case "preset":
       objType = "string";
