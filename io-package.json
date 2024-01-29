@@ -1,8 +1,12 @@
 {
   "common": {
     "name": "deconz",
-    "version": "1.3.23",
+    "version": "1.4.0",
     "news": {
+      "1.4.0": {
+        "en": "Added new objects for Tuya and Bosch thermostats",
+        "de": "Neue Objekte für Tuya- und Bosch-Thermostate hinzugefügt"
+      },
       "1.3.23": {
         "en": "fix crash when new device was added\n added possibility to change the port for websocket connection\n updated/added translations",
         "de": "Absturz behoben, wenn ein neues Gerät hinzugefügt wurde\n Möglichkeit hinzugefügt, den Port für die WebSocket-Verbindung zu ändern\n Übersetzungen aktualisiert/hinzugefügt"
