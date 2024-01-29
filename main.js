@@ -103,22 +103,13 @@ class deconz extends utils.Adapter {
 
           switch (dp) {
             case "bri":
-              if (
-                state.val > 0 &&
-                (transitionTime === "none" || transitionTime === 0)
-              ) {
-                parameters =
-                  '{"bri": ' + JSON.stringify(state.val) + ', "on": true}';
+              if (state.val > 0 && (transitionTime === "none" || transitionTime === 0))  
+              {
+                parameters = '{"bri": ' + JSON.stringify(state.val) + ', "on": true}';
               } else if (state.val > 0) {
-                parameters =
-                  '{"transitiontime": ' +
-                  JSON.stringify(transitionTime) +
-                  ', "bri": ' +
-                  JSON.stringify(state.val) +
-                  ', "on": true}';
+                parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "bri": ' + JSON.stringify(state.val) + ', "on": true}';
               } else {
-                parameters =
-                  '{"bri": ' + JSON.stringify(state.val) + ', "on": false}';
+                parameters = '{"bri": ' + JSON.stringify(state.val) + ', "on": false}';
               }
               await SetObjectAndState(
                 tmp[3],
@@ -129,113 +120,62 @@ class deconz extends utils.Adapter {
               );
               break;
             case "level":
-              if (
-                state.val > 0 &&
-                (transitionTime === "none" || transitionTime === 0)
-              ) {
-                parameters =
-                  '{"bri": ' +
-                  Math.floor((255 / 100) * state.val) +
-                  ', "on": true}';
+              if (state.val > 0 && (transitionTime === "none" || transitionTime === 0)) 
+              {
+                parameters = '{"bri": ' + Math.floor((255 / 100) * state.val) + ', "on": true}';
               } else if (state.val > 0) {
-                parameters =
-                  '{"transitiontime": ' +
-                  JSON.stringify(transitionTime) +
-                  ', "bri": ' +
-                  Math.floor((255 / 100) * state.val) +
-                  ', "on": true}';
+                parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "bri": ' + Math.floor((255 / 100) * state.val) + ', "on": true}';
               } else {
-                parameters =
-                  '{"bri": ' +
-                  Math.floor((255 / 100) * state.val) +
-                  ', "on": false}';
+                parameters = '{"bri": ' + Math.floor((255 / 100) * state.val) + ', "on": false}';
               }
               break;
             case "on":
               if (transitionTime === "none" || transitionTime === 0) {
                 parameters = '{"on": ' + JSON.stringify(state.val) + "}";
               } else {
-                parameters =
-                  '{"transitiontime": ' +
-                  JSON.stringify(transitionTime) +
-                  ', "on": ' +
-                  JSON.stringify(state.val) +
-                  "}";
+                parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "on": ' + JSON.stringify(state.val) + "}";
               }
               break;
             case "stop":
               if (transitionTime === "none" || transitionTime === 0) {
                 parameters = '{"stop": ' + JSON.stringify(state.val) + "}";
               } else {
-                parameters =
-                  '{"transitiontime": ' +
-                  JSON.stringify(transitionTime) +
-                  ', "on": ' +
-                  JSON.stringify(state.val) +
-                  "}";
+                parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "on": ' + JSON.stringify(state.val) + "}";
               }
               break;
             case "hue":
               if (transitionTime === "none" || transitionTime === 0) {
-                parameters =
-                  '{"hue": ' +
-                  Math.round(parseInt(JSON.stringify(state.val)) * hue_factor) +
-                  "}";
+                parameters = '{"hue": ' + Math.round(parseInt(JSON.stringify(state.val)) * hue_factor) + "}";
               } else {
-                parameters =
-                  '{"transitiontime": ' +
-                  JSON.stringify(transitionTime) +
-                  ', "hue": ' +
-                  Math.round(parseInt(JSON.stringify(state.val)) * hue_factor) +
-                  "}";
+                parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "hue": ' + Math.round(parseInt(JSON.stringify(state.val)) * hue_factor) + "}";
               }
               break;
             case "sat":
               if (transitionTime === "none" || transitionTime === 0) {
                 parameters = '{"sat": ' + JSON.stringify(state.val) + "}";
               } else {
-                parameters =
-                  '{"transitiontime": ' +
-                  JSON.stringify(transitionTime) +
-                  ', "sat": ' +
-                  JSON.stringify(state.val) +
-                  "}";
+                parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "sat": ' + JSON.stringify(state.val) + "}";
               }
               break;
             case "ct":
               if (transitionTime === "none" || transitionTime === 0) {
                 parameters = '{"ct": ' + JSON.stringify(state.val) + "}";
               } else {
-                parameters =
-                  '{"transitiontime": ' +
-                  JSON.stringify(transitionTime) +
-                  ', "ct": ' +
-                  JSON.stringify(state.val) +
-                  "}";
+                parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "ct": ' + JSON.stringify(state.val) + "}";
               }
               break;
             case "xy":
               if (transitionTime === "none" || transitionTime === 0) {
                 parameters = '{"xy":' + state.val + "}";
               } else {
-                parameters =
-                  '{"transitiontime": ' +
-                  JSON.stringify(transitionTime) +
-                  ', "xy":' +
-                  state.val +
-                  "}";
+                parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "xy":' + state.val + "}";
               }
               break;
             case "alert":
               if (transitionTime === "none" || transitionTime === 0) {
                 parameters = '{"alert": ' + JSON.stringify(state.val) + "}";
               } else {
-                parameters =
-                  '{"transitiontime": ' +
-                  JSON.stringify(transitionTime) +
-                  ', "alert": ' +
-                  JSON.stringify(state.val) +
-                  "}";
+                parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "alert": ' + JSON.stringify(state.val) + "}";
               }
               break;
             case "colorspeed":
@@ -243,10 +183,7 @@ class deconz extends utils.Adapter {
                 this.name + "." + this.instance + "." + id + ".effect"
               );
               if (effect && effect.val === "colorloop") {
-                parameters =
-                  '{"colorloopspeed": ' +
-                  state.val +
-                  ', "effect": "colorloop"}';
+                parameters = '{"colorloopspeed": ' + state.val + ', "effect": "colorloop"}';
               }
               break;
             case "effect":
@@ -257,12 +194,7 @@ class deconz extends utils.Adapter {
                 if (speed.val === null || speed.val === undefined) {
                   speed.val = 1;
                 }
-                parameters =
-                  '{"colorloopspeed": ' +
-                  speed.val +
-                  ', "effect": ' +
-                  JSON.stringify(state.val) +
-                  "}";
+                parameters = '{"colorloopspeed": ' + speed.val + ', "effect": ' + JSON.stringify(state.val) + "}";
               } else if (
                 state.val === "steady" ||
                 state.val === "snow" ||
@@ -292,13 +224,7 @@ class deconz extends utils.Adapter {
                 } else {
                   effectspeed = 1;
                 }
-                parameters = `{"effect": ${JSON.stringify(
-                  state.val
-                )}, "effectSpeed":  ${JSON.stringify(
-                  effectspeed
-                )}, "effectColours": ${JSON.stringify(
-                  effectcolours
-                    ? effectcolours.val
+                parameters = `{"effect": ${JSON.stringify(state.val)}, "effectSpeed":  ${JSON.stringify(effectspeed)}, "effectColours": ${JSON.stringify(effectcolours ? effectcolours.val
                     : [
                         [255, 0, 0],
                         [0, 255, 0],
@@ -333,9 +259,7 @@ class deconz extends utils.Adapter {
               }
               let speed = dp === "dimup" ? dimspeed.val : dimspeed.val * -1;
               if (transitionTime !== "none") {
-                parameters = `{ "transitiontime": ${JSON.stringify(
-                  transitionTime
-                )} , "bri_inc": ${speed} }`;
+                parameters = `{ "transitiontime": ${JSON.stringify(transitionTime)} , "bri_inc": ${speed} }`;
               } else {
                 parameters = `{ "bri_inc": ${speed} }`;
               }
@@ -382,23 +306,40 @@ class deconz extends utils.Adapter {
                 },
               });
               break;
-            case "tilt":
+              //boolean
+            case "boost":
+            case "delay":
+            case "displayflipped":
+            case "duration":
+            case "externalwindowopen":              
+            case "ledindication":
+            case "locked":
             case "lift":
+            case "off":
             case "offset":
             case "sensitivity":
+            case "tilt":
             case "usertest":
-            case "ledindication":
-            case "duration":
-            case "delay":
-            case "locked":
-            case "boost":
-            case "off":
-            case "mode":
             case "volume":
+            case "windowopen_set":              
             case "melody":
               parameters = `{ "${dp}": ${state.val} }`;
               break;
+              //string
+            case "airquality":
+            case "clickmode":
+            case "devicemode":
+            case "errorcode":
+            case "fanmode":
+            case "mode":
+            case "preset":
+            case "windowopen":
+              parameters = `{ "${dp}": "${state.val}" }`;
+              break;
+              //temperature
             case "heatsetpoint":
+            case "coolsetpoint":
+            case "externalsensortemp":   
             case "temperature":
               let val = Math.floor(state.val * 100);
               parameters = `{ "${dp}": ${val} }`;
@@ -608,9 +549,7 @@ function autoDiscovery() {
 
   discovery.on("message", (msg, rinfo, iface) => {
     if (msg.headers.st === "urn:schemas-upnp-org:device:basic:1") {
-      adapter.log.debug(
-        `M-SEARCH from ${rinfo.address} for "${msg.headers.st}"`
-      );
+      adapter.log.debug( `M-SEARCH from ${rinfo.address} for "${msg.headers.st}"` );
       if (msg.headers["gwid.phoscon.de"] !== undefined) {
         let loc = msg.headers.location.replace("/description.xml", "");
         loc = loc.replace("http://", "");
@@ -634,9 +573,7 @@ function autoDiscovery() {
   discovery.listen("", (error) => {
     discovery.search({ st: "ssdp:all" });
     wait = setTimeout(() => {
-      adapter.log.warn(
-        "Unable to find deConz by broadcast, establishing Websocket without monitoring the connection state. This usually happens when you are using a VLAN or installed deConz in a container."
-      );
+      adapter.log.warn("Unable to find deConz by broadcast, establishing Websocket without monitoring the connection state. This usually happens when you are using a VLAN or installed deConz in a container.");
       getAutoUpdates();
     }, 10 * 1000);
   });
@@ -713,15 +650,7 @@ async function deleteAPIkey() {
 
   if (ip !== "none" && port !== "none" && user !== "none") {
     let options = {
-      url:
-        "http://" +
-        ip +
-        ":" +
-        port +
-        "/api/" +
-        user +
-        "/config/whitelist/" +
-        user,
+      url: "http://" + ip + ":" + port + "/api/" + user + "/config/whitelist/" + user,
       method: "DELETE",
       headers: {
         "Content-Type": "text/plain;charset=UTF-8",
@@ -776,18 +705,9 @@ async function getAutoUpdates() {
   const results = await adapter.getObjectAsync("Gateway_info");
 
   if (results) {
-    host =
-      results !== null && results.native.ipaddress !== undefined
-        ? results.native.ipaddress
-        : null;
-    port =
-      results !== null && results.native.websocketport !== undefined
-        ? results.native.websocketport
-        : 443;
-    user =
-      results !== null && results.native.user !== undefined
-        ? results.native.user
-        : null;
+    host = results !== null && results.native.ipaddress !== undefined ? results.native.ipaddress : null;
+    port = results !== null && results.native.websocketport !== undefined ? results.native.websocketport : 443;
+    user = results !== null && results.native.user !== undefined ? results.native.user : null;
   }
 
   if (user !== null && host !== null && port !== null) {
@@ -805,9 +725,7 @@ async function getAutoUpdates() {
     });
 
     ws.on("error", async (err) => {
-      adapter.log.warn(
-        "Could not connect to websocket instance of deConz/Phoscon. " + err
-      );
+      adapter.log.warn("Could not connect to websocket instance of deConz/Phoscon. " + err);
       if (ws !== null) ws.terminate();
       adapter.setState("info.connection", { val: false, ack: true });
       setTimeout(async () => {
@@ -979,7 +897,7 @@ async function modifyConfig(parameters) {
     let options = {
       url: "http://" + ip + ":" + port + "/api/" + user + "/config",
       method: "PUT",
-      headers: 'Content-Type" : "application/json',
+      headers: 'Content-Type": "application/json',
       body: parameters,
     };
 
@@ -993,17 +911,12 @@ async function modifyConfig(parameters) {
           response = JSON.parse(body);
         } catch (err) {}
 
-        if (
-          (await logging(res, body, "modify config")) &&
-          response !== undefined &&
-          response !== "undefined"
-        ) {
+        if ((await logging(res, body, "modify config")) && response !== undefined && response !== "undefined") 
+        {
           if (response[0]["success"]) {
             switch (JSON.stringify(response[0]["success"])) {
               case `{"/config/permitjoin":${ot}}`:
-                adapter.log.info(
-                  `Network is now open for ${ot} seconds to register new devices.`
-                );
+                adapter.log.info(`Network is now open for ${ot} seconds to register new devices.`);
                 adapter.setState("Gateway_info.network_open", {
                   ack: true,
                   expire: ot,
@@ -1014,9 +927,7 @@ async function modifyConfig(parameters) {
             adapter.log.warn(JSON.stringify(response[0]["error"]));
           }
         } else if (res.statusCode === 403) {
-          adapter.log.warn(
-            "You do not have the permission to do this! " + parameters
-          );
+          adapter.log.warn("You do not have the permission to do this! " + parameters);
         } else if (res.statusCode === 400) {
           adapter.log.warn("Error 404 Not Found " + parameters);
         }
@@ -1039,12 +950,7 @@ async function getConfig() {
         adapter.log.error("Could not connect to deConz/Phoscon. " + error);
       } else if (await logging(res, body, " get config")) {
         let gateway = JSON.parse(body);
-        adapter.log.info(
-          "deConz Version: " +
-            gateway["swversion"] +
-            "; API version: " +
-            gateway["apiversion"]
-        );
+        adapter.log.info("deConz Version: " + gateway["swversion"] + "; API version: " + gateway["apiversion"]);
         adapter.extendObject("Gateway_info", {
           type: "device",
           common: {
@@ -1419,18 +1325,9 @@ async function setGroupState(parameters, groupId, stateId) {
 
   if (ip !== "none" && port !== "none" && user !== "none") {
     let options = {
-      url:
-        "http://" +
-        ip +
-        ":" +
-        port +
-        "/api/" +
-        user +
-        "/groups/" +
-        groupId +
-        "/action",
+      url: "http://" + ip + ":" + port + "/api/" + user + "/groups/" + groupId + "/action",
       method: "PUT",
-      headers: "Content-Type : application/json",
+      headers: 'Content-Type": "application/json',
       body: parameters,
     };
 
@@ -1443,11 +1340,8 @@ async function setGroupState(parameters, groupId, stateId) {
           response = JSON.parse(body);
         } catch (err) {}
 
-        if (
-          (await logging(res, body, "set group state " + groupId)) &&
-          response !== undefined &&
-          response !== "undefined"
-        ) {
+        if ((await logging(res, body, "set group state " + groupId)) && response !== undefined && response !== "undefined") 
+        {
           new ackStateVal(stateId, response);
         }
       }
@@ -1475,19 +1369,9 @@ async function setGroupScene(
 
   if (ip !== "none" && port !== "none" && user !== "none") {
     let options = {
-      url:
-        "http://" +
-        ip +
-        ":" +
-        port +
-        "/api/" +
-        user +
-        "/groups/" +
-        groupId +
-        "/scenes" +
-        sceneString,
+      url: "http://" + ip + ":" + port + "/api/" + user + "/groups/" + groupId + "/scenes" + sceneString,
       method: method,
-      headers: 'Content-Type" : "application/json',
+      headers: 'Content-Type": "application/json',
       body: parameters,
     };
 
@@ -1501,11 +1385,8 @@ async function setGroupScene(
           response = JSON.parse(body);
         } catch (err) {}
 
-        if (
-          (await logging(res, body, "set group scene " + groupId)) &&
-          response !== undefined &&
-          response !== "undefined"
-        ) {
+        if ((await logging(res, body, "set group scene " + groupId)) && response !== undefined && response !== "undefined") 
+        {
           new ackStateVal(stateId, response);
         }
       }
@@ -1548,7 +1429,7 @@ async function deleteGroup(groupId) {
     let options = {
       url: "http://" + ip + ":" + port + "/api/" + user + "/groups/" + groupId,
       method: "DELETE",
-      headers: 'Content-Type" : "application/json',
+      headers: 'Content-Type": "application/json',
     };
 
     request(options, async (error, res, body) => {
@@ -1560,11 +1441,8 @@ async function deleteGroup(groupId) {
           response = JSON.parse(body);
         } catch (err) {}
 
-        if (
-          (await logging(res, body, "delete group " + groupId)) &&
-          response !== undefined &&
-          response !== "undefined"
-        ) {
+        if ((await logging(res, body, "delete group " + groupId)) && response !== undefined && response !== "undefined") 
+        {
           if (response[0]["success"]) {
             adapter.log.info("The group with id " + groupId + " was removed.");
             adapter.getForeignObjects(
@@ -1576,15 +1454,9 @@ async function deleteGroup(groupId) {
                 for (let i = 0; i <= count; i++) {
                   //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ group handelt
                   let keyName = Object.keys(enums)[i];
-                  if (
-                    enums[keyName].common.role === "group" &&
-                    enums[keyName].native.id === groupId
-                  ) {
-                    adapter.log.info(
-                      "Delete device Object: " + enums[keyName].id
-                    );
+                  if (enums[keyName].common.role === "group" && enums[keyName].native.id === groupId) {
+                    adapter.log.info("Delete device Object: " + enums[keyName].id);
                     let name = enums[keyName]._id;
-
                     await deleteDevice(name);
                   }
                 }
@@ -1684,8 +1556,7 @@ async function getSensor(sensorId) {
 
   if (ip !== "none" && port !== "none" && user !== "none") {
     let options = {
-      url:
-        "http://" + ip + ":" + port + "/api/" + user + "/sensors/" + sensorId,
+      url: "http://" + ip + ":" + port + "/api/" + user + "/sensors/" + sensorId,
       method: "GET",
     };
     request(options, async (error, res, body) => {
@@ -1721,10 +1592,8 @@ async function getSensor(sensorId) {
           for (let z = 0; z <= count2; z++) {
             let stateName = Object.keys(list["state"])[z];
 
-            if (
-              stateName === "buttonevent" &&
-              list["modelid"] === "lumi.Sensors.switch.aq2"
-            ) {
+            if (stateName === "buttonevent" && list["modelid"] === "lumi.Sensors.switch.aq2") 
+            {
               let LastUpdate = Number(new Date(list["state"]["lastupdated"]));
               let Now = Number(new Date().getTime());
               let dateOff = new Date();
@@ -1739,13 +1608,7 @@ async function getSensor(sensorId) {
                   list["state"][stateName]
                 );
               } else {
-                adapter.log.info(
-                  "buttonevent NOT updated for " +
-                    list["name"] +
-                    ", too old: " +
-                    (Now - LastUpdate + TimeOffset) / 1000 +
-                    "sec time difference update to now"
-                );
+                adapter.log.info("buttonevent NOT updated for " + list["name"] + ", too old: " + (Now - LastUpdate + TimeOffset) / 1000 + "sec time difference update to now");
               }
             } else {
               await SetObjectAndState(
@@ -1781,18 +1644,9 @@ async function setSensorParameters(parameters, sensorId, stateId, callback) {
 
   if (ip !== "none" && port !== "none" && user !== "none") {
     let options = {
-      url:
-        "http://" +
-        ip +
-        ":" +
-        port +
-        "/api/" +
-        user +
-        "/sensors/" +
-        sensorId +
-        "/config",
+      url: "http://" + ip + ":" + port + "/api/" + user + "/sensors/" + sensorId + "/config",
       method: "PUT",
-      headers: 'Content-Type" : "application/json',
+      headers: 'Content-Type": "application/json',
       body: parameters,
     };
 
@@ -1805,11 +1659,8 @@ async function setSensorParameters(parameters, sensorId, stateId, callback) {
           response = JSON.parse(body);
         } catch (err) {}
 
-        if (
-          (await logging(res, body, "set sensor parameters")) &&
-          response !== undefined &&
-          response !== "undefined"
-        ) {
+        if ((await logging(res, body, "set sensor parameters")) && response !== undefined && response !== "undefined") 
+        {
           new ackStateVal(stateId, response);
         }
 
@@ -1824,10 +1675,9 @@ async function deleteSensor(sensorId) {
 
   if (ip !== "none" && port !== "none" && user !== "none") {
     let options = {
-      url:
-        "http://" + ip + ":" + port + "/api/" + user + "/sensors/" + sensorId,
+      url: "http://" + ip + ":" + port + "/api/" + user + "/sensors/" + sensorId,
       method: "DELETE",
-      headers: 'Content-Type" : "application/json',
+      headers: 'Content-Type": "application/json',
     };
 
     request(options, async (error, res, body) => {
@@ -1840,15 +1690,10 @@ async function deleteSensor(sensorId) {
           response = JSON.parse(body);
         } catch (err) {}
 
-        if (
-          (await logging(res, body, "delete sensor " + sensorId)) &&
-          response !== undefined &&
-          response !== "undefined"
-        ) {
+        if ((await logging(res, body, "delete sensor " + sensorId)) && response !== undefined && response !== "undefined") 
+        {
           if (response[0]["success"]) {
-            adapter.log.info(
-              "The sensor with id " + sensorId + " was removed."
-            );
+            adapter.log.info("The sensor with id " + sensorId + " was removed.");
             adapter.getForeignObjects(
               adapter.name + "." + adapter.instance + "*",
               "device",
@@ -1858,13 +1703,9 @@ async function deleteSensor(sensorId) {
                 for (let i = 0; i <= count; i++) {
                   //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ sensor handelt
                   let keyName = Object.keys(enums)[i];
-                  if (
-                    enums[keyName].common.role === "sensor" &&
-                    enums[keyName].native.id === sensorId
-                  ) {
-                    adapter.log.info(
-                      "delete device Object: " + enums[keyName]._id
-                    );
+                  if (enums[keyName].common.role === "sensor" && enums[keyName].native.id === sensorId) 
+                  {
+                    adapter.log.info("delete device Object: " + enums[keyName]._id);
                     let name = enums[keyName]._id;
 
                     await deleteDevice(name);
@@ -2162,18 +2003,9 @@ async function setLightState(parameters, lightId, stateId, callback) {
 
   if (ip !== "none" && port !== "none" && user !== "none") {
     let options = {
-      url:
-        "http://" +
-        ip +
-        ":" +
-        port +
-        "/api/" +
-        user +
-        "/lights/" +
-        lightId +
-        "/state",
+      url: "http://" + ip + ":" + port + "/api/" + user + "/lights/" + lightId + "/state",
       method: "PUT",
-      headers: 'Content-Type" : "application/json',
+      headers: 'Content-Type": "application/json',
       body: parameters,
     };
 
@@ -2186,11 +2018,8 @@ async function setLightState(parameters, lightId, stateId, callback) {
           response = JSON.parse(body);
         } catch (err) {}
 
-        if (
-          (await logging(res, body, "set light state " + lightId)) &&
-          response !== undefined &&
-          response !== "undefined"
-        ) {
+        if ((await logging(res, body, "set light state " + lightId)) && response !== undefined && response !== "undefined") 
+        {
           let oldParameters;
           try {
             oldParameters = JSON.parse(parameters);
@@ -2201,14 +2030,7 @@ async function setLightState(parameters, lightId, stateId, callback) {
               if ("error" in message) {
                 let failedAction = message.error.address.split("/")[4];
                 if (failedAction) {
-                  adapter.log.warn(
-                    'Failed action "' +
-                      failedAction +
-                      '" on light ' +
-                      lightId +
-                      "! Description: " +
-                      message.error.description
-                  );
+                  adapter.log.warn('Failed action "' + failedAction + '" on light ' + lightId + "! Description: " + message.error.description);
                   if (message.error.description.includes("951")) {
                     retryParameters[failedAction] = oldParameters[failedAction];
                   }
@@ -2216,8 +2038,7 @@ async function setLightState(parameters, lightId, stateId, callback) {
               }
             });
             if (Object.keys(retryParameters).length > 0) {
-              adapter.log.warn(
-                "Gateway busy! Retry: " + JSON.stringify(retryParameters)
+              adapter.log.warn("Gateway busy! Retry: " + JSON.stringify(retryParameters)
               );
               setTimeout(function () {
                 setLightState(
@@ -2244,7 +2065,7 @@ async function deleteLight(lightId) {
     let options = {
       url: "http://" + ip + ":" + port + "/api/" + user + "/lights/" + lightId,
       method: "DELETE",
-      headers: 'Content-Type" : "application/json',
+      headers: 'Content-Type": "application/json',
     };
 
     request(options, async (error, res, body) => {
@@ -2272,13 +2093,9 @@ async function deleteLight(lightId) {
                 for (let i = 0; i <= count; i++) {
                   //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ sensor handelt
                   let keyName = Object.keys(enums)[i];
-                  if (
-                    enums[keyName].common.role === "light" &&
-                    enums[keyName].native.id === lightId
-                  ) {
-                    adapter.log.info(
-                      "delete device Object: " + enums[keyName]._id
-                    );
+                  if (enums[keyName].common.role === "light" && enums[keyName].native.id === lightId) 
+                  {
+                    adapter.log.info("delete device Object: " + enums[keyName]._id);
                     let name = enums[keyName]._id;
 
                     await deleteDevice(name);
@@ -2300,18 +2117,9 @@ async function removeFromGroups(lightId) {
 
   if (ip !== "none" && port !== "none" && user !== "none") {
     let options = {
-      url:
-        "http://" +
-        ip +
-        ":" +
-        port +
-        "/api/" +
-        user +
-        "/lights/" +
-        lightId +
-        "/groups",
+      url: "http://" + ip + ":" + port + "/api/" + user + "/lights/" + lightId + "/groups",
       method: "DELETE",
-      headers: 'Content-Type" : "application/json',
+      headers: 'Content-Type": "application/json',
     };
 
     request(options, async (error, res, body) => {
@@ -2323,15 +2131,10 @@ async function removeFromGroups(lightId) {
           response = JSON.parse(body);
         } catch (err) {}
 
-        if (
-          (await logging(res, body, "remove light from groups " + lightId)) &&
-          response !== undefined &&
-          response !== "undefined"
-        ) {
+        if ((await logging(res, body, "remove light from groups " + lightId)) && response !== undefined && response !== "undefined") 
+        {
           if (response[0]["success"]) {
-            adapter.log.info(
-              "The light with id " + lightId + " was removed from all groups."
-            );
+            adapter.log.info("The light with id " + lightId + " was removed from all groups.");
           } else if (response[0]["error"]) {
             adapter.log.warn(JSON.stringify(response[0]["error"]));
           }
@@ -2385,15 +2188,11 @@ async function logging(res, message, action) {
       check = true;
       break;
     case 201:
-      adapter.log.info(
-        `Code 201: A new resource was created ${action}: ${message}`
-      );
+      adapter.log.info(`Code 201: A new resource was created ${action}: ${message}`);
       check = true;
       break;
     case 202:
-      adapter.log.info(
-        `Code 202: Request will be processed but isn\'t finished yet ${action}: ${message}`
-      );
+      adapter.log.info(`Code 202: Request will be processed but isn\'t finished yet ${action}: ${message}`);
       check = false;
       break;
     case 304:
@@ -2515,11 +2314,8 @@ function ackStateVal(stateId, response) {
  * @return {string}
  */
 function UTCtoLocal(timeString) {
-  if (
-    timeString !== "none" &&
-    timeString !== null &&
-    timeString !== undefined
-  ) {
+  if (timeString !== "none" && timeString !== null && timeString !== undefined) 
+  {
     let jsT = Date.parse(timeString + "Z");
 
     let d = new Date();
@@ -2674,26 +2470,22 @@ async function SetObjectAndState(id, name, type, stateName, value) {
   let objDefault = null;
 
   switch (stateName) {
-    case "orientation":
-      objType = "array";
-      objWrite = false;
-      value = JSON.stringify(value);
-      break;
-    case "pending":
-      objType = "array";
-      objWrite = false;
-      value = JSON.stringify(value);
-      break;
-    case "xy":
-      objType = "array";
-      objRole = "color.CIE";
-      objDefault = "[0.1,0.1]";
-      value = JSON.stringify(value);
-      break;
+    //attributes
     case "alarm":
       objType = "boolean";
       objRole = "sensor.alarm";
       objWrite = false;
+      break;
+    case "alert":
+      objType = "string";
+      objRole = "state";
+      objDefault = "none";
+      objStates = {
+        none: "none",
+        select: "select",
+        lselect: "lselect",
+        blink: "blink",
+      };
       break;
     case "all_on":
       objType = "boolean";
@@ -2710,83 +2502,9 @@ async function SetObjectAndState(id, name, type, stateName, value) {
         await SetObjectAndState(id, name, type, "on", false);
       }
       break;
-    case "boost":
-      objType = "boolean";
-      objRole = "switch";
-      break;
-    case "carbonmonoxide":
-      objType = "boolean";
-      objRole = "sensor.alarm";
-      objWrite = false;
-      break;
-    case "configured":
-      objType = "boolean";
-      objRole = "indicator";
-      objWrite = false;
-      break;
-    case "displayflipped":
-      objType = "boolean";
-      objRole = "indicator";
-      objWrite = false;
-      break;
-    case "fire":
-      objType = "boolean";
-      objRole = "sensor.alarm.fire";
-      objWrite = false;
-      break;
-    case "flag":
-      objType = "boolean";
-      objRole = "indicator";
-      objWrite = false;
-      break;
-    case "ledindication":
-      objType = "boolean";
-      objRole = "indicator";
-      break;
-    case "on":
-    case "off":
-    case "locked":
-    case "usertest":
-    case "toggle":
-      objType = "boolean";
-      objRole = "switch";
-      break;
-    case "lowbattery":
-      objType = "boolean";
-      objRole = "indicator.lowbat";
-      objWrite = false;
-      break;
-    case "open":
-      objType = "boolean";
-      objRole = "sensor.open";
-      objWrite = false;
-      break;
-    case "presence":
-      objType = "boolean";
-      objRole = "sensor.motion";
-      objWrite = false;
-      break;
-    case "reachable":
-      objType = "boolean";
-      objRole = "indicator.reachable";
-      objWrite = false;
-      break;
-    case "vibration":
-      objType = "boolean";
-      objRole = "sensor.vibration";
-      break;
-    case "water":
-      objType = "boolean";
-      objRole = "sensor.alarm.flood";
-      objWrite = false;
-      break;
-    case "scheduleron":
-    case "tampered":
-    case "dark":
-    case "daylight":
-      objType = "boolean";
+    case "airquality":
+      objType = "string";
       objRole = "state";
-      objWrite = false;
       break;
     case "battery":
       objType = "number";
@@ -2817,12 +2535,14 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objWrite = false;
       buttonEvents(`${type}.${id}.buttonevent`, value);
       break;
-    case "colorspeed":
-      objType = "number";
-      objRole = "state";
-      objMin = 1;
-      objMax = 255;
-      objDefault = 255;
+    case "boost":
+      objType = "boolean";
+      objRole = "switch";
+      break;
+    case "carbonmonoxide":
+      objType = "boolean";
+      objRole = "sensor.alarm";
+      objWrite = false;
       break;
     case "configid":
       objType = "number";
@@ -2834,6 +2554,30 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objWrite = false;
       objDefault = 0;
       objUnit = "Wh";
+      break;
+    case "coolsetpoint":
+      objType = "number";
+      objRole = "level.temperature";
+      objDefault = 0;
+      objUnit = "°C";
+      value = value / 100;
+      break;
+    case "configured":
+      objType = "boolean";
+      objRole = "indicator";
+      objWrite = false;
+      break;
+    case "colorspeed":
+      objType = "number";
+      objRole = "state";
+      objMin = 1;
+      objMax = 255;
+      objDefault = 255;
+      break;
+    case "colormode":
+      objType = "string";
+      objRole = "state";
+      objStates = { hs: "hs", xy: "xy", ct: "ct" };
       break;
     case "ct":
       objType = "number";
@@ -2849,9 +2593,31 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objDefault = 0;
       objUnit = "mA";
       break;
+    case "clickmode":
+      objType = "string";
+      objRole = "state";
+      break;
+    case "dark":
+      objType = "boolean";
+      objRole = "state";
+      objWrite = false;
+      break;
+    case "daylight":
+      objType = "boolean";
+      objRole = "state";
+      objWrite = false;
+      break;
     case "delay":
       objType = "number";
       objRole = "state";
+      break;
+    case "devicemode":
+      objType = "string";
+      objRole = "state";
+      break;
+    case "displayflipped":
+      objType = "boolean";
+      objRole = "switch";
       break;
     case "duration":
       objType = "number";
@@ -2861,206 +2627,10 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objDefault = 600;
       objUnit = "s";
       break;
-    case "group":
-      objType = "number";
-      objRole = "state";
-      value = parseInt(value);
-      break;
-    case "heatsetpoint":
-      objType = "number";
-      objRole = "level.temperature";
-      objDefault = 20.0;
-      objUnit = "°C";
-      value = value / 100;
-      break;
-    case "hue":
-      objType = "number";
-      objRole = "level.color.hue";
-      objMin = 0;
-      objMax = 360;
-      objDefault = 360;
-      objUnit = "°";
-      value = Math.round((value * 100) / hue_factor) / 100;
-      break;
-    case "humidity":
-      objType = "number";
-      objRole = "value.humidity";
-      objWrite = false;
-      objMin = 0;
-      objMax = 100;
-      objDefault = 0;
-      objUnit = "%";
-      value = value / 100;
-      break;
-    case "level":
-      objType = "number";
-      objRole = "level.brightness";
-      objMin = 0;
-      objMax = 100;
-      objDefault = 100;
-      objUnit = "%";
-      break;
-    case "lightlevel":
-      objType = "number";
-      objRole = "value";
-      objWrite = false;
-      objDefault = 0;
-      break;
-    case "lux":
-      objType = "number";
-      objRole = "value.brightness";
-      objDefault = 0;
-      objWrite = false;
-      objUnit = "Lux";
-      break;
-    case "melody":
-      objType = "number";
-      objRole = "state";
-      objDefault = 1;
-      break;
-    case "offset":
-      objType = "number";
-      objRole = "state";
-      objMin = -999;
-      objMax = 999;
-      objDefault = 0;
-      break;
-    case "power":
-      objType = "number";
-      objRole = "value.power";
-      objWrite = false;
-      objDefault = 0;
-      objUnit = "W";
-      break;
-    case "pressure":
-      objType = "number";
-      objRole = "value.pressure";
-      objWrite = false;
-      objDefault = 0;
-      objUnit = "hPa";
-      break;
-    case "sat":
-      objType = "number";
-      objRole = "level.color.saturation";
-      objMin = 0;
-      objMax = 255;
-      objDefault = 255;
-      break;
-    case "sensitivity":
-      objType = "number";
-      objRole = "state";
-      objDefault = 0;
-      break;
-    case "sensitivitymax":
-      objType = "number";
-      objRole = "state";
-      objDefault = 0;
-      break;
-    case "speed":
-      objType = "number";
-      objRole = "state";
-      objDefault = 0;
-      break;
-    case "status":
-      objType = "number";
-      objRole = "state";
-      objWrite = false;
-      objDefault = 0;
-      break;
-    case "sunriseoffset":
-      objType = "number";
-      objRole = "state";
-      break;
-    case "sunsetoffset":
-      objType = "number";
-      objRole = "state";
-      break;
-    case "temperature":
-      objType = "number";
-      objRole = "value.temperature";
-      objWrite = false;
-      objDefault = 0;
-      objUnit = "°C";
-      value = value / 100;
-      break;
-    case "tholddark":
-      objType = "number";
-      objRole = "value";
-      objDefault = 0;
-      objWrite = false;
-      break;
-    case "tholdoffset":
-      objType = "number";
-      objRole = "value";
-      objDefault = 0;
-      break;
-    case "tiltangle":
-      objType = "number";
-      objRole = "value.tilt";
-      objWrite = false;
-      objDefault = 0;
-      objUnit = "°";
-      break;
-    case "transitiontime":
-      objType = "number";
-      objRole = "state";
-      objUnit = "s";
-      objDefault = 0;
-      break;
-    case "vibrationstrength":
-      objType = "number";
-      objRole = "value";
-      objWrite = false;
-      objDefault = 0;
-      break;
-    case "valve":
-      objType = "number";
-      objRole = "value.valve";
-      objWrite = false;
-      objDefault = 0;
-      break;
-    case "voltage":
-      objType = "number";
-      objRole = "value.voltage";
-      objWrite = false;
-      objDefault = 0;
-      objUnit = "V";
-      break;
-    case "volume":
-      objType = "number";
-      objRole = "level.value";
-      objDefault = 1;
-      break;
-    case "lift":
-      objType = "number";
-      objRole = "level.value";
-      objDefault = 0;
-      break;
-    case "tilt":
-      objType = "number";
-      objRole = "level.value";
-      objDefault = 1;
-      break;
-    case "stop":
-      objType = "boolean";
-      objRole = "button";
-      objDefault = true;
-      break;
-    case "alert":
+    case "errorcode":
       objType = "string";
-      objRole = "state";
-      objDefault = "none";
-      objStates = {
-        none: "none",
-        select: "select",
-        lselect: "lselect",
-        blink: "blink",
-      };
-      break;
-    case "colormode":
-      objType = "string";
-      objRole = "state";
-      objStates = { hs: "hs", xy: "xy", ct: "ct" };
+      objRole = "indicator.error";
+      objWrite = false;
       break;
     case "effect":
       objType = "string";
@@ -3104,20 +2674,256 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objDefault = "[[255,0,0],[0,255,0],[0,0,255]]";
       value = JSON.stringify(value);
       break;
+    case "externalsensortemp":
+      objType = "number";
+      objRole = "level.temperature";
+      objDefault = 0;
+      objUnit = "°C";
+      value = value / 100;
+      break;
+    case "externalwindowopen":
+      objType = "boolean";
+      objRole = "switch";
+      break;
+    case "fanmode":
+      objType = "string";
+      objRole = "state";
+      break;
+    case "fire":
+      objType = "boolean";
+      objRole = "sensor.alarm.fire";
+      objWrite = false;
+      break;
+    case "flag":
+      objType = "boolean";
+      objRole = "indicator";
+      objWrite = false;
+      break;
+    case "group":
+      objType = "number";
+      objRole = "state";
+      value = parseInt(value);
+      break;
+    case "heatsetpoint":
+      objType = "number";
+      objRole = "level.temperature";
+      objDefault = 20.0;
+      objUnit = "°C";
+      value = value / 100;
+      break;
+    case "hue":
+      objType = "number";
+      objRole = "level.color.hue";
+      objMin = 0;
+      objMax = 360;
+      objDefault = 360;
+      objUnit = "°";
+      value = Math.round((value * 100) / hue_factor) / 100;
+      break;
+    case "humidity":
+      objType = "number";
+      objRole = "value.humidity";
+      objWrite = false;
+      objMin = 0;
+      objMax = 100;
+      objDefault = 0;
+      objUnit = "%";
+      value = value / 100;
+      break;
+    case "hostflags":
+      objType = "number";
+      objRole = "indicator";
+      objWrite = false;
+      break;
     case "lastupdated":
       objType = "string";
       objRole = "value.datetime";
       objWrite = false;
       value = UTCtoLocal(value);
       break;
+    case "ledindication":
+      objType = "boolean";
+      objRole = "indicator";
+      break;
+    case "level":
+      objType = "number";
+      objRole = "level.brightness";
+      objMin = 0;
+      objMax = 100;
+      objDefault = 100;
+      objUnit = "%";
+      break;
+    case "lightlevel":
+      objType = "number";
+      objRole = "value";
+      objWrite = false;
+      objDefault = 0;
+      break;
+    case "lowbattery":
+      objType = "boolean";
+      objRole = "indicator.lowbat";
+      objWrite = false;
+      break;
+    case "locked":
+      objType = "boolean";
+      objRole = "switch";
+      break;
     case "localtime":
       objType = "string";
       objRole = "value.datetime";
       objWrite = false;
+      break;     
+    case "lift":
+      objType = "number";
+      objRole = "level.value";
+      objDefault = 0;
+      break;
+    case "lux":
+      objType = "number";
+      objRole = "value.brightness";
+      objDefault = 0;
+      objWrite = false;
+      objUnit = "Lux";
+      break;
+    case "measured_value":
+      objType = "number";
+      objRole = "state";
+      objWrite = false;
+      break;
+    case "melody":
+      objType = "number";
+      objRole = "state";
+      objDefault = 1;
       break;
     case "mode":
       objType = "string";
       objRole = "state";
+      break;
+    case "on":
+      objType = "boolean";
+      objRole = "switch";
+      break;
+    case "off":
+      objType = "boolean";
+      objRole = "switch";
+      break;
+    case "offset":
+      objType = "number";
+      objRole = "state";
+      objMin = -999;
+      objMax = 999;
+      objDefault = 0;
+      break;
+    case "open":
+      objType = "boolean";
+      objRole = "sensor.open";
+      objWrite = false;
+      break;
+    case "orientation":
+      objType = "array";
+      objWrite = false;
+      value = JSON.stringify(value);
+      break;
+    case "pending":
+      objType = "array";
+      objWrite = false;
+      value = JSON.stringify(value);
+      break;
+    case "power":
+      objType = "number";
+      objRole = "value.power";
+      objWrite = false;
+      objDefault = 0;
+      objUnit = "W";
+      break;
+    case "presence":
+      objType = "boolean";
+      objRole = "sensor.motion";
+      objWrite = false;
+      break;
+    case "pressure":
+      objType = "number";
+      objRole = "value.pressure";
+      objWrite = false;
+      objDefault = 0;
+      objUnit = "hPa";
+      break;
+    case "preset":
+      objType = "string";
+      objRole = "state";
+      objDefault = "manual";
+      objStates = {
+        holiday: "holiday",
+        auto: "auto",
+        manual: "manual",
+        comfort: "comfort",
+        eco: "eco",
+        boost: "boost",
+        complex: "complex",
+      };
+      break;
+    case "reachable":
+      objType = "boolean";
+      objRole = "indicator.reachable";
+      objWrite = false;
+      break;
+    case "sat":
+      objType = "number";
+      objRole = "level.color.saturation";
+      objMin = 0;
+      objMax = 255;
+      objDefault = 255;
+      break;
+    case "scheduleron":
+      objType = "boolean";
+      objRole = "state";
+      objWrite = false;
+      break;
+    case "sensitivity":
+      objType = "number";
+      objRole = "state";
+      objDefault = 0;
+      break;
+    case "sensitivitymax":
+      objType = "number";
+      objRole = "state";
+      objDefault = 0;
+      break;
+    case "speed":
+      objType = "number";
+      objRole = "state";
+      objDefault = 0;
+      break;
+    case "status":
+      objType = "number";
+      objRole = "state";
+      objWrite = false;
+      objDefault = 0;
+      break;
+    case "sunrise":
+      objType = "string";
+      objRole = "date.sunrise";
+      objWrite = false;
+      break;
+    case "sunset":
+      objType = "string";
+      objRole = "date.sunset";
+      objWrite = false;
+      break;
+    case "sunriseoffset":
+      objType = "number";
+      objRole = "state";
+      objWrite = false;
+      break;
+    case "sunsetoffset":
+      objType = "number";
+      objRole = "state";
+      objWrite = false;
+      break;
+    case "stop":
+      objType = "boolean";
+      objRole = "button";
+      objDefault = true;
       break;
     case "schedule":
       objType = "object";
@@ -3129,15 +2935,102 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objType = "string";
       objRole = "state";
       break;
-    case "sunrise":
-      objType = "string";
-      objRole = "date.sunrise";
+    case "tampered":
+      objType = "boolean";
+      objRole = "state";
       objWrite = false;
       break;
-    case "sunset":
-      objType = "string";
-      objRole = "date.sunset";
+    case "temperature":
+      objType = "number";
+      objRole = "value.temperature";
       objWrite = false;
+      objDefault = 0;
+      objUnit = "°C";
+      value = value / 100;
+      break;
+    case "toggle":
+      objType = "boolean";
+      objRole = "switch";
+      break;
+    case "tholddark":
+      objType = "number";
+      objRole = "value";
+      objDefault = 0;
+      objWrite = false;
+      break;
+    case "tholdoffset":
+      objType = "number";
+      objRole = "value";
+      objDefault = 0;
+      break;
+    case "tilt":
+      objType = "number";
+      objRole = "level.value";
+      objDefault = 1;
+      break;
+    case "tiltangle":
+      objType = "number";
+      objRole = "value.tilt";
+      objWrite = false;
+      objDefault = 0;
+      objUnit = "°";
+      break;
+    case "transitiontime":
+      objType = "number";
+      objRole = "state";
+      objUnit = "s";
+      objDefault = 0;
+      break;
+    case "usertest":
+      objType = "boolean";
+      objRole = "switch";
+      break;
+    case "valve":
+      objType = "number";
+      objRole = "value.valve";
+      objWrite = false;
+      objDefault = 0;
+      break;
+    case "voltage":
+      objType = "number";
+      objRole = "value.voltage";
+      objWrite = false;
+      objDefault = 0;
+      objUnit = "V";
+      break;
+    case "volume":
+      objType = "number";
+      objRole = "level.value";
+      objDefault = 1;
+      break;
+    case "vibration":
+      objType = "boolean";
+      objRole = "sensor.vibration";
+      break;
+    case "vibrationstrength":
+      objType = "number";
+      objRole = "value";
+      objWrite = false;
+      objDefault = 0;
+      break;
+    case "water":
+      objType = "boolean";
+      objRole = "sensor.alarm.flood";
+      objWrite = false;
+      break;
+    case "windowopen":
+      objType = "string";
+      objRole = "state";
+      break;
+    case "windowopen_set":
+      objType = "boolean";
+      objRole = "switch";
+      break;
+    case "xy":
+      objType = "array";
+      objRole = "color.CIE";
+      objDefault = "[0.1,0.1]";
+      value = JSON.stringify(value);
       break;
   }
 
