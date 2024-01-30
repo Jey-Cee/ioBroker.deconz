@@ -93,12 +93,9 @@ class deconz extends utils.Adapter {
           let parameters = {};
           let action = "";
           let method = "";
-          let transitionTime =
-            err === null && tTime !== null ? tTime.val * 10 : "none";
+          let transitionTime = err === null && tTime !== null ? tTime.val * 10 : "none";
 
-          let obj = await this.getObjectAsync(
-            this.name + "." + this.instance + "." + id
-          );
+          let obj = await this.getObjectAsync(this.name + "." + this.instance + "." + id);
           if (obj === null) return false;
 
           switch (dp) {
@@ -213,12 +210,8 @@ class deconz extends utils.Adapter {
                 state.val === "carnival" ||
                 state.val === "glow"
               ) {
-                let effectspeed = await this.getStateAsync(
-                  this.name + "." + this.instance + "." + id + ".effectspeed"
-                );
-                const effectcolours = await this.getStateAsync(
-                  this.name + "." + this.instance + "." + id + ".effectcolours"
-                );
+                let effectspeed = await this.getStateAsync(this.name + "." + this.instance + "." + id + ".effectspeed");
+                const effectcolours = await this.getStateAsync(this.name + "." + this.instance + "." + id + ".effectcolours");
                 if (effectspeed !== null) {
                   effectspeed = effectspeed.val;
                 } else {
@@ -235,9 +228,6 @@ class deconz extends utils.Adapter {
                 parameters = '{"effect": ' + JSON.stringify(state.val) + "}";
               }
               break;
-            case "colormode":
-              parameters = `{ "${dp}": "${state.val}" }`;
-              break;
             case "dimup":
             case "dimdown":
               oid;
@@ -245,17 +235,10 @@ class deconz extends utils.Adapter {
                 this.name + "." + this.instance + "." + id + ".dimspeed"
               );
 
-              if (
-                dimspeed === null ||
-                dimspeed === undefined ||
-                dimspeed.val === 0
-              ) {
+              if (dimspeed === null || dimspeed === undefined || dimspeed.val === 0)
+              {
                 dimspeed = 10;
-                this.setState(
-                  this.name + "." + this.instance + "." + id + ".dimspeed",
-                  10,
-                  true
-                );
+                this.setState(this.name + "." + this.instance + "." + id + ".dimspeed", 10, true);
               }
               let speed = dp === "dimup" ? dimspeed.val : dimspeed.val * -1;
               if (transitionTime !== "none") {
@@ -265,11 +248,8 @@ class deconz extends utils.Adapter {
               }
               break;
             case "action":
-              if (
-                state.val === null ||
-                state.val === undefined ||
-                state.val === 0
-              ) {
+              if (state.val === null || state.val === undefined || state.val === 0)
+              {
                 return;
               }
               parameters = `{ ${state.val} }`;
@@ -284,9 +264,7 @@ class deconz extends utils.Adapter {
               break;
             case "delete":
               method = "DELETE";
-              await this.delObjectAsync(
-                this.name + "." + this.instance + "." + id
-              );
+              await this.delObjectAsync(this.name + "." + this.instance + "." + id);
               break;
             case "store":
               action = "store";
@@ -306,7 +284,7 @@ class deconz extends utils.Adapter {
                 },
               });
               break;
-              //boolean
+              //boolean&number
             case "boost":
             case "delay":
             case "displayflipped":
@@ -327,6 +305,7 @@ class deconz extends utils.Adapter {
               break;
               //string
             case "airquality":
+            case "colormode":
             case "clickmode":
             case "devicemode":
             case "errorcode":
@@ -363,8 +342,7 @@ class deconz extends utils.Adapter {
               parameters = JSON.stringify(parameters);
             }
 
-            let controlId =
-              obj !== null || obj !== undefined ? obj.native.id : "";
+            let controlId = obj !== null || obj !== undefined ? obj.native.id : "";
 
             switch (obj.common.role) {
               case "blind":
@@ -2800,9 +2778,6 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objRole = "state";
       break;
     case "on":
-      objType = "boolean";
-      objRole = "switch";
-      break;
     case "off":
       objType = "boolean";
       objRole = "switch";
@@ -2887,6 +2862,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "sensitivitymax":
       objType = "number";
       objRole = "state";
+      objWrite = false;
       objDefault = 0;
       break;
     case "speed":
@@ -2955,8 +2931,8 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "tholddark":
       objType = "number";
       objRole = "value";
-      objDefault = 0;
       objWrite = false;
+      objDefault = 0;
       break;
     case "tholdoffset":
       objType = "number";
@@ -2978,8 +2954,8 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "transitiontime":
       objType = "number";
       objRole = "state";
-      objUnit = "s";
       objDefault = 0;
+      objUnit = "s";
       break;
     case "usertest":
       objType = "boolean";
