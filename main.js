@@ -289,30 +289,34 @@ class deconz extends utils.Adapter {
             case "delay":
             case "displayflipped":
             case "duration":
-            case "externalwindowopen":              
+            case "externalwindowopen":
+            case "interfacemode":
             case "ledindication":
             case "locked":
             case "lift":
+            case "melody":
+            case "mountingmode":
             case "off":
             case "offset":
+            case "pulseconfiguration":
+            case "resetpresence":
             case "sensitivity":
             case "tilt":
             case "usertest":
             case "volume":
-            case "windowopen_set":              
-            case "melody":
+            case "windowcoveringtype":
+            case "windowopen_set":
               parameters = `{ "${dp}": ${state.val} }`;
               break;
               //string
-            case "airquality":
             case "colormode":
             case "clickmode":
             case "devicemode":
-            case "errorcode":
             case "fanmode":
             case "mode":
             case "preset":
-            case "windowopen":
+            case "swingmode":
+            case "triggerdistance":
               parameters = `{ "${dp}": "${state.val}" }`;
               break;
               //temperature
@@ -2483,6 +2487,14 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "airquality":
       objType = "string";
       objRole = "state";
+      objWrite = false;
+      break;
+    case "airqualityppb":
+      objType = "number";
+      objRole = "value";
+      objWrite = false;
+      objMin = 0;
+      objMax = 65534;
       break;
     case "battery":
       objType = "number";
@@ -2520,6 +2532,11 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "carbonmonoxide":
       objType = "boolean";
       objRole = "sensor.alarm";
+      objWrite = false;
+      break;
+    case "charging":
+      objType = "boolean";
+      objRole = "state";
       objWrite = false;
       break;
     case "configid":
@@ -2587,7 +2604,10 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       break;
     case "delay":
       objType = "number";
-      objRole = "state";
+      objRole = "value";
+      objMin = 0;
+      objMax = 65535;
+      objUnit = "s";
       break;
     case "devicemode":
       objType = "string";
@@ -2601,7 +2621,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objType = "number";
       objRole = "value";
       objMin = 0;
-      objMax = 999999;
+      objMax = 65535;
       objDefault = 600;
       objUnit = "s";
       break;
@@ -2652,9 +2672,15 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objDefault = "[[255,0,0],[0,255,0],[0,0,255]]";
       value = JSON.stringify(value);
       break;
+    case "enrolled":
+      objType = "number";
+      objRole = "state";
+      break;
     case "externalsensortemp":
       objType = "number";
       objRole = "level.temperature";
+      objMin = -32768;
+      objMax = 32767;
       objDefault = 0;
       objUnit = "°C";
       value = value / 100;
@@ -2666,6 +2692,15 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "fanmode":
       objType = "string";
       objRole = "state";
+      objStates = {
+        off: "off",
+        low: "low",
+        medium: "medium",
+        high: "high",
+        on: "on",
+        auto: "auto",
+        smart: "smart",
+      };
       break;
     case "fire":
       objType = "boolean";
@@ -2676,6 +2711,13 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objType = "boolean";
       objRole = "indicator";
       objWrite = false;
+      break;
+    case "floortemperature":
+      objType = "number";
+      objRole = "value.temperature";
+      objWrite = false;
+      objUnit = "°C";
+      value = value / 100;
       break;
     case "group":
       objType = "number";
@@ -2688,6 +2730,11 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objDefault = 20.0;
       objUnit = "°C";
       value = value / 100;
+      break;
+    case "heating":
+      objType = "boolean";
+      objRole = "indicator";
+      objWrite = false;
       break;
     case "hue":
       objType = "number";
@@ -2713,11 +2760,25 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objRole = "indicator";
       objWrite = false;
       break;
+    case "interfacemode":
+      objType = "number";
+      objRole = "value";
+      objWrite = false;
+      break;
+    case "lastset":
+      objType = "string";
+      objRole = "value.datetime";
+      objWrite = false;
+      break;
     case "lastupdated":
       objType = "string";
       objRole = "value.datetime";
       objWrite = false;
       value = UTCtoLocal(value);
+      break;
+    case "lat":
+      objType = "number";
+      objRole = "value.datetime";
       break;
     case "ledindication":
       objType = "boolean";
@@ -2750,7 +2811,11 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objType = "string";
       objRole = "value.datetime";
       objWrite = false;
-      break;     
+      break;
+    case "long":
+      objType = "number";
+      objRole = "value.datetime";
+      break;
     case "lift":
       objType = "number";
       objRole = "level.value";
@@ -2777,6 +2842,15 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objType = "string";
       objRole = "state";
       break;
+    case "mountingmode":
+      objType = "boolean";
+      objRole = "switch";
+      break;
+    case "mountingmodeactive":
+      objType = "boolean";
+      objRole = "indicator";
+      objWrite = false;
+      break;
     case "on":
     case "off":
       objType = "boolean";
@@ -2785,8 +2859,8 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "offset":
       objType = "number";
       objRole = "state";
-      objMin = -999;
-      objMax = 999;
+      objMin = -32768;
+      objMax = 32767;
       objDefault = 0;
       break;
     case "open":
@@ -2816,6 +2890,11 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objRole = "sensor.motion";
       objWrite = false;
       break;
+    case "presenceevent":
+      objType = "string";
+      objRole = "state";
+      objWrite = false;
+      break;
     case "pressure":
       objType = "number";
       objRole = "value.pressure";
@@ -2837,10 +2916,20 @@ async function SetObjectAndState(id, name, type, stateName, value) {
         complex: "complex",
       };
       break;
+    case "pulseconfiguration":
+      objType = "number";
+      objRole = "value";
+      objMin = 0;
+      objMax = 65535;
+      break;
     case "reachable":
       objType = "boolean";
       objRole = "indicator.reachable";
       objWrite = false;
+      break;
+    case "resetpresence":
+      objType = "boolean";
+      objRole = "switch";
       break;
     case "sat":
       objType = "number";
@@ -2848,6 +2937,16 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objMin = 0;
       objMax = 255;
       objDefault = 255;
+      break;
+    case "schedule":
+      objType = "object";
+      objRole = "schedule";
+      objDefault = "{}";
+      value = JSON.stringify(value);
+      break;
+    case "scheduler":
+      objType = "string";
+      objRole = "state";
       break;
     case "scheduleron":
       objType = "boolean";
@@ -2865,16 +2964,16 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objWrite = false;
       objDefault = 0;
       break;
-    case "speed":
-      objType = "number";
-      objRole = "state";
-      objDefault = 0;
-      break;
     case "status":
       objType = "number";
       objRole = "state";
       objWrite = false;
       objDefault = 0;
+      break;
+    case "stop":
+      objType = "boolean";
+      objRole = "button";
+      objDefault = true;
       break;
     case "sunrise":
       objType = "string";
@@ -2896,18 +2995,12 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objRole = "state";
       objWrite = false;
       break;
-    case "stop":
-      objType = "boolean";
-      objRole = "button";
-      objDefault = true;
+    case "speed":
+      objType = "number";
+      objRole = "state";
+      objDefault = 0;
       break;
-    case "schedule":
-      objType = "object";
-      objRole = "schedule";
-      objDefault = "{}";
-      value = JSON.stringify(value);
-      break;
-    case "scheduler":
+    case "swingmode":
       objType = "string";
       objRole = "state";
       break;
@@ -2931,13 +3024,16 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "tholddark":
       objType = "number";
       objRole = "value";
-      objWrite = false;
-      objDefault = 0;
+      objMin = 0;
+      objMax = 65534;
+      objDefault = 12000;
       break;
     case "tholdoffset":
       objType = "number";
       objRole = "value";
-      objDefault = 0;
+      objMin = 1;
+      objMax = 65534;
+      objDefault = 7000;
       break;
     case "tilt":
       objType = "number";
@@ -2957,9 +3053,18 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objDefault = 0;
       objUnit = "s";
       break;
+    case "triggerdistance":
+      objType = "string";
+      objRole = "state";
+      break;
     case "usertest":
       objType = "boolean";
       objRole = "switch";
+      break;
+    case "utc":
+      objType = "string";
+      objRole = "value.datetime";
+      objWrite = false;
       break;
     case "valve":
       objType = "number";
@@ -2982,6 +3087,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "vibration":
       objType = "boolean";
       objRole = "sensor.vibration";
+      objWrite = false;
       break;
     case "vibrationstrength":
       objType = "number";
@@ -2994,9 +3100,16 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objRole = "sensor.alarm.flood";
       objWrite = false;
       break;
+    case "windowcoveringtype":
+      objType = "number";
+      objRole = "state";
+      objMin = 0;
+      objMax = 9;
+      break;
     case "windowopen":
       objType = "string";
       objRole = "state";
+      objWrite = false;
       break;
     case "windowopen_set":
       objType = "boolean";
