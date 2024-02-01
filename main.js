@@ -2569,7 +2569,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objRole = "state";
       objMin = 1;
       objMax = 255;
-      objDefault = 255;
+      objDefault = 15;
       break;
     case "colormode":
       objType = "string";
