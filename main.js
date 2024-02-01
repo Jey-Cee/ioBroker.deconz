@@ -292,7 +292,9 @@ class deconz extends utils.Adapter {
             case "externalwindowopen":
             case "interfacemode":
             case "ledindication":
+            case "lat":
             case "locked":
+            case "long":
             case "lift":
             case "melody":
             case "mountingmode":
@@ -2679,8 +2681,6 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "externalsensortemp":
       objType = "number";
       objRole = "level.temperature";
-      objMin = -32768;
-      objMax = 32767;
       objDefault = 0;
       objUnit = "°C";
       value = value / 100;
@@ -2756,14 +2756,13 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       value = value / 100;
       break;
     case "hostflags":
-      objType = "number";
+      objType = "string";
       objRole = "indicator";
       objWrite = false;
       break;
     case "interfacemode":
       objType = "number";
-      objRole = "value";
-      objWrite = false;
+      objRole = "state";
       break;
     case "lastset":
       objType = "string";
@@ -2778,7 +2777,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       break;
     case "lat":
       objType = "number";
-      objRole = "value.datetime";
+      objRole = "value.gps.latitude";
       break;
     case "ledindication":
       objType = "boolean";
@@ -2814,11 +2813,13 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       break;
     case "long":
       objType = "number";
-      objRole = "value.datetime";
+      objRole = "value.gps.longitude";
       break;
     case "lift":
       objType = "number";
       objRole = "level.value";
+      objMin = 0;
+      objMax = 100;
       objDefault = 0;
       break;
     case "lux":
@@ -3038,7 +3039,10 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "tilt":
       objType = "number";
       objRole = "level.value";
+      objMin = 0;
+      objMax = 100;
       objDefault = 1;
+      objUnit = "%";
       break;
     case "tiltangle":
       objType = "number";
