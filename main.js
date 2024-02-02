@@ -309,7 +309,6 @@ class deconz extends utils.Adapter {
             case "tholddark":
             case "tholdoffset":
             case "toggle":
-            case "transitiontime":
             case "tilt":
             case "usertest":
             case "volume":
