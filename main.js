@@ -284,11 +284,13 @@ class deconz extends utils.Adapter {
                 },
               });
               break;
-              //boolean&number
+              //set boolean&number
             case "boost":
+            case "charging":
             case "delay":
             case "displayflipped":
             case "duration":
+            case "enrolled":
             case "externalwindowopen":
             case "interfacemode":
             case "ledindication":
@@ -303,6 +305,11 @@ class deconz extends utils.Adapter {
             case "pulseconfiguration":
             case "resetpresence":
             case "sensitivity":
+            case "speed":
+            case "tholddark":
+            case "tholdoffset":
+            case "toggle":
+            case "transitiontime":
             case "tilt":
             case "usertest":
             case "volume":
@@ -310,7 +317,7 @@ class deconz extends utils.Adapter {
             case "windowopen_set":
               parameters = `{ "${dp}": ${state.val} }`;
               break;
-              //string
+              //set string
             case "colormode":
             case "clickmode":
             case "devicemode":
@@ -321,11 +328,10 @@ class deconz extends utils.Adapter {
             case "triggerdistance":
               parameters = `{ "${dp}": "${state.val}" }`;
               break;
-              //temperature
+              //set temperature
             case "heatsetpoint":
             case "coolsetpoint":
-            case "externalsensortemp":   
-            case "temperature":
+            case "externalsensortemp":
               let val = Math.floor(state.val * 100);
               parameters = `{ "${dp}": ${val} }`;
               break;
@@ -2539,11 +2545,11 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "charging":
       objType = "boolean";
       objRole = "state";
-      objWrite = false;
       break;
     case "configid":
       objType = "number";
       objRole = "state";
+      objWrite = false;
       break;
     case "consumption":
       objType = "number";
@@ -2778,6 +2784,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "lat":
       objType = "number";
       objRole = "value.gps.latitude";
+      objRead= false;
       break;
     case "ledindication":
       objType = "boolean";
@@ -2814,6 +2821,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "long":
       objType = "number";
       objRole = "value.gps.longitude";
+      objRead= false;
       break;
     case "lift":
       objType = "number";
