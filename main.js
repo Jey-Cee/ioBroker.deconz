@@ -176,18 +176,14 @@ class deconz extends utils.Adapter {
               }
               break;
             case "colorspeed":
-              let effect = await this.getStateAsync(
-                this.name + "." + this.instance + "." + id + ".effect"
-              );
+              let effect = await this.getStateAsync(this.name + "." + this.instance + "." + id + ".effect");
               if (effect && effect.val === "colorloop") {
                 parameters = '{"colorloopspeed": ' + state.val + ', "effect": "colorloop"}';
               }
               break;
             case "effect":
               if (state.val === "colorloop") {
-                const speed = await this.getStateAsync(
-                  this.name + "." + this.instance + "." + id + ".colorspeed"
-                );
+                const speed = await this.getStateAsync(this.name + "." + this.instance + "." + id + ".colorspeed");
                 if (speed.val === null || speed.val === undefined) {
                   speed.val = 1;
                 }
@@ -2560,6 +2556,8 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "coolsetpoint":
       objType = "number";
       objRole = "level.temperature";
+      objMin = 7.0;
+      objMax = 35.0;
       objDefault = 0;
       objUnit = "°C";
       value = value / 100;
@@ -2686,6 +2684,8 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "externalsensortemp":
       objType = "number";
       objRole = "level.temperature";
+      objMin = -327.68;
+      objMax = 327.67;
       objDefault = 0;
       objUnit = "°C";
       value = value / 100;
@@ -2732,6 +2732,8 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "heatsetpoint":
       objType = "number";
       objRole = "level.temperature";
+      objMin = 5.0;
+      objMax = 32.0;
       objDefault = 20.0;
       objUnit = "°C";
       value = value / 100;
@@ -2867,8 +2869,8 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "offset":
       objType = "number";
       objRole = "state";
-      objMin = -32768;
-      objMax = 32767;
+      objMin = -327.68;
+      objMax = 327.67;
       objDefault = 0;
       break;
     case "open":
