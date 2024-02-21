@@ -300,6 +300,7 @@ class deconz extends utils.Adapter {
             case "offset":
             case "pulseconfiguration":
             case "resetpresence":
+            case "setvalve":
             case "sensitivity":
             case "speed":
             case "tholddark":
@@ -2962,6 +2963,10 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objType = "boolean";
       objRole = "state";
       objWrite = false;
+      break;
+    case "setvalve":
+      objType = "boolean";
+      objRole = "switch";
       break;
     case "sensitivity":
       objType = "number";
