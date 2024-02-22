@@ -2506,8 +2506,8 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objWrite = false;
       objMin = 0;
       objMax = 100;
-      objUnit = "%";
       objDefault = 0;
+      objUnit = "%";
       break;
     case "bri":
       objType = "number";
@@ -2559,7 +2559,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objRole = "level.temperature";
       objMin = 7.0;
       objMax = 35.0;
-      objDefault = 0;
+      objDefault = 18.0;
       objUnit = "°C";
       value = value / 100;
       break;
@@ -2698,6 +2698,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "fanmode":
       objType = "string";
       objRole = "state";
+      objDefault = "auto";
       objStates = {
         off: "off",
         low: "low",
@@ -2722,6 +2723,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objType = "number";
       objRole = "value.temperature";
       objWrite = false;
+      objDefault = 0;
       objUnit = "°C";
       value = value / 100;
       break;
@@ -2771,6 +2773,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "interfacemode":
       objType = "number";
       objRole = "state";
+      objDefault = 0;
       break;
     case "lastset":
       objType = "string";
@@ -2843,6 +2846,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objType = "number";
       objRole = "state";
       objWrite = false;
+      objDefault = 0;
       break;
     case "melody":
       objType = "number";
@@ -2932,6 +2936,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objRole = "value";
       objMin = 0;
       objMax = 65535;
+      objDefault = 0;
       break;
     case "reachable":
       objType = "boolean";
@@ -3074,6 +3079,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "triggerdistance":
       objType = "string";
       objRole = "state";
+      objUnit = "m";
       break;
     case "usertest":
       objType = "boolean";
@@ -3089,6 +3095,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objRole = "value.valve";
       objWrite = false;
       objDefault = 0;
+      objUnit = "%";
       break;
     case "voltage":
       objType = "number";
@@ -3123,6 +3130,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objRole = "state";
       objMin = 0;
       objMax = 9;
+      objDefault = 0;
       break;
     case "windowopen":
       objType = "string";
