@@ -2456,7 +2456,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
   let objDefault = null;
 
   switch (stateName) {
-    //attributes
+    //attributes&objects
     case "alarm":
       objType = "boolean";
       objRole = "sensor.alarm";
@@ -2477,6 +2477,13 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objType = "boolean";
       objRole = "indicator";
       objWrite = false;
+      break;
+    case "angle":
+      objType = "number";
+      objRole = "state";
+      objWrite = false;
+      objDefault = 0;
+      objUnit = "°";
       break;
     case "any_on":
       objType = "boolean";
@@ -2527,6 +2534,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objType = "number";
       objRole = "state";
       objWrite = false;
+      objDefault = 0;
       buttonEvents(`${type}.${id}.buttonevent`, value);
       break;
     case "boost":
@@ -2682,6 +2690,12 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objType = "number";
       objRole = "state";
       break;
+    case "eventduration":
+      objType = "number";
+      objRole = "state";
+      objWrite = false;
+      objDefault = 0;
+      break;
     case "externalsensortemp":
       objType = "number";
       objRole = "level.temperature";
@@ -2726,6 +2740,12 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objDefault = 0;
       objUnit = "°C";
       value = value / 100;
+      break;
+    case "gesture":
+      objType = "number";
+      objRole = "state";
+      objWrite = false;
+      objDefault = 0;
       break;
     case "group":
       objType = "number";
@@ -3140,6 +3160,18 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "windowopen_set":
       objType = "boolean";
       objRole = "switch";
+      break;
+    case "x":
+      objType = "number";
+      objRole = "state";
+      objWrite = false;
+      objDefault = 0;
+      break;
+    case "y":
+      objType = "number";
+      objRole = "state";
+      objWrite = false;
+      objDefault = 0;
       break;
     case "xy":
       objType = "array";
