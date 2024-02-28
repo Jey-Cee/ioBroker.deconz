@@ -2894,8 +2894,8 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "offset":
       objType = "number";
       objRole = "state";
-      objMin = -327.68;
-      objMax = 327.67;
+      objMin = -999;
+      objMax = 999;
       objDefault = 0;
       break;
     case "open":
