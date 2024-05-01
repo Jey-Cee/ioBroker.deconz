@@ -21,7 +21,7 @@ Connects to deConz REST-API software developed by dresden-elektronik. This softw
 You must first link to deConz.
 1. a) Enter IP address for deConz <br>
    b) Enter standard Bridge Port: 80 and standard Websocket: 443
-3. After IP address and port is entered and saved hit "Create API Key" Button. Now you can enter the credentials for deConz or go to Phoscon APP and register ioBroker as third party APP.
+2. After IP address and port is entered and saved hit "Create API Key" Button. Now you can enter the credentials for deConz or go to Phoscon APP and register ioBroker as third party APP.
 
 
 #### Send more than one command at the same time
