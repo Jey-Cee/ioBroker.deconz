@@ -23,6 +23,8 @@ You must first link to deConz.
    b) Enter standard Bridge Port: 80 and standard Websocket: 443
 2. After IP address and port is entered and saved hit "Create API Key" Button. Now you can enter the credentials for deConz or go to Phoscon APP and register ioBroker as third party APP.
 
+## To avoid some errors after an update (deconz/adapter), stop the adapter and delete these entries in the object structure. When you start, the object structure is recreated.
+![Deconz-Adapter](https://github.com/mattreim/ioBroker.deconz/assets/80219712/fb56647e-a0a8-4535-9e18-2b7651b32824)
 
 #### Send more than one command at the same time
 For this purpose there is a object called "action".
