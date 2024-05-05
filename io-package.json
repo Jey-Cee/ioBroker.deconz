@@ -1,8 +1,12 @@
 {
   "common": {
     "name": "deconz",
-    "version": "1.4.0",
+    "version": "1.4.1",
     "news": {
+      "1.4.1": {
+        "en": "Added new objects for various sensors",
+        "de": "Neue Objekte für verschiedene Sensoren hinzugefügt"
+      },
       "1.4.0": {
         "en": "Added new objects for Tuya and Bosch thermostats",
         "de": "Neue Objekte für Tuya- und Bosch-Thermostate hinzugefügt"
