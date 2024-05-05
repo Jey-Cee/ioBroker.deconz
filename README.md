@@ -45,6 +45,9 @@ Examples:
 
 ## Changelog
 
+### 1.4.1 (2024-05-05)
+* (mattreim) Added new objects for various sensors
+
 ### 1.4.0 (2024-01-29)
 * (mattreim) Added new objects for Tuya and Bosch thermostats
 
