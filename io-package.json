@@ -80,10 +80,9 @@
     "authors": [
       "Jey Cee <jey-cee@live.com>"
     ],
-    "license": "Apache-2.0",
     "licenseInformation": {
       "license": "Apache-2.0",
-      "type":  "free",
+      "type":  "free"
     },
     "platform": "Javascript/Node.js",
     "mode": "daemon",+
