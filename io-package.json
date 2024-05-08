@@ -81,8 +81,13 @@
       "Jey Cee <jey-cee@live.com>"
     ],
     "license": "Apache-2.0",
+    "licenseInformation": {
+      "license": "Apache-2.0",
+      "type":  "free",
+    },
     "platform": "Javascript/Node.js",
-    "mode": "daemon",
+    "mode": "daemon",+
+    "tier": "2",
     "connectionType": "local",
     "dataSource": "push",
     "localLinks": {
