@@ -85,7 +85,7 @@
       "type":  "free"
     },
     "platform": "Javascript/Node.js",
-    "mode": "daemon",+
+    "mode": "daemon",
     "tier": "2",
     "connectionType": "local",
     "dataSource": "push",
