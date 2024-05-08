@@ -86,7 +86,7 @@
     },
     "platform": "Javascript/Node.js",
     "mode": "daemon",
-    "tier": "2",
+    "tier": 2,
     "connectionType": "local",
     "dataSource": "push",
     "localLinks": {
