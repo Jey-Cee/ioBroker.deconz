@@ -130,7 +130,7 @@
     "plugins": {},
     "dependencies": [
       {
-        "js-controller": ">=2.0.0"
+        "js-controller": ">=4.0.24"
       }
     ],
     "readme": "https://github.com/Jey-Cee/ioBroker.deconz/blob/master/README.md",
