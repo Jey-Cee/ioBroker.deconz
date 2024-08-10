@@ -5,27 +5,55 @@
     "news": {
       "1.4.1": {
         "en": "Added new objects for various sensors",
-        "de": "Neue Objekte für verschiedene Sensoren hinzugefügt"
+        "de": "Neue Objekte für verschiedene Sensoren hinzugefügt",
+        "ru": "Добавлены новые объекты для различных датчиков",
+        "pt": "Adicionado novos objetos para vários sensores",
+        "nl": "Nieuwe objecten toegevoegd voor verschillende sensoren",
+        "fr": "Ajout de nouveaux objets pour différents capteurs",
+        "it": "Aggiunto nuovi oggetti per vari sensori",
+        "es": "Nuevos objetos añadidos para varios sensores",
+        "pl": "Dodano nowe obiekty dla różnych czujników",
+        "uk": "Додано нові об'єкти для різних датчиків",
+        "zh-cn": "添加用于各种传感器的新对象"
       },
       "1.4.0": {
         "en": "Added new objects for Tuya and Bosch thermostats",
-        "de": "Neue Objekte für Tuya- und Bosch-Thermostate hinzugefügt"
+        "de": "Neue Objekte für Tuya und Bosch Thermostate hinzugefügt",
+        "ru": "Добавлены новые объекты для термостатов Tuya и Bosch",
+        "pt": "Adicionados novos objetos para termostatos Tuya e Bosch",
+        "nl": "Nieuwe objecten toegevoegd voor Tuya en Bosch thermostaat",
+        "fr": "Ajout de nouveaux objets pour les thermostats Tuya et Bosch",
+        "it": "Aggiunti nuovi oggetti per termostati Tuya e Bosch",
+        "es": "Nuevos objetos añadidos para termostatos Tuya y Bosch",
+        "pl": "Dodano nowe obiekty dla termostatów Tuya i Bosch",
+        "uk": "Додано нові об'єкти для термостатів Туя та Bosch",
+        "zh-cn": "为 Tuya 和 Bosch 自动调温器添加新对象"
       },
       "1.3.23": {
-        "en": "fix crash when new device was added\n added possibility to change the port for websocket connection\n updated/added translations",
-        "de": "Absturz behoben, wenn ein neues Gerät hinzugefügt wurde\n Möglichkeit hinzugefügt, den Port für die WebSocket-Verbindung zu ändern\n Übersetzungen aktualisiert/hinzugefügt"
+        "en": "Fix crash when new device was added\nAdded possibility to change the port for websocket connection\nUpdated/added translations\n",
+        "de": "Absturz beheben, als neues Gerät hinzugefügt wurde Zusätzliche Möglichkeit, den Port für Websocket-Verbindung zu ändern\nAktualisierte/hinzugefügte Übersetzungen\n",
+        "ru": "Fix сбой при добавлении нового устройства\nДобавлена возможность изменить порт для websocket-соединения\nОбновленные/дополненные переводы\n",
+        "pt": "Corrigir acidente quando novo dispositivo foi adicionado\nAdicionado possibilidade de mudar a porta para conexão websocket\ntraduções atualizadas/adicionadas\n",
+        "nl": "Fix crash wanneer nieuw apparaat is toegevoegd\nToegevoegde mogelijkheid om de poort voor websocket verbinding te wijzigen\nBijgewerkte/toegevoegde vertalingen\n",
+        "fr": "Correction du crash lorsque le nouveau périphérique a été ajouté\nAjout de la possibilité de modifier le port pour la connexion websocket\nTraductions mises à jour/ajoutées\n",
+        "it": "Fisso crash quando è stato aggiunto un nuovo dispositivo Aggiunta possibilità di cambiare la porta per il collegamento websocket\nTraduzioni aggiornate/aggiunte\n",
+        "es": "Arreglar el fallo cuando el nuevo dispositivo fue añadido\nAñadido posibilidad de cambiar el puerto para la conexión websocket\nActualizado/added traducciones\n",
+        "pl": "Napraw awarię po dodaniu nowego urządzenia\nDodano możliwość zmiany portu dla połączenia websocket\nAktualizacja/dodane tłumaczenia\n",
+        "uk": "Виправлення аварійних ситуацій при додаванні нового пристрою\nДодана можливість змінити порт для підключення websocket\nОновлено/додано переклади\n",
+        "zh-cn": "添加新设备时修复崩溃\n 添加更改 Websocket 连接端口的可能性\n更新/添加翻译\n"
       },
       "1.3.21": {
-        "en": "added schedule to object definition\nchanged limit for duration to 999999",
-        "de": "Zeitplan zur Objektdefinition hinzugefügt\nLimit für die Dauer auf 999999 geändert",
-        "ru": "добавлено расписание в определение объекта\nизменен лимит продолжительности на 999999",
-        "pt": "agendamento adicionado à definição do objeto\nlimite de duração alterado para 999999",
-        "nl": "schema toegevoegd aan objectdefinitie\nlimiet voor duur gewijzigd in 999999",
-        "fr": "calendrier ajouté à la définition d'objet\nmodification de la limite de durée à 999999",
-        "it": "aggiunta pianificazione alla definizione dell'oggetto\nmodificato il limite di durata a 999999",
-        "es": "programación agregada a la definición de objeto\nlímite cambiado para la duración a 999999",
-        "pl": "dodano harmonogram do definicji obiektu\nzmieniono limit czasu trwania na 999999",
-        "zh-cn": "将计划添加到对象定义\n将持续时间限制更改为 999999"
+        "en": "Added schedule to object definition\nChanged limit for duration to 999999\n",
+        "de": "Zusätzlicher Zeitplan für die Objektdefinition\nGeänderte Grenze für die Dauer auf 999999\n",
+        "ru": "Добавленное расписание для объекта определения\nИзменение лимита на срок до 999999\n",
+        "pt": "Adicionado cronograma para definição de objeto\nLimite alterado para duração para 999999\n",
+        "nl": "Schema toegevoegd aan objectdefinitie\nGewijzigde limiet voor de duur tot 999999\n",
+        "fr": "Ajout du calendrier à la définition de l'objet\nModification de la limite pour la durée à 999999\n",
+        "it": "Calendario aggiunto alla definizione degli oggetti\nLimite modificato per durata a 999999\n",
+        "es": "Añadido programa para la definición de objeto\nlímite cambiado por duración a 999999\n",
+        "pl": "Dodano harmonogram do definicji obiektu\nZmieniono limit na czas trwania do 999999\n",
+        "uk": "Додано графік до визначення об'єкта\nЗмінений ліміт на тривалість до 999999999999\n",
+        "zh-cn": "添加到对象定义中的表\n持续时间限制改为999999\n"
       },
       "1.3.20": {
         "en": "add retry if gateway is busy\nchange min/max range for offset\nupdated translations\nfix link for overview page\nfix parameter can not be set since deConz 2.11.5\nfix xy is invalid: #289 #295\nremove Sentry",
@@ -37,6 +65,7 @@
         "it": "aggiungi riprova se il gateway è occupato\nmodificare l'intervallo min/max per l'offset\ntraduzioni aggiornate\ncollegamento di correzione per la pagina di panoramica\nfix parametro non può essere impostato da deConz 2.11.5\nfix xy non è valido: #289 #295\nrimuovi Sentinella",
         "es": "agregar reintento si la puerta de enlace está ocupada\ncambiar el rango mínimo/máximo para la compensación\ntraducciones actualizadas\narreglar el enlace para la página de resumen\nEl parámetro fijo no se puede configurar desde deConz 2.11.5\narreglar xy no es válido: #289 #295\nquitar centinela",
         "pl": "dodaj spróbuj ponownie, jeśli bramka jest zajęta\nzmień zakres min/maks dla przesunięcia\nzaktualizowane tłumaczenia\nnapraw link do strony przeglądu\nnie można ustawić parametru fix od czasu deConz 2.11.5\nnaprawienie xy jest nieprawidłowe: #289 #295\nusuń Sentry",
+        "uk": "add retry if gateway is busy\nchange min/max діапазон для offset\nоновлених перекладів\nfix посилання для оглядової сторінки\nfix параметр не може бути встановлений, оскільки deConz 2.11.5\nfix xy недійсний: #289 #295\nremove Sentry\n",
         "zh-cn": "如果网关忙，则添加重试\n更改偏移的最小/最大范围\n更新的翻译\n修复概览页面的链接\n自 deConz 2.11.5 以来无法设置修复参数\n修复 xy 无效：#289 #295\n移除哨兵"
       },
       "1.3.19": {
@@ -49,10 +78,10 @@
         "it": "correzione per js-controller 3.3.x",
         "es": "arreglo para js-controller 3.3.x",
         "pl": "poprawka dla kontrolera js 3.3.x",
+        "uk": "фіксатор для js-controller 3.3.x",
         "zh-cn": "修复 js 控制器 3.3.x"
       }
     },
-    "title": "deConz ZigBee",
     "titleLang": {
       "en": "deConz ZigBee",
       "de": "deConz ZigBee",
@@ -63,6 +92,7 @@
       "it": "deConz ZigBee",
       "es": "deConz ZigBee",
       "pl": "deConz ZigBee",
+      "uk": "deConz ZigBee",
       "zh-cn": "deConz ZigBee"
     },
     "desc": {
@@ -75,6 +105,7 @@
       "it": "Si collega al software deConz che è una soluzione gateway per ZigBee. deConz funziona con ConBee USB stick e RaspBee modul per Raspberry Pi, anch'esso di Dresden-Elektronik.",
       "es": "Se conecta al software deConz que es una solución de puerta de enlace para ZigBee. deConz funciona con el dispositivo USB ConBee y el módulo RaspBee para Raspberry Pi, que también es de Dresden-Elektronik.",
       "pl": "Łączy się z oprogramowaniem deConz, które jest rozwiązaniem bramkowym dla ZigBee. deConz współpracuje z pamięcią USB ConBee i modułem RaspBee dla Raspberry Pi, który jest również z firmy Dresden-Elektronik.",
+      "uk": "Підключається до програми deConz, яка є розчином для шлюзу ZigBee. DeConz працює з ConBee USB палицею і RaspBee модул для Малина Пі, який також від Dresden-Elonik.",
       "zh-cn": "deConz与ConBee USB棒和Raspberry Pi的RaspBee模块一起使用，后者也是来自Dresden-Elektronik。"
     },
     "authors": [
@@ -98,7 +129,7 @@
     "plugins": {},
     "dependencies": [
       {
-        "js-controller": ">=2.0.0"
+        "js-controller": ">=4.0.24"
       }
     ],
     "readme": "https://github.com/Jey-Cee/ioBroker.deconz/blob/master/README.md",
