@@ -45,6 +45,9 @@ Examples:
 
 ## Changelog
 
+### 1.5.0 (2024-08-11)
+* (mattreim) Dependencies have been updated
+
 ### 1.4.1 (2024-05-05)
 * (mattreim) Added new objects for various sensors
 
