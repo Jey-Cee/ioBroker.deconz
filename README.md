@@ -11,7 +11,7 @@ ioBroker deConz dresden-elektronik Adapter
 ## Notice
 No Support for Beta Versions of deConz
 
-Required js-controller version >4.x.x, Required node.js >= 18.x.x
+Required js-controller version >5.x.x, Required node.js >= 18.x.x
 
 ## English
 
