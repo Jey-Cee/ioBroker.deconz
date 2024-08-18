@@ -57,10 +57,12 @@
   },
   "main": "main.js",
   "files": [
-    "admin/",
+    "admin{,/!(src)/**}/!(tsconfig|tsconfig.*|.eslintrc).{json,json5}",
+    "admin{,/!(src)/**}/*.{html,css,png,svg,jpg,js}",
     "lib/",
-    "LICENSE",
+    "www/",
     "io-package.json",
+    "LICENSE",
     "main.js"
   ],
   "scripts": {
