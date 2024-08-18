@@ -56,6 +56,13 @@
     "sinon-chai": "^3.7.0"
   },
   "main": "main.js",
+  "files": [
+    "admin/",
+    "lib/",
+    "LICENSE",
+    "io-package.json",
+    "main.js"
+  ],
   "scripts": {
     "test:js": "node node_modules/mocha/bin/mocha --exit",
     "test:package": "mocha test/package --exit",
