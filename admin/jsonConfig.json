@@ -4,7 +4,7 @@
     "items": {
         "#tab-main": {
             "type": "panel",
-            "label": "Main Settings",
+            "label": "Main settings",
             "items": {
                 "sw_version": {
                     "type": "text",
@@ -22,18 +22,18 @@
                     "newLine": true,
                     "type": "header",
                     "text": "Settings",
-                    "size": 2
+                    "size": 3
                 },
                 "bridge": {
                     "newLine": true,
-                    "label": "deConz IP Adresse",
+                    "label": "deConz Address",
                     "type": "text",
                     "sm": 12,
                     "md": 3,
                     "lg": 3
                 },
                 "port": {
-                    "label": "Port",
+                    "label": "Bridge port",
                     "type": "number",
                     "default": 80,
                     "min": 0,
@@ -52,7 +52,12 @@
                     "md": 2,
                     "lg": 2
                 },
-            
+                "instruction": {
+                    "newLine": true,
+                    "type": "header",
+                    "text": "Instruction",
+                    "size": 3
+                },
                 "user": {
                     "newLine": true,
                     "label": "API key",
@@ -67,7 +72,7 @@
                     "variant": "outlined",
                     "showProcess": true,
                     "command": "sendTo1",
-                    "jsonData": "{ \"data1\": \"${data.sendTo1a}\", \"data2\": \"${data.sendTo1b}\" }",
+                    "jsonData": "{ \"data\": \"${data.user}\"}",
                     "useNative": true
                 },
                 "deleteAPIkey": {
@@ -77,6 +82,36 @@
                     "showProcess": true,
                     "command": "sendTo1",
                     "jsonData": "{ \"data1\": \"${data.sendTo1a}\", \"data2\": \"${data.sendTo1b}\" }",
+                    "useNative": true
+                },
+                "or": {
+                    "newLine": true,
+                    "type": "header",
+                    "text": "OR",
+                    "size": 3
+                },
+                "username": {
+                    "newLine": true,
+                    "label": "Username",
+                    "type": "text",
+                    "sm": 12,
+                    "md": 3,
+                    "lg": 3
+                },
+                "password": {
+                    "label": "Password",
+                    "type": "password",
+                    "sm": 12,
+                    "md": 3,
+                    "lg": 3
+                },
+                "create2": {
+                    "type": "sendTo",
+                    "label": "Create API key",
+                    "variant": "outlined",
+                    "showProcess": true,
+                    "command": "sendTo1",
+                    "jsonData": "{ \"data1\": \"${data.username}\", \"data2\": \"${data.password}\" }",
                     "useNative": true
                 }
             }
@@ -153,10 +188,10 @@
         },
         "#tab-manage-groups": {
             "type": "panel",
-            "label": "Manage Groups",
+            "label": "Manage Groupss",
             "items": {
                 "group_name": {
-                    "label": "Name of the new group",
+                    "label": "Name of the new group:",
                     "type": "text",
                     "sm": 12,
                     "md": 3,
@@ -168,7 +203,7 @@
                     "variant": "outlined",
                     "showProcess": true,
                     "command": "sendTo1",
-                    "jsonData": "{ \"data1\": \"${data.sendTo1a}\", \"data2\": \"${data.sendTo1b}\" }",
+                    "jsonData": "{ \"data\": \"${data.group_name}\"}",
                     "useNative": true
                 },
                 "groups": {
