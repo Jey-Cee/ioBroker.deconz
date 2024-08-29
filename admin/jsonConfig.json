@@ -10,24 +10,33 @@
                     "type": "text",
                     "label": "deConz Version",
                     "readOnly": true,
-                    "size": 2
+                    "size": 2,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 3
                 },
                 "api_version": {
                     "type": "text",
                     "label": "deConz REST API Version",
                     "readOnly": true,
-                    "size": 2
+                    "size": 2,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 3
                 },
-                "settings": {
+                "_header1": {
                     "newLine": true,
                     "type": "header",
                     "text": "Settings",
-                    "size": 3
+                    "size": 3,
+                    "xs": 12,
+                    "sm": 12
                 },
                 "bridge": {
                     "newLine": true,
                     "label": "deConz Address",
                     "type": "text",
+                    "xs": 12,
                     "sm": 12,
                     "md": 3,
                     "lg": 3
@@ -38,6 +47,7 @@
                     "default": 80,
                     "min": 0,
                     "max": 65535,
+                    "xs": 12,
                     "sm": 12,
                     "md": 2,
                     "lg": 2
@@ -48,20 +58,24 @@
                     "default": 443,
                     "min": 0,
                     "max": 65535,
+                    "xs": 12,
                     "sm": 12,
                     "md": 2,
                     "lg": 2
                 },
-                "instruction": {
+                "_header2": {
                     "newLine": true,
                     "type": "header",
                     "text": "Instruction",
-                    "size": 3
+                    "size": 3,
+                    "xs": 12,
+                    "sm": 12
                 },
                 "user": {
                     "newLine": true,
                     "label": "API key",
                     "type": "text",
+                    "xs": 12,
                     "sm": 12,
                     "md": 3,
                     "lg": 3
@@ -84,16 +98,19 @@
                     "jsonData": "{ \"data1\": \"${data.sendTo1a}\", \"data2\": \"${data.sendTo1b}\" }",
                     "useNative": true
                 },
-                "or": {
+                "_header3": {
                     "newLine": true,
                     "type": "header",
                     "text": "OR",
-                    "size": 3
+                    "size": 3,
+                    "xs": 12,
+                    "sm": 12
                 },
                 "username": {
                     "newLine": true,
                     "label": "Username",
                     "type": "text",
+                    "xs": 12,
                     "sm": 12,
                     "md": 3,
                     "lg": 3
@@ -101,6 +118,7 @@
                 "password": {
                     "label": "Password",
                     "type": "password",
+                    "xs": 12,
                     "sm": 12,
                     "md": 3,
                     "lg": 3
@@ -134,6 +152,7 @@
                     "type": "table",
                     "label": "Devices",
                     "noDelete": true,
+                    "xs": 12,
                     "sm": 12,
                     "md": 12,
                     "lg": 12,
@@ -193,6 +212,7 @@
                 "group_name": {
                     "label": "Name of the new group:",
                     "type": "text",
+                    "xs": 12,
                     "sm": 12,
                     "md": 3,
                     "lg": 3
@@ -211,6 +231,7 @@
                     "type": "table",
                     "label": "Groups",
                     "noDelete": true,
+                    "xs": 12,
                     "sm": 12,
                     "md": 12,
                     "lg": 12,
