@@ -207,7 +207,7 @@
         },
         "_manage-groups": {
             "type": "panel",
-            "label": "Manage Groupss",
+            "label": "Manage Groups",
             "items": {
                 "group_name": {
                     "label": "Name of the new group:",
