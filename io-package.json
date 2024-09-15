@@ -4,17 +4,17 @@
     "version": "1.5.0",
     "news": {
       "1.5.0": {
-        "en": "Dependencies have been updated",
-        "de": "Abhängigkeiten wurden aktualisiert",
-        "ru": "Зависимость обновлена",
-        "pt": "As dependências foram atualizadas",
-        "nl": "Afhankelijkheden zijn bijgewerkt",
-        "fr": "Les dépendances ont été actualisées",
-        "it": "Le dipendenze sono state aggiornate",
-        "es": "Se han actualizado las dependencias",
-        "pl": "Zaktualizowano zależności",
-        "uk": "Залежність було оновлено",
-        "zh-cn": "依赖关系已更新"
+        "en": "Dependencies have been updated\n Some translations are updated/added",
+        "de": "Abhängigkeiten wurden aktualisiert\n inige Übersetzungen wurden aktualisiert/hinzugefügt",
+        "ru": "Зависимость обновлена\n оторые переводы обновлены/добавлены",
+        "pt": "As dependências foram atualizadas\n Algumas traduções foram actualizadas/adicionadas",
+        "nl": "Afhankelijkheden zijn bijgewerkt\n Sommige vertalingen zijn bijgewerkt/toegevoegd",
+        "fr": "Les dépendances ont été actualisées\n Certaines traductions sont mises à jour/ajout",
+        "it": "Le dipendenze sono state aggiornate\n Alcune traduzioni sono state aggiornate/aggiunte",
+        "es": "Se han actualizado las dependencias\n Se actualizan/añaden algunas traducciones",
+        "pl": "Zaktualizowano zależności\n Niektóre tłumaczenia zostały zaktualizowane/dodane",
+        "uk": "Залежність було оновлено\n Деякі переклади оновлено/додано",
+        "zh-cn": "依赖关系已更新, 更新/添加了一些译文"
       },
       "1.4.1": {
         "en": "Added new objects for various sensors",
