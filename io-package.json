@@ -100,7 +100,12 @@
     "type": "hardware"
   },
   "native": {
-    "sentry": true
+    "bridge": "",
+    "port": 80,
+    "websocketport": 443,
+    "user": "",
+    "username": "",
+    "password": ""
   },
   "instanceObjects": [
     {
