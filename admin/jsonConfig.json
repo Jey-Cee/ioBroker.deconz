@@ -112,11 +112,6 @@
         "text-align": "center"
       }
     },
-    "_divider2": {
-      "newLine": true,
-      "type": "divider",
-      "color": "secondary"
-    },
     "username": {
       "newLine": true,
       "label": "Username",
