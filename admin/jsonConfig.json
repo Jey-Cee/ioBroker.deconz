@@ -1,0 +1,141 @@
+{
+  "i18n": true,
+  "type": "tabs",
+  "items": {
+    "_main": {
+      "type": "panel",
+      "label": "Main settings",
+      "items": {
+        "bridge": {
+          "newLine": true,
+          "label": "deConz Address",
+          "type": "text",
+          "xl": 3,
+          "lg": 3,
+          "md": 4,
+          "sm": 12,
+          "xs": 12
+        },
+        "port": {
+          "label": "Bridge port",
+          "type": "number",
+          "default": 80,
+          "min": 0,
+          "max": 65535,
+          "xl": 1,
+          "lg": 2,
+          "md": 2,
+          "sm": 6,
+          "xs": 6
+        },
+        "websocketport": {
+          "label": "Websocket Port",
+          "type": "number",
+          "default": 443,
+          "min": 0,
+          "max": 65535,
+          "xl": 1,
+          "lg": 2,
+          "md": 2,
+          "sm": 6,
+          "xs": 6
+        },
+        "_header1": {
+          "type": "header",
+          "text": "Authentication",
+          "size": 3
+        },
+        "_instruction": {
+          "type": "staticText",
+          "text": "Instruction",
+          "xl": 6,
+          "lg": 12,
+          "md": 12,
+          "sm": 12,
+          "xs": 12,
+          "newLine": true,
+          "style": { "font-size": "16px",  "text-align": "center" }
+        },
+        "user": {
+          "label": "API key",
+          "type": "text",
+          "xl": 3,
+          "lg": 3,
+          "md": 6,
+          "sm": 12,
+          "xs": 12,
+          "newLine": true
+        },
+        "create": {
+          "type": "sendTo",
+          "label": "Create API key",
+          "variant": "contained",
+          "showProcess": true,
+          "command": "createAPIkey",
+          "jsonData": "{ \"host\": \"${data.bridge}\", \"credentials\": \"null\"}",
+          "useNative": true,
+          "xl": 2,
+          "lg": 3,
+          "md": 3,
+          "sm": 12,
+          "xs": 12
+        },
+        "deleteAPIkey": {
+          "type": "sendTo",
+          "label": "Delete API key",
+          "variant": "outlined",
+          "showProcess": true,
+          "command": "deleteAPIkey",
+          "useNative": true,
+          "xl": 2,
+          "lg": 3,
+          "md": 3,
+          "sm": 12,
+          "xs": 12
+        },
+        "_or": {
+          "type": "staticText",
+          "text": "OR",
+          "xl": 6,
+          "lg": 12,
+          "md": 12,
+          "sm": 12,
+          "xs": 12,
+          "newLine": true,
+          "style": { "font-size": "16px",  "text-align": "center" }
+        },
+        "username": {
+          "newLine": true,
+          "label": "Username",
+          "type": "text",
+          "xs": 12,
+          "sm": 12,
+          "md": 3,
+          "lg": 3
+        },
+        "password": {
+          "label": "Password",
+          "type": "password",
+          "xs": 12,
+          "sm": 12,
+          "md": 3,
+          "lg": 3
+        },
+        "userCredentials": {
+          "type": "sendTo",
+          "label": "Create API key",
+          "variant": "contained",
+          "showProcess": true,
+          "command": "createAPIkey",
+          "jsonData": "{ \"host\": \"${data.bridge}\", \"credentials\": \"${data.username}:${data.password}\"}",
+          "useNative": true,
+          "xl": 2,
+          "lg": 3,
+          "md": 6,
+          "sm": 12,
+          "xs": 12
+        }
+      }
+    }
+  }
+}
