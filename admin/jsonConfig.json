@@ -100,9 +100,22 @@
     },
     "_or": {
       "newLine": true,
-      "type": "header",
+      "type": "staticText",
       "text": "OR",
-      "size": 3
+      "xl": 6,
+      "lg": 12,
+      "md": 12,
+      "sm": 12,
+      "xs": 12,
+      "style": {
+        "font-size": "16px",
+        "text-align": "center"
+      }
+    },
+    "_divider2": {
+      "newLine": true,
+      "type": "divider",
+      "color": "secondary"
     },
     "username": {
       "newLine": true,
