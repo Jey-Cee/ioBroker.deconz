@@ -100,7 +100,7 @@ class deconz extends utils.Adapter {
 
           switch (dp) {
             case "bri":
-              if (state.val > 0 && (transitionTime === "none" || transitionTime === 0))  
+              if (state.val > 0 && (transitionTime === "none" || transitionTime === 0))
               {
                 parameters = '{"bri": ' + JSON.stringify(state.val) + ', "on": true}';
               } else if (state.val > 0) {
@@ -117,7 +117,7 @@ class deconz extends utils.Adapter {
               );
               break;
             case "level":
-              if (state.val > 0 && (transitionTime === "none" || transitionTime === 0)) 
+              if (state.val > 0 && (transitionTime === "none" || transitionTime === 0))
               {
                 parameters = '{"bri": ' + Math.floor((255 / 100) * state.val) + ', "on": true}';
               } else if (state.val > 0) {
@@ -409,7 +409,7 @@ class deconz extends utils.Adapter {
               this.sendTo(
                 obj.from,
                 obj.command,
-                JSON.stringify(res),
+                  { native: { user: JSON.stringify(res.message).replace(/"/g, '') } },
                 obj.callback
               );
           });
@@ -417,6 +417,12 @@ class deconz extends utils.Adapter {
           break;
         case "deleteAPIkey":
           await deleteAPIkey();
+          this.sendTo(
+              obj.from,
+              obj.command,
+              { native: { user: "" } },
+              obj.callback
+          );
           wait = true;
           break;
         case "getConfig":
@@ -897,7 +903,7 @@ async function modifyConfig(parameters) {
           response = JSON.parse(body);
         } catch (err) {}
 
-        if ((await logging(res, body, "modify config")) && response !== undefined && response !== "undefined") 
+        if ((await logging(res, body, "modify config")) && response !== undefined && response !== "undefined")
         {
           if (response[0]["success"]) {
             switch (JSON.stringify(response[0]["success"])) {
@@ -1326,7 +1332,7 @@ async function setGroupState(parameters, groupId, stateId) {
           response = JSON.parse(body);
         } catch (err) {}
 
-        if ((await logging(res, body, "set group state " + groupId)) && response !== undefined && response !== "undefined") 
+        if ((await logging(res, body, "set group state " + groupId)) && response !== undefined && response !== "undefined")
         {
           new ackStateVal(stateId, response);
         }
@@ -1371,7 +1377,7 @@ async function setGroupScene(
           response = JSON.parse(body);
         } catch (err) {}
 
-        if ((await logging(res, body, "set group scene " + groupId)) && response !== undefined && response !== "undefined") 
+        if ((await logging(res, body, "set group scene " + groupId)) && response !== undefined && response !== "undefined")
         {
           new ackStateVal(stateId, response);
         }
@@ -1427,7 +1433,7 @@ async function deleteGroup(groupId) {
           response = JSON.parse(body);
         } catch (err) {}
 
-        if ((await logging(res, body, "delete group " + groupId)) && response !== undefined && response !== "undefined") 
+        if ((await logging(res, body, "delete group " + groupId)) && response !== undefined && response !== "undefined")
         {
           if (response[0]["success"]) {
             adapter.log.info("The group with id " + groupId + " was removed.");
@@ -1578,7 +1584,7 @@ async function getSensor(sensorId) {
           for (let z = 0; z <= count2; z++) {
             let stateName = Object.keys(list["state"])[z];
 
-            if (stateName === "buttonevent" && list["modelid"] === "lumi.Sensors.switch.aq2") 
+            if (stateName === "buttonevent" && list["modelid"] === "lumi.Sensors.switch.aq2")
             {
               let LastUpdate = Number(new Date(list["state"]["lastupdated"]));
               let Now = Number(new Date().getTime());
@@ -1645,7 +1651,7 @@ async function setSensorParameters(parameters, sensorId, stateId, callback) {
           response = JSON.parse(body);
         } catch (err) {}
 
-        if ((await logging(res, body, "set sensor parameters")) && response !== undefined && response !== "undefined") 
+        if ((await logging(res, body, "set sensor parameters")) && response !== undefined && response !== "undefined")
         {
           new ackStateVal(stateId, response);
         }
@@ -1676,7 +1682,7 @@ async function deleteSensor(sensorId) {
           response = JSON.parse(body);
         } catch (err) {}
 
-        if ((await logging(res, body, "delete sensor " + sensorId)) && response !== undefined && response !== "undefined") 
+        if ((await logging(res, body, "delete sensor " + sensorId)) && response !== undefined && response !== "undefined")
         {
           if (response[0]["success"]) {
             adapter.log.info("The sensor with id " + sensorId + " was removed.");
@@ -1689,7 +1695,7 @@ async function deleteSensor(sensorId) {
                 for (let i = 0; i <= count; i++) {
                   //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ sensor handelt
                   let keyName = Object.keys(enums)[i];
-                  if (enums[keyName].common.role === "sensor" && enums[keyName].native.id === sensorId) 
+                  if (enums[keyName].common.role === "sensor" && enums[keyName].native.id === sensorId)
                   {
                     adapter.log.info("delete device Object: " + enums[keyName]._id);
                     let name = enums[keyName]._id;
@@ -2004,7 +2010,7 @@ async function setLightState(parameters, lightId, stateId, callback) {
           response = JSON.parse(body);
         } catch (err) {}
 
-        if ((await logging(res, body, "set light state " + lightId)) && response !== undefined && response !== "undefined") 
+        if ((await logging(res, body, "set light state " + lightId)) && response !== undefined && response !== "undefined")
         {
           let oldParameters;
           try {
@@ -2079,7 +2085,7 @@ async function deleteLight(lightId) {
                 for (let i = 0; i <= count; i++) {
                   //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ sensor handelt
                   let keyName = Object.keys(enums)[i];
-                  if (enums[keyName].common.role === "light" && enums[keyName].native.id === lightId) 
+                  if (enums[keyName].common.role === "light" && enums[keyName].native.id === lightId)
                   {
                     adapter.log.info("delete device Object: " + enums[keyName]._id);
                     let name = enums[keyName]._id;
@@ -2117,7 +2123,7 @@ async function removeFromGroups(lightId) {
           response = JSON.parse(body);
         } catch (err) {}
 
-        if ((await logging(res, body, "remove light from groups " + lightId)) && response !== undefined && response !== "undefined") 
+        if ((await logging(res, body, "remove light from groups " + lightId)) && response !== undefined && response !== "undefined")
         {
           if (response[0]["success"]) {
             adapter.log.info("The light with id " + lightId + " was removed from all groups.");
@@ -2300,7 +2306,7 @@ function ackStateVal(stateId, response) {
  * @return {string}
  */
 function UTCtoLocal(timeString) {
-  if (timeString !== "none" && timeString !== null && timeString !== undefined) 
+  if (timeString !== "none" && timeString !== null && timeString !== undefined)
   {
     let jsT = Date.parse(timeString + "Z");
 
