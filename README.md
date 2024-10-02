@@ -45,6 +45,13 @@ Examples:
 
 ## Changelog
 
+### 1.6.0 (2024-10-02)
+* (Jey Cee/mattreim) Migrate config to JSONConfig
+* (Jey Cee) Removed device and group management from config
+* (mattreim) Add natives
+* (Jey Cee) Update dependencies
+* (Jey Cee) Use default test and release action
+
 ### 1.5.0 (2024-08-11)
 * Updated/added some translations
 * (mattreim) Dependencies have been updated

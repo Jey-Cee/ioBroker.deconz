@@ -1,8 +1,12 @@
 {
   "common": {
     "name": "deconz",
-    "version": "1.5.0",
+    "version": "1.6.0",
     "news": {
+      "1.6.0": {
+        "en": "Migrate config to JSONConfig \nRemoved device and group management from config",
+        "de": "Umstellung der Konfiguration auf JSONConfig \nGeräte- und Gruppenmanagement aus der Config entfernt"
+      },
       "1.5.0": {
         "en": "Dependencies have been updated\n Some translations are updated/added",
         "de": "Abhängigkeiten wurden aktualisiert\n inige Übersetzungen wurden aktualisiert/hinzugefügt",
