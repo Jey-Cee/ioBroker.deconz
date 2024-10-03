@@ -45,6 +45,9 @@ Examples:
 
 ## Changelog
 
+### 1.6.1 (2024-10-03)
+* (Jey Cee/mattreim) Highlight helper text for authentication
+
 ### 1.6.0 (2024-10-02)
 * (Jey Cee/mattreim) Migrate config to JSONConfig
 * (Jey Cee) Removed device and group management from config
