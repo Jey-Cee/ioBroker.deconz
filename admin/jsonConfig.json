@@ -51,8 +51,7 @@
           "sm": 12,
           "xs": 12,
           "newLine": true,
-          "style": { "font-size": "16px",  "text-align": "center", "background-color":  "rgb(224, 224, 224)", "border-radius":  "3px", "padding": "10px"},
-          "darkStyle": { "color": "black","font-size": "16px",  "text-align": "center", "background-color":  "rgb(224, 224, 224)", "border-radius":  "3px", "padding": "10px"}
+          "style": { "color": "black", "font-size": "16px",  "text-align": "center", "background-color":  "rgb(224, 224, 224)", "radiusBorder":  "3px", "padding": "10px"}
         },
         "user": {
           "label": "API key",
@@ -100,8 +99,7 @@
           "sm": 12,
           "xs": 12,
           "newLine": true,
-          "style": { "font-size": "16px",  "text-align": "center", "background-color":  "rgb(224, 224, 224)", "border-radius":  "3px", "padding": "10px"},
-          "darkStyle": { "color": "black","font-size": "16px",  "text-align": "center", "background-color":  "rgb(224, 224, 224)", "border-radius":  "3px", "padding": "10px"}
+          "style": { "color": "black", "font-size": "16px",  "text-align": "center", "background-color":  "rgb(224, 224, 224)", "radiusBorder":  "3px", "padding": "10px"}
         },
         "username": {
           "label": "Username",
