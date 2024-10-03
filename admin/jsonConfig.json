@@ -1,10 +1,6 @@
 {
-  "i18n": true,
-  "type": "tabs",
-  "items": {
-    "_main": {
+      "i18n": true,
       "type": "panel",
-      "label": "Main settings",
       "items": {
         "bridge": {
           "newLine": true,
@@ -20,7 +16,7 @@
           "label": "Bridge port",
           "type": "number",
           "default": 80,
-          "min": 0,
+          "min": 1,
           "max": 65535,
           "xl": 1,
           "lg": 2,
@@ -32,7 +28,7 @@
           "label": "Websocket Port",
           "type": "number",
           "default": 443,
-          "min": 0,
+          "min": 1,
           "max": 65535,
           "xl": 1,
           "lg": 2,
@@ -43,24 +39,26 @@
         "_header1": {
           "type": "header",
           "text": "Authentication",
-          "size": 3
+          "size": 3,
+          "newLine": true
         },
         "_instruction": {
           "type": "staticText",
           "text": "Instruction",
-          "xl": 6,
+          "xl": 8,
           "lg": 12,
           "md": 12,
           "sm": 12,
           "xs": 12,
           "newLine": true,
-          "style": { "font-size": "16px",  "text-align": "center" }
+          "style": { "font-size": "16px",  "text-align": "center", "background-color":  "rgb(224, 224, 224)", "border-radius":  "3px", "padding": "10px"},
+          "darkStyle": { "color": "black","font-size": "16px",  "text-align": "center", "background-color":  "rgb(224, 224, 224)", "border-radius":  "3px", "padding": "10px"}
         },
         "user": {
           "label": "API key",
           "type": "text",
-          "xl": 3,
-          "lg": 3,
+          "xl": 4,
+          "lg": 6,
           "md": 6,
           "sm": 12,
           "xs": 12,
@@ -96,30 +94,33 @@
         "_or": {
           "type": "staticText",
           "text": "OR",
-          "xl": 6,
+          "xl": 8,
           "lg": 12,
           "md": 12,
           "sm": 12,
           "xs": 12,
           "newLine": true,
-          "style": { "font-size": "16px",  "text-align": "center" }
+          "style": { "font-size": "16px",  "text-align": "center", "background-color":  "rgb(224, 224, 224)", "border-radius":  "3px", "padding": "10px"},
+          "darkStyle": { "color": "black","font-size": "16px",  "text-align": "center", "background-color":  "rgb(224, 224, 224)", "border-radius":  "3px", "padding": "10px"}
         },
         "username": {
-          "newLine": true,
           "label": "Username",
           "type": "text",
-          "xs": 12,
+          "xl": 3,
+          "lg": 4,
+          "md": 4,
           "sm": 12,
-          "md": 3,
-          "lg": 3
+          "xs": 12,
+          "newLine": true
         },
         "password": {
           "label": "Password",
           "type": "password",
-          "xs": 12,
+          "xl": 3,
+          "lg": 4,
+          "md": 4,
           "sm": 12,
-          "md": 3,
-          "lg": 3
+          "xs": 12
         },
         "userCredentials": {
           "type": "sendTo",
@@ -130,12 +131,10 @@
           "jsonData": "{ \"host\": \"${data.bridge}\", \"credentials\": \"${data.username}:${data.password}\"}",
           "useNative": true,
           "xl": 2,
-          "lg": 3,
-          "md": 6,
+          "lg": 4,
+          "md": 4,
           "sm": 12,
           "xs": 12
         }
       }
-    }
-  }
 }
