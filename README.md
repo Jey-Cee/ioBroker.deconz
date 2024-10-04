@@ -45,6 +45,9 @@ Examples:
 
 ## Changelog
 
+### 1.6.2 (2024-10-04)
+* (Jey Cee) Fix no connection on new installation
+
 ### 1.6.1 (2024-10-03)
 * (Jey Cee/mattreim) Highlight helper text for authentication
 

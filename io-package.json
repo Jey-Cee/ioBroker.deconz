@@ -1,8 +1,12 @@
 {
   "common": {
     "name": "deconz",
-    "version": "1.6.1",
+    "version": "1.6.2",
     "news": {
+      "1.6.2": {
+        "en": "Fix no connection on new installation",
+        "de": "Keine Verbindung bei Neuinstallation behoben"
+      },
       "1.6.1": {
         "en": "Highlight helper text for authentication",
         "de": "Hilfstext für die Authentifizierung hervorgehoben"
