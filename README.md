@@ -45,6 +45,9 @@ Examples:
 
 ## Changelog
 
+### 1.6.3 (2024-10-04)
+* (Jey Cee) Fix connection problems
+
 ### 1.6.2 (2024-10-04)
 * (Jey Cee) Fix no connection on new installation
 

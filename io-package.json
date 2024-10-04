@@ -1,8 +1,12 @@
 {
   "common": {
     "name": "deconz",
-    "version": "1.6.2",
+    "version": "1.6.3",
     "news": {
+      "1.6.3": {
+        "en": "Fix connection problems",
+        "de": "Verbindungsproblem behoben"
+      },
       "1.6.2": {
         "en": "Fix no connection on new installation",
         "de": "Keine Verbindung bei Neuinstallation behoben"
