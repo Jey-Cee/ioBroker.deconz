@@ -2256,13 +2256,24 @@ function nameFilter(name) {
  */
 async function getDeviceByID(deviceID, type) {}
 
+/**
+ * Retrieves gateway parameters including IP address, port, and user.
+ * Fetches the information from an adapter object named "Gateway_info".
+ * If any parameter is missing, it defaults to "none".
+ *
+ * @return {Promise<Object>} A promise that resolves to an object containing the gateway parameters.
+ *                           The object includes the properties:
+ *                           - ip: {string} The IP address of the gateway.
+ *                           - port: {string} The port of the gateway.
+ *                           - user: {string} The user of the gateway.
+ */
 async function getGatewayParam() {
   const results = await adapter.getObjectAsync("Gateway_info");
   if (results) {
     return {
-      ip: results.native.ipaddress ? results.native.ipaddress : "none",
-      port: results.native.port ? results.native.port : "none",
-      user: results.native.user ? results.native.user : "none",
+      ip: adapter.config.bridge ? adapter.config.bridge : "none",
+      port: adapter.config.port ? adapter.config.port : "none",
+      user: adapter.config.user ? adapter.config.user : "none",
     };
   }
 }
