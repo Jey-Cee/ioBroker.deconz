@@ -508,27 +508,18 @@ async function main() {
   adapter.subscribeStates("*");
 
   heartbeat();
-  const results = await adapter.getObjectAsync("Gateway_info");
-  if (results) {
-    if (results.native.ipaddress === undefined) {
+
+    if (adapter.config.ip === "undefined") {
       //only on first start
       autoDiscovery();
     } else {
-      if (results.native.port === "" || results.native.port === null) {
-        await adapter.extendObjectAsync("Gateway_info", {
-          native: {
-            port: 80,
-          },
-        });
-      }
-      if (results.native.user === "" || results.native.user === null) {
+      if (adapter.config.user === "" || adapter.config.user === null) {
         adapter.log.warn("No API Key found");
       } else {
         await getConfig();
         await getAutoUpdates();
       }
     }
-  }
 }
 
 //search for Gateway
@@ -693,14 +684,9 @@ function autoReconnect(host, port) {
 }
 
 async function getAutoUpdates() {
-  let host, port, user;
-  const results = await adapter.getObjectAsync("Gateway_info");
-
-  if (results) {
-    host = results !== null && results.native.ipaddress !== undefined ? results.native.ipaddress : null;
-    port = results !== null && results.native.websocketport !== undefined ? results.native.websocketport : 443;
-    user = results !== null && results.native.user !== undefined ? results.native.user : null;
-  }
+  const host = adapter.config.bridge ? adapter.config.bridge : null;
+  const port = adapter.config.port ? adapter.config.websocketport : 443;
+  const user = adapter.config.user ? adapter.config.user : null;
 
   if (user !== null && host !== null && port !== null) {
     ws = new WebSocket("ws://" + host + ":" + port);
@@ -878,12 +864,13 @@ async function getAutoUpdates() {
 
 //START deConz config --------------------------------------------------------------------------------------------------
 async function modifyConfig(parameters) {
-  let ip, port, user, ot;
+  let ip = adapter.config.bridge;
+  const port = adapter.config.port;
+  const user = adapter.config.user
+  let ot;
+
   const results = await adapter.getObjectAsync("Gateway_info");
   if (results) {
-    ip = results.native.ipaddress;
-    port = results.native.port;
-    user = results.native.user;
     ot = results.native.networkopenduration;
 
     let options = {
@@ -2268,14 +2255,11 @@ async function getDeviceByID(deviceID, type) {}
  *                           - user: {string} The user of the gateway.
  */
 async function getGatewayParam() {
-  const results = await adapter.getObjectAsync("Gateway_info");
-  if (results) {
     return {
       ip: adapter.config.bridge ? adapter.config.bridge : "none",
       port: adapter.config.port ? adapter.config.port : "none",
       user: adapter.config.user ? adapter.config.user : "none",
     };
-  }
 }
 
 async function deleteDevice(deviceId) {
