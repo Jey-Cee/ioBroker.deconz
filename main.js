@@ -681,7 +681,7 @@ function autoReconnect(host, port) {
 
 async function getAutoUpdates() {
   const host = adapter.config.bridge ? adapter.config.bridge : null;
-  const port = adapter.config.port ? adapter.config.websocketport : 443;
+  const port = adapter.config.websocketport ? adapter.config.websocketport : 443;
   const user = adapter.config.user ? adapter.config.user : null;
 
   if (user !== null && host !== null && port !== null) {
