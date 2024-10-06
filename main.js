@@ -100,8 +100,7 @@ class deconz extends utils.Adapter {
 
           switch (dp) {
             case "bri":
-              if (state.val > 0 && (transitionTime === "none" || transitionTime === 0))
-              {
+              if (state.val > 0 && (transitionTime === "none" || transitionTime === 0)) {
                 parameters = '{"bri": ' + JSON.stringify(state.val) + ', "on": true}';
               } else if (state.val > 0) {
                 parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "bri": ' + JSON.stringify(state.val) + ', "on": true}';
@@ -117,8 +116,7 @@ class deconz extends utils.Adapter {
               );
               break;
             case "level":
-              if (state.val > 0 && (transitionTime === "none" || transitionTime === 0))
-              {
+              if (state.val > 0 && (transitionTime === "none" || transitionTime === 0)) {
                 parameters = '{"bri": ' + Math.floor((255 / 100) * state.val) + ', "on": true}';
               } else if (state.val > 0) {
                 parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "bri": ' + Math.floor((255 / 100) * state.val) + ', "on": true}';
@@ -214,11 +212,11 @@ class deconz extends utils.Adapter {
                   effectspeed = 1;
                 }
                 parameters = `{"effect": ${JSON.stringify(state.val)}, "effectSpeed":  ${JSON.stringify(effectspeed)}, "effectColours": ${JSON.stringify(effectcolours ? effectcolours.val
-                    : [
-                        [255, 0, 0],
-                        [0, 255, 0],
-                        [0, 0, 255],
-                      ]
+                  : [
+                    [255, 0, 0],
+                    [0, 255, 0],
+                    [0, 0, 255],
+                  ]
                 )}}`;
               } else {
                 parameters = '{"effect": ' + JSON.stringify(state.val) + "}";
@@ -231,8 +229,7 @@ class deconz extends utils.Adapter {
                 this.name + "." + this.instance + "." + id + ".dimspeed"
               );
 
-              if (dimspeed === null || dimspeed === undefined || dimspeed.val === 0)
-              {
+              if (dimspeed === null || dimspeed === undefined || dimspeed.val === 0) {
                 dimspeed = 10;
                 this.setState(this.name + "." + this.instance + "." + id + ".dimspeed", 10, true);
               }
@@ -244,8 +241,7 @@ class deconz extends utils.Adapter {
               }
               break;
             case "action":
-              if (state.val === null || state.val === undefined || state.val === 0)
-              {
+              if (state.val === null || state.val === undefined || state.val === 0) {
                 return;
               }
               parameters = `{ ${state.val} }`;
@@ -280,7 +276,7 @@ class deconz extends utils.Adapter {
                 },
               });
               break;
-              //set boolean&number
+            //set boolean&number
             case "boost":
             case "charging":
             case "delay":
@@ -313,7 +309,7 @@ class deconz extends utils.Adapter {
             case "windowopen_set":
               parameters = `{ "${dp}": ${state.val} }`;
               break;
-              //set string
+            //set string
             case "colormode":
             case "clickmode":
             case "devicemode":
@@ -324,7 +320,7 @@ class deconz extends utils.Adapter {
             case "triggerdistance":
               parameters = `{ "${dp}": "${state.val}" }`;
               break;
-              //set temperature
+            //set temperature
             case "heatsetpoint":
             case "coolsetpoint":
             case "externalsensortemp":
@@ -360,8 +356,8 @@ class deconz extends utils.Adapter {
                   controlId,
                   this.name + "." + this.instance + "." + id + "." + dp
                 );
-                if ('stop' === dp){
-                  await getLightState( id.split('.').pop() );
+                if ('stop' === dp) {
+                  await getLightState(id.split('.').pop());
                 }
                 break;
               case "group":
@@ -409,7 +405,7 @@ class deconz extends utils.Adapter {
               this.sendTo(
                 obj.from,
                 obj.command,
-                  { native: { user: JSON.stringify(res.message).replace(/"/g, '') } },
+                { native: { user: JSON.stringify(res.message).replace(/"/g, '') } },
                 obj.callback
               );
           });
@@ -418,10 +414,10 @@ class deconz extends utils.Adapter {
         case "deleteAPIkey":
           await deleteAPIkey();
           this.sendTo(
-              obj.from,
-              obj.command,
-              { native: { user: "" } },
-              obj.callback
+            obj.from,
+            obj.command,
+            { native: { user: "" } },
+            obj.callback
           );
           wait = true;
           break;
@@ -509,17 +505,17 @@ async function main() {
 
   heartbeat();
 
-    if (adapter.config.ip === "undefined") {
-      //only on first start
-      autoDiscovery();
+  if (adapter.config.ip === "undefined") {
+    //only on first start
+    autoDiscovery();
+  } else {
+    if (adapter.config.user === "" || adapter.config.user === null) {
+      adapter.log.warn("No API Key found");
     } else {
-      if (adapter.config.user === "" || adapter.config.user === null) {
-        adapter.log.warn("No API Key found");
-      } else {
-        await getConfig();
-        await getAutoUpdates();
-      }
+      await getConfig();
+      await getAutoUpdates();
     }
+  }
 }
 
 //search for Gateway
@@ -532,7 +528,7 @@ function autoDiscovery() {
 
   discovery.on("message", (msg, rinfo, iface) => {
     if (msg.headers.st === "urn:schemas-upnp-org:device:basic:1") {
-      adapter.log.debug( `M-SEARCH from ${rinfo.address} for "${msg.headers.st}"` );
+      adapter.log.debug(`M-SEARCH from ${rinfo.address} for "${msg.headers.st}"`);
       if (msg.headers["gwid.phoscon.de"] !== undefined) {
         let loc = msg.headers.location.replace("/description.xml", "");
         loc = loc.replace("http://", "");
@@ -647,7 +643,7 @@ async function deleteAPIkey() {
         let response;
         try {
           response = JSON.parse(body);
-        } catch (err) {}
+        } catch (err) { }
         if (res !== undefined) {
           if (await logging(res, body, "delete API key")) {
             if (response[0]["success"]) {
@@ -685,7 +681,7 @@ function autoReconnect(host, port) {
 
 async function getAutoUpdates() {
   const host = adapter.config.bridge ? adapter.config.bridge : null;
-  const port = adapter.config.port ? adapter.config.websocketport : 443;
+  const port = adapter.config.websocketport ? adapter.config.websocketport : 443;
   const user = adapter.config.user ? adapter.config.user : null;
 
   if (user !== null && host !== null && port !== null) {
@@ -866,7 +862,7 @@ async function getAutoUpdates() {
 async function modifyConfig(parameters) {
   let ip = adapter.config.bridge;
   const port = adapter.config.port;
-  const user = adapter.config.user
+  const user = adapter.config.user;
   let ot;
 
   const results = await adapter.getObjectAsync("Gateway_info");
@@ -888,10 +884,9 @@ async function modifyConfig(parameters) {
         if (error) adapter.log.warn(error);
         try {
           response = JSON.parse(body);
-        } catch (err) {}
+        } catch (err) { }
 
-        if ((await logging(res, body, "modify config")) && response !== undefined && response !== "undefined")
-        {
+        if ((await logging(res, body, "modify config")) && response !== undefined && response !== "undefined") {
           if (response[0]["success"]) {
             switch (JSON.stringify(response[0]["success"])) {
               case `{"/config/permitjoin":${ot}}`:
@@ -1200,7 +1195,6 @@ function getGroupScenes(group, sceneList) {
                 id: scene.id,
               },
             });
-
             adapter.setObjectNotExists(`${group}.Scene_${scene.id}.recall`, {
               type: "state",
               common: {
@@ -1251,7 +1245,6 @@ function getGroupScenes(group, sceneList) {
                 );
               }
             );
-
             adapter.setObjectNotExists(
               `${group}.Scene_${scene.id}.transitiontime`,
               {
@@ -1317,10 +1310,9 @@ async function setGroupState(parameters, groupId, stateId) {
         let response;
         try {
           response = JSON.parse(body);
-        } catch (err) {}
+        } catch (err) { }
 
-        if ((await logging(res, body, "set group state " + groupId)) && response !== undefined && response !== "undefined")
-        {
+        if ((await logging(res, body, "set group state " + groupId)) && response !== undefined && response !== "undefined") {
           new ackStateVal(stateId, response);
         }
       }
@@ -1362,10 +1354,9 @@ async function setGroupScene(
         let response;
         try {
           response = JSON.parse(body);
-        } catch (err) {}
+        } catch (err) { }
 
-        if ((await logging(res, body, "set group scene " + groupId)) && response !== undefined && response !== "undefined")
-        {
+        if ((await logging(res, body, "set group scene " + groupId)) && response !== undefined && response !== "undefined") {
           new ackStateVal(stateId, response);
         }
       }
@@ -1418,10 +1409,9 @@ async function deleteGroup(groupId) {
         let response;
         try {
           response = JSON.parse(body);
-        } catch (err) {}
+        } catch (err) { }
 
-        if ((await logging(res, body, "delete group " + groupId)) && response !== undefined && response !== "undefined")
-        {
+        if ((await logging(res, body, "delete group " + groupId)) && response !== undefined && response !== "undefined") {
           if (response[0]["success"]) {
             adapter.log.info("The group with id " + groupId + " was removed.");
             adapter.getForeignObjects(
@@ -1571,8 +1561,7 @@ async function getSensor(sensorId) {
           for (let z = 0; z <= count2; z++) {
             let stateName = Object.keys(list["state"])[z];
 
-            if (stateName === "buttonevent" && list["modelid"] === "lumi.Sensors.switch.aq2")
-            {
+            if (stateName === "buttonevent" && list["modelid"] === "lumi.Sensors.switch.aq2") {
               let LastUpdate = Number(new Date(list["state"]["lastupdated"]));
               let Now = Number(new Date().getTime());
               let dateOff = new Date();
@@ -1636,10 +1625,9 @@ async function setSensorParameters(parameters, sensorId, stateId, callback) {
         let response;
         try {
           response = JSON.parse(body);
-        } catch (err) {}
+        } catch (err) { }
 
-        if ((await logging(res, body, "set sensor parameters")) && response !== undefined && response !== "undefined")
-        {
+        if ((await logging(res, body, "set sensor parameters")) && response !== undefined && response !== "undefined") {
           new ackStateVal(stateId, response);
         }
 
@@ -1667,10 +1655,9 @@ async function deleteSensor(sensorId) {
         let response;
         try {
           response = JSON.parse(body);
-        } catch (err) {}
+        } catch (err) { }
 
-        if ((await logging(res, body, "delete sensor " + sensorId)) && response !== undefined && response !== "undefined")
-        {
+        if ((await logging(res, body, "delete sensor " + sensorId)) && response !== undefined && response !== "undefined") {
           if (response[0]["success"]) {
             adapter.log.info("The sensor with id " + sensorId + " was removed.");
             adapter.getForeignObjects(
@@ -1682,8 +1669,7 @@ async function deleteSensor(sensorId) {
                 for (let i = 0; i <= count; i++) {
                   //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ sensor handelt
                   let keyName = Object.keys(enums)[i];
-                  if (enums[keyName].common.role === "sensor" && enums[keyName].native.id === sensorId)
-                  {
+                  if (enums[keyName].common.role === "sensor" && enums[keyName].native.id === sensorId) {
                     adapter.log.info("delete device Object: " + enums[keyName]._id);
                     let name = enums[keyName]._id;
 
@@ -1727,7 +1713,7 @@ async function getAllLights() {
             //mac = mac.match(/..:..:..:..:..:..:..:../g).toString();
             //let lightID = mac.replace(/:/g, '');
 
-            switch (list[keyName]['type']){
+            switch (list[keyName]['type']) {
               case 'Window covering device':  // is this a window covering unit?
               case 'Window covering controller':  // is this a window covering unit?
                 adapter.setObjectNotExists(`Lights.${lightID}`, {
@@ -1778,32 +1764,32 @@ async function getAllLights() {
   }
 } //END getAllLights
 
-async function createLightDevice(list, keyName, lightID){
+async function createLightDevice(list, keyName, lightID) {
   if (list[keyName]["state"]) {
     let count2 = Object.keys(list[keyName]["state"]).length - 1;
     //create states for light device
     for (let z = 0; z <= count2; z++) {
       let stateName = Object.keys(list[keyName]["state"])[z];
       await SetObjectAndState(
-          lightID,
-          list[keyName]["name"],
-          "Lights",
-          stateName,
-          list[keyName]["state"][stateName]
+        lightID,
+        list[keyName]["name"],
+        "Lights",
+        stateName,
+        list[keyName]["state"][stateName]
       );
       await SetObjectAndState(
-          lightID,
-          list[keyName]["name"],
-          "Lights",
-          "transitiontime",
-          null
+        lightID,
+        list[keyName]["name"],
+        "Lights",
+        "transitiontime",
+        null
       );
       await SetObjectAndState(
-          lightID,
-          list[keyName]["name"],
-          "Lights",
-          "level",
-          null
+        lightID,
+        list[keyName]["name"],
+        "Lights",
+        "level",
+        null
       );
       adapter.setObjectNotExists(`Lights.${lightID}.dimspeed`, {
         type: "state",
@@ -1852,25 +1838,25 @@ async function createLightDevice(list, keyName, lightID){
   }
 }
 
-async function createBlindsDevice(list, keyName, lightID){
+async function createBlindsDevice(list, keyName, lightID) {
   if (list[keyName]["state"]) {
     let count2 = Object.keys(list[keyName]["state"]).length - 1;
     //create states for light device
     for (let z = 0; z <= count2; z++) {
       let stateName = Object.keys(list[keyName]["state"])[z];
       await SetObjectAndState(
-          lightID,
-          list[keyName]["name"],
-          "Lights",
-          stateName,
-          list[keyName]["state"][stateName]
+        lightID,
+        list[keyName]["name"],
+        "Lights",
+        stateName,
+        list[keyName]["state"][stateName]
       );
       await SetObjectAndState(
-          lightID,
-          list[keyName]["name"],
-          "Lights",
-          "transitiontime",
-          null
+        lightID,
+        list[keyName]["name"],
+        "Lights",
+        "transitiontime",
+        null
       );
       adapter.setObjectNotExists(`Lights.${lightID}.stop`, {
         type: "state",
@@ -1880,7 +1866,7 @@ async function createBlindsDevice(list, keyName, lightID){
           role: "button",
           read: false,
           write: true,
-          default:false
+          default: false
         },
         native: {},
       });
@@ -1918,7 +1904,7 @@ async function getLightState(lightId) {
           let list = JSON.parse(body);
           let keyName = Object.keys(list)[0];
           //create object for light device
-          switch(list['type']){
+          switch (list['type']) {
             case 'Window covering device':  // is this a window covering unit?
             case 'Window covering controller':  // is this a window covering unit?
               adapter.extendObject(`Lights.${lightId}`, {
@@ -1995,14 +1981,13 @@ async function setLightState(parameters, lightId, stateId, callback) {
         let response;
         try {
           response = JSON.parse(body);
-        } catch (err) {}
+        } catch (err) { }
 
-        if ((await logging(res, body, "set light state " + lightId)) && response !== undefined && response !== "undefined")
-        {
+        if ((await logging(res, body, "set light state " + lightId)) && response !== undefined && response !== "undefined") {
           let oldParameters;
           try {
             oldParameters = JSON.parse(parameters);
-          } catch (err) {}
+          } catch (err) { }
           if (oldParameters) {
             let retryParameters = {};
             response.forEach((message) => {
@@ -2054,7 +2039,7 @@ async function deleteLight(lightId) {
         let response;
         try {
           response = JSON.parse(body);
-        } catch (err) {}
+        } catch (err) { }
 
         if (
           (await logging(res, body, "delete light " + lightId)) &&
@@ -2072,8 +2057,7 @@ async function deleteLight(lightId) {
                 for (let i = 0; i <= count; i++) {
                   //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ sensor handelt
                   let keyName = Object.keys(enums)[i];
-                  if (enums[keyName].common.role === "light" && enums[keyName].native.id === lightId)
-                  {
+                  if (enums[keyName].common.role === "light" && enums[keyName].native.id === lightId) {
                     adapter.log.info("delete device Object: " + enums[keyName]._id);
                     let name = enums[keyName]._id;
 
@@ -2108,10 +2092,9 @@ async function removeFromGroups(lightId) {
         let response;
         try {
           response = JSON.parse(body);
-        } catch (err) {}
+        } catch (err) { }
 
-        if ((await logging(res, body, "remove light from groups " + lightId)) && response !== undefined && response !== "undefined")
-        {
+        if ((await logging(res, body, "remove light from groups " + lightId)) && response !== undefined && response !== "undefined") {
           if (response[0]["success"]) {
             adapter.log.info("The light with id " + lightId + " was removed from all groups.");
           } else if (response[0]["error"]) {
@@ -2241,7 +2224,7 @@ function nameFilter(name) {
  * @param {number} deviceID
  * @param {string} type - first letter has to be upper case. Possible: Lights, Sensors
  */
-async function getDeviceByID(deviceID, type) {}
+async function getDeviceByID(deviceID, type) { }
 
 /**
  * Retrieves gateway parameters including IP address, port, and user.
@@ -2255,11 +2238,11 @@ async function getDeviceByID(deviceID, type) {}
  *                           - user: {string} The user of the gateway.
  */
 async function getGatewayParam() {
-    return {
-      ip: adapter.config.bridge ? adapter.config.bridge : "none",
-      port: adapter.config.port ? adapter.config.port : "none",
-      user: adapter.config.user ? adapter.config.user : "none",
-    };
+  return {
+    ip: adapter.config.bridge ? adapter.config.bridge : "none",
+    port: adapter.config.port ? adapter.config.port : "none",
+    user: adapter.config.user ? adapter.config.user : "none",
+  };
 }
 
 async function deleteDevice(deviceId) {
@@ -2301,8 +2284,7 @@ function ackStateVal(stateId, response) {
  * @return {string}
  */
 function UTCtoLocal(timeString) {
-  if (timeString !== "none" && timeString !== null && timeString !== undefined)
-  {
+  if (timeString !== "none" && timeString !== null && timeString !== undefined) {
     let jsT = Date.parse(timeString + "Z");
 
     let d = new Date();
@@ -2810,7 +2792,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "lat":
       objType = "number";
       objRole = "value.gps.latitude";
-      objRead= false;
+      objRead = false;
       break;
     case "ledindication":
       objType = "boolean";
@@ -2847,7 +2829,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "long":
       objType = "number";
       objRole = "value.gps.longitude";
-      objRead= false;
+      objRead = false;
       break;
     case "lift":
       objType = "number";
