@@ -45,6 +45,10 @@ Examples:
 
 ## Changelog
 
+### 1.6.4 (2024-10-06)
+* (mattreim) Add "protectedNative" and "encryptedNative"
+* (mattreim) Fix websocket connection
+
 ### 1.6.3 (2024-10-04)
 * (Jey Cee) Fix connection problems
 
