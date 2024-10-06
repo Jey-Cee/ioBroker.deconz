@@ -592,7 +592,7 @@ function createAPIkey(host, credentials, callback) {
   }
 
   let options = {
-    url: "http://" + host + "/api",
+    url: `http://${host}:${adapter.config.port}/api`,
     method: "POST",
     headers: {
       "Content-Type": "text/plain;charset=UTF-8",
