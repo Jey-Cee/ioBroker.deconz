@@ -20,10 +20,11 @@ Connects to deConz REST-API software developed by dresden-elektronik. This softw
 
 You must first link to deConz.
 1. a) Enter IP address for deConz <br>
-   b) Enter standard Bridge Port: 80 and standard Websocket: 443
+   b) Enter standard Bridge Port: 80 and standard Websocket: 443 <br>
+   [e.g. Phoscon App - Help - API information - No filter - search for port/websocketport]
 2. After IP address and port is entered and saved hit "Create API Key" Button. Now you can enter the credentials for deConz or go to Phoscon APP and register ioBroker as third party APP.
 
-## To avoid some errors after an update (deconz/adapter), stop the adapter and delete these entries in the object structure. When you start, the object structure is recreated.
+## To avoid some errors after an update (deConz/adapter), stop the adapter and delete these entries in the object structure. When you start, the object structure is recreated.
 ![Deconz-Adapter](https://github.com/mattreim/ioBroker.deconz/assets/80219712/fb56647e-a0a8-4535-9e18-2b7651b32824)
 
 #### Send more than one command at the same time
@@ -37,7 +38,7 @@ Examples:
 
 
 ## Links
-[deCONZ REST-API Plugin](https://github.com/dresden-elektronik/deconz-rest-plugin)  
+[deCONZ REST-API Plugin](https://github.com/dresden-elektronik/deconz-rest-plugin/releases)  
 [Documentation of deCONZ REST-API Plugin](https://dresden-elektronik.github.io/deconz-rest-doc/)  
 [Gateways (Hardware)](https://www.dresden-elektronik.de/funktechnik/solutions/wireless-light-control/gateways/)  
 
