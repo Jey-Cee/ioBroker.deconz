@@ -4,8 +4,17 @@
     "version": "1.6.4",
     "news": {
       "1.6.4": {
-        "en": "Fix websocket connection \nEncrypt password in configuration",
-        "de": "Websocket-Verbindung repariert \nPasswort in der Konfiguration verschlüsseln"
+        "en": "Fix websocket connection \\nEncrypt password in configuration",
+        "de": "Websocket-Verbindung repariert \nPasswort in der Konfiguration verschlüsseln",
+        "ru": "Fix websocket соединение \\nEncrypt пароль в конфигурации",
+        "pt": "Corrigir conexão websocket \\nEncrypt senha na configuração",
+        "nl": "Fix websocket verbinding \\nVersleutel wachtwoord in configuratie",
+        "fr": "Correction de la connexion websocket \\nEncrypter le mot de passe dans la configuration",
+        "it": "Fissare la connessione websocket \\nEncrypt password in configurazione",
+        "es": "Fijar la conexión websocket \\nEncrypt password en configuración",
+        "pl": "Napraw połączenie websocket\\ nEncrypt hasło w konfiguracji",
+        "uk": "Виправлено підключення websocket \\nЗашифрувати пароль в конфігурації",
+        "zh-cn": "修复 Websocket 连接\\ n 在配置中输入密码"
       },
       "1.5.0": {
         "en": "Dependencies have been updated\n Some translations are updated/added",
@@ -65,7 +74,7 @@
     ],
     "licenseInformation": {
       "license": "Apache-2.0",
-      "type":  "free"
+      "type": "free"
     },
     "platform": "Javascript/Node.js",
     "mode": "daemon",
