@@ -10,7 +10,7 @@
     "Devices (ID of Device)": "Geräte (ID des Geräts)",
     "Duration": "Dauer",
     "Enable adapter first": "Adapter bitte zuerst aktivieren",
-    "Instruction": "Gehen Sie zur Phoscon APP -> Einstellungen -> Erweitert und klicken Sie auf \"Unlock Gateway\". Zeitlimit 30 Sekunden.",
+    "Instruction": "Gehen Sie zur Phoscon APP -> Gateway -> Erweitert und klicken Sie auf \"App verbinden\". Zeitlimit 60 Sekunden.",
     "Lights (ID of Light)": "Lampen (ID der Lampe)",
     "Main settings": "Haupteinstellungen",
     "Manage Devices": "Geräte verwalten",
