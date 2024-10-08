@@ -3,6 +3,7 @@
     "API key": "Ключ API",
     "Auto setup": "Авто настройка",
     "Bridge port": "Порт HUE bridge",
+    "Websocket Port": "Порт веб-сокета",
     "Create API key": "Создать ключ API",
     "Create Group": "Создать группу",
     "Delete API key": "Удалить ключ API",
