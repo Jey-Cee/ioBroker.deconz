@@ -10,7 +10,7 @@
     "Devices (ID of Device)": "Devices (ID of Device)",
     "Duration": "Duration",
     "Enable adapter first": "Enable adapter first",
-    "Instruction": "Go to Phoscon APP -> Settings -> Advanced and click on \"Unlock Gateway\". Timelimit 30 seconds.",
+    "Instruction": "Go to Phoscon APP -> Gateway -> Advanced and click on \"Authenticate app\". Timelimit 60 seconds.",
     "Lights (ID of Light)": "Lights (ID of Light)",
     "Main settings": "Main settings",
     "Manage Devices": "Manage Devices",
