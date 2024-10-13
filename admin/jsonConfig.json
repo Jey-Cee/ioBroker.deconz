@@ -36,101 +36,161 @@
                     "newLine": true,
                     "label": "deConz Address",
                     "type": "text",
-                    "xs": 12,
+                    "xl": 3,
+                    "lg": 3,
+                    "md": 4,
                     "sm": 12,
-                    "md": 3,
-                    "lg": 3
+                    "xs": 12
                 },
                 "port": {
                     "label": "Bridge port",
                     "type": "number",
                     "default": 80,
-                    "min": 0,
+                    "min": 1,
                     "max": 65535,
-                    "xs": 12,
-                    "sm": 12,
+                    "xl": 1,
+                    "lg": 2,
                     "md": 2,
-                    "lg": 2
+                    "sm": 6,
+                    "xs": 6
                 },
                 "websocketport": {
-                    "label": "Websocket Port",
+                    "label": "Websocket port",
                     "type": "number",
                     "default": 443,
-                    "min": 0,
+                    "min": 1,
                     "max": 65535,
-                    "xs": 12,
-                    "sm": 12,
+                    "xl": 1,
+                    "lg": 2,
                     "md": 2,
-                    "lg": 2
+                    "sm": 6,
+                    "xs": 6
                 },
                 "_header2": {
                     "newLine": true,
+                    "text": "Authentication",
                     "type": "header",
+                    "size": 3
+                },
+                "_instruction": {
+                    "newLine": true,
                     "text": "Instruction",
-                    "size": 3,
+                    "type": "staticText",
+                    "xl": 8,
+                    "lg": 12,
+                    "md": 12,
+                    "sm": 12,
                     "xs": 12,
-                    "sm": 12
+                    "style": {
+                        "font-size": "16px",
+                        "text-align": "center",
+                        "background-color": "rgb(224, 224, 224)",
+                        "border-radius": "3px",
+                        "padding": "10px"
+                    },
+                    "darkStyle": {
+                        "color": "black",
+                        "font-size": "16px",
+                        "text-align": "center",
+                        "background-color": "rgb(224, 224, 224)",
+                        "border-radius": "3px",
+                        "padding": "10px"
+                    }
                 },
                 "user": {
                     "newLine": true,
                     "label": "API key",
                     "type": "text",
-                    "xs": 12,
+                    "xl": 4,
+                    "lg": 6,
+                    "md": 6,
                     "sm": 12,
-                    "md": 3,
-                    "lg": 3
+                    "xs": 12
                 },
                 "create": {
-                    "type": "sendTo",
                     "label": "Create API key",
-                    "variant": "outlined",
+                    "type": "sendTo",
+                    "variant": "contained",
                     "showProcess": true,
-                    "command": "sendTo1",
-                    "jsonData": "{ \"data\": \"${data.user}\"}",
-                    "useNative": true
+                    "command": "createAPIkey",
+                    "jsonData": "{ \"host\": \"${data.bridge}\", \"credentials\": \"null\"}",
+                    "useNative": true,
+                    "xl": 2,
+                    "lg": 3,
+                    "md": 3,
+                    "sm": 12,
+                    "xs": 12
                 },
                 "deleteAPIkey": {
-                    "type": "sendTo",
                     "label": "Delete API key",
+                    "type": "sendTo",
                     "variant": "outlined",
                     "showProcess": true,
-                    "command": "sendTo1",
-                    "jsonData": "{ \"data1\": \"${data.sendTo1a}\", \"data2\": \"${data.sendTo1b}\" }",
-                    "useNative": true
+                    "command": "deleteAPIkey",
+                    "useNative": true,
+                    "xl": 2,
+                    "lg": 3,
+                    "md": 3,
+                    "sm": 12,
+                    "xs": 12
                 },
-                "_header3": {
+                "_or": {
                     "newLine": true,
-                    "type": "header",
                     "text": "OR",
-                    "size": 3,
+                    "type": "staticText",
+                    "xl": 8,
+                    "lg": 12,
+                    "md": 12,
+                    "sm": 12,
                     "xs": 12,
-                    "sm": 12
+                    "style": {
+                        "font-size": "16px",
+                        "text-align": "center",
+                        "background-color": "rgb(224, 224, 224)",
+                        "border-radius": "3px",
+                        "padding": "10px"
+                    },
+                    "darkStyle": {
+                        "color": "black",
+                        "font-size": "16px",
+                        "text-align": "center",
+                        "background-color": "rgb(224, 224, 224)",
+                        "border-radius": "3px",
+                        "padding": "10px"
+                    }
                 },
                 "username": {
                     "newLine": true,
                     "label": "Username",
                     "type": "text",
-                    "xs": 12,
+                    "xl": 3,
+                    "lg": 4,
+                    "md": 4,
                     "sm": 12,
-                    "md": 3,
-                    "lg": 3
+                    "xs": 12
                 },
                 "password": {
                     "label": "Password",
                     "type": "password",
-                    "xs": 12,
+                    "xl": 3,
+                    "lg": 4,
+                    "md": 4,
                     "sm": 12,
-                    "md": 3,
-                    "lg": 3
+                    "xs": 12
                 },
                 "userCredentials": {
-                    "type": "sendTo",
                     "label": "Create API key",
-                    "variant": "outlined",
+                    "type": "sendTo",
+                    "variant": "contained",
                     "showProcess": true,
-                    "command": "sendTo1",
-                    "jsonData": "{ \"data1\": \"${data.username}\", \"data2\": \"${data.password}\" }",
-                    "useNative": true
+                    "command": "createAPIkey",
+                    "jsonData": "{ \"host\": \"${data.bridge}\", \"credentials\": \"${data.username}:${data.password}\"}",
+                    "useNative": true,
+                    "xl": 2,
+                    "lg": 4,
+                    "md": 4,
+                    "sm": 12,
+                    "xs": 12
                 }
             }
         },
