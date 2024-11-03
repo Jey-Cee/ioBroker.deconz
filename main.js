@@ -296,6 +296,7 @@ class deconz extends utils.Adapter {
             case "offset":
             case "pulseconfiguration":
             case "resetpresence":
+            case "schedule_on":
             case "setvalve":
             case "sensitivity":
             case "speed":
@@ -316,6 +317,7 @@ class deconz extends utils.Adapter {
             case "fanmode":
             case "mode":
             case "preset":
+            case "schedule":
             case "swingmode":
             case "triggerdistance":
               parameters = `{ "${dp}": "${state.val}" }`;
@@ -2694,7 +2696,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       break;
     case "fanmode":
       objType = "string";
-      objRole = "state";
+      objRole = "level.mode.fan";
       objDefault = "auto";
       objStates = {
         off: "off",
@@ -2733,6 +2735,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "group":
       objType = "number";
       objRole = "state";
+      objWrite = false;
       value = parseInt(value);
       break;
     case "heatsetpoint":
@@ -2922,7 +2925,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       break;
     case "preset":
       objType = "string";
-      objRole = "state";
+      objRole = "level.mode.thermostat";
       objDefault = "manual";
       objStates = {
         holiday: "holiday",
@@ -2962,6 +2965,10 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objRole = "schedule";
       objDefault = "{}";
       value = JSON.stringify(value);
+      break;
+    case "schedule_on":
+      objType = "boolean";
+      objRole = "switch";
       break;
     case "scheduler":
       objType = "string";
