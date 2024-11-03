@@ -2696,7 +2696,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       break;
     case "fanmode":
       objType = "string";
-      objRole = "state";
+      objRole = "level.mode.fan";
       objDefault = "auto";
       objStates = {
         off: "off",
@@ -2925,7 +2925,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       break;
     case "preset":
       objType = "string";
-      objRole = "state";
+      objRole = "level.mode.thermostat";
       objDefault = "manual";
       objStates = {
         holiday: "holiday",
@@ -2972,7 +2972,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       break;
     case "schedule_on":
       objType = "boolean";
-      objRole = "state";
+      objRole = "switch";
       break;
     case "setvalve":
       objType = "boolean";
