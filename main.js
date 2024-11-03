@@ -2966,13 +2966,18 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objDefault = "{}";
       value = JSON.stringify(value);
       break;
+    case "schedule_on":
+      objType = "boolean";
+      objRole = "switch";
+      break;
     case "scheduler":
       objType = "string";
       objRole = "state";
       break;
-    case "schedule_on":
+    case "scheduleron":
       objType = "boolean";
-      objRole = "switch";
+      objRole = "state";
+      objWrite = false;
       break;
     case "setvalve":
       objType = "boolean";
