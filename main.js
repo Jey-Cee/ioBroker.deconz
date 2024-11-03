@@ -296,6 +296,7 @@ class deconz extends utils.Adapter {
             case "offset":
             case "pulseconfiguration":
             case "resetpresence":
+            case "schedule_on":
             case "setvalve":
             case "sensitivity":
             case "speed":
@@ -316,6 +317,7 @@ class deconz extends utils.Adapter {
             case "fanmode":
             case "mode":
             case "preset":
+            case "schedule":
             case "swingmode":
             case "triggerdistance":
               parameters = `{ "${dp}": "${state.val}" }`;
@@ -2733,6 +2735,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "group":
       objType = "number";
       objRole = "state";
+      objWrite = false;
       value = parseInt(value);
       break;
     case "heatsetpoint":
@@ -2967,10 +2970,9 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objType = "string";
       objRole = "state";
       break;
-    case "scheduleron":
+    case "schedule_on":
       objType = "boolean";
       objRole = "state";
-      objWrite = false;
       break;
     case "setvalve":
       objType = "boolean";
