@@ -112,16 +112,16 @@ class deconz extends utils.Adapter {
                 "",
                 tmp[2],
                 "level",
-                Math.floor((100 / 255) * state.val)
+                Math.round((100 / 255) * state.val)
               );
               break;
             case "level":
               if (state.val > 0 && (transitionTime === "none" || transitionTime === 0)) {
-                parameters = '{"bri": ' + Math.floor((255 / 100) * state.val) + ', "on": true}';
+                parameters = '{"bri": ' + Math.round((255 / 100) * state.val) + ', "on": true}';
               } else if (state.val > 0) {
-                parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "bri": ' + Math.floor((255 / 100) * state.val) + ', "on": true}';
+                parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "bri": ' + Math.round((255 / 100) * state.val) + ', "on": true}';
               } else {
-                parameters = '{"bri": ' + Math.floor((255 / 100) * state.val) + ', "on": false}';
+                parameters = '{"bri": ' + Math.round((255 / 100) * state.val) + ', "on": false}';
               }
               break;
             case "on":
@@ -311,7 +311,6 @@ class deconz extends utils.Adapter {
               parameters = `{ "${dp}": ${state.val} }`;
               break;
             //set string
-            case "colormode":
             case "clickmode":
             case "devicemode":
             case "fanmode":
@@ -326,7 +325,7 @@ class deconz extends utils.Adapter {
             case "heatsetpoint":
             case "coolsetpoint":
             case "externalsensortemp":
-              let val = Math.floor(state.val * 100);
+              let val = Math.round(state.val * 100);
               parameters = `{ "${dp}": ${val} }`;
               break;
             case "network_open":
@@ -860,7 +859,7 @@ async function getAutoUpdates() {
   }
 }
 
-//START deConz config --------------------------------------------------------------------------------------------------
+//START deConz config ------------------------------------------------------------------------------------------------
 async function modifyConfig(parameters) {
   let ip = adapter.config.bridge;
   const port = adapter.config.port;
@@ -971,10 +970,11 @@ async function getConfig() {
       }
     });
   }
-} //END getConfig
-//END deConz config ----------------------------------------------------------------------------------------------------
+} //END getConfig ----------------------------------------------------------------------------------------------------
 
-//START  Group functions -----------------------------------------------------------------------------------------------
+//END deConz config --------------------------------------------------------------------------------------------------
+
+//START  Group functions ---------------------------------------------------------------------------------------------
 async function getAllGroups() {
   const { ip, port, user } = await getGatewayParam();
 
@@ -1028,7 +1028,7 @@ async function getAllGroups() {
       }
     });
   }
-} //END getAllGroups
+} //END getAllGroups -------------------------------------------------------------------------------------------------
 
 async function getGroupAttributes(groupId) {
   const { ip, port, user } = await getGatewayParam();
@@ -1119,7 +1119,7 @@ async function getGroupAttributes(groupId) {
                 type: "number",
                 role: "level.dimspeed",
                 min: 0,
-                max: 254,
+                max: 255,
                 read: false,
                 write: true,
               },
@@ -1161,7 +1161,7 @@ async function getGroupAttributes(groupId) {
       }
     });
   }
-} //END getGroupAttributes
+} //END getGroupAttributes -------------------------------------------------------------------------------------------
 
 function getGroupScenes(group, sceneList) {
   //TODO: rewrite, function should only be called on startup or if websocket message says there was a scene added
@@ -1292,7 +1292,7 @@ function getGroupScenes(group, sceneList) {
       }
     }
   );
-} //END getGroupScenes
+} //END getGroupScenes ------------------------------------------------------------------------------------------------
 
 async function setGroupState(parameters, groupId, stateId) {
   const { ip, port, user } = await getGatewayParam();
@@ -1320,7 +1320,7 @@ async function setGroupState(parameters, groupId, stateId) {
       }
     });
   }
-} //END setGroupState
+} //END setGroupState -------------------------------------------------------------------------------------------------
 
 async function setGroupScene(
   parameters,
@@ -1351,7 +1351,6 @@ async function setGroupScene(
     request(options, async (error, res, body) => {
       if (error) {
         adapter.log.warn(error);
-        adapter.log.warn(error);
       } else {
         let response;
         try {
@@ -1364,7 +1363,7 @@ async function setGroupScene(
       }
     });
   }
-} //END setGroupScene
+} //END setGroupScene -------------------------------------------------------------------------------------------------
 
 async function createGroup(name, callback) {
   const { ip, port, user } = await getGatewayParam();
@@ -1392,7 +1391,7 @@ async function createGroup(name, callback) {
       adapter.log.error(err);
     }
   }
-} //END createGroup
+} //END createGroup ---------------------------------------------------------------------------------------------------
 
 async function deleteGroup(groupId) {
   const { ip, port, user } = await getGatewayParam();
@@ -1440,10 +1439,9 @@ async function deleteGroup(groupId) {
       }
     });
   }
-}
-//END  Group functions -------------------------------------------------------------------------------------------------
+} //END  Group functions ----------------------------------------------------------------------------------------------
 
-//START  Sensor functions ----------------------------------------------------------------------------------------------
+//START  Sensor functions ---------------------------------------------------------------------------------------------
 async function getAllSensors() {
   const { ip, port, user } = await getGatewayParam();
 
@@ -1488,8 +1486,8 @@ async function getAllSensors() {
                   uniqueid: list[keyName]["uniqueid"],
                 },
               });
-
               let count2 = Object.keys(list[keyName]["state"]).length - 1;
+
               //create states for sensor device
               for (let z = 0; z <= count2; z++) {
                 let stateName = Object.keys(list[keyName]["state"])[z];
@@ -1501,8 +1499,8 @@ async function getAllSensors() {
                   list[keyName]["state"][stateName]
                 );
               }
-
               let count3 = Object.keys(list[keyName]["config"]).length - 1;
+
               //create config states for sensor device
               for (let x = 0; x <= count3; x++) {
                 let stateName = Object.keys(list[keyName]["config"])[x];
@@ -1520,7 +1518,7 @@ async function getAllSensors() {
       }
     });
   }
-} //END getAllSensors
+} //END getAllSensors -------------------------------------------------------------------------------------------------
 
 async function getSensor(sensorId) {
   const { ip, port, user } = await getGatewayParam();
@@ -1558,8 +1556,8 @@ async function getSensor(sensorId) {
             },
           });
           let count2 = Object.keys(list["state"]).length - 1;
-          //create states for sensor device
 
+          //create states for sensor device
           for (let z = 0; z <= count2; z++) {
             let stateName = Object.keys(list["state"])[z];
 
@@ -1607,7 +1605,7 @@ async function getSensor(sensorId) {
       }
     });
   }
-} //END getSensor
+} //END getSensor -----------------------------------------------------------------------------------------------------
 
 async function setSensorParameters(parameters, sensorId, stateId, callback) {
   const { ip, port, user } = await getGatewayParam();
@@ -1637,7 +1635,7 @@ async function setSensorParameters(parameters, sensorId, stateId, callback) {
       }
     });
   }
-} //END setSensorParameters
+} //END setSensorParameters -------------------------------------------------------------------------------------------
 
 async function deleteSensor(sensorId) {
   const { ip, port, user } = await getGatewayParam();
@@ -1687,11 +1685,9 @@ async function deleteSensor(sensorId) {
       }
     });
   }
-}
+} //END  Sensor functions ---------------------------------------------------------------------------------------------
 
-//END  Sensor functions ------------------------------------------------------------------------------------------------
-
-//START  Light functions -----------------------------------------------------------------------------------------------
+//START  Light functions ----------------------------------------------------------------------------------------------
 async function getAllLights() {
   const { ip, port, user } = await getGatewayParam();
 
@@ -1764,7 +1760,7 @@ async function getAllLights() {
       }
     });
   }
-} //END getAllLights
+} //END getAllLights --------------------------------------------------------------------------------------------------
 
 async function createLightDevice(list, keyName, lightID) {
   if (list[keyName]["state"]) {
@@ -1800,7 +1796,7 @@ async function createLightDevice(list, keyName, lightID) {
           type: "number",
           role: "level.dimspeed",
           min: 0,
-          max: 254,
+          max: 255,
           read: false,
           write: true,
         },
@@ -1963,7 +1959,7 @@ async function getLightState(lightId) {
       }
     });
   }
-} //END getLightState
+} //END getLightState --------------------------------------------------------------------------------------------------
 
 async function setLightState(parameters, lightId, stateId, callback) {
   const { ip, port, user } = await getGatewayParam();
@@ -2022,7 +2018,7 @@ async function setLightState(parameters, lightId, stateId, callback) {
       }
     });
   }
-} //END setLightState
+} //END setLightState --------------------------------------------------------------------------------------------------
 
 async function deleteLight(lightId) {
   const { ip, port, user } = await getGatewayParam();
@@ -2106,11 +2102,9 @@ async function removeFromGroups(lightId) {
       }
     });
   }
-}
+} //END  Light functions -------------------------------------------------------------------------------------------------
 
-//END  Light functions -------------------------------------------------------------------------------------------------
-
-//START Devices functions ----------------------------------------------------------------------------------------------
+//START Devices functions ------------------------------------------------------------------------------------------------
 async function getDevices() {
   const { ip, port, user } = await getGatewayParam();
 
@@ -2130,9 +2124,7 @@ async function getDevices() {
       }
     });
   }
-}
-
-//END Devices functions ------------------------------------------------------------------------------------------------
+} //END Devices functions ------------------------------------------------------------------------------------------------
 
 async function logging(res, message, action) {
   //if(typeof message !== 'string'){
@@ -2506,13 +2498,13 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objRole = "level.brightness";
       objMin = 0;
       objMax = 255;
-      objDefault = 255;
+      objDefault = 254;
       let bri = await SetObjectAndState(
         id,
         name,
         type,
         "level",
-        Math.floor((100 / 254) * value)
+        Math.round((100 / 255) * value)
       );
       break;
     case "buttonevent":
