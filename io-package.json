@@ -168,6 +168,8 @@
         "name": "Connection to deConz",
         "type": "boolean",
         "role": "indicator",
+        "read": true,
+        "write": false,
         "def": false
       },
       "native": {}
