@@ -1768,7 +1768,7 @@ async function createLightDevice(list, keyName, lightID) {
         stateName,
         list[keyName]["state"][stateName]
       );
-      if (list[keyName]['type'] !== "On/Off plug-in unit" && list[keyName]['type'] !== "Configuration tool") {
+      if (list[keyName]['type'] !== "On/Off plug-in unit" && list[keyName]['type'] !== "On/Off light" && list[keyName]['type'] !== "Configuration tool") {
         await SetObjectAndState(
           lightID,
           list[keyName]["name"],
