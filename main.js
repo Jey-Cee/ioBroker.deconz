@@ -1554,7 +1554,7 @@ async function getSensor(sensorId) {
           for (let z = 0; z <= count2; z++) {
             let stateName = Object.keys(list["state"])[z];
 
-            if (stateName === "buttonevent" && list["modelid"] === "lumi.Sensors.switch.aq2") {
+            if (stateName === "buttonevent" && (list["modelid"] === "lumi.sensor_switch" || list["modelid"] === "lumi.sensor_switch.aq2")) {
               let LastUpdate = Number(new Date(list["state"]["lastupdated"]));
               let Now = Number(new Date().getTime());
               let dateOff = new Date();
