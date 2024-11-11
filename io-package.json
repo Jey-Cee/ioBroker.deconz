@@ -1,20 +1,33 @@
 {
   "common": {
     "name": "deconz",
-    "version": "1.5.0",
+    "version": "1.6.4",
     "news": {
+      "1.6.4": {
+        "en": "Fix websocket connection \\nEncrypt password in configuration",
+        "de": "Websocket-Verbindung repariert \nPasswort in der Konfiguration verschlüsseln",
+        "ru": "Fix websocket соединение \\nEncrypt пароль в конфигурации",
+        "pt": "Corrigir conexão websocket \\nEncrypt senha na configuração",
+        "nl": "Fix websocket verbinding \\nVersleutel wachtwoord in configuratie",
+        "fr": "Correction de la connexion websocket \\nEncrypter le mot de passe dans la configuration",
+        "it": "Fissare la connessione websocket \\nEncrypt password in configurazione",
+        "es": "Fijar la conexión websocket \\nEncrypt password en configuración",
+        "pl": "Napraw połączenie websocket\\ nEncrypt hasło w konfiguracji",
+        "uk": "Виправлено підключення websocket \\nЗашифрувати пароль в конфігурації",
+        "zh-cn": "修复 Websocket 连接\\ n 在配置中输入密码"
+      },
       "1.5.0": {
-        "en": "Dependencies have been updated",
-        "de": "Abhängigkeiten wurden aktualisiert",
-        "ru": "Зависимость обновлена",
-        "pt": "As dependências foram atualizadas",
-        "nl": "Afhankelijkheden zijn bijgewerkt",
-        "fr": "Les dépendances ont été actualisées",
-        "it": "Le dipendenze sono state aggiornate",
-        "es": "Se han actualizado las dependencias",
-        "pl": "Zaktualizowano zależności",
-        "uk": "Залежність було оновлено",
-        "zh-cn": "依赖关系已更新"
+        "en": "Dependencies have been updated\n Some translations are updated/added",
+        "de": "Abhängigkeiten wurden aktualisiert\n inige Übersetzungen wurden aktualisiert/hinzugefügt",
+        "ru": "Зависимость обновлена\n оторые переводы обновлены/добавлены",
+        "pt": "As dependências foram atualizadas\n Algumas traduções foram actualizadas/adicionadas",
+        "nl": "Afhankelijkheden zijn bijgewerkt\n Sommige vertalingen zijn bijgewerkt/toegevoegd",
+        "fr": "Les dépendances ont été actualisées\n Certaines traductions sont mises à jour/ajout",
+        "it": "Le dipendenze sono state aggiornate\n Alcune traduzioni sono state aggiornate/aggiunte",
+        "es": "Se han actualizado las dependencias\n Se actualizan/añaden algunas traducciones",
+        "pl": "Zaktualizowano zależności\n Niektóre tłumaczenia zostały zaktualizowane/dodane",
+        "uk": "Залежність було оновлено\n Деякі переклади оновлено/додано",
+        "zh-cn": "依赖关系已更新, 更新/添加了一些译文"
       },
       "1.4.1": {
         "en": "Added new objects for various sensors",
@@ -28,71 +41,6 @@
         "pl": "Dodano nowe obiekty dla różnych czujników",
         "uk": "Додано нові об'єкти для різних датчиків",
         "zh-cn": "添加用于各种传感器的新对象"
-      },
-      "1.4.0": {
-        "en": "Added new objects for Tuya and Bosch thermostats",
-        "de": "Neue Objekte für Tuya und Bosch Thermostate hinzugefügt",
-        "ru": "Добавлены новые объекты для термостатов Tuya и Bosch",
-        "pt": "Adicionados novos objetos para termostatos Tuya e Bosch",
-        "nl": "Nieuwe objecten toegevoegd voor Tuya en Bosch thermostaat",
-        "fr": "Ajout de nouveaux objets pour les thermostats Tuya et Bosch",
-        "it": "Aggiunti nuovi oggetti per termostati Tuya e Bosch",
-        "es": "Nuevos objetos añadidos para termostatos Tuya y Bosch",
-        "pl": "Dodano nowe obiekty dla termostatów Tuya i Bosch",
-        "uk": "Додано нові об'єкти для термостатів Туя та Bosch",
-        "zh-cn": "为 Tuya 和 Bosch 自动调温器添加新对象"
-      },
-      "1.3.23": {
-        "en": "Fix crash when new device was added\nAdded possibility to change the port for websocket connection\nUpdated/added translations\n",
-        "de": "Absturz beheben, als neues Gerät hinzugefügt wurde Zusätzliche Möglichkeit, den Port für Websocket-Verbindung zu ändern\nAktualisierte/hinzugefügte Übersetzungen\n",
-        "ru": "Fix сбой при добавлении нового устройства\nДобавлена возможность изменить порт для websocket-соединения\nОбновленные/дополненные переводы\n",
-        "pt": "Corrigir acidente quando novo dispositivo foi adicionado\nAdicionado possibilidade de mudar a porta para conexão websocket\ntraduções atualizadas/adicionadas\n",
-        "nl": "Fix crash wanneer nieuw apparaat is toegevoegd\nToegevoegde mogelijkheid om de poort voor websocket verbinding te wijzigen\nBijgewerkte/toegevoegde vertalingen\n",
-        "fr": "Correction du crash lorsque le nouveau périphérique a été ajouté\nAjout de la possibilité de modifier le port pour la connexion websocket\nTraductions mises à jour/ajoutées\n",
-        "it": "Fisso crash quando è stato aggiunto un nuovo dispositivo Aggiunta possibilità di cambiare la porta per il collegamento websocket\nTraduzioni aggiornate/aggiunte\n",
-        "es": "Arreglar el fallo cuando el nuevo dispositivo fue añadido\nAñadido posibilidad de cambiar el puerto para la conexión websocket\nActualizado/added traducciones\n",
-        "pl": "Napraw awarię po dodaniu nowego urządzenia\nDodano możliwość zmiany portu dla połączenia websocket\nAktualizacja/dodane tłumaczenia\n",
-        "uk": "Виправлення аварійних ситуацій при додаванні нового пристрою\nДодана можливість змінити порт для підключення websocket\nОновлено/додано переклади\n",
-        "zh-cn": "添加新设备时修复崩溃\n 添加更改 Websocket 连接端口的可能性\n更新/添加翻译\n"
-      },
-      "1.3.21": {
-        "en": "Added schedule to object definition\nChanged limit for duration to 999999\n",
-        "de": "Zusätzlicher Zeitplan für die Objektdefinition\nGeänderte Grenze für die Dauer auf 999999\n",
-        "ru": "Добавленное расписание для объекта определения\nИзменение лимита на срок до 999999\n",
-        "pt": "Adicionado cronograma para definição de objeto\nLimite alterado para duração para 999999\n",
-        "nl": "Schema toegevoegd aan objectdefinitie\nGewijzigde limiet voor de duur tot 999999\n",
-        "fr": "Ajout du calendrier à la définition de l'objet\nModification de la limite pour la durée à 999999\n",
-        "it": "Calendario aggiunto alla definizione degli oggetti\nLimite modificato per durata a 999999\n",
-        "es": "Añadido programa para la definición de objeto\nlímite cambiado por duración a 999999\n",
-        "pl": "Dodano harmonogram do definicji obiektu\nZmieniono limit na czas trwania do 999999\n",
-        "uk": "Додано графік до визначення об'єкта\nЗмінений ліміт на тривалість до 999999999999\n",
-        "zh-cn": "添加到对象定义中的表\n持续时间限制改为999999\n"
-      },
-      "1.3.20": {
-        "en": "add retry if gateway is busy\nchange min/max range for offset\nupdated translations\nfix link for overview page\nfix parameter can not be set since deConz 2.11.5\nfix xy is invalid: #289 #295\nremove Sentry",
-        "de": "Fügen Sie einen Wiederholungsversuch hinzu, wenn das Gateway beschäftigt ist\nMin/Max-Bereich für Offset ändern\naktualisierte Übersetzungen\nFix Link für Übersichtsseite\nfix Parameter kann seit deConz 2.11.5 nicht gesetzt werden\nFix xy ist ungültig: #289 #295\nSentry entfernen",
-        "ru": "добавить повтор, если шлюз занят\nизменить мин./макс. диапазон для смещения\nобновленные переводы\nисправить ссылку на обзорную страницу\nпараметр fix не может быть установлен, начиная с deConz 2.11.5\nисправить xy недопустимо: # 289 # 295\nудалить часового",
-        "pt": "adicionar nova tentativa se o gateway estiver ocupado\nalterar intervalo mínimo/máximo para deslocamento\ntraduções atualizadas\ncorrigir link para página de visão geral\nparâmetro fix não pode ser definido desde deConz 2.11.5\ncorreção xy é inválida: #289 #295\nremover Sentinela",
-        "nl": "voeg opnieuw toe als gateway bezet is\nverander min/max bereik voor offset\nbijgewerkte vertalingen\nfix link voor overzichtspagina\nfix parameter kan niet worden ingesteld sinds deConz 2.11.5\nfix xy is ongeldig: #289 #295\nverwijder Sentry",
-        "fr": "ajouter une nouvelle tentative si la passerelle est occupée\nchanger la plage min/max pour le décalage\ntraductions mises à jour\nlien fixe pour la page de présentation\nle paramètre fix ne peut pas être défini depuis deConz 2.11.5\ncorriger xy n'est pas valide : #289 #295\nsupprimer sentinelle",
-        "it": "aggiungi riprova se il gateway è occupato\nmodificare l'intervallo min/max per l'offset\ntraduzioni aggiornate\ncollegamento di correzione per la pagina di panoramica\nfix parametro non può essere impostato da deConz 2.11.5\nfix xy non è valido: #289 #295\nrimuovi Sentinella",
-        "es": "agregar reintento si la puerta de enlace está ocupada\ncambiar el rango mínimo/máximo para la compensación\ntraducciones actualizadas\narreglar el enlace para la página de resumen\nEl parámetro fijo no se puede configurar desde deConz 2.11.5\narreglar xy no es válido: #289 #295\nquitar centinela",
-        "pl": "dodaj spróbuj ponownie, jeśli bramka jest zajęta\nzmień zakres min/maks dla przesunięcia\nzaktualizowane tłumaczenia\nnapraw link do strony przeglądu\nnie można ustawić parametru fix od czasu deConz 2.11.5\nnaprawienie xy jest nieprawidłowe: #289 #295\nusuń Sentry",
-        "uk": "add retry if gateway is busy\nchange min/max діапазон для offset\nоновлених перекладів\nfix посилання для оглядової сторінки\nfix параметр не може бути встановлений, оскільки deConz 2.11.5\nfix xy недійсний: #289 #295\nremove Sentry\n",
-        "zh-cn": "如果网关忙，则添加重试\n更改偏移的最小/最大范围\n更新的翻译\n修复概览页面的链接\n自 deConz 2.11.5 以来无法设置修复参数\n修复 xy 无效：#289 #295\n移除哨兵"
-      },
-      "1.3.19": {
-        "en": "fix for js-controller 3.3.x",
-        "de": "Fix für js-Controller 3.3.x",
-        "ru": "исправление для js-controller 3.3.x",
-        "pt": "correção para js-controller 3.3.x",
-        "nl": "fix voor js-controller 3.3.x",
-        "fr": "correctif pour js-controller 3.3.x",
-        "it": "correzione per js-controller 3.3.x",
-        "es": "arreglo para js-controller 3.3.x",
-        "pl": "poprawka dla kontrolera js 3.3.x",
-        "uk": "фіксатор для js-controller 3.3.x",
-        "zh-cn": "修复 js 控制器 3.3.x"
       }
     },
     "titleLang": {
@@ -126,7 +74,7 @@
     ],
     "licenseInformation": {
       "license": "Apache-2.0",
-      "type":  "free"
+      "type": "free"
     },
     "platform": "Javascript/Node.js",
     "mode": "daemon",
@@ -160,12 +108,25 @@
       "zigbee"
     ],
     "icon": "deconz.png",
-    "materialize": true,
+    "adminUI": {
+      "config": "json"
+    },
     "extIcon": "https://raw.githubusercontent.com/Jey-Cee/ioBroker.deconz/master/admin/deconz.png",
     "type": "hardware"
   },
+  "encryptedNative": [
+    "password"
+  ],
+  "protectedNative": [
+    "password"
+  ],
   "native": {
-    "sentry": true
+    "bridge": "",
+    "port": 80,
+    "websocketport": 443,
+    "user": "",
+    "username": "",
+    "password": ""
   },
   "instanceObjects": [
     {
@@ -207,6 +168,8 @@
         "name": "Connection to deConz",
         "type": "boolean",
         "role": "indicator",
+        "read": true,
+        "write": false,
         "def": false
       },
       "native": {}

@@ -6,3 +6,6 @@ node_modules
 /.gitignore
 /helper
 main_backup.js
+
+# ioBroker dev-server
+.dev-server/
