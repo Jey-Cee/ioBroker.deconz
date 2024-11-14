@@ -1322,14 +1322,7 @@ async function setGroupState(parameters, groupId, stateId) {
   }
 } //END setGroupState -------------------------------------------------------------------------------------------------
 
-async function setGroupScene(
-  parameters,
-  groupId,
-  sceneId,
-  action,
-  stateId,
-  method
-) {
+async function setGroupScene(parameters, groupId, sceneId, action, stateId, method) {
   let sceneString = "";
   if (sceneId > 0) {
     sceneString = "/" + sceneId;
@@ -1561,7 +1554,7 @@ async function getSensor(sensorId) {
           for (let z = 0; z <= count2; z++) {
             let stateName = Object.keys(list["state"])[z];
 
-            if (stateName === "buttonevent" && list["modelid"] === "lumi.Sensors.switch.aq2") {
+            if (stateName === "buttonevent" && (list["modelid"] === "lumi.sensor_switch" || list["modelid"] === "lumi.sensor_switch.aq2")) {
               let LastUpdate = Number(new Date(list["state"]["lastupdated"]));
               let Now = Number(new Date().getTime());
               let dateOff = new Date();
@@ -1775,63 +1768,65 @@ async function createLightDevice(list, keyName, lightID) {
         stateName,
         list[keyName]["state"][stateName]
       );
-      await SetObjectAndState(
-        lightID,
-        list[keyName]["name"],
-        "Lights",
-        "transitiontime",
-        null
-      );
-      await SetObjectAndState(
-        lightID,
-        list[keyName]["name"],
-        "Lights",
-        "level",
-        null
-      );
-      adapter.setObjectNotExists(`Lights.${lightID}.dimspeed`, {
-        type: "state",
-        common: {
-          name: list[keyName]["name"] + " " + "dimspeed",
-          type: "number",
-          role: "level.dimspeed",
-          min: 0,
-          max: 255,
-          read: false,
-          write: true,
-        },
-        native: {},
-      });
-      adapter.setObjectNotExists(`Lights.${lightID}.dimup`, {
-        type: "state",
-        common: {
-          name: list[keyName]["name"] + " " + "dimup",
-          role: "button",
-          type: "boolean",
-          read: false,
-          write: true,
-        },
-      });
-      adapter.setObjectNotExists(`Lights.${lightID}.dimdown`, {
-        type: "state",
-        common: {
-          name: list[keyName]["name"] + " " + "dimdown",
-          role: "button",
-          type: "boolean",
-          read: false,
-          write: true,
-        },
-      });
-      adapter.setObjectNotExists(`Lights.${lightID}.action`, {
-        type: "state",
-        common: {
-          name: list[keyName]["name"] + " " + "action",
-          role: "argument",
-          type: "string",
-          read: false,
-          write: true,
-        },
-      });
+      if (list[keyName]['type'] !== "On/Off plug-in unit" && list[keyName]['type'] !== "On/Off light" && list[keyName]['type'] !== "Configuration tool") {
+        await SetObjectAndState(
+          lightID,
+          list[keyName]["name"],
+          "Lights",
+          "transitiontime",
+          null
+        );
+        await SetObjectAndState(
+          lightID,
+          list[keyName]["name"],
+          "Lights",
+          "level",
+          null
+        );
+        adapter.setObjectNotExists(`Lights.${lightID}.dimspeed`, {
+          type: "state",
+          common: {
+            name: list[keyName]["name"] + " " + "dimspeed",
+            type: "number",
+            role: "level.dimspeed",
+            min: 0,
+            max: 255,
+            read: false,
+            write: true,
+          },
+          native: {},
+        });
+        adapter.setObjectNotExists(`Lights.${lightID}.dimup`, {
+          type: "state",
+          common: {
+            name: list[keyName]["name"] + " " + "dimup",
+            role: "button",
+            type: "boolean",
+            read: false,
+            write: true,
+          },
+        });
+        adapter.setObjectNotExists(`Lights.${lightID}.dimdown`, {
+          type: "state",
+          common: {
+            name: list[keyName]["name"] + " " + "dimdown",
+            role: "button",
+            type: "boolean",
+            read: false,
+            write: true,
+          },
+        });
+        adapter.setObjectNotExists(`Lights.${lightID}.action`, {
+          type: "state",
+          common: {
+            name: list[keyName]["name"] + " " + "action",
+            role: "argument",
+            type: "string",
+            read: false,
+            write: true,
+          },
+        });
+      }
     }
   }
 }
