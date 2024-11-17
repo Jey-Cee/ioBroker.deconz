@@ -1000,28 +1000,56 @@ async function getAllGroups() {
 
             //Changed check if is helper group, if skip it
             let regex = new RegExp("helper[0-9]+ for group [0-9]+");
-            if (!regex.test(objectName)) {
-              adapter.setObjectNotExists(
-                `Groups.${groupID}`,
-                {
-                  type: "device",
-                  common: {
-                    name: list[keyName]["name"],
-                    role: "group",
-                  },
-                  native: {
-                    devicemembership: list[keyName]["devicemembership"],
-                    etag: list[keyName]["etag"],
-                    id: list[keyName]["id"],
-                    hidden: list[keyName]["hidden"],
-                    type: "group",
-                  },
-                },
-                () => {
-                  getGroupAttributes(list[keyName]["id"]);
-                  getGroupScenes(`Groups.${groupID}`, list[keyName]["scenes"]);
+            if (adapter.config.switchGroups == true) {
+              if (!list[keyName]["uniqueid"]) {
+                if (!regex.test(objectName)) {
+                  adapter.setObjectNotExists(
+                    `Groups.${groupID}`,
+                    {
+                      type: "device",
+                      common: {
+                        name: list[keyName]["name"],
+                        role: "group",
+                      },
+                      native: {
+                        devicemembership: list[keyName]["devicemembership"],
+                        etag: list[keyName]["etag"],
+                        id: list[keyName]["id"],
+                        hidden: list[keyName]["hidden"],
+                        type: "group",
+                      },
+                    },
+                    () => {
+                      getGroupAttributes(list[keyName]["id"]);
+                      getGroupScenes(`Groups.${groupID}`, list[keyName]["scenes"]);
+                    }
+                  );
                 }
-              );
+              }
+            } else {
+              if (!regex.test(objectName)) {
+                adapter.setObjectNotExists(
+                  `Groups.${groupID}`,
+                  {
+                    type: "device",
+                    common: {
+                      name: list[keyName]["name"],
+                      role: "group",
+                    },
+                    native: {
+                      devicemembership: list[keyName]["devicemembership"],
+                      etag: list[keyName]["etag"],
+                      id: list[keyName]["id"],
+                      hidden: list[keyName]["hidden"],
+                      type: "group",
+                    },
+                  },
+                  () => {
+                    getGroupAttributes(list[keyName]["id"]);
+                    getGroupScenes(`Groups.${groupID}`, list[keyName]["scenes"]);
+                  }
+                );
+              }
             }
           }
         }
@@ -1065,6 +1093,7 @@ async function getGroupAttributes(groupId) {
                 lights: list["lights"],
                 lightsequence: list["lightsequence"],
                 multideviceids: list["multideviceids"],
+                uniqueid: list["uniqueid"],
               },
             });
             let count2 = Object.keys(list["action"]).length - 1;
@@ -1078,13 +1107,15 @@ async function getGroupAttributes(groupId) {
                 stateName,
                 list["action"][stateName]
               );
-              await SetObjectAndState(
-                groupId,
-                list["name"],
-                "Groups",
-                "transitiontime",
-                null
-              );
+              if (!list["uniqueid"]) {
+                await SetObjectAndState(
+                  groupId,
+                  list["name"],
+                  "Groups",
+                  "transitiontime",
+                  null
+                );
+              }
             }
             let count3 = Object.keys(list["state"]).length - 1;
             //create states for light device
@@ -1097,64 +1128,68 @@ async function getGroupAttributes(groupId) {
                 stateName,
                 list["state"][stateName]
               );
+              if (!list["uniqueid"]) {
+                await SetObjectAndState(
+                  groupId,
+                  list["name"],
+                  "Groups",
+                  "transitiontime",
+                  null
+                );
+              }
+            }
+            if (!list["uniqueid"]) {
               await SetObjectAndState(
                 groupId,
                 list["name"],
                 "Groups",
-                "transitiontime",
+                "level",
                 null
               );
+              adapter.setObjectNotExists(`Groups.${groupId}.dimspeed`, {
+                type: "state",
+                common: {
+                  name: list["name"] + " " + "dimspeed",
+                  type: "number",
+                  role: "level.dimspeed",
+                  min: 0,
+                  max: 255,
+                  read: false,
+                  write: true,
+                },
+                native: {},
+              });
+              adapter.setObjectNotExists(`Groups.${groupId}.dimup`, {
+                type: "state",
+                common: {
+                  name: list["name"] + " " + "dimup",
+                  role: "button",
+                  type: "boolean",
+                  read: false,
+                  write: true,
+                },
+              });
+              adapter.setObjectNotExists(`Groups.${groupId}.dimdown`, {
+                type: "state",
+                common: {
+                  name: list["name"] + " " + "dimdown",
+                  role: "button",
+                  type: "boolean",
+                  read: false,
+                  write: true,
+                },
+              });
+              adapter.setObjectNotExists(`Groups.${groupId}.action`, {
+                type: "state",
+                common: {
+                  name: list["name"] + " " + "action",
+                  role: "argument",
+                  type: "string",
+                  read: false,
+                  write: true,
+                },
+              });
             }
-            await SetObjectAndState(
-              groupId,
-              list["name"],
-              "Groups",
-              "level",
-              null
-            );
-            adapter.setObjectNotExists(`Groups.${groupId}.dimspeed`, {
-              type: "state",
-              common: {
-                name: list["name"] + " " + "dimspeed",
-                type: "number",
-                role: "level.dimspeed",
-                min: 0,
-                max: 255,
-                read: false,
-                write: true,
-              },
-              native: {},
-            });
-            adapter.setObjectNotExists(`Groups.${groupId}.dimup`, {
-              type: "state",
-              common: {
-                name: list["name"] + " " + "dimup",
-                role: "button",
-                type: "boolean",
-                read: false,
-                write: true,
-              },
-            });
-            adapter.setObjectNotExists(`Groups.${groupId}.dimdown`, {
-              type: "state",
-              common: {
-                name: list["name"] + " " + "dimdown",
-                role: "button",
-                type: "boolean",
-                read: false,
-                write: true,
-              },
-            });
-            adapter.setObjectNotExists(`Groups.${groupId}.action`, {
-              type: "state",
-              common: {
-                name: list["name"] + " " + "action",
-                role: "argument",
-                type: "string",
-                read: false,
-                write: true,
-              },
-            });
           }
           getGroupScenes(`Groups.${groupID}`, list["scenes"]);
         }
@@ -1455,55 +1490,110 @@ async function getAllSensors() {
             //Get each Sensor
             let keyName = Object.keys(list)[i];
             let sensorID = keyName;
+            let typS = list[keyName]["type"];
             //create object for sensor device
             let regex = new RegExp("CLIP-Sensor TOOGLE-");
-            if (!regex.test(list[keyName]["name"])) {
-              adapter.setObjectNotExists(`Sensors.${sensorID}`, {
-                type: "device",
-                common: {
-                  name: list[keyName]["name"],
-                  role: "sensor",
-                },
-                native: {
-                  ep: list[keyName]["ep"],
-                  etag: list[keyName]["etag"],
-                  id: keyName,
-                  group:
-                    list[keyName]["config"] !== undefined
-                      ? list[keyName]["config"]["group"]
-                      : "",
-                  manufacturername: list[keyName]["manufacturername"],
-                  modelid: list[keyName]["modelid"],
-                  swversion: list[keyName]["swversion"],
-                  type: list[keyName]["type"],
-                  uniqueid: list[keyName]["uniqueid"],
-                },
-              });
-              let count2 = Object.keys(list[keyName]["state"]).length - 1;
+            if (adapter.config.virtualSensors == true) {
+              if (typS.substring(0, 4) !== "CLIP") {
+                if (!regex.test(list[keyName]["name"])) {
+                  adapter.setObjectNotExists(`Sensors.${sensorID}`, {
+                    type: "device",
+                    common: {
+                      name: list[keyName]["name"],
+                      role: "sensor",
+                    },
+                    native: {
+                      ep: list[keyName]["ep"],
+                      etag: list[keyName]["etag"],
+                      id: keyName,
+                      group:
+                        list[keyName]["config"] !== undefined
+                          ? list[keyName]["config"]["group"]
+                          : "",
+                      manufacturername: list[keyName]["manufacturername"],
+                      modelid: list[keyName]["modelid"],
+                      swversion: list[keyName]["swversion"],
+                      type: list[keyName]["type"],
+                      uniqueid: list[keyName]["uniqueid"],
+                    },
+                  });
+                  let count2 = Object.keys(list[keyName]["state"]).length - 1;
 
-              //create states for sensor device
-              for (let z = 0; z <= count2; z++) {
-                let stateName = Object.keys(list[keyName]["state"])[z];
-                await SetObjectAndState(
-                  sensorID,
-                  list[keyName]["name"],
-                  "Sensors",
-                  stateName,
-                  list[keyName]["state"][stateName]
-                );
+                  //create states for sensor device
+                  for (let z = 0; z <= count2; z++) {
+                    let stateName = Object.keys(list[keyName]["state"])[z];
+                    await SetObjectAndState(
+                      sensorID,
+                      list[keyName]["name"],
+                      "Sensors",
+                      stateName,
+                      list[keyName]["state"][stateName]
+                    );
+                  }
+                  let count3 = Object.keys(list[keyName]["config"]).length - 1;
+
+                  //create config states for sensor device
+                  for (let x = 0; x <= count3; x++) {
+                    let stateName = Object.keys(list[keyName]["config"])[x];
+                    await SetObjectAndState(
+                      sensorID,
+                      list[keyName]["name"],
+                      "Sensors",
+                      stateName,
+                      list[keyName]["config"][stateName]
+                    );
+                  }
+                }
               }
-              let count3 = Object.keys(list[keyName]["config"]).length - 1;
+            } else {
+              if (!regex.test(list[keyName]["name"])) {
+                adapter.setObjectNotExists(`Sensors.${sensorID}`, {
+                  type: "device",
+                  common: {
+                    name: list[keyName]["name"],
+                    role: "sensor",
+                  },
+                  native: {
+                    ep: list[keyName]["ep"],
+                    etag: list[keyName]["etag"],
+                    id: keyName,
+                    group:
+                      list[keyName]["config"] !== undefined
+                        ? list[keyName]["config"]["group"]
+                        : "",
+                    manufacturername: list[keyName]["manufacturername"],
+                    modelid: list[keyName]["modelid"],
+                    swversion: list[keyName]["swversion"],
+                    type: list[keyName]["type"],
+                    uniqueid: list[keyName]["uniqueid"],
+                  },
+                });
+                let count2 = Object.keys(list[keyName]["state"]).length - 1;
 
-              //create config states for sensor device
-              for (let x = 0; x <= count3; x++) {
-                let stateName = Object.keys(list[keyName]["config"])[x];
-                await SetObjectAndState(
-                  sensorID,
-                  list[keyName]["name"],
-                  "Sensors",
-                  stateName,
-                  list[keyName]["config"][stateName]
-                );
+                //create states for sensor device
+                for (let z = 0; z <= count2; z++) {
+                  let stateName = Object.keys(list[keyName]["state"])[z];
+                  await SetObjectAndState(
+                    sensorID,
+                    list[keyName]["name"],
+                    "Sensors",
+                    stateName,
+                    list[keyName]["state"][stateName]
+                  );
+                }
+                let count3 = Object.keys(list[keyName]["config"]).length - 1;
+
+                //create config states for sensor device
+                for (let x = 0; x <= count3; x++) {
+                  let stateName = Object.keys(list[keyName]["config"])[x];
+                  await SetObjectAndState(
+                    sensorID,
+                    list[keyName]["name"],
+                    "Sensors",
+                    stateName,
+                    list[keyName]["config"][stateName]
+                  );
+                }
               }
             }
           }

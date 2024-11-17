@@ -30,5 +30,7 @@
     "deConz Version": "deConz Version",
     "deConz adapter settings": "deConz adapter settings",
     "error creating API key: ": "error creating API key: ",
-    "link button not pressed": "Please first click on \"Unlock Gateway\" in the web app"
+    "link button not pressed": "Please first click on \"Unlock Gateway\" in the web app",
+    "Hide switch groups": "Hide switch groups",
+    "Hide virtual sensors": "Hide virtual sensors"
 }
