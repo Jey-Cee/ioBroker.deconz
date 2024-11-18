@@ -506,7 +506,7 @@ async function main() {
 
   heartbeat();
 
-  if (adapter.config.ip === "undefined") {
+  if (adapter.config.bridge === "") {
     //only on first start
     autoDiscovery();
   } else {
@@ -1617,32 +1617,59 @@ async function getSensor(sensorId) {
       } else {
         if (await logging(res, body, "get sensor " + sensorId)) {
           let list = JSON.parse(body);
+          let typS = list["type"];
 
-          //create object for sensor
-          adapter.setObjectNotExists(`Sensors.${sensorId}`, {
-            type: "device",
-            common: {
-              name: list["name"],
-              role: "sensor",
-            },
-            native: {
-              ep: list["ep"],
-              etag: list["etag"],
-              id: sensorId,
-              group: list["config"]["group"],
-              manufacturername: list["manufacturername"],
-              mode: list["mode"],
-              modelid: list["modelid"],
-              swversion: list["swversion"],
-              type: list["type"],
-              uniqueid: list["uniqueid"],
-            },
-          });
+          if (adapter.config.virtualSensors == true) {
+            if (typS.substring(0, 4) !== "CLIP") {
+              //create object for sensor
+              adapter.setObjectNotExists(`Sensors.${sensorId}`, {
+                type: "device",
+                common: {
+                  name: list["name"],
+                  role: "sensor",
+                },
+                native: {
+                  ep: list["ep"],
+                  etag: list["etag"],
+                  id: sensorId,
+                  group: list["config"]["group"],
+                  manufacturername: list["manufacturername"],
+                  mode: list["mode"],
+                  modelid: list["modelid"],
+                  swversion: list["swversion"],
+                  type: list["type"],
+                  uniqueid: list["uniqueid"],
+                },
+              });
+            }
+          } else {
+            //create object for sensor
+            adapter.setObjectNotExists(`Sensors.${sensorId}`, {
+              type: "device",
+              common: {
+                name: list["name"],
+                role: "sensor",
+              },
+              native: {
+                ep: list["ep"],
+                etag: list["etag"],
+                id: sensorId,
+                group: list["config"]["group"],
+                manufacturername: list["manufacturername"],
+                mode: list["mode"],
+                modelid: list["modelid"],
+                swversion: list["swversion"],
+                type: list["type"],
+                uniqueid: list["uniqueid"],
+              },
+            });
+          }
           let count2 = Object.keys(list["state"]).length - 1;
 
           //create states for sensor device
           for (let z = 0; z <= count2; z++) {
             let stateName = Object.keys(list["state"])[z];
+            let typS = list["type"];
 
             if (stateName === "buttonevent" && (list["modelid"] === "lumi.sensor_switch" || list["modelid"] === "lumi.sensor_switch.aq2")) {
               let LastUpdate = Number(new Date(list["state"]["lastupdated"]));
@@ -1662,26 +1689,50 @@ async function getSensor(sensorId) {
                 adapter.log.info("buttonevent NOT updated for " + list["name"] + ", too old: " + (Now - LastUpdate + TimeOffset) / 1000 + "sec time difference update to now");
               }
             } else {
-              await SetObjectAndState(
-                sensorId,
-                list["name"],
-                "Sensors",
-                stateName,
-                list["state"][stateName]
-              );
+              if (adapter.config.virtualSensors == true) {
+                if (typS.substring(0, 4) !== "CLIP") {
+                  await SetObjectAndState(
+                    sensorId,
+                    list["name"],
+                    "Sensors",
+                    stateName,
+                    list["state"][stateName]
+                  );
+                }
+              } else {
+                await SetObjectAndState(
+                  sensorId,
+                  list["name"],
+                  "Sensors",
+                  stateName,
+                  list["state"][stateName]
+                );
+              }
             }
 
             let count3 = Object.keys(list["config"]).length - 1;
             //create config for sensor device
             for (let x = 0; x <= count3; x++) {
               let stateName = Object.keys(list["config"])[x];
-              await SetObjectAndState(
-                sensorId,
-                list["name"],
-                "Sensors",
-                stateName,
-                list["config"][stateName]
-              );
+              if (adapter.config.virtualSensors == true) {
+                if (typS.substring(0, 4) !== "CLIP") {
+                  await SetObjectAndState(
+                    sensorId,
+                    list["name"],
+                    "Sensors",
+                    stateName,
+                    list["config"][stateName]
+                  );
+                }
+              } else {
+                await SetObjectAndState(
+                  sensorId,
+                  list["name"],
+                  "Sensors",
+                  stateName,
+                  list["config"][stateName]
+                );
+              }
             }
           }
         }
