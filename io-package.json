@@ -126,7 +126,9 @@
     "websocketport": 443,
     "user": "",
     "username": "",
-    "password": ""
+    "password": "",
+    "switchGroups": false,
+    "virtualSensors": false
   },
   "instanceObjects": [
     {
