@@ -161,6 +161,32 @@
       "md": 4,
       "sm": 12,
       "xs": 12
+    },
+    "_header2": {
+      "newLine": true,
+      "text": "Settings",
+      "type": "header",
+      "size": 3
+    },
+    "switchGroups": {
+      "newLine": true,
+      "type": "checkbox",
+      "label": "Hide switch groups",
+      "xs": 12,
+      "sm": 12,
+      "md": 6,
+      "lg": 4,
+      "xl": 4
+    },
+    "virtualSensors": {
+      "newLine": true,
+      "type": "checkbox",
+      "label": "Hide virtual sensors",
+      "xs": 12,
+      "sm": 12,
+      "md": 6,
+      "lg": 4,
+      "xl": 4
     }
   }
 }

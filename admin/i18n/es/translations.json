@@ -19,16 +19,18 @@
     "Manufacturer": "Fabricante",
     "Model ID": "ID de modelo",
     "Name": "Nombre",
-    "Name of the new group:": "Nombre del nuevo grupo:",
+    "Name of the new group": "Nombre del nuevo grupo",
     "OR": "o",
     "Ok": "Ok",
     "Open Network": "Red abierta",
     "Settings": "Settings",
     "Type": "Tipo",
     "deConz Address": "deConz Address",
-    "deConz REST API Version": "Versión de la API REST deConz",
+    "deConz REST-API Version": "Versión de la API-REST deConz",
     "deConz Version": "Versión deConz",
     "deConz adapter settings": "deConz adapter settings",
-    "error creating API key: ": "error creating API key: ",
-    "link button not pressed": "Please first click on \"Unlock Gateway\" in the web app"
+    "error creating API key": "error creating API key",
+    "link button not pressed": "Please first click on \"Unlock Gateway\" in the web app",
+    "Hide switch groups": "Ocultar grupos de interruptores",
+    "Hide virtual sensors": "Ocultar sensores virtuales"
 }
