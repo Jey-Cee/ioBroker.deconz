@@ -26,7 +26,7 @@
     "Settings": "Настройки",
     "Type": "Тип",
     "deConz Address": "Адрес deConz",
-    "deConz REST-API Version": "Версия API-REST deConz",
+    "deConz REST-API Version": "Версия REST-API deConz",
     "deConz Version": "Версия deConz",
     "deConz adapter settings": "Настройки драйвера deConz",
     "error creating API key": "ошибка создания ключа API",
