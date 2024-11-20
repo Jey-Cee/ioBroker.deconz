@@ -19,16 +19,18 @@
     "Manufacturer": "Виробник",
     "Model ID": "ID моделі",
     "Name": "Ім'я",
-    "Name of the new group:": "Назва нової групи:",
+    "Name of the new group": "Назва нової групи",
     "OR": "або",
     "Ok": "В порядку",
     "Open Network": "Відкрийте мережу",
     "Settings": "Налаштування",
     "Type": "Тип",
     "deConz Address": "deConz Адреса",
-    "deConz REST API Version": "Версія deConz REST API",
+    "deConz REST-API Version": "Версія deConz REST-API",
     "deConz Version": "Версія deConz",
     "deConz adapter settings": "налаштування адаптера deConz",
-    "error creating API key: ": "помилка створення ключа API:",
-    "link button not pressed": "Спочатку натисніть «Розблокувати шлюз» у веб-програмі"
+    "error creating API key": "помилка створення ключа API",
+    "link button not pressed": "Спочатку натисніть «Розблокувати шлюз» у веб-програмі",
+    "Hide switch groups": "Приховати групи перемикачів",
+    "Hide virtual sensors": "Приховати віртуальні датчики"
 }
