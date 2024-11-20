@@ -10,7 +10,7 @@
     "Devices (ID of Device)": "设备（设备 ID）",
     "Duration": "期间",
     "Enable adapter first": "首先启用适配器",
-    "Instruction": "转到Phoscon APP  - >设置 - >高级，然后单击“解锁网关”。时间限制为30秒。保持此消息打开。",
+    "Instruction": "转到Phoscon APP - >设置 - >高级，然后单击“解锁网关”。时间限制为60秒。",
     "Lights (ID of Light)": "灯（灯的 ID）",
     "Main settings": "主要设置",
     "Manage Devices": "管理设备",
