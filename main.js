@@ -3316,7 +3316,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
   if (objMin !== null) {
     objCommon.min = objMin;
   }
-  if (objMin !== null) {
+  if (objMax !== null) {
     objCommon.max = objMax;
   }
   if (objDefault !== null) {
