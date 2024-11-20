@@ -10,7 +10,7 @@
     "Devices (ID of Device)": "Apparaten (ID van apparaat)",
     "Duration": "Looptijd",
     "Enable adapter first": "Activeer de adapter eerst",
-    "Instruction": "Ga naar Phoscon APP -> Instellingen -> Geavanceerd en klik op \"Gateway ontgrendelen\". Tijdlimiet 30 seconden.",
+    "Instruction": "Ga naar Phoscon APP -> Gateway -> Geavanceerd en klik op \"App verbinden\". Tijdlimiet 60 seconden.",
     "Lights (ID of Light)": "Lichten (ID van licht)",
     "Main settings": "Belangrijkste instellingen",
     "Manage Devices": "Beheer apparaten",
