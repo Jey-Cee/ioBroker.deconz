@@ -19,16 +19,18 @@
     "Manufacturer": "制造商",
     "Model ID": "型号编号",
     "Name": "名称",
-    "Name of the new group:": "新组名称：",
+    "Name of the new group": "新组名称",
     "OR": "要么",
     "Ok": "确定",
     "Open Network": "开放网络",
     "Settings": "设置",
     "Type": "类型",
     "deConz Address": "德康兹地址",
-    "deConz REST API Version": "deConz REST API 版本",
+    "deConz REST-API Version": "deConz REST-API 版本",
     "deConz Version": "deConz版本",
     "deConz adapter settings": "deConz 适配器设置",
-    "error creating API key: ": "创建 API 密钥时出错：",
-    "link button not pressed": "请先点击网络应用程序中的“解锁网关”"
+    "error creating API key": "创建 API 密钥时出错",
+    "link button not pressed": "请先点击网络应用程序中的“解锁网关”",
+    "Hide switch groups": "隱藏開關組",
+    "Hide virtual sensors": "隱藏虛擬感測器"
 }
