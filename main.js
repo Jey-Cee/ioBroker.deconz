@@ -124,20 +124,6 @@ class deconz extends utils.Adapter {
                 parameters = '{"bri": ' + Math.round((255 / 100) * state.val) + ', "on": false}';
               }
               break;
-            case "on":
-              if (transitionTime === "none" || transitionTime === 0) {
-                parameters = '{"on": ' + JSON.stringify(state.val) + "}";
-              } else {
-                parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "on": ' + JSON.stringify(state.val) + "}";
-              }
-              break;
-            case "stop":
-              if (transitionTime === "none" || transitionTime === 0) {
-                parameters = '{"stop": ' + JSON.stringify(state.val) + "}";
-              } else {
-                parameters = '{"transitiontime": ' + JSON.stringify(transitionTime) + ', "on": ' + JSON.stringify(state.val) + "}";
-              }
-              break;
             case "hue":
               if (transitionTime === "none" || transitionTime === 0) {
                 parameters = '{"hue": ' + Math.round(parseInt(JSON.stringify(state.val)) * hue_factor) + "}";
@@ -228,16 +214,11 @@ class deconz extends utils.Adapter {
               let dimspeed = await this.getStateAsync(
                 this.name + "." + this.instance + "." + id + ".dimspeed"
               );
-
-              if (dimspeed === null || dimspeed === undefined || dimspeed.val === 0) {
-                dimspeed = 10;
-                this.setState(this.name + "." + this.instance + "." + id + ".dimspeed", 10, true);
-              }
               let speed = dp === "dimup" ? dimspeed.val : dimspeed.val * -1;
               if (transitionTime !== "none") {
-                parameters = `{ "transitiontime": ${JSON.stringify(transitionTime)} , "bri_inc": ${speed} }`;
+                parameters = `{ "transitiontime": ${JSON.stringify(transitionTime)} , "bri_inc": ${speed} , "on": true}`;
               } else {
-                parameters = `{ "bri_inc": ${speed} }`;
+                parameters = `{ "bri_inc": ${speed} , "on": true}`;
               }
               break;
             case "action":
@@ -292,6 +273,7 @@ class deconz extends utils.Adapter {
             case "lift":
             case "melody":
             case "mountingmode":
+            case "on":
             case "off":
             case "offset":
             case "pulseconfiguration":
@@ -300,6 +282,7 @@ class deconz extends utils.Adapter {
             case "setvalve":
             case "sensitivity":
             case "speed":
+            case "stop":
             case "tholddark":
             case "tholdoffset":
             case "toggle":
@@ -1128,15 +1111,6 @@ async function getGroupAttributes(groupId) {
                 stateName,
                 list["state"][stateName]
               );
-              if (!list["uniqueid"]) {
-                await SetObjectAndState(
-                  groupId,
-                  list["name"],
-                  "Groups",
-                  "transitiontime",
-                  null
-                );
-              }
             }
             if (!list["uniqueid"]) {
               await SetObjectAndState(
@@ -1152,8 +1126,9 @@ async function getGroupAttributes(groupId) {
                   name: list["name"] + " " + "dimspeed",
                   type: "number",
                   role: "level.dimspeed",
-                  min: 0,
+                  min: 1,
                   max: 255,
+                  def: 10,
                   read: false,
                   write: true,
                 },
@@ -1930,8 +1905,9 @@ async function createLightDevice(list, keyName, lightID) {
             name: list[keyName]["name"] + " " + "dimspeed",
             type: "number",
             role: "level.dimspeed",
-            min: 0,
+            min: 1,
             max: 255,
+            def: 10,
             read: false,
             write: true,
           },
@@ -1984,13 +1960,6 @@ async function createBlindsDevice(list, keyName, lightID) {
         "Lights",
         stateName,
         list[keyName]["state"][stateName]
-      );
-      await SetObjectAndState(
-        lightID,
-        list[keyName]["name"],
-        "Lights",
-        "transitiontime",
-        null
       );
       adapter.setObjectNotExists(`Lights.${lightID}.stop`, {
         type: "state",
