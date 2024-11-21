@@ -3180,6 +3180,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
     case "transitiontime":
       objType = "number";
       objRole = "state";
+      objMin = 0;
       objDefault = 0;
       objUnit = "s";
       break;
