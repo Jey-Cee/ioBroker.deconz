@@ -10,7 +10,7 @@
     "Devices (ID of Device)": "Urządzenia (identyfikator urządzenia)",
     "Duration": "Trwanie",
     "Enable adapter first": "Enable adapter first",
-    "Instruction": "Przejdź do aplikacji Phoscon -> Ustawienia -> Zaawansowane i kliknij „Odblokuj bramę”. Timelimit 30 sekund.",
+    "Instruction": "Przejdź do aplikacji Phoscon -> Bramka -> Zaawansowane i kliknij „Uwierzytelnij aplikację”. Timelimit 60 sekund.",
     "Lights (ID of Light)": "Światła (ID światła)",
     "Main settings": "Ustawienia główne",
     "Manage Devices": "Zarządzaj urządzeniami",

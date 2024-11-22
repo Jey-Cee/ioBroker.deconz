@@ -10,7 +10,7 @@
     "Devices (ID of Device)": "Пристрої (ID пристрою)",
     "Duration": "Тривалість",
     "Enable adapter first": "Спочатку ввімкніть адаптер",
-    "Instruction": "Перейдіть у Phoscon APP -> Settings -> Advanced і натисніть «Unlock Gateway». Часовий ліміт 30 секунд.",
+    "Instruction": "Перейдіть у Phoscon APP -> Settings -> Advanced і натисніть «Автентифікація програми». Часовий ліміт 60 секунд.",
     "Lights (ID of Light)": "Вогні (ID of Light)",
     "Main settings": "Основні налаштування",
     "Manage Devices": "Керування пристроями",
