@@ -107,13 +107,7 @@ class deconz extends utils.Adapter {
               } else {
                 parameters = '{"bri": ' + JSON.stringify(state.val) + ', "on": false}';
               }
-              await SetObjectAndState(
-                tmp[3],
-                "",
-                tmp[2],
-                "level",
-                Math.round((100 / 255) * state.val)
-              );
+              await SetObjectAndState(tmp[3], "", tmp[2], "level", Math.round((100 / 255) * state.val));
               break;
             case "level":
               if (state.val > 0 && (transitionTime === "none" || transitionTime === 0)) {
@@ -216,9 +210,9 @@ class deconz extends utils.Adapter {
               );
               let speed = dp === "dimup" ? dimspeed.val : dimspeed.val * -1;
               if (transitionTime !== "none") {
-                parameters = `{ "transitiontime": ${JSON.stringify(transitionTime)} , "bri_inc": ${speed} , "on": true}`;
+                parameters = `{ "transitiontime": ${JSON.stringify(transitionTime)}, "bri_inc": ${speed}, "on": true}`;
               } else {
-                parameters = `{ "bri_inc": ${speed} , "on": true}`;
+                parameters = `{ "bri_inc": ${speed}, "on": true}`;
               }
               break;
             case "action":
@@ -335,42 +329,23 @@ class deconz extends utils.Adapter {
             switch (obj.common.role) {
               case "blind":
               case "light":
-                await setLightState(
-                  parameters,
-                  controlId,
-                  this.name + "." + this.instance + "." + id + "." + dp
-                );
+                await setLightState(parameters, controlId, this.name + "." + this.instance + "." + id + "." + dp);
                 if ('stop' === dp) {
                   await getLightState(id.split('.').pop());
                 }
                 break;
               case "group":
                 if (dp !== "createscene") {
-                  await setGroupState(
-                    parameters,
-                    controlId,
-                    this.name + "." + this.instance + "." + id + "." + dp
-                  );
+                  await setGroupState(parameters, controlId, this.name + "." + this.instance + "." + id + "." + dp);
                 }
                 break;
               case "sensor":
-                await setSensorParameters(
-                  parameters,
-                  controlId,
-                  this.name + "." + this.instance + "." + id + "." + dp
-                );
+                await setSensorParameters(parameters, controlId, this.name + "." + this.instance + "." + id + "." + dp);
                 break;
               case "scene":
                 let parentDeviceId = id.split(".")[1];
                 //let parent = await adapter.getObjectAsync(adapter.name + '.' + adapter.instance + '.Groups.' + parentDeviceId);
-                await setGroupScene(
-                  parameters,
-                  parentDeviceId,
-                  controlId,
-                  action,
-                  oid,
-                  method
-                );
+                await setGroupScene(parameters, parentDeviceId, controlId, action, oid, method);
                 break;
             }
           }
@@ -386,23 +361,13 @@ class deconz extends utils.Adapter {
         case "createAPIkey":
           createAPIkey(obj.message.host, obj.message.credentials, (res) => {
             if (obj.callback)
-              this.sendTo(
-                obj.from,
-                obj.command,
-                { native: { user: JSON.stringify(res.message).replace(/"/g, '') } },
-                obj.callback
-              );
+              this.sendTo(obj.from, obj.command, { native: { user: JSON.stringify(res.message).replace(/"/g, '') } }, obj.callback);
           });
           wait = true;
           break;
         case "deleteAPIkey":
           await deleteAPIkey();
-          this.sendTo(
-            obj.from,
-            obj.command,
-            { native: { user: "" } },
-            obj.callback
-          );
+          this.sendTo(obj.from, obj.command, { native: { user: "" } }, obj.callback);
           wait = true;
           break;
         case "getConfig":
@@ -422,48 +387,28 @@ class deconz extends utils.Adapter {
         case "deleteLight":
           await deleteLight(obj.message, (res) => {
             if (obj.callback)
-              this.sendTo(
-                obj.from,
-                obj.command,
-                JSON.stringify(res),
-                obj.callback
-              );
+              this.sendTo(obj.from, obj.command, JSON.stringify(res), obj.callback);
           });
           wait = true;
           break;
         case "deleteSensor":
           await deleteSensor(obj.message, (res) => {
             if (obj.callback)
-              this.sendTo(
-                obj.from,
-                obj.command,
-                JSON.stringify(res),
-                obj.callback
-              );
+              this.sendTo(obj.from, obj.command, JSON.stringify(res), obj.callback);
           });
           wait = true;
           break;
         case "createGroup":
           await createGroup(obj.message, (res) => {
             if (obj.callback)
-              this.sendTo(
-                obj.from,
-                obj.command,
-                JSON.stringify(res),
-                obj.callback
-              );
+              this.sendTo(obj.from, obj.command, JSON.stringify(res), obj.callback);
           });
           wait = true;
           break;
         case "deleteGroup":
           await deleteGroup(obj.message, (res) => {
             if (obj.callback)
-              this.sendTo(
-                obj.from,
-                obj.command,
-                JSON.stringify(res),
-                obj.callback
-              );
+              this.sendTo(obj.from, obj.command, JSON.stringify(res), obj.callback);
           });
           wait = true;
           break;
@@ -546,9 +491,7 @@ function heartbeat() {
   discovery.on("notify", (msg, rinfo, iface) => {
     if (msg.headers.nt === "urn:schemas-upnp-org:device:basic:1") {
       if (msg.headers["gwid.phoscon.de"]) {
-        let time = parseInt(
-          msg.headers["cache-control"].replace("max-age=", "")
-        );
+        let time = parseInt(msg.headers["cache-control"].replace("max-age=", ""));
         adapter.setState("Gateway_info.alive", {
           val: true,
           ack: true,
@@ -715,13 +658,7 @@ async function getAutoUpdates() {
               }
               for (let stateName in state) {
                 adapter.log.debug(stateName + ": " + state[stateName]);
-                await SetObjectAndState(
-                  id,
-                  object.value.common.name,
-                  "Lights",
-                  stateName,
-                  state[stateName]
-                );
+                await SetObjectAndState(id, object.value.common.name, "Lights", stateName, state[stateName]);
               }
             } else {
               adapter.log.debug("Event has no state-Changes");
@@ -764,22 +701,10 @@ async function getAutoUpdates() {
                   `${adapter.name}.${adapter.instance}.Sensors.${id}.lastupdated`,
                   async (err, lupdate) => {
                     if (lupdate === null) {
-                      await SetObjectAndState(
-                        id,
-                        object.value.common.name,
-                        "Sensors",
-                        obj,
-                        state[obj]
-                      );
+                      await SetObjectAndState(id, object.value.common.name, "Sensors", obj, state[obj]);
                     } else if (lupdate.val !== state[obj]) {
                       if (obj === "buttonevent") {
-                        await SetObjectAndState(
-                          id,
-                          object.value.common.name,
-                          "Sensors",
-                          obj,
-                          state[obj]
-                        );
+                        await SetObjectAndState(id, object.value.common.name, "Sensors", obj, state[obj]);
                         adapter.setObjectNotExists(
                           `Sensors.${id}` + "." + "buttonpressed",
                           {
@@ -811,13 +736,7 @@ async function getAutoUpdates() {
                           );
                         }, 800);
                       } else {
-                        await SetObjectAndState(
-                          id,
-                          object.value.common.name,
-                          "Sensors",
-                          obj,
-                          state[obj]
-                        );
+                        await SetObjectAndState(id, object.value.common.name, "Sensors", obj, state[obj]);
                       }
                     }
                   }
@@ -826,13 +745,7 @@ async function getAutoUpdates() {
             }
             if (typeof config == "object") {
               for (let obj in config) {
-                await SetObjectAndState(
-                  id,
-                  object.value.common.name,
-                  "Sensors",
-                  obj,
-                  config[obj]
-                );
+                await SetObjectAndState(id, object.value.common.name, "Sensors", obj, config[obj]);
               }
             }
           }
@@ -1083,43 +996,19 @@ async function getGroupAttributes(groupId) {
             //create states for light device
             for (let z = 0; z <= count2; z++) {
               let stateName = Object.keys(list["action"])[z];
-              await SetObjectAndState(
-                groupId,
-                list["name"],
-                "Groups",
-                stateName,
-                list["action"][stateName]
-              );
+              await SetObjectAndState(groupId, list["name"], "Groups", stateName, list["action"][stateName]);
               if (!list["uniqueid"]) {
-                await SetObjectAndState(
-                  groupId,
-                  list["name"],
-                  "Groups",
-                  "transitiontime",
-                  null
-                );
+                await SetObjectAndState(groupId, list["name"], "Groups", "transitiontime", null);
               }
             }
             let count3 = Object.keys(list["state"]).length - 1;
             //create states for light device
             for (let z = 0; z <= count3; z++) {
               let stateName = Object.keys(list["state"])[z];
-              await SetObjectAndState(
-                groupId,
-                list["name"],
-                "Groups",
-                stateName,
-                list["state"][stateName]
-              );
+              await SetObjectAndState(groupId, list["name"], "Groups", stateName, list["state"][stateName]);
             }
             if (!list["uniqueid"]) {
-              await SetObjectAndState(
-                groupId,
-                list["name"],
-                "Groups",
-                "level",
-                null
-              );
+              await SetObjectAndState(groupId, list["name"], "Groups", "level", null);
               adapter.setObjectNotExists(`Groups.${groupId}.dimspeed`, {
                 type: "state",
                 common: {
@@ -1250,11 +1139,7 @@ function getGroupScenes(group, sceneList) {
                 },
               },
               () => {
-                adapter.setState(
-                  `${group}.Scene_${scene.id}.lightcount`,
-                  scene.lightcount,
-                  true
-                );
+                adapter.setState(`${group}.Scene_${scene.id}.lightcount`, scene.lightcount, true);
               }
             );
             adapter.setObjectNotExists(
@@ -1270,11 +1155,7 @@ function getGroupScenes(group, sceneList) {
                 },
               },
               () => {
-                adapter.setState(
-                  `${group}.Scene_${scene.id}.transitiontime`,
-                  scene.transitiontime,
-                  true
-                );
+                adapter.setState(`${group}.Scene_${scene.id}.transitiontime`, scene.transitiontime, true);
               }
             );
             adapter.setObjectNotExists(
@@ -1290,11 +1171,7 @@ function getGroupScenes(group, sceneList) {
                 },
               },
               () => {
-                adapter.setState(
-                  `${group}.Scene_${scene.id}.name`,
-                  scene.name,
-                  true
-                );
+                adapter.setState(`${group}.Scene_${scene.id}.name`, scene.name, true);
               }
             );
           }
@@ -1497,26 +1374,14 @@ async function getAllSensors() {
                   //create states for sensor device
                   for (let z = 0; z <= count2; z++) {
                     let stateName = Object.keys(list[keyName]["state"])[z];
-                    await SetObjectAndState(
-                      sensorID,
-                      list[keyName]["name"],
-                      "Sensors",
-                      stateName,
-                      list[keyName]["state"][stateName]
-                    );
+                    await SetObjectAndState(sensorID, list[keyName]["name"], "Sensors", stateName, list[keyName]["state"][stateName]);
                   }
                   let count3 = Object.keys(list[keyName]["config"]).length - 1;
 
                   //create config states for sensor device
                   for (let x = 0; x <= count3; x++) {
                     let stateName = Object.keys(list[keyName]["config"])[x];
-                    await SetObjectAndState(
-                      sensorID,
-                      list[keyName]["name"],
-                      "Sensors",
-                      stateName,
-                      list[keyName]["config"][stateName]
-                    );
+                    await SetObjectAndState(sensorID, list[keyName]["name"], "Sensors", stateName, list[keyName]["config"][stateName]);
                   }
                 }
               }
@@ -1548,26 +1413,14 @@ async function getAllSensors() {
                 //create states for sensor device
                 for (let z = 0; z <= count2; z++) {
                   let stateName = Object.keys(list[keyName]["state"])[z];
-                  await SetObjectAndState(
-                    sensorID,
-                    list[keyName]["name"],
-                    "Sensors",
-                    stateName,
-                    list[keyName]["state"][stateName]
-                  );
+                  await SetObjectAndState(sensorID, list[keyName]["name"], "Sensors", stateName, list[keyName]["state"][stateName]);
                 }
                 let count3 = Object.keys(list[keyName]["config"]).length - 1;
 
                 //create config states for sensor device
                 for (let x = 0; x <= count3; x++) {
                   let stateName = Object.keys(list[keyName]["config"])[x];
-                  await SetObjectAndState(
-                    sensorID,
-                    list[keyName]["name"],
-                    "Sensors",
-                    stateName,
-                    list[keyName]["config"][stateName]
-                  );
+                  await SetObjectAndState(sensorID, list[keyName]["name"], "Sensors", stateName, list[keyName]["config"][stateName]);
                 }
               }
             }
@@ -1653,35 +1506,17 @@ async function getSensor(sensorId) {
               let TimeOffset = dateOff.getTimezoneOffset() * 60000;
 
               if (Now - LastUpdate + TimeOffset < 2000) {
-                await SetObjectAndState(
-                  sensorId,
-                  list["name"],
-                  "Sensors",
-                  stateName,
-                  list["state"][stateName]
-                );
+                await SetObjectAndState(sensorId, list["name"], "Sensors", stateName, list["state"][stateName]);
               } else {
                 adapter.log.info("buttonevent NOT updated for " + list["name"] + ", too old: " + (Now - LastUpdate + TimeOffset) / 1000 + "sec time difference update to now");
               }
             } else {
               if (adapter.config.virtualSensors == true) {
                 if (typS.substring(0, 4) !== "CLIP") {
-                  await SetObjectAndState(
-                    sensorId,
-                    list["name"],
-                    "Sensors",
-                    stateName,
-                    list["state"][stateName]
-                  );
+                  await SetObjectAndState(sensorId, list["name"], "Sensors", stateName, list["state"][stateName]);
                 }
               } else {
-                await SetObjectAndState(
-                  sensorId,
-                  list["name"],
-                  "Sensors",
-                  stateName,
-                  list["state"][stateName]
-                );
+                await SetObjectAndState(sensorId, list["name"], "Sensors", stateName, list["state"][stateName]);
               }
             }
 
@@ -1691,22 +1526,10 @@ async function getSensor(sensorId) {
               let stateName = Object.keys(list["config"])[x];
               if (adapter.config.virtualSensors == true) {
                 if (typS.substring(0, 4) !== "CLIP") {
-                  await SetObjectAndState(
-                    sensorId,
-                    list["name"],
-                    "Sensors",
-                    stateName,
-                    list["config"][stateName]
-                  );
+                  await SetObjectAndState(sensorId, list["name"], "Sensors", stateName, list["config"][stateName]);
                 }
               } else {
-                await SetObjectAndState(
-                  sensorId,
-                  list["name"],
-                  "Sensors",
-                  stateName,
-                  list["config"][stateName]
-                );
+                await SetObjectAndState(sensorId, list["name"], "Sensors", stateName, list["config"][stateName]);
               }
             }
           }
@@ -1877,28 +1700,11 @@ async function createLightDevice(list, keyName, lightID) {
     //create states for light device
     for (let z = 0; z <= count2; z++) {
       let stateName = Object.keys(list[keyName]["state"])[z];
-      await SetObjectAndState(
-        lightID,
-        list[keyName]["name"],
-        "Lights",
-        stateName,
-        list[keyName]["state"][stateName]
+      await SetObjectAndState(lightID, list[keyName]["name"], "Lights", stateName, list[keyName]["state"][stateName]
       );
       if (list[keyName]['type'] !== "On/Off plug-in unit" && list[keyName]['type'] !== "On/Off light" && list[keyName]['type'] !== "Configuration tool") {
-        await SetObjectAndState(
-          lightID,
-          list[keyName]["name"],
-          "Lights",
-          "transitiontime",
-          null
-        );
-        await SetObjectAndState(
-          lightID,
-          list[keyName]["name"],
-          "Lights",
-          "level",
-          null
-        );
+        await SetObjectAndState(lightID, list[keyName]["name"], "Lights", "transitiontime", null);
+        await SetObjectAndState(lightID, list[keyName]["name"], "Lights", "level", null);
         adapter.setObjectNotExists(`Lights.${lightID}.dimspeed`, {
           type: "state",
           common: {
@@ -1954,13 +1760,7 @@ async function createBlindsDevice(list, keyName, lightID) {
     //create states for light device
     for (let z = 0; z <= count2; z++) {
       let stateName = Object.keys(list[keyName]["state"])[z];
-      await SetObjectAndState(
-        lightID,
-        list[keyName]["name"],
-        "Lights",
-        stateName,
-        list[keyName]["state"][stateName]
-      );
+      await SetObjectAndState(lightID, list[keyName]["name"], "Lights", stateName, list[keyName]["state"][stateName]);
       adapter.setObjectNotExists(`Lights.${lightID}.stop`, {
         type: "state",
         common: {
@@ -2052,13 +1852,7 @@ async function getLightState(lightId) {
           //create states for light device
           for (let z = 0; z <= count2; z++) {
             let stateName = Object.keys(list["state"])[z];
-            await SetObjectAndState(
-              lightId,
-              list[keyName]["name"],
-              "Lights",
-              stateName,
-              list["state"][stateName]
-            );
+            await SetObjectAndState(lightId, list[keyName]["name"], "Lights", stateName, list["state"][stateName]);
           }
         }
       }
@@ -2108,12 +1902,7 @@ async function setLightState(parameters, lightId, stateId, callback) {
               adapter.log.warn("Gateway busy! Retry: " + JSON.stringify(retryParameters)
               );
               setTimeout(function () {
-                setLightState(
-                  JSON.stringify(retryParameters),
-                  lightId,
-                  stateId,
-                  callback
-                );
+                setLightState(JSON.stringify(retryParameters), lightId, stateId, callback);
               }, 1000);
             }
             new ackStateVal(stateId, response);
@@ -2144,30 +1933,23 @@ async function deleteLight(lightId) {
           response = JSON.parse(body);
         } catch (err) { }
 
-        if (
-          (await logging(res, body, "delete light " + lightId)) &&
-          response !== undefined &&
-          response !== "undefined"
-        ) {
+        if ((await logging(res, body, "delete light " + lightId)) && response !== undefined && response !== "undefined") {
           if (response[0]["success"]) {
             adapter.log.info("The light with id " + lightId + " was removed.");
-            adapter.getForeignObjects(
-              adapter.name + "." + adapter.instance + ".Lights.*",
-              "device",
-              async (err, enums) => {
-                //alle Objekte des Adapters suchen
-                let count = Object.keys(enums).length - 1; //Anzahl der Objekte
-                for (let i = 0; i <= count; i++) {
-                  //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ sensor handelt
-                  let keyName = Object.keys(enums)[i];
-                  if (enums[keyName].common.role === "light" && enums[keyName].native.id === lightId) {
-                    adapter.log.info("delete device Object: " + enums[keyName]._id);
-                    let name = enums[keyName]._id;
+            adapter.getForeignObjects(adapter.name + "." + adapter.instance + ".Lights.*", "device", async (err, enums) => {
+              //alle Objekte des Adapters suchen
+              let count = Object.keys(enums).length - 1; //Anzahl der Objekte
+              for (let i = 0; i <= count; i++) {
+                //jedes durchgehen und prüfen ob es sich um ein Objekt vom Typ sensor handelt
+                let keyName = Object.keys(enums)[i];
+                if (enums[keyName].common.role === "light" && enums[keyName].native.id === lightId) {
+                  adapter.log.info("delete device Object: " + enums[keyName]._id);
+                  let name = enums[keyName]._id;
 
-                    await deleteDevice(name);
-                  }
+                  await deleteDevice(name);
                 }
               }
+            }
             );
           } else if (response[0]["error"]) {
             adapter.log.warn(JSON.stringify(response[0]["error"]));
@@ -2604,13 +2386,7 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       objMin = 0;
       objMax = 255;
       objDefault = 254;
-      let bri = await SetObjectAndState(
-        id,
-        name,
-        type,
-        "level",
-        Math.round((100 / 255) * value)
-      );
+      let bri = await SetObjectAndState(id, name, type, "level", Math.round((100 / 255) * value));
       break;
     case "buttonevent":
       objType = "number";
@@ -2940,9 +2716,9 @@ async function SetObjectAndState(id, name, type, stateName, value) {
       break;
     case "lux":
       objType = "number";
-      objRole = "value.brightness";
+      objRole = "value.brightness",
+        objWrite = false;
       objDefault = 0;
-      objWrite = false;
       objUnit = "Lux";
       break;
     case "measured_value":
