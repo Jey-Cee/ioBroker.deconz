@@ -1,167 +1,197 @@
 {
-  "i18n": true,
-  "type": "panel",
-  "items": {
-    "bridge": {
-      "newLine": true,
-      "label": "deConz Address",
-      "type": "text",
-      "xl": 3,
-      "lg": 3,
-      "md": 4,
-      "sm": 12,
-      "xs": 12
-    },
-    "port": {
-      "label": "Bridge port",
-      "type": "number",
-      "default": 80,
-      "min": 1,
-      "max": 65535,
-      "xl": 1,
-      "lg": 2,
-      "md": 2,
-      "sm": 6,
-      "xs": 6
-    },
-    "websocketport": {
-      "label": "Websocket port",
-      "type": "number",
-      "default": 443,
-      "min": 1,
-      "max": 65535,
-      "xl": 1,
-      "lg": 2,
-      "md": 2,
-      "sm": 6,
-      "xs": 6
-    },
-    "_header1": {
-      "newLine": true,
-      "text": "Authentication",
-      "type": "header",
-      "size": 3
-    },
-    "_instruction": {
-      "newLine": true,
-      "text": "Instruction",
-      "type": "staticText",
-      "xl": 8,
-      "lg": 12,
-      "md": 12,
-      "sm": 12,
-      "xs": 12,
-      "style": {
-        "font-size": "16px",
-        "text-align": "center",
-        "background-color": "rgb(224, 224, 224)",
-        "border-radius": "3px",
-        "padding": "10px"
-      },
-      "darkStyle": {
-        "color": "black",
-        "font-size": "16px",
-        "text-align": "center",
-        "background-color": "rgb(224, 224, 224)",
-        "border-radius": "3px",
-        "padding": "10px"
-      }
-    },
-    "user": {
-      "newLine": true,
-      "label": "API key",
-      "type": "text",
-      "xl": 4,
-      "lg": 6,
-      "md": 6,
-      "sm": 12,
-      "xs": 12
-    },
-    "create": {
-      "label": "Create API key",
-      "type": "sendTo",
-      "variant": "contained",
-      "showProcess": true,
-      "command": "createAPIkey",
-      "jsonData": "{ \"host\": \"${data.bridge}\", \"credentials\": \"null\"}",
-      "useNative": true,
-      "xl": 2,
-      "lg": 3,
-      "md": 3,
-      "sm": 12,
-      "xs": 12
-    },
-    "deleteAPIkey": {
-      "label": "Delete API key",
-      "type": "sendTo",
-      "variant": "outlined",
-      "showProcess": true,
-      "command": "deleteAPIkey",
-      "useNative": true,
-      "xl": 2,
-      "lg": 3,
-      "md": 3,
-      "sm": 12,
-      "xs": 12
-    },
-    "_or": {
-      "newLine": true,
-      "text": "OR",
-      "type": "staticText",
-      "xl": 8,
-      "lg": 12,
-      "md": 12,
-      "sm": 12,
-      "xs": 12,
-      "style": {
-        "font-size": "16px",
-        "text-align": "center",
-        "background-color": "rgb(224, 224, 224)",
-        "border-radius": "3px",
-        "padding": "10px"
-      },
-      "darkStyle": {
-        "color": "black",
-        "font-size": "16px",
-        "text-align": "center",
-        "background-color": "rgb(224, 224, 224)",
-        "border-radius": "3px",
-        "padding": "10px"
-      }
-    },
-    "username": {
-      "newLine": true,
-      "label": "Username",
-      "type": "text",
-      "xl": 3,
-      "lg": 4,
-      "md": 4,
-      "sm": 12,
-      "xs": 12
-    },
-    "password": {
-      "label": "Password",
-      "type": "password",
-      "xl": 3,
-      "lg": 4,
-      "md": 4,
-      "sm": 12,
-      "xs": 12
-    },
-    "userCredentials": {
-      "label": "Create API key",
-      "type": "sendTo",
-      "variant": "contained",
-      "showProcess": true,
-      "command": "createAPIkey",
-      "jsonData": "{ \"host\": \"${data.bridge}\", \"credentials\": \"${data.username}:${data.password}\"}",
-      "useNative": true,
-      "xl": 2,
-      "lg": 4,
-      "md": 4,
-      "sm": 12,
-      "xs": 12
-    },
+    "i18n": true,
+    "type": "tabs",
+    "items": {
+        "_main": {
+            "type": "panel",
+            "label": "Main settings",
+            "items": {
+                "sw_version": {
+                    "type": "text",
+                    "label": "deConz Version",
+                    "readOnly": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 3,
+                    "lg": 3
+                },
+                "api_version": {
+                    "type": "text",
+                    "label": "deConz REST-API Version",
+                    "readOnly": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 3,
+                    "lg": 3
+                },
+                "_header1": {
+                    "newLine": true,
+                    "type": "header",
+                    "text": "Settings",
+                    "size": 3,
+                    "xs": 12,
+                    "sm": 12
+                },
+                "bridge": {
+                    "newLine": true,
+                    "label": "deConz Address",
+                    "type": "text",
+                    "xl": 3,
+                    "lg": 3,
+                    "md": 4,
+                    "sm": 12,
+                    "xs": 12
+                },
+                "port": {
+                    "label": "Bridge port",
+                    "type": "number",
+                    "default": 80,
+                    "min": 1,
+                    "max": 65535,
+                    "xl": 1,
+                    "lg": 2,
+                    "md": 2,
+                    "sm": 6,
+                    "xs": 6
+                },
+                "websocketport": {
+                    "label": "Websocket port",
+                    "type": "number",
+                    "default": 443,
+                    "min": 1,
+                    "max": 65535,
+                    "xl": 1,
+                    "lg": 2,
+                    "md": 2,
+                    "sm": 6,
+                    "xs": 6
+                },
+                "_header2": {
+                    "newLine": true,
+                    "text": "Authentication",
+                    "type": "header",
+                    "size": 3
+                },
+                "_instruction": {
+                    "newLine": true,
+                    "text": "Instruction",
+                    "type": "staticText",
+                    "xl": 8,
+                    "lg": 12,
+                    "md": 12,
+                    "sm": 12,
+                    "xs": 12,
+                    "style": {
+                        "font-size": "16px",
+                        "text-align": "center",
+                        "background-color": "rgb(224, 224, 224)",
+                        "border-radius": "3px",
+                        "padding": "10px"
+                    },
+                    "darkStyle": {
+                        "color": "black",
+                        "font-size": "16px",
+                        "text-align": "center",
+                        "background-color": "rgb(224, 224, 224)",
+                        "border-radius": "3px",
+                        "padding": "10px"
+                    }
+                },
+                "user": {
+                    "newLine": true,
+                    "label": "API key",
+                    "type": "text",
+                    "xl": 4,
+                    "lg": 6,
+                    "md": 6,
+                    "sm": 12,
+                    "xs": 12
+                },
+                "create": {
+                    "label": "Create API key",
+                    "type": "sendTo",
+                    "variant": "contained",
+                    "showProcess": true,
+                    "command": "createAPIkey",
+                    "jsonData": "{ \"host\": \"${data.bridge}\", \"credentials\": \"null\"}",
+                    "useNative": true,
+                    "xl": 2,
+                    "lg": 3,
+                    "md": 3,
+                    "sm": 12,
+                    "xs": 12
+                },
+                "deleteAPIkey": {
+                    "label": "Delete API key",
+                    "type": "sendTo",
+                    "variant": "outlined",
+                    "showProcess": true,
+                    "command": "deleteAPIkey",
+                    "useNative": true,
+                    "xl": 2,
+                    "lg": 3,
+                    "md": 3,
+                    "sm": 12,
+                    "xs": 12
+                },
+                "_or": {
+                    "newLine": true,
+                    "text": "OR",
+                    "type": "staticText",
+                    "xl": 8,
+                    "lg": 12,
+                    "md": 12,
+                    "sm": 12,
+                    "xs": 12,
+                    "style": {
+                        "font-size": "16px",
+                        "text-align": "center",
+                        "background-color": "rgb(224, 224, 224)",
+                        "border-radius": "3px",
+                        "padding": "10px"
+                    },
+                    "darkStyle": {
+                        "color": "black",
+                        "font-size": "16px",
+                        "text-align": "center",
+                        "background-color": "rgb(224, 224, 224)",
+                        "border-radius": "3px",
+                        "padding": "10px"
+                    }
+                },
+                "username": {
+                    "newLine": true,
+                    "label": "Username",
+                    "type": "text",
+                    "xl": 3,
+                    "lg": 4,
+                    "md": 4,
+                    "sm": 12,
+                    "xs": 12
+                },
+                "password": {
+                    "label": "Password",
+                    "type": "password",
+                    "xl": 3,
+                    "lg": 4,
+                    "md": 4,
+                    "sm": 12,
+                    "xs": 12
+                },
+                "userCredentials": {
+                    "label": "Create API key",
+                    "type": "sendTo",
+                    "variant": "contained",
+                    "showProcess": true,
+                    "command": "createAPIkey",
+                    "jsonData": "{ \"host\": \"${data.bridge}\", \"credentials\": \"${data.username}:${data.password}\"}",
+                    "useNative": true,
+                    "xl": 2,
+                    "lg": 4,
+                    "md": 4,
+                    "sm": 12,
+                    "xs": 12
+                }
     "_header2": {
       "newLine": true,
       "text": "Settings",
@@ -188,5 +218,147 @@
       "lg": 4,
       "xl": 4
     }
-  }
-}
+            }
+        },
+        "_manage-devices": {
+            "type": "panel",
+            "label": "Manage Devices",
+            "items": {
+                "opennetwork": {
+                    "type": "sendTo",
+                    "label": "Open Network",
+                    "variant": "outlined",
+                    "showProcess": true,
+                    "command": "sendTo1",
+                    "jsonData": "{ \"data1\": \"${data.sendTo1a}\", \"data2\": \"${data.sendTo1b}\" }",
+                    "useNative": true
+                },
+                "devices": {
+                    "newLine": true,
+                    "type": "table",
+                    "label": "Devices",
+                    "noDelete": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "items": [
+                        {
+                            "type": "text",
+                            "attr": "name",
+                            "width": "30%",
+                            "title": "Name",
+                            "filter": true,
+                            "sort": false,
+                            "default": ""
+                        },
+                        {
+                            "type": "text",
+                            "attr": "ID",
+                            "width": "15%",
+                            "title": "ID",
+                            "filter": true,
+                            "sort": true,
+                            "default": ""
+                        },
+                        {
+                            "type": "text",
+                            "attr": "Manufacturer",
+                            "width": "30%",
+                            "title": "Manufacturer",
+                            "filter": false,
+                            "sort": false,
+                            "default": ""
+                        },
+                        {
+                            "type": "number",
+                            "attr": "Model ID",
+                            "width": "10%",
+                            "title": "Model ID",
+                            "filter": false,
+                            "sort": false,
+                            "default": ""
+                        },
+                        {
+                            "type": "text",
+                            "attr": "Type",
+                            "title": "Type",
+                            "filter": false,
+                            "sort": false,
+                            "default": ""
+                        }
+                    ]
+                }
+            }
+        },
+        "_manage-groups": {
+            "type": "panel",
+            "label": "Manage Groups",
+            "items": {
+                "group_name": {
+                    "label": "Name of the new group",
+                    "type": "text",
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 3,
+                    "lg": 3
+                },
+                "create_group": {
+                    "type": "sendTo",
+                    "label": "Create Group",
+                    "variant": "outlined",
+                    "showProcess": true,
+                    "command": "sendTo1",
+                    "jsonData": "{ \"data\": \"${data.group_name}\"}",
+                    "useNative": true
+                },
+                "groups": {
+                    "newLine": true,
+                    "type": "table",
+                    "label": "Groups",
+                    "noDelete": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "items": [
+                        {
+                            "type": "text",
+                            "attr": "name",
+                            "width": "30%",
+                            "title": "Name",
+                            "filter": true,
+                            "sort": false,
+                            "default": ""
+                        },
+                        {
+                            "type": "number",
+                            "attr": "ID",
+                            "width": "15%",
+                            "title": "ID",
+                            "filter": true,
+                            "sort": true,
+                            "default": ""
+                        },
+                        {
+                            "type": "text",
+                            "attr": "Devices (ID of Device)",
+                            "width": "30%",
+                            "title": "Devices (ID of Device)",
+                            "filter": false,
+                            "sort": false,
+                            "default": ""
+                        },
+                        {
+                            "type": "text",
+                            "attr": "Lights (ID of Light)",
+                            "title": "Lights (ID of Light)",
+                            "filter": false,
+                            "sort": false,
+                            "default": ""
+                        }
+                    ]
+                }
+            }
+        }
+    }
