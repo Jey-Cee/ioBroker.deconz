@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "deconz",
-    "version": "1.6.4",
+    "version": "1.7.0",
     "news": {
+      "1.7.0": {
+        "en": "Hide virtual sensors function\nHide switch groups function\nUpdate dependencies\nUpdated/added some translations\nSome bug fixes and more",
+        "de": "Funktion virtuelle Sensoren verbergen\nSchaltgruppen einstellen Funktion\nAbhängigkeiten aktualisieren\nEinige Übersetzungen aktualisiert/gefügt\nEinige Fehlerbehebungen und mehr",
+        "ru": "Скрыть функцию виртуальных датчиков\nФункция переключателей\nЗависимости обновления\nОбновление/дополнение некоторых переводов\nНекоторые исправления ошибок и больше",
+        "pt": "Ocultar a função de sensores virtuais\nOcultar função de grupos de interruptor\nDependências de atualização\nAtualizado / adicionado algumas traduções\nAlgumas correções de bugs e muito mais",
+        "nl": "Virtuele sensoren functie verbergen\nSwitch groepen functie verbergen\nAfhankelijkheden bijwerken\nBijgewerkt/vertalingen toegevoegd\nSommige bug fixes en meer",
+        "fr": "Cacher la fonction des capteurs virtuels\nMasquer la fonction des groupes de commutation\nMise à jour des dépendances\nMise à jour/ajout de certaines traductions\nQuelques corrections de bugs et plus",
+        "it": "Nascondi la funzione dei sensori virtuali\nNascondi la funzione dei gruppi di commutazione\nDipendenze di aggiornamento\nAggiornato/aggiunto alcune traduzioni\nAlcune correzioni di bug e altro ancora",
+        "es": "Ocultar función de sensores virtuales\nFunción de grupos de interruptor\nActualizar las dependencias\nActualizado/added algunas traducciones\nAlgunas correcciones de errores y más",
+        "pl": "Ukryj funkcję wirtualnych czujników\nUkryj funkcję grup przełączników\nAktualizuj zależności\nAktualizacja / dodanie niektórych tłumaczeń\nNiektóre poprawki błędów i więcej",
+        "uk": "Приховати функцію віртуальних датчиків\nПриховати функцію комутаторів\nОновлення залежності\nОновлено / додано деякі переклади\nДеякі виправлення помилок і багато іншого",
+        "zh-cn": "隐藏虚拟传感器功能\n隐藏开关组功能\n更新依赖关系\n更新/增加一些翻译\n一些错误修正和更多"
+      },
       "1.6.4": {
         "en": "Fix websocket connection \\nEncrypt password in configuration",
         "de": "Websocket-Verbindung repariert \nPasswort in der Konfiguration verschlüsseln",
