@@ -45,13 +45,17 @@ Examples:
 ## [Sponsors](https://github.com/Jey-Cee/ioBroker.deconz/blob/master/SPONSORS.MD)
 
 ## Changelog
+<!--
+	Placeholder for the next version (at the beginning of the line):
+	### **WORK IN PROGRESS**
+-->
 
 ### 1.7.0 (2024-11-22)
-(mattreim) Hide virtual sensors function
-(mattreim) Hide switch groups function
-(mattreim) Update dependencies
-(mattreim) Updated/added some translations
-(mattreim) Some bug fixes and more
+* (mattreim) Hide virtual sensors function
+* (mattreim) Hide switch groups function
+* (mattreim) Update dependencies
+* (mattreim) Updated/added some translations
+* (mattreim) Some bug fixes and more
 
 ### 1.6.4 (2024-10-06)
 * (mattreim) Add "protectedNative" and "encryptedNative"
