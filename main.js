@@ -2264,6 +2264,7 @@ async function getDevices() {
         });
     }
 } //END Devices functions ------------------------------------------------------------------------------------------------
+}
 
 async function logging(res, message, action) {
     //if(typeof message !== 'string'){
