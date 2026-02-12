@@ -472,40 +472,37 @@ async function main() {
 
     heartbeat();
 
-  // Migrate config from Gateway_info native to adapter.config (upgrade from <= 1.4.x)
-  if (!adapter.config.bridge || !adapter.config.user) {
-    const gwInfo = await adapter.getObjectAsync("Gateway_info");
-    if (gwInfo && gwInfo.native) {
-      const update = {};
-      if (!adapter.config.bridge && gwInfo.native.ipaddress) {
-        update.bridge = gwInfo.native.ipaddress;
-      }
-      if (!adapter.config.user && gwInfo.native.user) {
-        update.user = gwInfo.native.user;
-      }
-      if (!adapter.config.port && gwInfo.native.port) {
-        update.port = gwInfo.native.port;
-      }
-      if (!adapter.config.websocketport && gwInfo.native.websocketport) {
-        update.websocketport = gwInfo.native.websocketport;
-      }
-      if (Object.keys(update).length > 0) {
-        adapter.log.info("Migrating gateway config from Gateway_info to adapter config: " + JSON.stringify(update));
-        await adapter.extendForeignObjectAsync(`system.adapter.${adapter.namespace}`, { native: update });
-        // Update in-memory config so the current startup works without restart
-        Object.assign(adapter.config, update);
-      }
+    // Migrate config from Gateway_info native to adapter.config (upgrade from <= 1.4.x)
+    if (!adapter.config.bridge || !adapter.config.user) {
+        const gwInfo = await adapter.getObjectAsync('Gateway_info');
+        if (gwInfo && gwInfo.native) {
+            const update = {};
+            if (!adapter.config.bridge && gwInfo.native.ipaddress) {
+                update.bridge = gwInfo.native.ipaddress;
+            }
+            if (!adapter.config.user && gwInfo.native.user) {
+                update.user = gwInfo.native.user;
+            }
+            if (!adapter.config.port && gwInfo.native.port) {
+                update.port = gwInfo.native.port;
+            }
+            if (!adapter.config.websocketport && gwInfo.native.websocketport) {
+                update.websocketport = gwInfo.native.websocketport;
+            }
+            if (Object.keys(update).length > 0) {
+                adapter.log.info('Migrating gateway config from Gateway_info to adapter config: ' + JSON.stringify(update));
+                await adapter.extendForeignObjectAsync(`system.adapter.${adapter.namespace}`, { native: update });
+                // Update in-memory config so the current startup works without restart
+                Object.assign(adapter.config, update);
+            }
+        }
     }
-  }
 
-  if (!adapter.config.bridge) {
-    //only on first start
-    autoDiscovery();
-  } else {
-    if (!adapter.config.user) {
-      adapter.log.warn("No API Key found");
+    if (!adapter.config.bridge) {
+        //only on first start
+        autoDiscovery();
     } else {
-        if (adapter.config.user === '' || adapter.config.user === null) {
+        if (!adapter.config.user) {
             adapter.log.warn('No API Key found');
         } else {
             await getConfig();
@@ -2264,7 +2261,6 @@ async function getDevices() {
         });
     }
 } //END Devices functions ------------------------------------------------------------------------------------------------
-}
 
 async function logging(res, message, action) {
     //if(typeof message !== 'string'){
