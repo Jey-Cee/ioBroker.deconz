@@ -1,0 +1,185 @@
+name: Monthly Release
+
+# Automatically creates a patch release on the 3rd of every month
+# if there are any commits since the last release tag.
+# Requires NPM_TOKEN secret to be set for the deploy job in test-and-release.yml.
+
+on:
+  schedule:
+    - cron: '0 2 3 * *'
+  workflow_dispatch: {}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for commits since last tag
+        id: check
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$LAST_TAG" ]; then
+            echo "No previous tag found — proceeding with first release."
+            CHANGELOG_EN="Initial release"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            COMMITS=$(git log "${LAST_TAG}..HEAD" --oneline | wc -l)
+            echo "Commits since last tag (${LAST_TAG}): ${COMMITS}"
+            if [ "${COMMITS}" -gt "0" ]; then
+              # Collect commit messages (skip merge commits and dependabot version bumps noise)
+              CHANGELOG_EN=$(git log "${LAST_TAG}..HEAD" --pretty=format:"* %s" --no-merges | \
+                grep -v "^\\* chore(release)" | head -20 || echo "* Updated dependencies")
+              if [ -z "$CHANGELOG_EN" ]; then
+                CHANGELOG_EN="* Updated dependencies"
+              fi
+              echo "has_changes=true" >> $GITHUB_OUTPUT
+            else
+              echo "No changes since last release — skipping."
+              echo "has_changes=false" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+          fi
+          # Save changelog for later steps (escape newlines)
+          echo "changelog_en<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG_EN" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Setup Node.js
+        if: steps.check.outputs.has_changes == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Configure Git
+        if: steps.check.outputs.has_changes == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Bump versions and update changelogs
+        if: steps.check.outputs.has_changes == 'true'
+        env:
+          CHANGELOG_EN: ${{ steps.check.outputs.changelog_en }}
+        run: |
+          # Bump patch version in package.json
+          NEW_VERSION=$(npm version patch --no-git-tag-version)
+          VERSION=${NEW_VERSION#v}
+          echo "New version: ${VERSION}"
+
+          # Update io-package.json
+          node -e "
+            const fs = require('fs');
+            const pkg = JSON.parse(fs.readFileSync('io-package.json', 'utf8'));
+            const version = '${VERSION}';
+            const changelogEn = process.env.CHANGELOG_EN || 'Updated dependencies';
+
+            // Update version
+            pkg.common.version = version;
+
+            // Add news entry (prepend)
+            const news = pkg.common.news || {};
+            const newNews = {};
+            newNews[version] = {
+              en: changelogEn,
+              de: 'Abhängigkeiten aktualisiert',
+              ru: 'Обновлены зависимости',
+              pt: 'Dependências atualizadas',
+              nl: 'Afhankelijkheden bijgewerkt',
+              fr: 'Dépendances mises à jour',
+              it: 'Dipendenze aggiornate',
+              es: 'Dependencias actualizadas',
+              pl: 'Zaktualizowano zależności',
+              uk: 'Оновлено залежності',
+              'zh-cn': '更新依赖'
+            };
+            // Merge: new entry first, keep existing (limit to last 10 to avoid bloat)
+            const existingEntries = Object.entries(news).slice(0, 9);
+            for (const [k, v] of existingEntries) {
+              newNews[k] = v;
+            }
+            pkg.common.news = newNews;
+
+            fs.writeFileSync('io-package.json', JSON.stringify(pkg, null, 2) + '\n');
+            console.log('io-package.json updated');
+          "
+
+          # Update README.md changelog
+          DATE=$(date +%Y-%m-%d)
+          CHANGELOG_ENTRY="### ${VERSION} (${DATE})"$'\n'"${CHANGELOG_EN}"$'\n'
+
+          # Insert after the "## Changelog" line (before first existing version entry)
+          # Handle both "### **WORK IN PROGRESS**" placeholder and direct entries
+          if grep -q "WORK IN PROGRESS" README.md; then
+            # Insert after the WORK IN PROGRESS block (before the next ### x.y.z line)
+            python3 - <<'PYEOF'
+          import re, os
+
+          with open('README.md', 'r') as f:
+              content = f.read()
+
+          version = os.environ['VERSION']
+          date = os.environ['DATE']
+          changelog_en = os.environ['CHANGELOG_EN']
+
+          entry = f"### {version} ({date})\n{changelog_en}\n\n"
+
+          # Insert after WORK IN PROGRESS block, before next semver heading
+          pattern = r'(### \*\*WORK IN PROGRESS\*\*.*?\n(?:.*\n)*?)(### \d+\.\d+\.\d+)'
+          replacement = r'\1' + entry + r'\3'
+          new_content = re.sub(pattern, lambda m: m.group(1) + entry + m.group(2), content, count=1)
+
+          if new_content == content:
+              # Fallback: insert after ## Changelog line
+              new_content = content.replace('## Changelog\n', f'## Changelog\n\n{entry}', 1)
+
+          with open('README.md', 'w') as f:
+              f.write(new_content)
+          print('README.md updated')
+          PYEOF
+          else
+            python3 - <<'PYEOF'
+          import re, os
+
+          with open('README.md', 'r') as f:
+              content = f.read()
+
+          version = os.environ['VERSION']
+          date = os.environ['DATE']
+          changelog_en = os.environ['CHANGELOG_EN']
+
+          entry = f"### {version} ({date})\n{changelog_en}\n\n"
+
+          # Insert after ## Changelog heading
+          new_content = re.sub(
+              r'(## Changelog\n+)',
+              r'\1' + entry,
+              content,
+              count=1
+          )
+
+          if new_content == content:
+              new_content = content.replace('## Changelog\n', f'## Changelog\n\n{entry}', 1)
+
+          with open('README.md', 'w') as f:
+              f.write(new_content)
+          print('README.md updated')
+          PYEOF
+          fi
+
+          # Update package-lock.json if present
+          if [ -f package-lock.json ]; then
+            npm install --package-lock-only --ignore-scripts
+          fi
+
+          # Commit and tag
+          git add package.json io-package.json README.md
+          [ -f package-lock.json ] && git add package-lock.json
+          git commit -m "chore: release v${VERSION} [skip ci]"
+          git tag "v${VERSION}"
+          git push origin HEAD --tags
