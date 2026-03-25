@@ -1,0 +1,64 @@
+name: Monthly Release
+
+# Automatically creates a patch release on the 3rd of every month
+# if there are any commits since the last release tag.
+# Requires NPM_TOKEN secret to be set for the deploy job in test-and-release.yml.
+
+on:
+  schedule:
+    - cron: '0 2 3 * *'
+  workflow_dispatch: {}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for commits since last tag
+        id: check
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$LAST_TAG" ]; then
+            echo "No previous tag found — proceeding with first release."
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            COMMITS=$(git log "${LAST_TAG}..HEAD" --oneline | wc -l)
+            echo "Commits since last tag (${LAST_TAG}): ${COMMITS}"
+            if [ "${COMMITS}" -gt "0" ]; then
+              echo "has_changes=true" >> $GITHUB_OUTPUT
+            else
+              echo "No changes since last release — skipping."
+              echo "has_changes=false" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+      - name: Setup Node.js
+        if: steps.check.outputs.has_changes == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Configure Git
+        if: steps.check.outputs.has_changes == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Bump patch version and push tag
+        if: steps.check.outputs.has_changes == 'true'
+        run: |
+          NEW_VERSION=$(npm version patch --no-git-tag-version)
+          git add package.json
+          if [ -f package-lock.json ]; then
+            npm install --package-lock-only --ignore-scripts
+            git add package-lock.json
+          fi
+          git commit -m "chore: release ${NEW_VERSION}"
+          git tag "${NEW_VERSION}"
+          git push origin HEAD --tags
