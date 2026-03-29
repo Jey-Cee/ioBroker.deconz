@@ -47,8 +47,7 @@ Examples:
 ## [Sponsors](https://github.com/Jey-Cee/ioBroker.deconz/blob/master/SPONSORS.MD)
 
 ## Changelog
-
-### **WORK IN PROGRESS**
+### 1.7.4 (2026-03-29)
 - update dependencies
 
 ### 1.7.3 (2026-03-29)

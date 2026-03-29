@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "deconz",
-    "version": "1.7.3",
+    "version": "1.7.4",
     "news": {
+      "1.7.4": {
+        "en": "update dependencies",
+        "de": "aktualisierung der abhängigkeiten",
+        "ru": "обновление зависимостей",
+        "pt": "atualizar dependências",
+        "nl": "afhankelijkheden bijwerken",
+        "fr": "mettre à jour les dépendances",
+        "it": "aggiornamento dipendenze",
+        "es": "dependencias de actualización",
+        "pl": "aktualizacji zależności",
+        "uk": "оновлення залежності",
+        "zh-cn": "更新依赖关系"
+      },
       "1.7.3": {
         "en": "Adapter requires node.js >= 20 now.\nupdate dependencies\nfix: errors found by ioBroker repo checker",
         "de": "Adapter benötigt jetzt node.js >= 20.\naktualisierung der abhängigkeiten\nfix: Fehler gefunden von ioBroker repo checker",
