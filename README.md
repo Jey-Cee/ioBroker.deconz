@@ -51,6 +51,9 @@ Examples:
 ### **WORK IN PROGRESS**
 - (iobroker-bot) Adapter requires node.js >= 20 now.
 
+### 1.7.2 (2026-03-29)
+* fix: remove [skip ci] from release commit so test-and-release triggers on tag
+
 ### 1.7.1 (2026-03-29)
 * chore: update GitHub Actions to v6 (Node.js 24 compatibility)
 * fix: export VERSION and DATE env vars for Python subprocess in release workflow
