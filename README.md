@@ -48,7 +48,7 @@ Examples:
 
 ## Changelog
 
-### *** WORK IN PROGRESS ***
+### **WORK IN PROGRESS**
 - update dependencies
 
 ### 1.7.3 (2026-03-29)
