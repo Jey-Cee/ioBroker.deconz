@@ -70,8 +70,6 @@ jobs:
           # Bump patch version in package.json
           NEW_VERSION=$(npm version patch --no-git-tag-version)
           VERSION=${NEW_VERSION#v}
-          export VERSION
-          export DATE=$(date +%Y-%m-%d)
           echo "New version: ${VERSION}"
 
           # Update io-package.json
@@ -112,6 +110,7 @@ jobs:
           "
 
           # Update README.md changelog
+          DATE=$(date +%Y-%m-%d)
           CHANGELOG_ENTRY="### ${VERSION} (${DATE})"$'\n'"${CHANGELOG_EN}"$'\n'
 
           # Insert after the "## Changelog" line (before first existing version entry)

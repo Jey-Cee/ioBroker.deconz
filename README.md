@@ -48,6 +48,9 @@ Examples:
 
 ## Changelog
 
+### **WORK IN PROGRESS**
+- (iobroker-bot) Adapter requires node.js >= 20 now.
+
 ### 1.7.0 (2024-11-22)
 * (mattreim) Hide virtual sensors function
 * (mattreim) Hide switch groups function
