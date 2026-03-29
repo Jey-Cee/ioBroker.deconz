@@ -181,6 +181,6 @@ jobs:
           # Commit and tag
           git add package.json io-package.json README.md
           [ -f package-lock.json ] && git add package-lock.json
-          git commit -m "chore: release v${VERSION} [skip ci]"
+          git commit -m "chore: release v${VERSION}"
           git tag "v${VERSION}"
           git push origin HEAD --tags
