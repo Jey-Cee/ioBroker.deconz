@@ -2417,7 +2417,15 @@ function ackStateVal(stateId, response) {
  */
 function UTCtoLocal(timeString) {
     if (timeString !== 'none' && timeString !== null && timeString !== undefined) {
-        let jsT = Date.parse(`${timeString}Z`);
+        const raw = String(timeString).trim();
+        const hasTz = /(?:Z|[+-]\d{2}:\d{2})$/.test(raw);
+        const normalized = hasTz ? raw : `${raw}Z`;
+        let jsT = Date.parse(normalized);
+
+        if (!Number.isFinite(jsT)) {
+            adapter.log.warn(`UTCtoLocal: invalid timestamp value "${raw}", returning as-is`);
+            return raw;
+        }
 
         let d = new Date();
         let n = d.getTimezoneOffset();
