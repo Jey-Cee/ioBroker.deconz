@@ -29,7 +29,7 @@
     "node": ">= 20"
   },
   "dependencies": {
-    "@iobroker/adapter-core": "^3.2.2",
+    "@iobroker/adapter-core": "^3.3.2",
     "request": "^2.88.2",
     "ws": "^8.20.0"
   },
@@ -40,7 +40,7 @@
     "@alcalzone/release-script-plugin-manual-review": "^5.1.1",
     "@iobroker/adapter-dev": "^1.5.0",
     "@iobroker/eslint-config": "^2.2.0",
-    "@iobroker/testing": "^5.0.0",
+    "@iobroker/testing": "^5.2.2",
     "@types/chai": "^5.0.0",
     "@types/chai-as-promised": "^8.0.1",
     "@types/mocha": "^10.0.9",
