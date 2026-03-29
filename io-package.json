@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "deconz",
-    "version": "1.7.2",
+    "version": "1.7.3",
     "news": {
+      "1.7.3": {
+        "en": "Adapter requires node.js >= 20 now.\nupdate dependencies\nfix: errors found by ioBroker repo checker",
+        "de": "Adapter benötigt jetzt node.js >= 20.\naktualisierung der abhängigkeiten\nfix: Fehler gefunden von ioBroker repo checker",
+        "ru": "Адаптер требует node.js >= 20 сейчас.\nобновление зависимостей\nисправление: ошибки, обнаруженные ioBroker repo checker",
+        "pt": "O adaptador requer gnod.js >= 20 agora.\natualizar dependências\ncorreção: erros encontrados por ioBroker repo checker",
+        "nl": "Voor de adapter zijn node.js > 20 nu nodig.\nafhankelijkheden bijwerken\nfix: fouten gevonden door ioBroker repo-checker",
+        "fr": "Adapter nécessite node.js >= 20 maintenant.\nmettre à jour les dépendances\ncorrection : erreurs trouvées par ioBroker repo checker",
+        "it": "Adattatore richiede node.js >= 20 ora.\naggiornamento dipendenze\ncorrezione: errori trovati da ioBroker repo checker",
+        "es": "Adaptador requiere node.js >= 20 ahora.\ndependencias de actualización\nsolución: errores encontrados por ioBroker repo checker",
+        "pl": "Adapter wymaga node.js > = 20 teraz.\naktualizacji zależności\nfix: błędy znaleziono przez joBroker repo checker",
+        "uk": "Адаптер вимагає node.js >= 20 тепер.\nоновлення залежності\nвиправити: помилки, виявлені ioBroker repo checker",
+        "zh-cn": "适配器需要节点.js >= 20 现在.\n更新依赖关系\n修补: ioBroker repo 检查器发现的错误"
+      },
       "1.7.2": {
         "en": "* fix: remove [skip ci] from release commit so test-and-release triggers on tag",
         "de": "Abhängigkeiten aktualisiert",

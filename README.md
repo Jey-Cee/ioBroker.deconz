@@ -47,8 +47,7 @@ Examples:
 ## [Sponsors](https://github.com/Jey-Cee/ioBroker.deconz/blob/master/SPONSORS.MD)
 
 ## Changelog
-
-### **WORK IN PROGRESS**
+### 1.7.3 (2026-03-29)
 - (iobroker-bot) Adapter requires node.js >= 20 now.
 - update dependencies
 - fix: errors found by ioBroker repo checker
