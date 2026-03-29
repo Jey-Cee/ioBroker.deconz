@@ -129,7 +129,12 @@
     "plugins": {},
     "dependencies": [
       {
-        "js-controller": ">=5.0.19"
+        "js-controller": ">=6.0.11"
+      }
+    ],
+    "globalDependencies": [
+      {
+        "admin": ">=7.6.20"
       }
     ],
     "readme": "https://github.com/Jey-Cee/ioBroker.deconz/blob/master/README.md",

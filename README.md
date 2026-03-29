@@ -50,6 +50,8 @@ Examples:
 
 ### **WORK IN PROGRESS**
 - (iobroker-bot) Adapter requires node.js >= 20 now.
+- update dependencies
+- fix: errors found by ioBroker repo checker
 
 ### 1.7.2 (2026-03-29)
 * fix: remove [skip ci] from release commit so test-and-release triggers on tag
