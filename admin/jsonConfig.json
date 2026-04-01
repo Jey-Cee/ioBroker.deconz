@@ -187,6 +187,25 @@
       "md": 6,
       "lg": 4,
       "xl": 4
+    },
+    "swversion": {
+      "newLine": true,
+      "type": "staticText",
+      "text": "deConz Version: ${data.swversion}",
+      "xs": 12,
+      "sm": 12,
+      "md": 6,
+      "lg": 4,
+      "xl": 4
+    },
+    "apiversion": {
+      "type": "staticText",
+      "text": "deConz REST-API Version: ${data.apiversion}",
+      "xs": 12,
+      "sm": 12,
+      "md": 6,
+      "lg": 4,
+      "xl": 4
     }
   }
 }

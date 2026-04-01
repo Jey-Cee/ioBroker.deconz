@@ -172,7 +172,9 @@
     "username": "",
     "password": "",
     "switchGroups": false,
-    "virtualSensors": false
+    "virtualSensors": false,
+    "swversion": "",
+    "apiversion": ""
   },
   "instanceObjects": [
     {
