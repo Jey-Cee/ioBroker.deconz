@@ -43,7 +43,7 @@ Examples:
 ## [Sponsors](https://github.com/Jey-Cee/ioBroker.deconz/blob/master/SPONSORS.MD)
 
 ## Changelog
-### **WORK IN PROGRESS**
+### 1.7.5 (2026-04-02)
 * migrate from request to fetch
 
 ### 1.7.4 (2026-03-29)
