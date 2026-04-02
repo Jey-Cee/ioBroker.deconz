@@ -41,7 +41,7 @@
     "@iobroker/eslint-config": "^2.2.0",
     "@iobroker/testing": "^5.2.2",
     "@types/node": "^20",
-    "typescript": "~5.9.2"
+    "typescript": "~6.0.2"
   },
   "main": "main.js",
   "files": [
