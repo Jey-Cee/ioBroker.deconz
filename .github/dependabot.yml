@@ -11,7 +11,7 @@ updates:
       interval: 'monthly'
       time: '00:05'
       timezone: 'Europe/Berlin'
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 15
     assignees:
       - 'jey-cee'
     versioning-strategy: 'increase'
@@ -24,6 +24,6 @@ updates:
       interval: 'monthly'
       time: '00:05'
       timezone: 'Europe/Berlin'
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 15
     assignees:
       - 'jey-cee'
