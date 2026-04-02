@@ -11,10 +11,6 @@ ioBroker deCONZ dresden-elektronik Adapter
 ## Notice
 No Support for Beta Versions of deCONZ
 
-Required js-controller version >5.x.x, Required node.js >= 18.x.x
-
-## English
-
 Connects to deCONZ REST-API software developed by dresden-elektronik. This software aims to be a universal ZigBee Gateway solution, using hardware from dresden-elektronik the ConBee(X) USB stick and RaspBee(X) a modul for the Raspberry Pi.
 
 
