@@ -3,19 +3,6 @@
     "name": "deconz",
     "version": "1.7.5",
     "news": {
-      "1.7.5": {
-        "en": "migrate from request to fetch",
-        "de": "migrieren sie von der anfrage nach dem fetch",
-        "ru": "миграция с запроса на получение",
-        "pt": "migrar da solicitação para obter",
-        "nl": "migreren van verzoek om op te halen",
-        "fr": "migrer de la requête pour récupérer",
-        "it": "migrare da richiesta a fetch",
-        "es": "migrar de petición para buscar",
-        "pl": "migrate z prośby o pobranie",
-        "uk": "migrate від запиту до fetch",
-        "zh-cn": "从请求移到获取"
-      },
       "1.7.4": {
         "en": "update dependencies",
         "de": "aktualisierung der abhängigkeiten",
