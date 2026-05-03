@@ -43,6 +43,12 @@ Examples:
 ## [Sponsors](https://github.com/Jey-Cee/ioBroker.deconz/blob/master/SPONSORS.MD)
 
 ## Changelog
+### 1.7.7 (2026-05-03)
+* chore(deps-dev): bump protobufjs from 7.5.4 to 7.5.5
+* chore(deps-dev): bump follow-redirects from 1.15.11 to 1.16.0
+* chore(deps-dev): bump axios from 1.14.0 to 1.15.0
+* Update from template: X0000-updateNodeJsAtTestAndRelease
+
 ### 1.7.6 (2026-04-02)f
 * migrate from request to fetch
 
