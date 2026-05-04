@@ -372,6 +372,8 @@ Examples:
 
 * (Jey-Cee) first release
 
+[Older changelogs can be found there](CHANGELOG_OLD.md)
+
 ## License
 Apache-2.0
 
