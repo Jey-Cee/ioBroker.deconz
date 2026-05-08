@@ -43,6 +43,8 @@ Examples:
 ## [Sponsors](https://github.com/Jey-Cee/ioBroker.deconz/blob/master/SPONSORS.MD)
 
 ## Changelog
+### **WORK IN PROGRESS**
+- (copilot) Adapter requires node.js >= 22 now
 ### 1.7.7 (2026-05-03)
 * chore(deps-dev): bump protobufjs from 7.5.4 to 7.5.5
 * chore(deps-dev): bump follow-redirects from 1.15.11 to 1.16.0
