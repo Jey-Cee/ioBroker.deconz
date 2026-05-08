@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "deconz",
-    "version": "1.7.6",
+    "version": "1.7.7",
     "news": {
+      "1.7.7": {
+        "en": "* chore(deps-dev): bump protobufjs from 7.5.4 to 7.5.5\n* chore(deps-dev): bump follow-redirects from 1.15.11 to 1.16.0\n* chore(deps-dev): bump axios from 1.14.0 to 1.15.0\n* Update from template: X0000-updateNodeJsAtTestAndRelease",
+        "de": "Abhängigkeiten aktualisiert",
+        "ru": "Обновлены зависимости",
+        "pt": "Dependências atualizadas",
+        "nl": "Afhankelijkheden bijgewerkt",
+        "fr": "Dépendances mises à jour",
+        "it": "Dipendenze aggiornate",
+        "es": "Dependencias actualizadas",
+        "pl": "Zaktualizowano zależności",
+        "uk": "Оновлено залежності",
+        "zh-cn": "更新依赖"
+      },
       "1.7.6": {
         "en": "migrate from request to fetch",
         "de": "migrieren sie von der anfrage nach dem fetch",
