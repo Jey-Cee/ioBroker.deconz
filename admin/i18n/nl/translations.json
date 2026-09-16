@@ -1,6 +1,6 @@
 {
     "'Please wait, searching for deConz...'": "Even geduld, ik zoek de deConz...",
-    "API key": "API key",
+    "API key": "API sleutel",
     "Auto setup": "Auto setup",
     "Bridge port": "Bridge port",
     "Websocket port": "Websocket port",
@@ -8,7 +8,7 @@
     "Create Group": "Maak een groep",
     "Delete API key": "Verwijder API key",
     "Devices (ID of Device)": "Apparaten (ID van apparaat)",
-    "Duration": "Looptijd",
+    "Duration": "Duur",
     "Enable adapter first": "Activeer de adapter eerst",
     "Instruction": "Ga naar Phoscon APP -> Gateway -> Geavanceerd en klik op \"App verbinden\". Tijdlimiet 60 seconden.",
     "Lights (ID of Light)": "Lichten (ID van licht)",

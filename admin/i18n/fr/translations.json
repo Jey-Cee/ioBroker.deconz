@@ -1,6 +1,6 @@
 {
     "'Please wait, searching for deConz...'": "Please wait, searching for deConz...",
-    "API key": "API key",
+    "API key": "Clé API",
     "Auto setup": "Auto setup",
     "Bridge port": "Bridge port",
     "Websocket port": "Websocket port",
@@ -18,7 +18,7 @@
     "Manage deConz": "Gérer deConz",
     "Manufacturer": "Fabricant",
     "Model ID": "ID du modèle",
-    "Name": "prénom",
+    "Name": "Nom",
     "Name of the new group": "Nom du nouveau groupe",
     "OR": "ou",
     "Ok": "Ok",
