@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "deconz",
-    "version": "1.7.11",
+    "version": "1.7.12",
     "news": {
+      "1.7.12": {
+        "en": "* chore(deps-dev): bump @grpc/grpc-js from 1.14.3 to 1.14.5\n* chore(deps-dev): bump axios from 1.18.1 to 1.20.0\n* chore(deps-dev): bump @types/node from 25.9.5 to 25.9.8\n* chore(deps-dev): bump js-yaml from 4.3.1 to 4.3.2\n* chore(deps-dev): bump browserslist from 4.28.2 to 4.28.8\n* chore(deps-dev): bump @humanfs/node from 0.16.7 to 0.16.8",
+        "de": "Abhängigkeiten aktualisiert",
+        "ru": "Обновлены зависимости",
+        "pt": "Dependências atualizadas",
+        "nl": "Afhankelijkheden bijgewerkt",
+        "fr": "Dépendances mises à jour",
+        "it": "Dipendenze aggiornate",
+        "es": "Dependencias actualizadas",
+        "pl": "Zaktualizowano zależności",
+        "uk": "Оновлено залежності",
+        "zh-cn": "更新依赖"
+      },
       "1.7.11": {
         "en": "* chore(deps-dev): bump @alcalzone/release-script-plugin-license\n* chore(deps-dev): bump js-yaml from 4.3.0 to 4.3.1",
         "de": "Abhängigkeiten aktualisiert",
@@ -119,19 +132,6 @@
         "pl": "Zaktualizowano zależności",
         "uk": "Оновлено залежності",
         "zh-cn": "更新依赖"
-      },
-      "1.6.4": {
-        "en": "Fix websocket connection \\nEncrypt password in configuration",
-        "de": "Websocket-Verbindung repariert \nPasswort in der Konfiguration verschlüsseln",
-        "ru": "Fix websocket соединение \\nEncrypt пароль в конфигурации",
-        "pt": "Corrigir conexão websocket \\nEncrypt senha na configuração",
-        "nl": "Fix websocket verbinding \\nVersleutel wachtwoord in configuratie",
-        "fr": "Correction de la connexion websocket \\nEncrypter le mot de passe dans la configuration",
-        "it": "Fissare la connessione websocket \\nEncrypt password in configurazione",
-        "es": "Fijar la conexión websocket \\nEncrypt password en configuración",
-        "pl": "Napraw połączenie websocket\\ nEncrypt hasło w konfiguracji",
-        "uk": "Виправлено підключення websocket \\nЗашифрувати пароль в конфігурації",
-        "zh-cn": "修复 Websocket 连接\\ n 在配置中输入密码"
       }
     },
     "titleLang": {
