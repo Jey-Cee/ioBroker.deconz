@@ -1,6 +1,6 @@
 {
     "'Please wait, searching for deConz...'": "Please wait, searching for deConz...",
-    "API key": "API key",
+    "API key": "Chiave API",
     "Auto setup": "Auto setup",
     "Bridge port": "Bridge port",
     "Websocket port": "Websocket port",
@@ -24,7 +24,7 @@
     "Ok": "Ok",
     "Open Network": "Apri la rete",
     "Settings": "Settings",
-    "Type": "genere",
+    "Type": "Tipo",
     "deConz Address": "deConz Address",
     "deConz REST-API Version": "Versione dell'REST-API deConz",
     "deConz Version": "versione deConz",
